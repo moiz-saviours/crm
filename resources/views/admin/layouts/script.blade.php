@@ -100,25 +100,6 @@
 <script async defer src="{{asset('assets/js/buttons.js')}}"></script>
 <script src="{{asset('assets/js/dashboard.min.js')}}?v=2.1.0"></script>
 
-<!-- dropdown -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
-<!-- create popup modal -->
-<script>
-    const modal = document.getElementById("myModal");
-
-    function openModal() {
-        modal.style.display = "block";
-    }
-
-    function closeModal() {
-        modal.style.display = "none";
-    }
-    window.onclick = e => {
-        if (e.target === modal) closeModal();
-    }
-</script>
 
 <!-- Toaster -->
 <script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>

@@ -128,33 +128,6 @@
   --bs-form-invalid-border-color: #fd5c70;
 }
 
-.card-header.pb-0 {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.card-header h3 {
-  font-size: 17px;
-  -webkit-box-shadow: 0 0 18px 0 rgb(0 0 0 / 15%);
-  -moz-box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.15);
-  box-shadow: 0 0 18px 0 rgb(0 0 0 / 15%);
-  background: #fff;
-  padding: 10px 15px;
-  font-weight: 700;
-  border-radius: 10px;
-  width: 24%;
-}
-.my_table thead tr th {
-  border: 1px solid #e9ecef;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.my_table tbody tr td {
-  border: 1px solid #e9ecef;
-  font-size: 13px;
- }
-
 [data-bs-theme=dark] {
   color-scheme: dark;
   --bs-body-color: #dee2e6;
@@ -11802,7 +11775,7 @@ fieldset:disabled .btn {
 }
 
 .min-height-100 {
-  min-height: 85px !important;
+  min-height: 100px !important;
 }
 
 .min-height-150 {
@@ -21584,10 +21557,9 @@ fieldset:disabled .btn {
 }
 
 .avatar-sm {
-  width: 100% !important;
-  height: 30px !important;
+  width: 36px !important;
+  height: 36px !important;
   font-size: 0.875rem;
-  object-fit: scale-down;
 }
 
 .avatar-sm.avatar-raised {
@@ -23152,7 +23124,7 @@ label,
 }
 
 .icon-shape i {
-  /* color: #fff; */
+  color: #fff;
   opacity: 0.8;
   top: 14px;
   position: relative;
@@ -28283,93 +28255,3 @@ pre[class*=language-] {
 }
 
 /*# sourceMappingURL=dashboard-free.css.map */
-
-.drop_menu li a {
-  color: white;
-  font-size: 12px;
-  padding: 10px 45px;
-}
-
-.drop_menu {
-  background: #344767;
-  border-radius: 0px;
-  margin: 0 auto;
-  margin-top: 0px !important;
-}
-
-.drop_menu li a i {
-  padding-right: 10px;
-}
-
-.card-header a i {
-  font-family: sans-serif;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-  background: #fff;
-  margin: 5% auto;
-  padding: 20px;
-  width: 80%;
-  max-width: 800px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  color: #aaa;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover {
-  color: #000;
-}
-.create_modal_area .form-check-input {
-    width: 20px;
-    height: 19px;
-}
-.create_modal_area input {
-  width: 100%;
-  border: 1px solid #c7c7c7;
-  height: 35px;
-  font-size: 14px;
-  color: #403f3f;
-  font-weight: 500;
-  margin-top: -4px;
-}
-.create_modal_area label {
-  font-size: 12px;
-  font-weight: 700;
-  padding-left: 0;
-  font-family: sans-serif;
-}
-.create_modal_area .col {
-  margin-bottom: 20px;
-}
-.create_modal_btns{
-  float: right;
-}
-.create_modal_area h4 {
-  font-size: 17px;
-  font-weight: 800;
-  -webkit-box-shadow: 0 0 18px 0 rgb(0 0 0 / 15%);
-  -moz-box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.15);
-  box-shadow: 0 0 18px 0 rgb(0 0 0 / 15%);
-  background: #fff;
-  width: max-content;
-  padding: 6px 20px;
-  border-radius: 8px;
-  margin-left: 25px;
-}
