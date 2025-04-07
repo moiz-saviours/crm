@@ -162,3 +162,4 @@ Route::fallback(function () {
 });
 Route::get('invoice', [CheckoutController::class,'index'])->name('invoice');
 Route::get('checkout', [CheckoutController::class,'index'])->name('checkout');
+
