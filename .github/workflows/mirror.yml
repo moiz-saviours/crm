@@ -1,4 +1,4 @@
-name: Mirror (Exclude Self)
+name: Mirror
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target_repo: ['trefid-crm']
+        target_repo: ['Trefid-Crm']
     concurrency:
       group: mirror-${{ github.ref }}-${{ matrix.target_repo }}
       cancel-in-progress: true
@@ -21,42 +21,50 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          persist-credentials: false
 
       - name: Determine target branch
         id: target-branch
         run: |
           BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Current branch: $BRANCH_NAME"
           echo "target_branch=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Configure Git
         run: |
-          git config --global user.name "moiz-saviours"
-          git config --global user.email "moiz@saviours.com"
-          echo "https://x-access-token:${{ secrets.MIRRORING_ACCESS_TOKEN }}@github.com" > ${HOME}/.git-credentials
-          chmod 600 ${HOME}/.git-credentials
-          git config --global credential.helper 'store --file=${HOME}/.git-credentials'
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
-      - name: Add target remote
+      - name: Add target repository
         run: |
-          git remote remove ${{ matrix.target_repo }} || true
-          git remote add ${{ matrix.target_repo }} https://github.com/moiz-saviours/${{ matrix.target_repo }}.git
+          git remote add ${{ matrix.target_repo }} https://${{ secrets.MIRRORING_ACCESS_TOKEN }}@github.com/moiz-saviours/${{ matrix.target_repo }}.git
 
-      - name: Prepare clean mirror
+      - name: Verify repository access
         run: |
-          # Remove the workflow file from staging
-          git rm --cached .github/workflows/mirror.yml
+          curl -s -H "Authorization: token ${{ secrets.MIRRORING_ACCESS_TOKEN }}" \
+          https://api.github.com/repos/moiz-saviours/${{ matrix.target_repo }} \
+          | jq -r '.name'
 
-          # Commit the removal (but keep file locally)
-          git commit -m "Remove mirror workflow from target" || echo "No workflow file to remove"
-
-      - name: Mirror content
+      - name: Fetch from target repository
         run: |
-          # Force push excluding the workflow file
-          git push --force ${{ matrix.target_repo }} HEAD:refs/heads/${{ steps.target-branch.outputs.target_branch }}
+          git fetch ${{ matrix.target_repo }} ${{ steps.target-branch.outputs.target_branch }} || echo "Branch might not exist yet"
 
-      - name: Restore local workflow
+      - name: Create branch if not exists
         run: |
-          # Undo the removal commit while keeping the file
-          git reset --soft HEAD~1
-          git restore --staged .github/workflows/mirror.yml || true
+          if ! git ls-remote --exit-code --heads ${{ matrix.target_repo }} ${{ steps.target-branch.outputs.target_branch }}; then
+            git push ${{ matrix.target_repo }} HEAD:refs/heads/${{ steps.target-branch.outputs.target_branch }}
+            exit 0
+          fi
+
+      - name: Merge changes from target
+        run: |
+          if git show-ref --verify --quiet refs/remotes/${{ matrix.target_repo }}/${{ steps.target-branch.outputs.target_branch }}; then
+            git merge --allow-unrelated-histories ${{ matrix.target_repo }}/${{ steps.target-branch.outputs.target_branch }} -m "Merge from target"
+          fi
+
+      - name: Push to target repository
+        run: |
+          git push ${{ matrix.target_repo }} HEAD:${{ steps.target-branch.outputs.target_branch }} || {
+            echo "::error::Push to ${{ matrix.target_repo }} failed"
+            exit 1
+          }
+
