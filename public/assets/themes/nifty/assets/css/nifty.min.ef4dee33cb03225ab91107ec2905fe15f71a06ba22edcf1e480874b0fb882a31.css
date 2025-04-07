@@ -2267,7 +2267,7 @@ body[style*=padding-right] .tm--expanded-hd .content__header + .content__boxed, 
     --nf-hv-outline-width: 0.125rem;
     --nf-hv-outline-offset: 0.3125rem;
     --nf-hv-outline-color: rgba(var(--bs-link-hover-color-rgb), 0);
-    --nf-hv-outline-color-active: rgba(var(--bs-link-hover-color-rgb), 1)
+    --nf-hv-outline-color-active: rgba(var(--bs-secondary), 1)
 }
 
 .hv-outline, .hv-outline-parent .hv-oc {

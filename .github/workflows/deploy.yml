@@ -51,7 +51,6 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_TREFID_SERVER_DIR }}
 
-
       - name: Deploy to Development
         if: env.environment == 'development'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

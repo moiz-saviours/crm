@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Invoice</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{{asset('assets/favicon/apple-touch-icon.png')}}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{asset('assets/favicon//favicon-32x32.png')}}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{asset('assets/favicon//favicon-16x16.png')}}">
+    <link rel="manifest" href="{{asset('assets/favicon//site.webmanifest')}}">
+
     <link rel="stylesheet" href="{{asset('assets/css/checkout.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
           integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
@@ -59,8 +64,8 @@ $tax_amount = number_format($invoiceData['tax_amount'] ?? 0, 2);
 $total_amount = number_format($invoiceData['total_amount'] ?? 0, 2);
 $description = htmlspecialchars($invoiceData['description'] ?? 'N/A', ENT_QUOTES, 'UTF-8');
 $status = $invoiceData['status'] ?? 0;
-$dueDate = new DateTime($invoiceData['due_date'] ?? 'now');
-$currentDate = new DateTime();
+$dueDate = (new DateTime($invoiceData['due_date'] ?? 'now'))->format('Y-m-d');
+$currentDate = (new DateTime())->format('Y-m-d');
 $brandData = $invoiceData['brand'] ?? [];
 $countries = ['US' => 'United States', 'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AS' => 'American Samoa', 'AD' => 'Andorra', 'AO' => 'Angola', 'AI' => 'Anguilla', 'AG' => 'Antigua and Barbuda', 'AR' => 'Argentina', 'AM' => 'Armenia', 'AW' => 'Aruba', 'AU' => 'Australia', 'AT' => 'Austria', 'AZ' => 'Azerbaijan', 'BS' => 'Bahamas', 'BH' => 'Bahrain', 'BD' => 'Bangladesh', 'BB' => 'Barbados', 'BY' => 'Belarus', 'BE' => 'Belgium', 'BZ' => 'Belize', 'BJ' => 'Benin', 'BM' => 'Bermuda', 'BT' => 'Bhutan', 'BO' => 'Bolivia', 'BA' => 'Bosnia and Herzegovina', 'BW' => 'Botswana', 'BR' => 'Brazil', 'BN' => 'Brunei', 'BG' => 'Bulgaria', 'BF' => 'Burkina Faso', 'BI' => 'Burundi', 'CV' => 'Cabo Verde', 'KH' => 'Cambodia', 'CM' => 'Cameroon', 'CA' => 'Canada', 'KY' => 'Cayman Islands', 'CF' => 'Central African Republic', 'TD' => 'Chad', 'CL' => 'Chile', 'CN' => 'China', 'CO' => 'Colombia', 'KM' => 'Comoros', 'CG' => 'Congo', 'CD' => 'Congo (Democratic Republic)', 'CR' => 'Costa Rica', 'HR' => 'Croatia', 'CU' => 'Cuba', 'CY' => 'Cyprus', 'CZ' => 'Czech Republic', 'DK' => 'Denmark', 'DJ' => 'Djibouti', 'DM' => 'Dominica', 'DO' => 'Dominican Republic', 'EC' => 'Ecuador', 'EG' => 'Egypt', 'SV' => 'El Salvador', 'GQ' => 'Equatorial Guinea', 'ER' => 'Eritrea', 'EE' => 'Estonia', 'SZ' => 'Eswatini', 'ET' => 'Ethiopia', 'FJ' => 'Fiji', 'FI' => 'Finland', 'FR' => 'France', 'GA' => 'Gabon', 'GM' => 'Gambia', 'GE' => 'Georgia', 'DE' => 'Germany', 'GH' => 'Ghana', 'GR' => 'Greece', 'GD' => 'Grenada', 'GU' => 'Guam', 'GT' => 'Guatemala', 'GN' => 'Guinea', 'GW' => 'Guinea-Bissau', 'GY' => 'Guyana', 'HT' => 'Haiti', 'HN' => 'Honduras', 'HU' => 'Hungary', 'IS' => 'Iceland', 'IN' => 'India', 'ID' => 'Indonesia', 'IR' => 'Iran', 'IQ' => 'Iraq', 'IE' => 'Ireland', 'IL' => 'Israel', 'IT' => 'Italy', 'JM' => 'Jamaica', 'JP' => 'Japan', 'JO' => 'Jordan', 'KZ' => 'Kazakhstan', 'KE' => 'Kenya', 'KI' => 'Kiribati', 'KP' => 'North Korea', 'KR' => 'South Korea', 'KW' => 'Kuwait', 'KG' => 'Kyrgyzstan', 'LA' => 'Laos', 'LV' => 'Latvia', 'LB' => 'Lebanon', 'LS' => 'Lesotho', 'LR' => 'Liberia', 'LY' => 'Libya', 'LI' => 'Liechtenstein', 'LT' => 'Lithuania', 'LU' => 'Luxembourg', 'MG' => 'Madagascar', 'MW' => 'Malawi', 'MY' => 'Malaysia', 'MV' => 'Maldives', 'ML' => 'Mali', 'MT' => 'Malta', 'MH' => 'Marshall Islands', 'MR' => 'Mauritania', 'MU' => 'Mauritius', 'MX' => 'Mexico', 'FM' => 'Micronesia', 'MD' => 'Moldova', 'MC' => 'Monaco', 'MN' => 'Mongolia', 'ME' => 'Montenegro', 'MA' => 'Morocco', 'MZ' => 'Mozambique', 'MM' => 'Myanmar', 'NA' => 'Namibia', 'NR' => 'Nauru', 'NP' => 'Nepal', 'NL' => 'Netherlands', 'NZ' => 'New Zealand', 'NI' => 'Nicaragua', 'NE' => 'Niger', 'NG' => 'Nigeria', 'MK' => 'North Macedonia', 'NO' => 'Norway', 'OM' => 'Oman', 'PK' => 'Pakistan', 'PW' => 'Palau', 'PA' => 'Panama', 'PG' => 'Papua New Guinea', 'PY' => 'Paraguay', 'PE' => 'Peru', 'PH' => 'Philippines', 'PL' => 'Poland', 'PT' => 'Portugal', 'QA' => 'Qatar', 'RO' => 'Romania', 'RU' => 'Russia', 'RW' => 'Rwanda', 'WS' => 'Samoa', 'SM' => 'San Marino', 'SA' => 'Saudi Arabia', 'SN' => 'Senegal', 'RS' => 'Serbia', 'SC' => 'Seychelles', 'SL' => 'Sierra Leone', 'SG' => 'Singapore', 'SK' => 'Slovakia', 'SI' => 'Slovenia', 'SB' => 'Solomon Islands', 'SO' => 'Somalia', 'ZA' => 'South Africa', 'ES' => 'Spain', 'LK' => 'Sri Lanka', 'SD' => 'Sudan', 'SR' => 'Suriname', 'SE' => 'Sweden', 'CH' => 'Switzerland', 'SY' => 'Syria', 'TW' => 'Taiwan', 'TJ' => 'Tajikistan', 'TZ' => 'Tanzania', 'TH' => 'Thailand', 'TL' => 'Timor-Leste', 'TG' => 'Togo', 'TO' => 'Tonga', 'TT' => 'Trinidad and Tobago', 'TN' => 'Tunisia', 'TR' => 'Turkey', 'TM' => 'Turkmenistan', 'TV' => 'Tuvalu', 'UG' => 'Uganda', 'UA' => 'Ukraine', 'AE' => 'United Arab Emirates', 'GB' => 'United Kingdom', 'US' => 'United States', 'UY' => 'Uruguay', 'UZ' => 'Uzbekistan', 'VU' => 'Vanuatu', 'VA' => 'Vatican City', 'VE' => 'Venezuela', 'VN' => 'Vietnam', 'YE' => 'Yemen', 'ZM' => 'Zambia', 'ZW' => 'Zimbabwe'];
 $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
@@ -90,10 +95,10 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     <?php
                                     if ($status == 1) {
                                         echo '<div class="ribbon-inner ribbon-paid">Paid</div>';
-                                    } elseif ($dueDate < $currentDate) {
-                                        echo '<div class="ribbon-inner ribbon-overdue">Overdue</div>';
-                                    } else {
+                                    } elseif ($dueDate >= $currentDate) {
                                         echo '<div class="ribbon-inner ribbon-unpaid">Unpaid</div>';
+                                    } else {
+                                        echo '<div class="ribbon-inner ribbon-overdue">Overdue</div>';
                                     }
                                     ?>
                                 </div>
@@ -101,7 +106,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     <div class="brand-logo">
                                         <img
                                             src="<?= htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                                            class="img-fluid" class="images">
+                                            class="img-fluid images">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-8 text-right ">
@@ -114,7 +119,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         <?php
                                         if ($status != 1) {
                                             echo '<h5>Balance Due</h5>
-                                        <h6>' . $currency . $amount . '</h6>';
+                                        <h6>' . $currency . $total_amount . '</h6>';
                                         } else {
                                             echo '<h5>Invoice Paid</h5>';
                                         }
@@ -504,7 +509,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         <div class="payment-btn-wrapper">
                                             <button type="submit" id="submit-btn-credit_card"
                                                     class="btn btn-primary make-payment-btn">Pay
-                                                Now {{$currency . $amount}}
+                                                Now {{$currency . $total_amount}}
                                             </button>
                                         </div>
                                     </form>
@@ -767,7 +772,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         <div class="payment-btn-wrapper">
                                             <button type="submit" id="submit-btn-edp"
                                                     class="btn btn-primary make-payment-btn">Pay
-                                                Now {{$currency . $amount}}
+                                                Now {{$currency . $total_amount}}
                                             </button>
                                         </div>
                                     </form>

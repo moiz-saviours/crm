@@ -301,7 +301,7 @@
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
                     const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status ? "checked" : ""} data-bs-toggle="toggle">`;
-                    table.cell(rowIndex, 8).data(statusHtml).draw();
+                    table.cell(rowIndex, table.column($('th:contains("STATUS")')).index()).data(statusHtml).draw();
                 })
                 .catch(() => {
                     statusCheckbox.prop('checked', !status);

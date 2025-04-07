@@ -165,7 +165,7 @@
                                     <input type="checkbox" name="employees[]" value="{{ $user->id }}"
                                            id="user-{{ $user->id }}"
                                            {{ in_array($user->id, old('employees', [])) ? 'checked' : '' }}
-                                           class="select-user-checkbox">
+                                           class="select-user-checkbox" title="{{ $user->email }}">
                                     <img
                                         src="{{ $user->image && file_exists(public_path('assets/images/employees/'.$user->image)) ? asset('assets/images/employees/'.$user->image) : ($user->gender == 'male' ? asset('assets/img/team-4.jpg') : asset('assets/img/team-1.jpg')) }}"
                                         alt="{{ $user->name }}" title="{{ $user->email }}"

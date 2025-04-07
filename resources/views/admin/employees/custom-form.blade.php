@@ -38,6 +38,38 @@
             <!-- Form Body -->
             <div class="form-body">
                 <div class="form-group mb-3">
+                    <label for="department" class="form-label">Department</label>
+                    <select class="form-control" id="department" name="department_id">
+                        <option value="" disabled selected>Select Department</option>
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('department')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-control" id="role" name="role_id">
+                        <option value="" disabled selected>Select Role</option>
+                    </select>
+                    @error('role')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="position" class="form-label">Position</label>
+                    <select class="form-control" id="position" name="position_id">
+                        <option value="" disabled selected>Select Position</option>
+                    </select>
+                    @error('position')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Select Team</label>
                     <select class="form-control" id="team_key" name="team_key">
                         <option value="" disabled selected>Select Team</option>
@@ -79,7 +111,7 @@
                     <label for="pseudo_email" class="form-label">Pseudo Email</label>
                     <input type="email" class="form-control" id="pseudo_email" name="pseudo_email"
                            placeholder="Enter Pseudo Email">
-                    @error('email')
+                    @error('pseudo_email')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>

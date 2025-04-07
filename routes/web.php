@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\User\SettingController;
+use App\Models\ClientContact;
 use App\Http\Controllers\User\{BrandController,
     Customer\CompanyController as UserCustomerCompanyController,
     Customer\ContactController as UserCustomerContactController,
@@ -10,11 +12,15 @@ use App\Http\Controllers\User\{BrandController,
     LeadController,
     LeadStatusController,
     PaymentController,
-    PaymentMerchantController,
+    Client\ContactController as UserClientContactController,
+    Client\CompanyController as UserClientCompanyController,
+    Client\PaymentMerchantController as UserClientPaymentMerchantController,
     PaymentTransactionLogController,
     ProfileController,
     TeamController,
-    TeamMemberController};
+    TeamMemberController
+};
+use Database\Seeders\PermissionSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -26,26 +32,15 @@ Route::get('/', function () {
 //    return view('welcome');
 });
 require __DIR__ . '/auth.php';
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('user.dashboard');
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified', 'throttle:60,1', 'dynamic.access'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard')//->middleware('can:dashboard_view')
+    ;
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    /** Companies Routes */
-    Route::prefix('')->name('customer.company.')->group(function () {
-        Route::get('/customer/companies', [UserCustomerCompanyController::class, 'index'])->name('index');
-    });
-    /** Contacts Routes */
-//    Route::name('customer.contact.')->group(function () {
-//        Route::get('/contacts', [UserCustomerContactController::class, 'index'])->name('index');
-//        Route::prefix('contacts')->group(function () {
-//            Route::post('/store', [UserCustomerContactController::class, 'store'])->name('store');
-//            Route::get('/edit/{customer_contact?}', [UserCustomerContactController::class, 'edit'])->name('edit');
-//
-//            Route::post('/update/{customer_contact?}', [UserCustomerContactController::class, 'update'])->name('update');
-//        });
-//    });
+    /** Customer Routes */
     Route::name('customer.')->group(function () {
+        /** Contacts Routes */
         Route::name('contact.')->group(function () {
             Route::get('/customer/contacts', [UserCustomerContactController::class, 'index'])->name('index');
             Route::prefix('customer/contact')->group(function () {
@@ -53,6 +48,10 @@ Route::middleware('auth')->group(function () {
                 Route::get('/edit/{customer_contact?}', [UserCustomerContactController::class, 'edit'])->name('edit');
                 Route::post('/update/{customer_contact?}', [UserCustomerContactController::class, 'update'])->name('update');
             });
+        });
+        /** Companies Routes */
+        Route::prefix('')->name('company.')->group(function () {
+            Route::get('/customer/companies', [UserCustomerCompanyController::class, 'index'])->name('index');
         });
     });
     Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
@@ -66,10 +65,10 @@ Route::middleware('auth')->group(function () {
     /** Brand Routes */
     Route::prefix('brands')->name('brand.')->group(function () {
         Route::get('/', [BrandController::class, 'index'])->name('index');
-        Route::get('/create', [BrandController::class, 'create'])->name('create');
-        Route::post('/store', [BrandController::class, 'store'])->name('store');
-        Route::get('/edit/{brand?}', [BrandController::class, 'edit'])->name('edit');
-        Route::post('/update/{brand?}', [BrandController::class, 'update'])->name('update');
+//        Route::get('/create', [BrandController::class, 'create'])->name('create');
+//        Route::post('/store', [BrandController::class, 'store'])->name('store');
+//        Route::get('/edit/{brand?}', [BrandController::class, 'edit'])->name('edit');
+//        Route::post('/update/{brand?}', [BrandController::class, 'update'])->name('update');
     });
     /** Leads Routes */
     Route::name('lead.')->group(function () {
@@ -88,13 +87,56 @@ Route::middleware('auth')->group(function () {
             Route::post('/update/{invoice?}', [InvoiceController::class, 'update'])->name('update');
         });
     });
-    /** Payment Merchant Routes */
-    Route::get('/by-brand/{brand_key?}', [PaymentMerchantController::class, 'by_brand'])->name('client.account.by.brand');
-
     Route::get('/payments', [PaymentController::class, 'index'])->name('payment.index');
-
     /** Payment Transaction Logs Route */
     Route::get('payment-transaction-logs', [PaymentTransactionLogController::class, 'getLogs'])->name('payment-transaction-logs');
+    /** Client Contacts Routes */
+    Route::name('user.client.')->group(function () {
+        Route::name('contact.')->group(function () {
+            Route::get('/client/contacts', [UserClientContactController::class, 'index'])->name('index')//                ->middleware('can:viewAny,App\Models\ClientContact')
+            ;
+            Route::prefix('client/contact')->group(function () {
+                Route::get('/companies/{client_contact?}', [UserClientContactController::class, 'companies'])->name('companies')//                    ->middleware('can:view,client_contact')
+                ;
+                Route::get('/create', [UserClientContactController::class, 'create'])->name('create')//                    ->middleware('can:create,App\Models\ClientContact')
+                ;
+                Route::post('/store', [UserClientContactController::class, 'store'])->name('store')//                    ->middleware('can:create,App\Models\ClientContact')
+                ;
+                Route::get('/edit/{client_contact?}', [UserClientContactController::class, 'edit'])->name('edit')//                    ->middleware('can:update,client_contact')
+                ;
+                Route::post('/update/{client_contact?}', [UserClientContactController::class, 'update'])->name('update')//                    ->middleware('can:update,client_contact')
+                ;
+                Route::get('/change-status/{client_contact?}', [UserClientContactController::class, 'change_status'])->name('change.status')//                    ->middleware('can:update,client_contact')
+                ;
+            });
+        });
+        /** Client Companies Routes */
+        Route::name('company.')->group(function () {
+            Route::get('/client/companies', [UserClientCompanyController::class, 'index'])->name('index');
+            Route::prefix('client/company')->group(function () {
+                Route::get('/create', [UserClientCompanyController::class, 'create'])->name('create');
+                Route::post('/store', [UserClientCompanyController::class, 'store'])->name('store');
+                Route::get('/edit/{client_company?}', [UserClientCompanyController::class, 'edit'])->name('edit');
+                Route::post('/update/{client_company?}', [UserClientCompanyController::class, 'update'])->name('update');
+                Route::get('/change-status/{client_company?}', [UserClientCompanyController::class, 'change_status'])->name('change.status');
+            });
+        });
+        /** Payment Merchant Routes */
+        /** Payment Merchant Routes */ 
+        Route::name('account.')->group(function () {
+            Route::get('/client/accounts', [UserClientPaymentMerchantController::class, 'index'])->name('index');
+            Route::prefix('client/account')->group(function () {
+                Route::get('/create', [UserClientPaymentMerchantController::class, 'create'])->name('create');
+                Route::post('/store', [UserClientPaymentMerchantController::class, 'store'])->name('store');
+                Route::get('/edit/{client_account?}', [UserClientPaymentMerchantController::class, 'edit'])->name('edit');
+                Route::post('/update/{client_account?}', [UserClientPaymentMerchantController::class, 'update'])->name('update');
+                Route::get('/change-status/{client_account?}', [UserClientPaymentMerchantController::class, 'change_status'])->name('change.status');
+                Route::get('/by-brand/{brand_key?}', [UserClientPaymentMerchantController::class, 'by_brand'])->name('by.brand');
+            });
+        });
+    });
+    /** Save Setting Route */
+    Route::post('/save-settings', [SettingController::class, 'saveSettings'])->name('save.settings');
 });
 require __DIR__ . '/admin-old-routes.php';
 require __DIR__ . '/admin-routes.php';
@@ -155,11 +197,12 @@ Route::controller(StripePaymentController::class)->group(function () {
 
 });
 Route::fallback(function () {
-    if (auth()->check()) {
+    $attempts = session('fallback_attempts', 0) + 1;
+    session(['fallback_attempts' => $attempts]);
+    if ($attempts < 2 && auth()->check()) {
         return back();
     }
     return redirect('/login');
 });
-Route::get('invoice', [CheckoutController::class,'index'])->name('invoice');
-Route::get('checkout', [CheckoutController::class,'index'])->name('checkout');
-
+Route::get('invoice', [CheckoutController::class, 'index'])->name('invoice');
+Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout');

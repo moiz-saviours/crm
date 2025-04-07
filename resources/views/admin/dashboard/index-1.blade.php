@@ -69,6 +69,14 @@
                 transform: scale(0);
             }
 
+            .col-md-3[data-bs-toggle="modal"] {
+                cursor: pointer;
+            }
+
+            .total-sum {
+                cursor: text;
+                pointer-events: none;
+            }
         </style>
     @endpush
     <section id="content" class="content">
@@ -126,7 +134,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Fresh Invoices -->
                     <div class="col-md-3" data-bs-toggle="modal" data-bs-target="#freshInvoicesModal">
                         <div class="card text-white" style="background-color: var(--bs-primary);">
@@ -134,8 +141,10 @@
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="demo-pli-cart-coin display-6"></i>
                                     <div class="ms-4">
-                                        <h5 class="text-white h2 mb-0">{{ max(0,count($freshInvoices)) }}</h5>
-                                        <p class="text-white text-opacity-75 mb-0">Fresh Invoices</p>
+                                        <h5 class="text-white h2 mb-0 total-sum">
+                                            ${{$freshInvoices->sum('total_amount')}}</h5>
+                                        <p class="text-white text-opacity-75 mb-0">{{ max(0,count($freshInvoices)) }}
+                                            Fresh Invoice</p>
                                     </div>
                                 </div>
                                 <div class="progress progress-md">
@@ -145,7 +154,7 @@
                                          aria-valuemax="100">
                                     </div>
                                 </div>
-                                <small>{{ round($freshInvoiceProgress, 2) }}% of Total Invoices</small>
+                                <small>{{ round($freshInvoiceProgress, 2) }}% of Total Paid Invoices</small>
                             </div>
                         </div>
                     </div>
@@ -157,8 +166,10 @@
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="demo-pli-cart-coin display-6"></i>
                                     <div class="ms-4">
-                                        <h5 class="text-white h2 mb-0">{{ max(0,count($upsaleInvoices)) }}</h5>
-                                        <p class="text-white text-opacity-75 mb-0">Upsale Invoices</p>
+                                        <h5 class="text-white h2 mb-0 total-sum">
+                                            ${{$upsaleInvoices->sum('total_amount')}}</h5>
+                                        <p class="text-white text-opacity-75 mb-0">{{ max(0,count($upsaleInvoices)) }}
+                                            Upsale Invoice</p>
                                     </div>
                                 </div>
                                 <div class="progress progress-md">
@@ -168,7 +179,7 @@
                                          aria-valuemax="100">
                                     </div>
                                 </div>
-                                <small>{{ round($upsalInvoiceProgress, 2) }}% of Total Invoices</small>
+                                <small>{{ round($upsalInvoiceProgress, 2) }}% of Total Paid Invoices</small>
                             </div>
                         </div>
                     </div>
@@ -179,13 +190,12 @@
             <div class="content__wrap" style="padding-top: 0px">
                 <div class="row">
                     <h1 class="page-title mb-2">Invoices</h1>
-
                     @php
                         $invoiceData = [
-                            ['title' => 'Paid', 'invoices' => $paidInvoices, 'count' => count($paidInvoices), 'progress' => $invoicesProgress['paid'], 'color' => 'success', 'icon' => 'demo-pli-check', 'modal' => 'paidInvoicesModal'],
-                            ['title' => 'Due', 'invoices' => $dueInvoices, 'count' => count($dueInvoices), 'progress' => $invoicesProgress['due'], 'color' => 'danger', 'icon' => 'demo-pli-clock', 'modal' => 'dueInvoicesModal'],
-                            ['title' => 'Refunded', 'invoices' => $refundInvoices, 'count' => count($refundInvoices), 'progress' => $invoicesProgress['refund'], 'color' => 'warning', 'icon' => 'demo-pli-repeat-2', 'modal' => 'refundInvoicesModal'],
-                            ['title' => 'Chargeback', 'invoices' => $chargebackInvoices, 'count' => count($chargebackInvoices), 'progress' => $invoicesProgress['chargeback'], 'color' => 'dark', 'icon' => 'demo-pli-close', 'modal' => 'chargebackInvoicesModal']
+                            ['title' => 'Paid', 'invoices' => $paidInvoices, 'count' => count($paidInvoices),'total_sum' => $paidInvoices->sum('total_amount'), 'progress' => $invoicesProgress['paid'], 'color' => 'success', 'icon' => 'demo-pli-check', 'modal' => 'paidInvoicesModal'],
+                            ['title' => 'Due', 'invoices' => $dueInvoices, 'count' => count($dueInvoices),'total_sum' => $dueInvoices->sum('total_amount'), 'progress' => $invoicesProgress['due'], 'color' => 'danger', 'icon' => 'demo-pli-clock', 'modal' => 'dueInvoicesModal'],
+                            ['title' => 'Refunded', 'invoices' => $refundInvoices, 'count' => count($refundInvoices),'total_sum' => $refundInvoices->sum('total_amount'), 'progress' => $invoicesProgress['refund'], 'color' => 'warning', 'icon' => 'demo-pli-repeat-2', 'modal' => 'refundInvoicesModal'],
+                            ['title' => 'Chargeback', 'invoices' => $chargebackInvoices, 'count' => count($chargebackInvoices),'total_sum' => $chargebackInvoices->sum('total_amount'), 'progress' => $invoicesProgress['chargeback'], 'color' => 'dark', 'icon' => 'demo-pli-close', 'modal' => 'chargebackInvoicesModal']
                         ];
                     @endphp
                     @foreach ($invoiceData as $invoice)
@@ -195,9 +205,10 @@
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="{{ $invoice['icon'] }} display-6"></i>
                                         <div class="ms-4">
-                                            <h5 class="h2 mb-0"
-                                                style="color: var(--bs-primary);">{{ $invoice['count'] }}</h5>
-                                            <p class="text-opacity-75 mb-0">Total {{ $invoice['title'] }}</p>
+                                            <h5 class="h2 mb-0 total-sum"
+                                                style="color: var(--bs-primary);">${{ $invoice['total_sum'] }}</h5>
+                                            <p class="text-opacity-75 mb-0">{{ $invoice['count'] }}
+                                                Total {{ $invoice['title'] }}</p>
                                         </div>
                                     </div>
                                     <div class="progress progress-md">
@@ -402,7 +413,7 @@
     <!--Modals Start -->
 
     <!-- Active Admin Modal -->
-    <div class="modal fade" id="activeAdminModal" tabindex="-1" role="dialog" aria-hidden="true"
+    <div class="modal fade" id="activeAdminModal"
          aria-labelledby="activeAdminModalAnimationLabel">
         <div class="modal-dialog modal-dialog-centered transform-popover modal-lg">
             <div class="modal-content">
@@ -446,7 +457,7 @@
     <!-- END : Active Admin Modal Animation -->
 
     <!-- Active User Modal -->
-    <div class="modal fade" id="activeUserModal" tabindex="-1" role="dialog" aria-hidden="true"
+    <div class="modal fade" id="activeUserModal"
          aria-labelledby="activeUserModalAnimationLabel">
         <div class="modal-dialog modal-dialog-centered transform-popover modal-lg">
             <div class="modal-content">
@@ -490,7 +501,7 @@
     <!-- END : Active User Modal Animation -->
 
     <!-- Fresh Invoices Modal -->
-    <div class="modal fade" id="freshInvoicesModal" tabindex="-1" role="dialog" aria-hidden="true"
+    <div class="modal fade" id="freshInvoicesModal"
          aria-labelledby="freshInvoicesModalAnimationLabel">
         <div class="modal-dialog modal-dialog-centered transform-popover modal-lg">
             <div class="modal-content">
@@ -556,22 +567,22 @@
                                 <td class="align-middle space-between text-nowrap"
                                     style="text-align: left;">
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Amount:</span>
                                         <span>{{ $freshInvoice->currency ." ". number_format($freshInvoice->amount, 2, '.', '') }}</span>
                                     </div>
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Tax:</span>
                                         <span>{{ $freshInvoice->tax_type == 'percentage' ? '%' : ($freshInvoice->tax_type == 'fixed' ? $freshInvoice->currency : '') }} {{ $freshInvoice->tax_value ?? 0 }}</span>
                                     </div>
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Tax Amount:</span>
                                         <span>{{ $freshInvoice->currency ." ". number_format($freshInvoice->tax_amount, 2, '.', '') }}</span>
                                     </div>
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Total Amount:</span>
                                         <span>{{ $freshInvoice->currency ." ". number_format($freshInvoice->total_amount, 2, '.', '') }}</span>
                                     </div>
@@ -610,7 +621,7 @@
     <!-- END : Fresh Invoices Modal Animation -->
 
     <!-- Upsale Invoices Modal -->
-    <div class="modal fade" id="upsaleInvoicesModal" tabindex="-1" role="dialog" aria-hidden="true"
+    <div class="modal fade" id="upsaleInvoicesModal"
          aria-labelledby="upsaleInvoicesModalAnimationLabel">
         <div class="modal-dialog modal-dialog-centered transform-popover modal-lg">
             <div class="modal-content">
@@ -676,22 +687,22 @@
                                 <td class="align-middle space-between text-nowrap"
                                     style="text-align: left;">
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Amount:</span>
                                         <span>{{ $upsaleInvoice->currency ." ". number_format($upsaleInvoice->amount, 2, '.', '') }}</span>
                                     </div>
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Tax:</span>
                                         <span>{{ $upsaleInvoice->tax_type == 'percentage' ? '%' : ($upsaleInvoice->tax_type == 'fixed' ? $upsaleInvoice->currency : '') }} {{ $upsaleInvoice->tax_value ?? 0 }}</span>
                                     </div>
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Tax Amount:</span>
                                         <span>{{ $upsaleInvoice->currency ." ". number_format($upsaleInvoice->tax_amount, 2, '.', '') }}</span>
                                     </div>
                                     <div
-                                            style="display: flex; justify-content: space-between; gap: 10px;">
+                                        style="display: flex; justify-content: space-between; gap: 10px;">
                                         <span style="width: 120px; ">Total Amount:</span>
                                         <span>{{ $upsaleInvoice->currency ." ". number_format($upsaleInvoice->total_amount, 2, '.', '') }}</span>
                                     </div>
@@ -731,12 +742,13 @@
 
     @foreach ($invoiceData as $invoice)
         <!-- Modal for {{ $invoice['title'] }} Invoices -->
-        <div class="modal fade" id="{{ $invoice['modal'] }}" tabindex="-1" role="dialog" aria-hidden="true"
+        <div class="modal fade" id="{{ $invoice['modal'] }}"
              aria-labelledby="{{ $invoice['modal'] }}AnimationLabel">
             <div class="modal-dialog modal-dialog-centered transform-popover modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="{{ $invoice['modal'] }}AnimationLabel">{{ $invoice['title'] }} Invoices</h1>
+                        <h1 class="modal-title fs-5" id="{{ $invoice['modal'] }}AnimationLabel">{{ $invoice['title'] }}
+                            Invoices</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -760,11 +772,14 @@
                                                 <span class="badge bg-warning text-dark"
                                                       style="min-width: -webkit-fill-available;">Pending</span>
                                             @elseif($invoiceItem->status == 1)
-                                                <span class="badge bg-success" style="min-width: -webkit-fill-available;">Paid</span>
+                                                <span class="badge bg-success"
+                                                      style="min-width: -webkit-fill-available;">Paid</span>
                                             @elseif($invoiceItem->status == 2)
-                                                <span class="badge bg-danger" style="min-width: -webkit-fill-available;">Refund</span>
+                                                <span class="badge bg-danger"
+                                                      style="min-width: -webkit-fill-available;">Refund</span>
                                             @elseif($invoiceItem->status == 3)
-                                                <span class="badge bg-danger" style="min-width: -webkit-fill-available;">Charge Back</span>
+                                                <span class="badge bg-danger"
+                                                      style="min-width: -webkit-fill-available;">Charge Back</span>
                                             @endif
                                         </div>
                                     </td>

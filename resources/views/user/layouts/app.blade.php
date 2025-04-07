@@ -1252,6 +1252,7 @@
         <i class="demo-psi-gear fs-1"></i>
     </button>
 
+    <form id="settingsForm">
 
     <div class="offcanvas-body py-0">
         <div class="_dm-settings-container__content row">
@@ -1329,20 +1330,21 @@
                     </div>
                 </div>
 
+                <button type="submit" class="btn btn-md btn-primary">Save</button>
 
-                <!-- OPTION : Additional Offcanvas -->
-                <h6 class="mt-4 mb-2 py-1">Additional Offcanvas</h6>
-                <p>Select the offcanvas placement.</p>
-                <div class="text-nowrap">
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-top">Top
-                    </button>
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-end">Right
-                    </button>
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-bottom">Btm
-                    </button>
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-start">Left
-                    </button>
-                </div>
+{{--                <!-- OPTION : Additional Offcanvas -->--}}
+{{--                <h6 class="mt-4 mb-2 py-1">Additional Offcanvas</h6>--}}
+{{--                <p>Select the offcanvas placement.</p>--}}
+{{--                <div class="text-nowrap">--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-top">Top--}}
+{{--                    </button>--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-end">Right--}}
+{{--                    </button>--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-bottom">Btm--}}
+{{--                    </button>--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-start">Left--}}
+{{--                    </button>--}}
+{{--                </div>--}}
 
 
             </div>
@@ -1690,9 +1692,9 @@
 
             </div>
         </div>
-
-
     </div>
+    </form>
+
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <!-- END - SETTINGS CONTAINER [ DEMO ] -->

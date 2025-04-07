@@ -3,6 +3,7 @@
 
 <!-- Date Range Picker CSS -->
 <link rel="stylesheet" href="{{asset('assets/css/daterangepicker/daterangepicker.css')}}">
+<link id="_dm-cssOverlayScrollbars" rel="stylesheet" href="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.min.css')}}">
 
 <!-- Fonts [ OPTIONAL ] -->
 <!-- Font Awesome Icons -->
@@ -544,8 +545,11 @@ Detailed information and more samples can be found in the documentation.
         max-height: 50px;
     }
 
-    .mn--min .mininav-content h3 {
+    .root .mainnav__inner .nav-link.active ~ .nav .active,.root .mainnav__inner .nav-link.active ~ .nav .active:hover {
         color: var(--nf-mainnav-submenu-active-color);
+    }
+    .mn--min .mininav-content h3 {
+        color: var(--nf-mainnav-link-color);
         font-size: var(--nf-brand-size);
         font-weight: 600;
         font-family: var(--bs-body-font-family);
@@ -577,6 +581,9 @@ Detailed information and more samples can be found in the documentation.
     }
 </style>
 <style>
+    #_dm-settingsContainer .form-check-input[type=checkbox]::after {
+        content: '';
+    }
     .form-check-input:checked[type=checkbox] {
         --bs-form-check-bg-image: none;
         background-color: var(--bs-primary);

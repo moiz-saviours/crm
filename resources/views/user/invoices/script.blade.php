@@ -260,8 +260,13 @@
 
             $('#total_amount').val(totalAmount.toFixed(2));
         }
-        $('.my').on('click', function () {
-            dataTables[0].column(6).search(`{{auth()->user()->name}}`).draw();
+        $('.all-tab').on('click', function () {
+            dataTables[0].column('th:contains("AGENT")').search('').draw();
+        });
+
+        $('.my-tab').on('click', function () {
+            const currentUser = '{{ auth()->user()->name }}';
+            dataTables[0].column('th:contains("AGENT")').search(currentUser, true, false).draw();
         });
         function setDataAndShowEdit(data) {
             const invoice = data?.invoice;
@@ -660,7 +665,7 @@
             const merchantTypesContainer = $('#merchant-types-container');
             merchantTypesContainer.empty();
             if (selectedBrand) {
-                AjaxRequestPromise(`{{ route('client.account.by.brand') }}/${selectedBrand}`, null, 'GET',)
+                AjaxRequestPromise(`{{ route('user.client.account.by.brand') }}/${selectedBrand}`, null, 'GET',)
                     .then(response => {
                         if (response.data) {
                             const merchant_types = response.data;

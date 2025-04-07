@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\Cooldown;
+use App\Http\Middleware\DynamicAccessMiddleware;
 use App\Http\Middleware\LastSeen;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\Authenticate;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Route;
 
 $helperPath = __DIR__ . '/../app/Helpers/Restrict';
 if (is_dir($helperPath)) {
@@ -25,6 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::prefix('webhooks')->group(function () {
+//                require __DIR__ . '/../routes/webhooks.php';
+            });
+        }
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [LastSeen::class, Cooldown::class]);
@@ -34,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'restrict.dev' => RestrictDevAccess::class,
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
+            'dynamic.access' => DynamicAccessMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

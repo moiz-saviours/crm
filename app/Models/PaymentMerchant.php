@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\ActivityLoggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -71,6 +72,11 @@ class PaymentMerchant extends Model
     }
 
     /**Scopes*/
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
     public function scopeHasSufficientLimitAndCapacity($query, $merchantId, $amount)
     {
         $total_amount = Payment::where('merchant_id', $merchantId)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('amount');
@@ -80,6 +86,11 @@ class PaymentMerchant extends Model
             ->where('capacity', '>=', (float)$total_amount);
     }
 
+    /**
+     * Adds monthly usage data to the query results by summing payment amounts
+     * for the current month and grouping by merchant ID.
+     *
+     */
     public function scopeWithMonthlyUsage($query)
     {
         return $query->with(['payments' => function ($query) {
@@ -90,4 +101,29 @@ class PaymentMerchant extends Model
         }]);
     }
     /**Scopes*/
+    /** Attributes */
+    /**
+     * Get the formatted monthly usage amount for the current month.
+     *
+     * This accessor calculates the sum of all payment amounts associated with this merchant
+     * for the current month and year, then formats it with thousand separators.
+     *
+     * Returns '0' if no payments exist.
+     *
+     * @return string Formatted amount with thousand separators
+     *
+     * @example
+     * <code>
+     * $merchant->current_month_usage; // "1,250.00"
+     * </code>
+     */
+    public function getCurrentMonthUsageAttribute(): string
+    {
+        $totalAmount = $this->payments()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('amount') ?? 0;
+        return number_format($totalAmount);
+    }
+    /** Attributes */
 }

@@ -36,10 +36,10 @@ class DashboardController extends Controller
         $activeUsers = User::where('last_seen', '>=', $activeTime)->get();
         $freshInvoices = Invoice::whereMonth('created_at', $this->currentMonth)
             ->whereYear('created_at', $this->currentYear)
-            ->where('type', 0)->get();
+            ->where('type', 0)->where('status',1)->get();
         $upsaleInvoices = Invoice::whereMonth('created_at', $this->currentMonth)
             ->whereYear('created_at', $this->currentYear)
-            ->where('type', 1)->get();
+            ->where('type', 1)->where('status',1)->get();
         $adminProgress = $totalAdmins > 0 && count($activeAdmins) > 0 ? (count($activeAdmins) / $totalAdmins) * 100 : 0;
         $userProgress = $totalUsers > 0 && count($activeUsers) > 0 ? (count($activeUsers) / $totalUsers) * 100 : 0;
         $freshInvoiceProgress = (count($freshInvoices) + count($upsaleInvoices)) > 0 ? (count($freshInvoices) / (count($freshInvoices) + count($upsaleInvoices))) * 100 : 0;

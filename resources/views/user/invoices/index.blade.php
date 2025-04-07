@@ -33,9 +33,9 @@
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
-                            <li class="tab-item active" data-tab="home">All Invoices <i class="fa fa-times close-icon"
+                            <li class="tab-item active all-tab" data-tab="home">All Invoices <i class="fa fa-times close-icon"
                                                                                         aria-hidden="true"></i></li>
-                            <li class="tab-item my" data-tab="home">My Invoices <i class="fa fa-times close-icon"
+                            <li class="tab-item my-tab" data-tab="home">My Invoices <i class="fa fa-times close-icon"
                                                                                    aria-hidden="true"></i></li>
                         </ul>
                     </div>

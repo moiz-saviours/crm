@@ -12,3 +12,5 @@ database/seeders/AdminSeeder.php
 public/assets/images/user.png
 /app/Helpers/Restrict
 /app/Services/Restrict
+/.github/workflows/mirror.yml
+/.github/workflows/deploy.yml

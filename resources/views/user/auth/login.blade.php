@@ -20,7 +20,6 @@
 </head>
 
 <body>
-
 <section class="login-section">
     <div class="container" style="min-width: 100%;">
         <div class="main-login-row">
@@ -32,7 +31,6 @@
 
                     </div>
                     <div class="left-side-box">
-
                         <h4> User Login </h4>
                         <p>Enter your email and password to login</p>
                         <form method="POST" action="{{ route('login') }}">
@@ -127,6 +125,12 @@
     }, 1500);
 
     @php session()->forget('errors'); @endphp
+    @endif
+
+    @if(session('error'))
+    let error = {!! json_encode(session('error')) !!};
+    toastr.error(error);
+    @php session()->forget('error'); @endphp
     @endif
 
     @if(session('message'))

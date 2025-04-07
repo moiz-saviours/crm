@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\{
-    DashboardController as AdminDashboardController,
+use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     AccountController as AdminAccountController,
     ActivityLogController as AdminActivityLogController,
     BrandController as AdminBrandController,
@@ -18,11 +17,10 @@ use App\Http\Controllers\Admin\{
     PaymentTransactionLogController as AdminPaymentTransactionLogController,
     PaymentController as AdminPaymentController,
     ProfileController as AdminProfileController,
+    SettingController as AdminSettingController,
     TeamController as AdminTeamController,
-    TeamTargetController as AdminTeamTargetController,
-};
+    TeamTargetController as AdminTeamTargetController};
 use Illuminate\Support\Facades\Route;
-
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
@@ -65,7 +63,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             Route::post('/store', [AdminEmployeeController::class, 'store'])->name('store');
             Route::get('/edit/{user?}', [AdminEmployeeController::class, 'edit'])->name('edit');
             Route::post('/update/{user?}', [AdminEmployeeController::class, 'update'])->name('update');
-            Route::post('/update-password/{admin?}', [AdminEmployeeController::class, 'update_password'])->name('update.password');
+            Route::post('/update-password/{user?}', [AdminEmployeeController::class, 'update_password'])->name('update.password');
             Route::get('/change-status/{user?}', [AdminEmployeeController::class, 'change_status'])->name('change.status');
             Route::delete('/delete/{user?}', [AdminEmployeeController::class, 'delete'])->name('delete');
         });
@@ -214,9 +212,5 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
 
-
-
-
-
-
+    Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
 });

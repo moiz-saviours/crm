@@ -3,7 +3,7 @@
 
 <!-- Date Range Picker CSS -->
 <link rel="stylesheet" href="{{asset('assets/css/daterangepicker/daterangepicker.css')}}">
-
+<link id="_dm-cssOverlayScrollbars" rel="stylesheet" href="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.min.css')}}">
 <!-- Fonts [ OPTIONAL ] -->
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
@@ -544,8 +544,11 @@ Detailed information and more samples can be found in the documentation.
         max-height: 50px;
     }
 
-    .mn--min .mininav-content h3 {
+    .root .mainnav__inner .nav-link.active ~ .nav .active,.root .mainnav__inner .nav-link.active ~ .nav .active:hover {
         color: var(--nf-mainnav-submenu-active-color);
+    }
+    .mn--min .mininav-content h3 {
+        color: var(--nf-mainnav-link-color);
         font-size: var(--nf-brand-size);
         font-weight: 600;
         font-family: var(--bs-body-font-family);

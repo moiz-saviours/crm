@@ -10,6 +10,7 @@ use App\Models\ClientContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -181,4 +182,73 @@ class ContactController extends Controller
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
+
+
+    /**
+     * Change the specified resource status from storage.
+     */
+    /**
+     * Change the contact status and cascade to related companies/accounts
+     *
+     * @param Request $request
+     * @param ClientContact $clientContact
+     * @return \Illuminate\Http\JsonResponse
+     */
+//    public function change_status(Request $request, ClientContact $clientContact)
+//    {
+//        try {
+//            $newStatus = (int)$request->query('status');
+//            $oldStatus = $clientContact->status;
+//            if ($oldStatus !== $newStatus) {
+//                DB::beginTransaction();
+//                $companyCount = $clientContact->companies()->where('status', 1)->count();
+//                $accountCount = $clientContact->companies()
+//                    ->with(['client_accounts' => function ($query) {
+//                        $query->where('status', 'active');
+//                    }])
+//                    ->get()
+//                    ->sum(function ($company) {
+//                        return $company->client_accounts->count();
+//                    });
+//                $clientContact->status = $newStatus;
+//                $clientContact->save();
+//                DB::commit();
+//                $companyMessage = $companyCount === 1 ? '1 company' : "{$companyCount} companies";
+//                $accountMessage = $accountCount === 1 ? '1 account' : "{$accountCount} accounts";
+//                $message = $newStatus
+//                    ? 'Contact activated successfully'
+//                    : "Contact and related active records deactivated. (Affected: This Contact, {$companyMessage}, {$accountMessage})";
+//                return response()->json([
+//                    'success' => true,
+//                    'message' => $message,
+//                    'status' => $newStatus,
+//                    'affected_records' => [
+//                        'companies' => $clientContact->companies()->count(),
+//                        'accounts' => $clientContact->companies()->with('client_accounts')->get()->sum(function ($company) {
+//                            return $company->client_accounts->count();
+//                        })
+//                    ]
+//                ]);
+//            }
+//            return response()->json([
+//                'success' => true,
+//                'message' => 'Status unchanged (already ' . ($newStatus ? 'active' : 'inactive') . ')',
+//                'status' => $newStatus
+//            ]);
+//
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//            Log::error('Contact status change failed', [
+//                'contact_id' => $clientContact->id,
+//                'error' => $e->getMessage(),
+//                'trace' => $e->getTraceAsString()
+//            ]);
+//            return response()->json([
+//                'success' => false,
+//                'message' => 'Failed to update contact status',
+//                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+//                'suggestion' => 'Please try again or contact support'
+//            ], 500);
+//        }
+//    }
 }

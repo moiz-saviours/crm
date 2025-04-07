@@ -1254,6 +1254,7 @@
     </button>
 
 
+    <form id="settingsForm">
     <div class="offcanvas-body py-0">
         <div class="_dm-settings-container__content row">
             <div class="col-lg-3 p-4">
@@ -1331,19 +1332,21 @@
                 </div>
 
 
+                <button type="submit" class="btn btn-md btn-primary">Save</button>
+
                 <!-- OPTION : Additional Offcanvas -->
-                <h6 class="mt-4 mb-2 py-1">Additional Offcanvas</h6>
-                <p>Select the offcanvas placement.</p>
-                <div class="text-nowrap">
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-top">Top
-                    </button>
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-end">Right
-                    </button>
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-bottom">Btm
-                    </button>
-                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-start">Left
-                    </button>
-                </div>
+{{--                <h6 class="mt-4 mb-2 py-1">Additional Offcanvas</h6>--}}
+{{--                <p>Select the offcanvas placement.</p>--}}
+{{--                <div class="text-nowrap">--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-top">Top--}}
+{{--                    </button>--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-end">Right--}}
+{{--                    </button>--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-bottom">Btm--}}
+{{--                    </button>--}}
+{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-start">Left--}}
+{{--                    </button>--}}
+{{--                </div>--}}
 
 
             </div>
@@ -1367,7 +1370,7 @@
                 <div class="d-flex align-items-center pt-1 mb-2">
                     <label class="form-check-label flex-fill" for="_dm-profileWidgetCheckbox">Widget Profile</label>
                     <div class="form-check form-switch">
-                        <input id="_dm-profileWidgetCheckbox" class="form-check-input ms-0" type="checkbox"
+                        <input id="_dm-profileWidgetCheckbox" class="form-check-input ms-0 enabled" type="checkbox"
                                autocomplete="off">
                     </div>
                 </div>
@@ -1692,9 +1695,8 @@
 
             </div>
         </div>
-
-
     </div>
+    </form>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <!-- END - SETTINGS CONTAINER [ DEMO ] -->

@@ -15,15 +15,12 @@ class Admin extends Authenticatable
     protected $table = 'admins';
     protected $guard = 'admin';
     protected $primaryKey = 'id';
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'password', 'type', 'designation', 'gender', 'image', 'phone_number', 'address', 'city', 'country', 'postal_code', 'age', 'dob', 'about', 'status',
-    ];
-
+    protected $fillable = ['name', 'email', 'password', 'type', 'designation', 'gender', 'image', 'phone_number', 'address', 'city', 'country', 'postal_code', 'age', 'dob', 'about', 'status', 'settings',];
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -41,6 +38,7 @@ class Admin extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'settings' => 'array',
         ];
     }
 
@@ -57,7 +55,7 @@ class Admin extends Authenticatable
     /**
      * Mutator to update the age attribute when dob is set.
      *
-     * @param  string|\DateTimeInterface|null  $value
+     * @param string|\DateTimeInterface|null $value
      * @return void
      */
     public function setDobAttribute($value)

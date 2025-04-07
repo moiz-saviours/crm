@@ -2,8 +2,8 @@
 @section('title','Client Contact Companies')
 @section('datatable', true)
 @push('breadcrumb')
-{{--    <li class="breadcrumb-item text-sm active" aria-current="page"><a href="{{route('admin.brand.index')}}">Brand</a>--}}
-{{--    </li>--}}
+    {{--    <li class="breadcrumb-item text-sm active" aria-current="page"><a href="{{route('admin.brand.index')}}">Brand</a>--}}
+    {{--    </li>--}}
 @endpush
 @section('content')
     @push('style')
@@ -92,15 +92,15 @@
                 <header class="custm_header">
                     <div class="new_head">
                         <h1 class="page-title mb-2">Companies <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
-{{--                        <h2 id="record-count" class="h6">{{count($client_companies) }} records</h2>--}}
+                        {{--                        <h2 id="record-count" class="h6">{{count($client_companies) }} records</h2>--}}
                     </div>
                     <div class="filters">
                         <div class="actions">
                             {{--                            <h1><i class="fa fa-lock" aria-hidden="true"></i> Data Quality</h1>--}}
 
-{{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
-{{--                            </button>--}}
-{{--                            <button class="header_btn" disabled>Import</button>--}}
+                            {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
+                            {{--                            </button>--}}
+                            {{--                            <button class="header_btn" disabled>Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
                             <button class="create-contact open-form-btn">Create New</button>
 
@@ -114,7 +114,7 @@
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
-                            <li class="tab-item active" data-tab="home">Client Companies
+                            <li class="tab-item active" data-tab="home">Companies
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
                         </ul>
                     </div>
@@ -125,21 +125,21 @@
                                     <div class="container" style="min-width: 100%;">
                                         <div class="row fltr-sec">
                                             <div class="col-md-8">
-{{--                                                <ul class="custm-filtr">--}}
-{{--                                                    <div class="table-li">--}}
-{{--                                                        <li class="">Company Owner <i class="fa fa-caret-down"--}}
-{{--                                                                                      aria-hidden="true"></i></li>--}}
-{{--                                                        <li class="">Create date <i class="fa fa-caret-down"--}}
-{{--                                                                                    aria-hidden="true"></i></li>--}}
-{{--                                                        <li class="">Last activity date <i class="fa fa-caret-down"--}}
-{{--                                                                                           aria-hidden="true"></i>--}}
-{{--                                                        </li>--}}
+                                                {{--                                                <ul class="custm-filtr">--}}
+                                                {{--                                                    <div class="table-li">--}}
+                                                {{--                                                        <li class="">Company Owner <i class="fa fa-caret-down"--}}
+                                                {{--                                                                                      aria-hidden="true"></i></li>--}}
+                                                {{--                                                        <li class="">Create date <i class="fa fa-caret-down"--}}
+                                                {{--                                                                                    aria-hidden="true"></i></li>--}}
+                                                {{--                                                        <li class="">Last activity date <i class="fa fa-caret-down"--}}
+                                                {{--                                                                                           aria-hidden="true"></i>--}}
+                                                {{--                                                        </li>--}}
 
-{{--                                                        <li class=""><i class="fa fa-bars" aria-hidden="true"></i> All--}}
-{{--                                                            filters--}}
-{{--                                                        </li>--}}
-{{--                                                    </div>--}}
-{{--                                                </ul>--}}
+                                                {{--                                                        <li class=""><i class="fa fa-bars" aria-hidden="true"></i> All--}}
+                                                {{--                                                            filters--}}
+                                                {{--                                                        </li>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                </ul>--}}
                                             </div>
                                             <div class="col-md-4 right-icon" id="right-icon-0"></div>
                                         </div>
@@ -155,12 +155,12 @@
                                             <th class="align-middle text-center text-nowrap">SNO.</th>
                                             <th class="align-middle text-center text-nowrap">Contact</th>
                                             <th class="align-middle text-center text-nowrap">LOGO</th>
-                                            <th class="align-middle text-center text-nowrap">Name</th>
-                                            <th class="align-middle text-center text-nowrap">Email</th>
-                                            <th class="align-middle text-center text-nowrap">Url</th>
-                                            <th class="align-middle text-center text-nowrap">Description</th>
-                                            <th class="align-middle text-center text-nowrap">Status</th>
-                                            <th class="align-middle text-center text-nowrap">Action</th>
+                                            <th class="align-middle text-center text-nowrap">NAME</th>
+                                            <th class="align-middle text-center text-nowrap">EMAIL</th>
+                                            <th class="align-middle text-center text-nowrap">URL</th>
+                                            <th class="align-middle text-center text-nowrap">DESCRIPTION</th>
+                                            <th class="align-middle text-center text-nowrap">STATUS</th>
+                                            <th class="align-middle text-center text-nowrap">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -168,13 +168,16 @@
                                             <tr id="tr-{{$client_company->id}}">
                                                 <td class="align-middle text-center text-nowrap"></td>
                                                 <td class="align-middle text-center text-nowrap">{{$loop->iteration}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{optional($client_company->
-                                                                                                    client_contact)->name}}</td>
+                                                <td class="align-middle text-center text-nowrap">{{optional($client_company->client_contact)->name}}</td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @php
                                                         $logoUrl = filter_var($client_company->logo, FILTER_VALIDATE_URL) ? $client_company->logo : asset('assets/images/clients/companies/logos/'.$client_company->logo);
                                                     @endphp
-                                                    <object data="{{ $logoUrl }}" class="avatar avatar-sm me-3" title="{{ $client_company->name }}" ><img src="{{ $logoUrl }}" alt="{{ $client_company->name }}" class="avatar avatar-sm me-3" title="{{ $client_company->name }}"></object>
+                                                    <object data="{{ $logoUrl }}" class="avatar avatar-sm me-3"
+                                                            title="{{ $client_company->name }}"><img
+                                                            src="{{ $logoUrl }}" alt="{{ $client_company->name }}"
+                                                            class="avatar avatar-sm me-3"
+                                                            title="{{ $client_company->name }}"></object>
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{$client_company->name}}
                                                 </td>

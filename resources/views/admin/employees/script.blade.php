@@ -152,11 +152,46 @@
             if (!$imageInput.val()) updateImage($(this).val());
         });
         updateImage();
+        const roles = @json($roles->keyBy('id'));
+        const positions = @json($positions->keyBy('id'));
 
+        const department = document.getElementById('department');
+        const role = document.getElementById('role');
+        const position = document.getElementById('position');
+
+        const populateDropdown = (dropdown, items, key, value) => {
+            dropdown.innerHTML = '<option value="" disabled selected>Select ' + dropdown.id.charAt(0).toUpperCase() + dropdown.id.slice(1) + '</option>';
+            items.filter(item => item[key] === value).forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                dropdown.appendChild(option);
+            });
+        };
+
+        department.addEventListener('change', () => {
+            const departmentId = parseInt(department.value, 10);
+            populateDropdown(role, Object.values(roles), 'department_id', departmentId);
+            position.innerHTML = '<option value="" disabled selected>Select Position</option>';
+        });
+
+        role.addEventListener('change', () => {
+            const roleId = parseInt(role.value, 10);
+            populateDropdown(position, Object.values(positions), 'role_id', roleId);
+        });
         function setDataAndShowEdit(data) {
             let user = data.user;
             let teams = data.teams;
             $('#manage-form').data('id', user.id);
+
+            $('#department').val(user.department_id).trigger('change');
+            const roleDropdown = document.getElementById('role');
+            populateDropdown(roleDropdown, Object.values(roles), 'department_id', user.department_id);
+
+            $('#role').val(user.role_id).trigger('change');
+            const positionDropdown = document.getElementById('position');
+            populateDropdown(positionDropdown, Object.values(positions), 'role_id', user.role_id);
+            $('#position').val(user.position_id);
 
             $('#emp_id').val(user.emp_id);
             $('#name').val(user.name);
@@ -368,6 +403,24 @@
             $('#manage-form-2').attr('action', `{{route('admin.employee.update.password')}}/` + id);
             $('#formContainerChangePassword').addClass('open');
         });
+
+        /** Manage Passowrd */
+        $('#manage-form-2').on('submit', function (e) {
+            e.preventDefault();
+            var dataId = $(this).data('id');
+            var formData = new FormData(this);
+            if (dataId) {
+                const url = $(this).attr('action');
+                AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
+                    .then(response => {
+                        if (response?.data) {
+                            $(this)[0].reset();
+                        }
+                    })
+                    .catch(error => console.log(error));
+            }
+        });
+
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');

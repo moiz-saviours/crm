@@ -9,6 +9,9 @@
 <script
     src="{{asset('assets/themes/nifty/assets/pages/dashboard-1.min.b651fbd1a6f6a43e11bc01617b4481ab0edc4ba4582106c466d7ae2a9a9ac178.js')}}"></script>
 <script src="{{asset('assets/js/jquery.min.js')}}"></script>
+<script id="_dm-jsOverlayScrollbars"
+        src="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.browser.es6.min.js')}}"></script>
+
 <!-- New -->
 {{--https://cdn.datatables.net/v/bs4/jszip-3.10.1/dt-2.1.8/b-3.2.0/b-colvis-3.2.0/b-html5-3.2.0/b-print-3.2.0/cr-2.0.4/date-1.5.4/fc-5.0.4/fh-4.0.1/sc-2.4.3/sp-2.3.3/sl-2.1.0/datatables.min.css--}}
 <link href="{{asset('assets/css/datatable/new/datatables.min.css')}}" rel="stylesheet">
@@ -93,13 +96,232 @@
     @endif
 </script>
 
-
 <script>
+    const userSettings = @json(auth()->user()->settings ?? []);
+    document.addEventListener('DOMContentLoaded', function () {
+        const settings = userSettings;
+        function stringToBoolean(value) {
+            if (typeof value === 'string') {
+                return value.toLowerCase() === 'true';
+            }
+            return Boolean(value);
+        }
+        function isElementInDesiredState(element, desiredState) {
+            if (element.type === 'checkbox' || element.type === 'radio') {
+                return element.checked === desiredState;
+            }
+            return false;
+        }
+        if (settings.layouts) {
+            const fluidLayoutRadio = document.getElementById('_dm-fluidLayoutRadio');
+            if (stringToBoolean(settings.layouts.fluidLayout) && !isElementInDesiredState(fluidLayoutRadio, true)) {
+                fluidLayoutRadio.click();
+            }
 
+            const boxedLayoutRadio = document.getElementById('_dm-boxedLayoutRadio');
+            if (stringToBoolean(settings.layouts.boxedLayout) && !isElementInDesiredState(boxedLayoutRadio, true)) {
+                boxedLayoutRadio.click();
+            }
+
+            const centeredLayoutRadio = document.getElementById('_dm-centeredLayoutRadio');
+            if (stringToBoolean(settings.layouts.centeredLayout) && !isElementInDesiredState(centeredLayoutRadio, true)) {
+                centeredLayoutRadio.click();
+            }
+        }
+
+        if (settings.transitions) {
+            const transitionSelect = document.getElementById('_dm-transitionSelect');
+            if (transitionSelect.value !== settings.transitions.transitionTiming) {
+                transitionSelect.value = settings.transitions.transitionTiming;
+                const changeEvent = new Event('change', {bubbles: true});
+                transitionSelect.dispatchEvent(changeEvent);
+            }
+        }
+
+        if (settings.header) {
+            const stickyHeaderCheckbox = document.getElementById('_dm-stickyHeaderCheckbox');
+            if (stringToBoolean(settings.header.stickyHeader) && !isElementInDesiredState(stickyHeaderCheckbox, true)) {
+                stickyHeaderCheckbox.click();
+            }
+        }
+
+        if (settings.navigation) {
+            const stickyNavCheckbox = document.getElementById('_dm-stickyNavCheckbox');
+            if (stringToBoolean(settings.navigation.stickyNav) && !isElementInDesiredState(stickyNavCheckbox, true)) {
+                stickyNavCheckbox.click();
+            }
+
+            const profileWidgetCheckbox = document.getElementById('_dm-profileWidgetCheckbox');
+            if (stringToBoolean(settings.navigation.profileWidget) && !isElementInDesiredState(profileWidgetCheckbox, true)) {
+                profileWidgetCheckbox.click();
+            }
+
+            const miniNavRadio = document.getElementById('_dm-miniNavRadio');
+            if (stringToBoolean(settings.navigation.miniNav) && !isElementInDesiredState(miniNavRadio, true)) {
+                miniNavRadio.click();
+            }
+
+            const maxiNavRadio = document.getElementById('_dm-maxiNavRadio');
+            if (stringToBoolean(settings.navigation.maxiNav) && !isElementInDesiredState(maxiNavRadio, true)) {
+                maxiNavRadio.click();
+            }
+
+            const pushNavRadio = document.getElementById('_dm-pushNavRadio');
+            if (stringToBoolean(settings.navigation.pushNav) && !isElementInDesiredState(pushNavRadio, true)) {
+                pushNavRadio.click();
+            }
+
+            const slideNavRadio = document.getElementById('_dm-slideNavRadio');
+            if (stringToBoolean(settings.navigation.slideNav) && !isElementInDesiredState(slideNavRadio, true)) {
+                slideNavRadio.click();
+            }
+
+            const revealNavRadio = document.getElementById('_dm-revealNavRadio');
+            if (stringToBoolean(settings.navigation.revealNav) && !isElementInDesiredState(revealNavRadio, true)) {
+                revealNavRadio.click();
+            }
+        }
+
+        if (settings.sidebar) {
+            const disableBackdropCheckbox = document.getElementById('_dm-disableBackdropCheckbox');
+            if (stringToBoolean(settings.sidebar.disableBackdrop) && !isElementInDesiredState(disableBackdropCheckbox, true)) {
+                disableBackdropCheckbox.click();
+            }
+
+            const staticSidebarCheckbox = document.getElementById('_dm-staticSidebarCheckbox');
+            if (stringToBoolean(settings.sidebar.staticPosition) && !isElementInDesiredState(staticSidebarCheckbox, true)) {
+                staticSidebarCheckbox.click();
+            }
+
+            const stuckSidebarCheckbox = document.getElementById('_dm-stuckSidebarCheckbox');
+            if (stringToBoolean(settings.sidebar.stuckSidebar) && !isElementInDesiredState(stuckSidebarCheckbox, true)) {
+                stuckSidebarCheckbox.click();
+            }
+
+            const uniteSidebarCheckbox = document.getElementById('_dm-uniteSidebarCheckbox');
+            if (stringToBoolean(settings.sidebar.uniteSidebar) && !isElementInDesiredState(uniteSidebarCheckbox, true)) {
+                uniteSidebarCheckbox.click();
+            }
+
+            const pinnedSidebarCheckbox = document.getElementById('_dm-pinnedSidebarCheckbox');
+            if (stringToBoolean(settings.sidebar.pinnedSidebar) && !isElementInDesiredState(pinnedSidebarCheckbox, true)) {
+                pinnedSidebarCheckbox.click();
+            }
+        }
+
+        if (settings.colors) {
+            const themeToggler = document.getElementById('settingsThemeToggler');
+            if (stringToBoolean(settings.colors.themeColor) && !isElementInDesiredState(themeToggler, true)) {
+                themeToggler.click();
+            }
+
+            const colorSchemeButton = document.querySelector(`._dm-colorSchemes[data-color="${settings.colors.colorScheme}"]`);
+            if (colorSchemeButton && !colorSchemeButton.classList.contains('active')) {
+                colorSchemeButton.click();
+            }
+
+            const colorSchemeModeButton = document.querySelector(`._dm-colorModeBtn[data-color-mode="${settings.colors.colorSchemeMode}"]`);
+            if (colorSchemeModeButton && !colorSchemeModeButton.classList.contains('active')) {
+                colorSchemeModeButton.click();
+            }
+        }
+
+        if (settings.font) {
+            const fontSizeRange = document.getElementById('_dm-fontSizeRange');
+            const fontSizeValue = document.getElementById('_dm-fontSizeValue');
+
+            if (fontSizeRange.value !== settings.font.fontSize) {
+                fontSizeRange.value = settings.font.fontSize;
+                const inputEvent = new Event('input', {bubbles: true});
+                fontSizeRange.dispatchEvent(inputEvent);
+                fontSizeValue.textContent = settings.font.fontSize;
+            }
+        }
+
+        setTimeout(function () {
+            if (settings.scrollbars) {
+                const bodyScrollbarCheckbox = document.getElementById('_dm-bodyScrollbarCheckbox');
+                if (stringToBoolean(settings.scrollbars.bodyScrollbar) && !isElementInDesiredState(bodyScrollbarCheckbox, true)) {
+                    bodyScrollbarCheckbox.click();
+                }
+
+                const sidebarScrollbarCheckbox = document.getElementById('_dm-sidebarsScrollbarCheckbox');
+                if (stringToBoolean(settings.scrollbars.sidebarScrollbar) && !isElementInDesiredState(sidebarScrollbarCheckbox, true)) {
+                    sidebarScrollbarCheckbox.click();
+                }
+            }
+        }, 1000)
+    });
+    document.getElementById('settingsForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const settings = {
+            layouts: {
+                fluidLayout: document.getElementById('_dm-fluidLayoutRadio').checked,
+                boxedLayout: document.getElementById('_dm-boxedLayoutRadio').checked,
+                centeredLayout: document.getElementById('_dm-centeredLayoutRadio').checked,
+            },
+            transitions: {
+                transitionTiming: document.getElementById('_dm-transitionSelect').value,
+            },
+            header: {
+                stickyHeader: document.getElementById('_dm-stickyHeaderCheckbox').checked,
+            },
+            navigation: {
+                stickyNav: document.getElementById('_dm-stickyNavCheckbox').checked,
+                profileWidget: document.getElementById('_dm-profileWidgetCheckbox').checked,
+                miniNav: document.getElementById('_dm-miniNavRadio').checked,
+                maxiNav: document.getElementById('_dm-maxiNavRadio').checked,
+                pushNav: document.getElementById('_dm-pushNavRadio').checked,
+                slideNav: document.getElementById('_dm-slideNavRadio').checked,
+                revealNav: document.getElementById('_dm-revealNavRadio').checked,
+            },
+            sidebar: {
+                disableBackdrop: document.getElementById('_dm-disableBackdropCheckbox').checked,
+                staticPosition: document.getElementById('_dm-staticSidebarCheckbox').checked,
+                stuckSidebar: document.getElementById('_dm-stuckSidebarCheckbox').checked,
+                uniteSidebar: document.getElementById('_dm-uniteSidebarCheckbox').checked,
+                pinnedSidebar: document.getElementById('_dm-pinnedSidebarCheckbox').checked,
+            },
+            colors: {
+                themeColor: document.getElementById('settingsThemeToggler').checked,
+                colorScheme: document.querySelector('._dm-colorSchemes.active')?.dataset.color,
+                colorSchemeMode: document.querySelector('._dm-colorModeBtn.active')?.dataset.colorMode
+            },
+            font: {
+                fontSize: document.getElementById('_dm-fontSizeRange').value,
+            },
+            scrollbars: {
+                bodyScrollbar: document.getElementById('_dm-bodyScrollbarCheckbox').checked,
+                sidebarScrollbar: document.getElementById('_dm-sidebarsScrollbarCheckbox').checked,
+            },
+        };
+        const formData = new FormData();
+        flattenObject(settings, 'settings', formData);
+        AjaxRequestPromise(`{{route('save.settings')}}`, formData, 'POST', {useToastr: true})
+            .then(response => {
+                console.log('Settings updated successfully:', response);
+            })
+            .catch(error => console.log('An error occurred while updating the record.'));
+
+    });
+    function flattenObject(obj, parentKey = '', formData = new FormData()) {
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                const nestedKey = parentKey ? `${parentKey}[${key}]` : key;
+                if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
+                    flattenObject(obj[key], nestedKey, formData); // Recursively flatten nested objects
+                } else {
+                    formData.append(nestedKey, obj[key]); // Append primitive values to FormData
+                }
+            }
+        }
+        return formData;
+    }
     $(function () {
-        $("#_dm-profileWidgetCheckbox").prop("checked") && $("#_dm-profileWidgetCheckbox").click();
-        $("#_dm-stickyHeaderCheckbox").prop("checked") || $("#_dm-stickyHeaderCheckbox").click();
-        $("#dm_colorModeContainer ._dm-colorModeBtn[data-color-mode='tm--primary-mn']:not(.active)").click();
+        // $('._dm-settings-container__content .enabled').click();
+        // $("#_dm-stickyHeaderCheckbox").prop("checked") || $("#_dm-stickyHeaderCheckbox").click();
+        // $("#dm_colorModeContainer ._dm-colorModeBtn[data-color-mode='tm--primary-mn']:not(.active)").click();
     });
 
     /** Loader Start */
@@ -151,6 +373,10 @@
     $(document).ready(function () {
         /** Ajax Error Handle Start */
         $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             error: function (jqXHR, textStatus, errorThrown) {
                 error = true;
                 if (jqXHR.status === 429) {
@@ -265,12 +491,14 @@
                 confirmButtonText: 'OK'
             });
         } else if (jqXHR.status === 403) {
-            Swal.fire({
-                title: 'Forbidden',
-                text: jqXHR.responseJSON.error ?? 'You do not have permission to perform this action.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+            toastr['error']("You don\'t have permission to perform this action.");
+
+            // Swal.fire({
+            //     title: 'Forbidden',
+            //     text: jqXHR.responseJSON.error ?? 'You do not have permission to perform this action.',
+            //     icon: 'error',
+            //     confirmButtonText: 'OK'
+            // });
         } else if (jqXHR.status === 0) {
             Swal.fire({
                 title: 'Network Error',
@@ -279,6 +507,14 @@
                 confirmButtonText: 'OK'
             });
         } else if (jqXHR.status === 401) {
+            // Swal.fire({
+            //     title: 'Forbidden',
+            //     text: 'You do not have permission to perform this action.',
+            //     icon: 'error',
+            //     confirmButtonText: 'OK'
+            // });
+            console.log(jqXHR.responseJSON.error||jqXHR.responseJSON.message);
+        } else if (jqXHR.status === 419) {
             Swal.fire({
                 title: 'Unauthorized',
                 text: 'Your session has expired or you are not authorized to perform this action. Please log in again.',
@@ -293,7 +529,7 @@
         } else if (jqXHR.status === 400) {
             toastr.error(jqXHR.responseJSON.error);
             console.log(jqXHR.responseJSON.error);
-        }  else {
+        } else {
             Swal.fire({
                 title: 'Error',
                 text: `An error occurred: ${jqXHR.status} - ${jqXHR.statusText}`,
@@ -452,8 +688,11 @@
                             for (let field in response.errors) {
                                 firstError = true;
                                 const fieldSelector = $(isUpdate ? `#edit_${field}` : `#edit_${field}`).length > 0 ? `#edit_${field}` : `#${field}`;
-                                if(firstError){
-                                    document.getElementById(field).scrollIntoView({behavior: 'smooth', block: 'center'});
+                                if (firstError) {
+                                    document.getElementById(field).scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'center'
+                                    });
                                 }
 
                                 const errorMessages = response.errors[field];
@@ -507,7 +746,9 @@
                     }
                     /** Show generic error with toastr */
                     if (options.useToastr) {
-                        if (jqXHR.status !== 422 || !jqXHR.responseJSON.errors) {
+                        if (jqXHR.status === 401) {
+                            toastr['error']("You don\'t have permission to perform this action.");
+                        }else if (jqXHR.status !== 422 || !jqXHR.responseJSON.errors) {
                             toastr['error'](message);
                         }
                         if (options.useToastrReload) {

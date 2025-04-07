@@ -102,8 +102,14 @@
             // datatable.buttons().container().appendTo(`#right-icon-${index}`);
             return datatable;
         }
-        $('.my').on('click', function () {
-            dataTables[0].column(8).search(`{{auth()->user()->name}}`).draw();
+
+        $('.all-tab').on('click', function() {
+            dataTables[0].column('th:contains("AGENT")').search('').draw();
+        });
+
+        $('.my-tab').on('click', function() {
+            const currentUser = '{{ auth()->user()->name }}';
+            dataTables[0].column('th:contains("AGENT")').search(currentUser, true, false).draw();
         });
     {{--    /** Create Record */--}}
     {{--    $('#create-form').on('submit', function (e) {--}}

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssignTeamMember;
+use App\Models\Department;
+use App\Models\Position;
+use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +22,19 @@ class EmployeeController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('admin.employees.index', compact('users'));
+        $departments = Department::whereIn('name', ['Sales', 'Operations'])->get();
+        $roles = Role::whereHas('department', function ($query) {
+            $query->where('name', 'Sales');
+        })
+            ->orWhere(function ($query) {
+                $query->whereHas('department', function ($q) {
+                    $q->where('name', 'Operations');
+                })
+                    ->where('name', 'Accounts');
+            })
+            ->get();
+        $positions = Position::all();
+        return view('admin.employees.index', compact('users', 'departments', 'roles', 'positions'));
     }
 
     /**
@@ -35,13 +50,95 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
+        $messages = [
+            // Department ID
+            'department_id.required' => 'The department field is required.',
+            'department_id.integer' => 'The department must be a valid ID.',
+            'department_id.exists' => 'The selected department is invalid.',
+            // Role ID
+            'role_id.required' => 'The role field is required.',
+            'role_id.integer' => 'The role must be a valid ID.',
+            'role_id.exists' => 'The selected role is invalid.',
+            // Position ID
+            'position_id.required' => 'The position field is required.',
+            'position_id.integer' => 'The position must be a valid ID.',
+            'position_id.exists' => 'The selected position is invalid.',
+            // Team Key
+            'team_key.integer' => 'The team must be a valid number.',
+            'team_key.exists' => 'The selected team is invalid.',
+            // Employee ID
+            'emp_id.string' => 'The employee ID must be a string.',
+            'emp_id.max' => 'The employee ID must not exceed 255 characters.',
+            // Name
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name must not exceed 255 characters.',
+            // Pseudo Name
+            'pseudo_name.string' => 'The pseudo name must be a string.',
+            'pseudo_name.max' => 'The pseudo name must not exceed 255 characters.',
+            // Email
+            'email.required' => 'The email field is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.max' => 'The email must not exceed 255 characters.',
+            'email.unique' => 'The email has already been taken.',
+            // Pseudo Email
+            'pseudo_email.email' => 'The pseudo email must be a valid email address.',
+            'pseudo_email.max' => 'The pseudo email must not exceed 255 characters.',
+            'pseudo_email.unique' => 'The pseudo email has already been taken.',
+            // Designation
+            'designation.string' => 'The designation must be a string.',
+            'designation.max' => 'The designation must not exceed 255 characters.',
+            // Image
+            'image.image' => 'The file must be an image.',
+            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif.',
+            'image.max' => 'The image must not exceed 2048 kilobytes.',
+            // Target
+            'target.integer' => 'The target must be an integer.',
+            // Status
+            'status.required' => 'The status field is required.',
+            'status.in' => 'The status must be either 0 or 1.',
+            // Password
+            'password.string' => 'The password must be a string.',
+            'password.max' => 'The password must not exceed 255 characters.',
+            // Gender
+            'gender.string' => 'The gender must be a string.',
+            'gender.max' => 'The gender must not exceed 10 characters.',
+            // Phone Number
+            'phone_number.string' => 'The phone number must be a string.',
+            // Pseudo Phone
+            'pseudo_phone.string' => 'The pseudo phone must be a string.',
+            // Address
+            'address.string' => 'The address must be a string.',
+            'address.max' => 'The address must not exceed 255 characters.',
+            // City
+            'city.string' => 'The city must be a string.',
+            'city.max' => 'The city must not exceed 255 characters.',
+            // State
+            'state.string' => 'The state must be a string.',
+            'state.max' => 'The state must not exceed 255 characters.',
+            // Country
+            'country.string' => 'The country must be a string.',
+            'country.max' => 'The country must not exceed 255 characters.',
+            // Postal Code
+            'postal_code.string' => 'The postal code must be a string.',
+            'postal_code.max' => 'The postal code must not exceed 10 characters.',
+            // Date of Birth
+            'dob.date' => 'The date of birth must be a valid date.',
+            // Date of Joining
+            'date_of_joining.date' => 'The date of joining must be a valid date.',
+            // About
+            'about.string' => 'The about field must be a string.',
+        ];
         $request->validate([
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'role_id' => 'nullable|integer|exists:roles,id',
+            'position_id' => 'nullable|integer|exists:positions,id',
             'team_key' => 'nullable|integer|exists:teams,team_key',
             'emp_id' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'pseudo_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
-            'pseudo_email' => 'nullable|email|max:255|unique:users,email',
+            'pseudo_email' => 'nullable|email|max:255|unique:users,pseudo_email',
             'designation' => 'nullable|string|max:255',
             'gender' => 'nullable|string|max:10',
             'phone_number' => 'nullable|string',
@@ -59,11 +156,12 @@ class EmployeeController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'nullable|string|max:255',
 //            'phone_number' => 'nullable|regex:/^(\+?\d{1,3})[\d\s().-]+$/|min:8|max:20'
-        ]);
+        ], $messages);
         try {
 
             $user = new User($request->only([
-                'team_key', 'emp_id', 'name', 'pseudo_name', 'email', 'pseudo_email', 'designation', 'gender',
+                'department_id', 'role_id', 'position_id', 'team_key', 'emp_id',
+                'name', 'pseudo_name', 'email', 'pseudo_email', 'designation', 'gender',
                 'phone_number', 'pseudo_phone', 'address', 'city', 'state', 'country',
                 'postal_code', 'dob', 'date_of_joining', 'about', 'target', 'status'
             ]));
@@ -113,13 +211,95 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $messages = [
+            // Department ID
+            'department_id.required' => 'The department field is required.',
+            'department_id.integer' => 'The department must be a valid ID.',
+            'department_id.exists' => 'The selected department is invalid.',
+            // Role ID
+            'role_id.required' => 'The role field is required.',
+            'role_id.integer' => 'The role must be a valid ID.',
+            'role_id.exists' => 'The selected role is invalid.',
+            // Position ID
+            'position_id.required' => 'The position field is required.',
+            'position_id.integer' => 'The position must be a valid ID.',
+            'position_id.exists' => 'The selected position is invalid.',
+            // Team Key
+            'team_key.integer' => 'The team must be a valid number.',
+            'team_key.exists' => 'The selected team is invalid.',
+            // Employee ID
+            'emp_id.string' => 'The employee ID must be a string.',
+            'emp_id.max' => 'The employee ID must not exceed 255 characters.',
+            // Name
+            'name.required' => 'The name field is required.',
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The name must not exceed 255 characters.',
+            // Pseudo Name
+            'pseudo_name.string' => 'The pseudo name must be a string.',
+            'pseudo_name.max' => 'The pseudo name must not exceed 255 characters.',
+            // Email
+            'email.required' => 'The email field is required.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.max' => 'The email must not exceed 255 characters.',
+            'email.unique' => 'The email has already been taken.',
+            // Pseudo Email
+            'pseudo_email.email' => 'The pseudo email must be a valid email address.',
+            'pseudo_email.max' => 'The pseudo email must not exceed 255 characters.',
+            'pseudo_email.unique' => 'The pseudo email has already been taken.',
+            // Designation
+            'designation.string' => 'The designation must be a string.',
+            'designation.max' => 'The designation must not exceed 255 characters.',
+            // Image
+            'image.image' => 'The file must be an image.',
+            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif.',
+            'image.max' => 'The image must not exceed 2048 kilobytes.',
+            // Target
+            'target.integer' => 'The target must be an integer.',
+            // Status
+            'status.required' => 'The status field is required.',
+            'status.in' => 'The status must be either 0 or 1.',
+            // Password
+            'password.string' => 'The password must be a string.',
+            'password.max' => 'The password must not exceed 255 characters.',
+            // Gender
+            'gender.string' => 'The gender must be a string.',
+            'gender.max' => 'The gender must not exceed 10 characters.',
+            // Phone Number
+            'phone_number.string' => 'The phone number must be a string.',
+            // Pseudo Phone
+            'pseudo_phone.string' => 'The pseudo phone must be a string.',
+            // Address
+            'address.string' => 'The address must be a string.',
+            'address.max' => 'The address must not exceed 255 characters.',
+            // City
+            'city.string' => 'The city must be a string.',
+            'city.max' => 'The city must not exceed 255 characters.',
+            // State
+            'state.string' => 'The state must be a string.',
+            'state.max' => 'The state must not exceed 255 characters.',
+            // Country
+            'country.string' => 'The country must be a string.',
+            'country.max' => 'The country must not exceed 255 characters.',
+            // Postal Code
+            'postal_code.string' => 'The postal code must be a string.',
+            'postal_code.max' => 'The postal code must not exceed 10 characters.',
+            // Date of Birth
+            'dob.date' => 'The date of birth must be a valid date.',
+            // Date of Joining
+            'date_of_joining.date' => 'The date of joining must be a valid date.',
+            // About
+            'about.string' => 'The about field must be a string.',
+        ];
         $request->validate([
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'role_id' => 'nullable|integer|exists:roles,id',
+            'position_id' => 'nullable|integer|exists:positions,id',
             'team_key' => 'nullable|integer|exists:teams,team_key',
             'emp_id' => 'nullable|string|max:255',
             'name' => 'required|string|max:255',
             'pseudo_name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'pseudo_email' => 'nullable|email|max:255|unique:users,email',
+            'pseudo_email' => 'nullable|email|max:255|unique:users,pseudo_email,' . $user->id,
             'designation' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'target' => 'nullable|integer',
@@ -137,9 +317,10 @@ class EmployeeController extends Controller
             'date_of_joining' => 'nullable|date',
             'about' => 'nullable|string',
 //            'phone_number' => 'nullable|regex:/^(\+?\d{1,3})[\d\s().-]+$/|min:8|max:20'
-        ]);
+        ], $messages);
         $user->fill($request->only([
-            'team_key', 'emp_id', 'name', 'pseudo_name', 'email', 'pseudo_email', 'designation', 'gender',
+            'department_id', 'role_id', 'position_id', 'team_key', 'emp_id',
+            'name', 'pseudo_name', 'email', 'pseudo_email', 'designation', 'gender',
             'phone_number', 'pseudo_phone', 'address', 'city', 'state', 'country',
             'postal_code', 'dob', 'date_of_joining', 'about', 'target', 'status'
         ]));

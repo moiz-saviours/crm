@@ -32,7 +32,7 @@
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
-                            <li class="tab-item active" data-tab="home">Client Accounts
+                            <li class="tab-item active" data-tab="home">Accounts
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
                         </ul>
                     </div>

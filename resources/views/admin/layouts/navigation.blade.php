@@ -10,7 +10,7 @@
 
                 <!-- Profile picture  -->
                 <div class="mininav-toggle text-center py-2">
-                    <img class="mainnav__avatar img-md rounded-circle hv-oc"
+                    <img class="mainnav__avatar img-md rounded-circle hv-oc" style="background-color: var(--bs-secondary);"
                          src="{{auth()->guard('admin')->user()->image && file_exists(public_path('assets/images/employees/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/employees/'.auth()->guard('admin')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
                          alt="{{auth()->guard('admin')->user()->name}}" title="Dashboard" loading="lazy">
                 </div>
@@ -24,34 +24,37 @@
                            <span class="dropdown-toggle d-flex justify-content-center align-items-center">
                               <h5 class="mb-0 me-3">{{auth()->guard('admin')->user()->name}}</h5>
                            </span>
-                            <small class="text-body-secondary">{{auth()->guard('admin')->user()->designation}}</small>
                         </button>
-
+                        <div class="text-center pb-1">
+                            <small class="text-body-secondary d-block">{{auth()->guard('admin')->user()->email}}</small>
+                            <small
+                                class="text-body-secondary d-block text-capitalize">{{auth()->guard('admin')->user()->designation}}</small>
+                        </div>
 
                         <!-- Collapsed user menu -->
                         <div id="usernav" class="nav flex-column collapse">
-                            <a href="#" class="nav-link d-flex justify-content-between align-items-center">
-                                    <span><i class="demo-pli-mail fs-5 me-2"></i><span
-                                            class="ms-1">Messages</span></span>
-                                <span class="badge bg-danger rounded-pill">14</span>
-                            </a>
-                            <a href="#" class="nav-link">
+{{--                            <a href="#" class="nav-link d-flex justify-content-between align-items-center">--}}
+{{--                                    <span><i class="demo-pli-mail fs-5 me-2"></i><span--}}
+{{--                                            class="ms-1">Messages</span></span>--}}
+{{--                                <span class="badge bg-danger rounded-pill">14</span>--}}
+{{--                            </a>--}}
+                            <a href="javascript:void(0)" class="nav-link">
                                 <i class="demo-pli-male fs-5 me-2"></i>
                                 <span class="ms-1">Profile</span>
                             </a>
-                            <a href="#" class="nav-link">
-                                <i class="demo-pli-gear fs-5 me-2"></i>
-                                <span class="ms-1">Settings</span>
-                            </a>
-                            <a href="#" class="nav-link">
-                                <i class="demo-pli-computer-secure fs-5 me-2"></i>
-                                <span class="ms-1">Lock screen</span>
-                            </a>
-                            <a class="nav-link" style="cursor: pointer;"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="demo-pli-unlock fs-5 me-2"></i>
-                                <span class="ms-1">Logout</span>
-                            </a>
+{{--                            <a href="#" class="nav-link">--}}
+{{--                                <i class="demo-pli-gear fs-5 me-2"></i>--}}
+{{--                                <span class="ms-1">Settings</span>--}}
+{{--                            </a>--}}
+{{--                            <a href="#" class="nav-link">--}}
+{{--                                <i class="demo-pli-computer-secure fs-5 me-2"></i>--}}
+{{--                                <span class="ms-1">Lock screen</span>--}}
+{{--                            </a>--}}
+{{--                            <a class="nav-link" style="cursor: pointer;"--}}
+{{--                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">--}}
+{{--                                <i class="demo-pli-unlock fs-5 me-2"></i>--}}
+{{--                                <span class="ms-1">Logout</span>--}}
+{{--                            </a>--}}
                         </div>
 
 
@@ -63,7 +66,7 @@
 
 
             <!-- Navigation Category Dashboard -->
-            <div class="mainnav__categoriy pb-1 pt-3">
+            <div class="mainnav__categoriy pb-1">
                 {{--                    <h6 class="mainnav__caption mt-0 fw-bold">Navigation</h6>--}}
                 <ul class="mainnav__menu nav flex-column">
                     <!-- Link with submenu -->
@@ -164,7 +167,7 @@
                     <!-- Link with submenu -->
                     <li class="nav-item">
                         <a href="{{route('admin.account.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/account*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-lock-user fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Admins
@@ -222,7 +225,7 @@
 {{--                    </li>--}}
                     <li class="nav-item">
                         <a href="{{route('admin.brand.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/brand*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-tag fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Brands
@@ -280,7 +283,7 @@
 {{--                    </li>--}}
                     <li class="nav-item">
                         <a href="{{route('admin.team-target.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/team-target*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-bar-chart fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Team Targets
@@ -335,7 +338,7 @@
 
                     <li class="nav-item">
                         <a href="{{route('admin.lead-status.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/lead-status*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-gears fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Lead Status
@@ -364,7 +367,7 @@
 {{--                    </li>--}}
                     <li class="nav-item">
                         <a href="{{route('admin.lead.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/lead*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-mine fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Leads
@@ -393,7 +396,7 @@
 {{--                    </li>--}}
                     <li class="nav-item">
                         <a href="{{route('admin.invoice.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/invoice*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-file fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Invoices
@@ -422,7 +425,7 @@
 {{--                    </li>--}}
                     <li class="nav-item">
                         <a href="{{route('admin.payment.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/payment*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-wallet-2 fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Payments
@@ -464,16 +467,16 @@
                             </div>
                             <li class="nav-item">
                                 <a href="{{ route('admin.client.contact.index') }}"
-                                   class="nav-link {{ request()->is('admin/client/contact*') ? '' : '' }}">Contacts</a>
+                                   class="nav-link {{ request()->is('admin/client/contact*') ? 'active' : '' }}">Contacts</a>
                             </li>
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.client.company.index') }}"
-                                   class="nav-link {{ request()->is('admin/client/{company,companies}*') ? '' : '' }}">Company</a>
+                                   class="nav-link {{ request()->is('admin/client/company*') || request()->is('admin/client/companies*') ? 'active' : '' }}">Company</a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.client.account.index') }}"
-                                   class="nav-link {{ request()->is('admin/client/account*') ? '' : '' }}">Accounts</a>
+                                   class="nav-link {{ request()->is('admin/client/account*') ? 'active' : '' }}">Accounts</a>
                             </li>
 
                         </ul>
@@ -481,7 +484,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{route('admin.activity-log.index')}}" class="nav-link mininav-toggle {{ request()->is('admin/activity-logs*') ? 'active' : '' }}">
-                            <i class="demo-pli-add-user fs-5 me-2"></i>
+                            <i class="demo-pli-calendar-4 fs-5 me-2"></i>
                             <span class="nav-label mininav-content ms-1 collapse show" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Activity Logs
