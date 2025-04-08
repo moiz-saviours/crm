@@ -43,39 +43,39 @@ jobs:
           echo "DEV_STELLER_ENABLE=${{ secrets.DEV_STELLER_ENABLE }}" >> $GITHUB_ENV
 
           # Status
-          if [[ "$LIVE_ENABLE" == "true" ]]; then
+          if [[ "${{ secrets.LIVE_ENABLE }}" == "true" ]]; then
             echo "🚀 Live: ENABLED"
           else
             echo "❌ Live: DISABLED"
           fi
 
-          if [[ "$DEV_ENABLE" == "true" ]]; then
+          if [[ "${{ secrets.DEV_ENABLE }}" == "true" ]]; then
             echo "🚀 Dev: ENABLED"
           else
             echo "❌ Dev: DISABLED"
           fi
 
           # GENX Status
-          if [[ "$LIVE_GENX_ENABLE" == "true" ]]; then
+          if [[ "${{ secrets.LIVE_GENX_ENABLE }}" == "true" ]]; then
             echo "🚀 GENX Live: ENABLED"
           else
             echo "❌ GENX Live: DISABLED"
           fi
 
-          if [[ "$DEV_GENX_ENABLE" == "true" ]]; then
+          if [[ "${{ secrets.DEV_GENX_ENABLE }}" == "true" ]]; then
             echo "🚀 GENX Dev: ENABLED"
           else
             echo "❌ GENX Dev: DISABLED"
           fi
 
           # STELLER Status
-          if [[ "$LIVE_STELLER_ENABLE" == "true" ]]; then
+          if [[ "${{ secrets.LIVE_STELLER_ENABLE }}" == "true" ]]; then
             echo "🚀 STELLER Live: ENABLED"
           else
             echo "❌ STELLER Live: DISABLED"
           fi
 
-          if [[ "$DEV_STELLER_ENABLE" == "true" ]]; then
+          if [[ "${{ secrets.DEV_STELLER_ENABLE }}" == "true" ]]; then
             echo "🚀 STELLER Dev: ENABLED"
           else
             echo "❌ STELLER Dev: DISABLED"
