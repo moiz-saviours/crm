@@ -40,16 +40,16 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_SPANEL_SERVER_DIR }}
 
-      - name: Deploy to Trefid Live
+      - name: Deploy to GENX Live
         if: env.environment == 'live'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.LIVE_TREFID_FTP_SERVER }}
-          username: ${{ secrets.LIVE_TREFID_FTP_USERNAME }}
-          password: ${{ secrets.LIVE_TREFID_FTP_PASSWORD }}
-          port: ${{ secrets.LIVE_TREFID_FTP_PORT || 21 }}
+          server: ${{ secrets.LIVE_GENX_FTP_SERVER }}
+          username: ${{ secrets.LIVE_GENX_FTP_USERNAME }}
+          password: ${{ secrets.LIVE_GENX_FTP_PASSWORD }}
+          port: ${{ secrets.LIVE_GENX_FTP_PORT || 21 }}
           local-dir: ./
-          server-dir: ${{ secrets.LIVE_TREFID_SERVER_DIR }}
+          server-dir: ${{ secrets.LIVE_GENX_SERVER_DIR }}
 
       - name: Deploy to Development
         if: env.environment == 'development'
@@ -62,13 +62,13 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.DEV_SPANEL_SERVER_DIR }}
 
-      - name: Deploy to Trefid Development
+      - name: Deploy to GENX Development
         if: env.environment == 'development'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.DEV_TREFID_FTP_SERVER }}
-          username: ${{ secrets.DEV_TREFID_FTP_USERNAME }}
-          password: ${{ secrets.DEV_TREFID_FTP_PASSWORD }}
-          port: ${{ secrets.DEV_TREFID_FTP_PORT || 21 }}
+          server: ${{ secrets.DEV_GENX_FTP_SERVER }}
+          username: ${{ secrets.DEV_GENX_FTP_USERNAME }}
+          password: ${{ secrets.DEV_GENX_FTP_PASSWORD }}
+          port: ${{ secrets.DEV_GENX_FTP_PORT || 21 }}
           local-dir: ./
-          server-dir: ${{ secrets.DEV_TREFID_SERVER_DIR }}
+          server-dir: ${{ secrets.DEV_GENX_SERVER_DIR }}
