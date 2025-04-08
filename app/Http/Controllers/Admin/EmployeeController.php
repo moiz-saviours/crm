@@ -21,6 +21,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
+        $teams = Team::whereStatus(1)->get();
         $users = User::all();
         $departments = Department::whereIn('name', ['Sales', 'Operations'])->get();
         $roles = Role::whereHas('department', function ($query) {
@@ -34,7 +35,7 @@ class EmployeeController extends Controller
             })
             ->get();
         $positions = Position::all();
-        return view('admin.employees.index', compact('users', 'departments', 'roles', 'positions'));
+        return view('admin.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions'));
     }
 
     /**
@@ -177,8 +178,11 @@ class EmployeeController extends Controller
                 $user->password = Hash::make(12345678);
             }
             $user->save();
-            return response()->json(['data' => $user, 'message' => 'Record created successfully.']);
-
+            if ($request->has('team_key') && !empty($request->input('team_key'))) {
+                $user->teams()->sync($request->input('team_key'));
+            }
+            $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
+            return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record created successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }

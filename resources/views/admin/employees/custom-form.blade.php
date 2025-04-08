@@ -73,6 +73,11 @@
                     <label for="team_key" class="form-label">Select Team</label>
                     <select class="form-control" id="team_key" name="team_key">
                         <option value="" disabled selected>Select Team</option>
+                        @foreach($teams as $team)
+                            <option value="{{ $team->team_key }}">
+                                {{ $team->name }}
+                            </option>
+                        @endforeach
                     </select>
                     @error('teams')
                     <span class="text-danger">{{ $message }}</span>
