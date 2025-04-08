@@ -1,4 +1,4 @@
-name: Deploy to Spanel (Live and Dev)
+name: Deploy to (Live and Dev)
 
 on:
   push:
@@ -29,8 +29,53 @@ jobs:
             echo "environment=development" >> "$GITHUB_ENV"
           fi
 
+      # Debug: Print Deployment Status for All Providers
+      - name: Check Deployment Status
+        run: |
+          echo "=== DEPLOYMENT CONFIGURATION ==="
+
+          # Status
+          if [[ "${{ secrets.LIVE_ENABLE }}" == "true" ]]; then
+            echo "🚀 Live: ENABLED"
+          else
+            echo "❌ Live: DISABLED"
+          fi
+
+          if [[ "${{ secrets.DEV_ENABLE }}" == "true" ]]; then
+            echo "🚀 Dev: ENABLED"
+          else
+            echo "❌ Dev: DISABLED"
+          fi
+
+          # GENX Status
+          if [[ "${{ secrets.LIVE_GENX_ENABLE }}" == "true" ]]; then
+            echo "🚀 GENX Live: ENABLED"
+          else
+            echo "❌ GENX Live: DISABLED"
+          fi
+
+          if [[ "${{ secrets.DEV_GENX_ENABLE }}" == "true" ]]; then
+            echo "🚀 GENX Dev: ENABLED"
+          else
+            echo "❌ GENX Dev: DISABLED"
+          fi
+
+          # STELLER Status
+          if [[ "${{ secrets.LIVE_STELLER_ENABLE }}" == "true" ]]; then
+            echo "🚀 STELLER Live: ENABLED"
+          else
+            echo "❌ STELLER Live: DISABLED"
+          fi
+
+          if [[ "${{ secrets.DEV_STELLER_ENABLE }}" == "true" ]]; then
+            echo "🚀 STELLER Dev: ENABLED"
+          else
+            echo "❌ STELLER Dev: DISABLED"
+          fi
+
+      # ========== LIVE DEPLOYMENTS ==========
       - name: Deploy to Live
-        if: env.environment == 'live'
+        if: env.environment == 'live' && secrets.LIVE_ENABLE == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.LIVE_SPANEL_FTP_SERVER }}
@@ -41,7 +86,7 @@ jobs:
           server-dir: ${{ secrets.LIVE_SPANEL_SERVER_DIR }}
 
       - name: Deploy to GENX Live
-        if: env.environment == 'live'
+        if: env.environment == 'live' && secrets.LIVE_GENX_ENABLE == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.LIVE_GENX_FTP_SERVER }}
@@ -51,8 +96,20 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_GENX_SERVER_DIR }}
 
-      - name: Deploy to Development
-        if: env.environment == 'development'
+      - name: Deploy to STELLER Live
+        if: env.environment == 'live' && secrets.LIVE_STELLER_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.LIVE_STELLER_FTP_SERVER }}
+          username: ${{ secrets.LIVE_STELLER_FTP_USERNAME }}
+          password: ${{ secrets.LIVE_STELLER_FTP_PASSWORD }}
+          port: ${{ secrets.LIVE_STELLER_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.LIVE_STELLER_SERVER_DIR }}
+
+      # ========== DEV DEPLOYMENTS ==========
+      - name: Deploy to Dev
+        if: env.environment == 'development' && secrets.DEV_ENABLE == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.DEV_SPANEL_FTP_SERVER }}
@@ -62,8 +119,8 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.DEV_SPANEL_SERVER_DIR }}
 
-      - name: Deploy to GENX Development
-        if: env.environment == 'development'
+      - name: Deploy to GENX Dev
+        if: env.environment == 'development' && secrets.DEV_GENX_ENABLE == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.DEV_GENX_FTP_SERVER }}
@@ -72,3 +129,14 @@ jobs:
           port: ${{ secrets.DEV_GENX_FTP_PORT || 21 }}
           local-dir: ./
           server-dir: ${{ secrets.DEV_GENX_SERVER_DIR }}
+
+      - name: Deploy to STELLER Dev
+        if: env.environment == 'development' && secrets.DEV_STELLER_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.DEV_STELLER_FTP_SERVER }}
+          username: ${{ secrets.DEV_STELLER_FTP_USERNAME }}
+          password: ${{ secrets.DEV_STELLER_FTP_PASSWORD }}
+          port: ${{ secrets.DEV_STELLER_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.DEV_STELLER_SERVER_DIR }}
