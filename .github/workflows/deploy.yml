@@ -75,7 +75,7 @@ jobs:
 
       # ========== LIVE DEPLOYMENTS ==========
       - name: Deploy to Live
-        if: ${{ env.environment == 'live' && secrets.LIVE_ENABLE == 'true' }}
+        if: env.environment == 'live' && ${{ secrets.LIVE_ENABLE }} == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.LIVE_SPANEL_FTP_SERVER }}
@@ -86,7 +86,7 @@ jobs:
           server-dir: ${{ secrets.LIVE_SPANEL_SERVER_DIR }}
 
       - name: Deploy to GENX Live
-        if: ${{ env.environment == 'live' && secrets.LIVE_GENX_ENABLE == 'true' }}
+        if: env.environment == 'live' && ${{ secrets.LIVE_GENX_ENABLE }} == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.LIVE_GENX_FTP_SERVER }}
@@ -97,7 +97,7 @@ jobs:
           server-dir: ${{ secrets.LIVE_GENX_SERVER_DIR }}
 
       - name: Deploy to STELLER Live
-        if: ${{ env.environment == 'live' && secrets.LIVE_STELLER_ENABLE == 'true' }}
+        if: env.environment == 'live' && ${{ secrets.LIVE_STELLER_ENABLE }} == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.LIVE_STELLER_FTP_SERVER }}
@@ -109,7 +109,7 @@ jobs:
 
       # ========== DEV DEPLOYMENTS ==========
       - name: Deploy to Dev
-        if: ${{ env.environment == 'development' && secrets.DEV_ENABLE == 'true' }}
+        if: env.environment == 'development' && ${{ secrets.DEV_ENABLE }} == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.DEV_SPANEL_FTP_SERVER }}
@@ -120,7 +120,7 @@ jobs:
           server-dir: ${{ secrets.DEV_SPANEL_SERVER_DIR }}
 
       - name: Deploy to GENX Dev
-        if: ${{ env.environment == 'development' && secrets.DEV_GENX_ENABLE == 'true' }}
+        if: env.environment == 'development' && ${{ secrets.DEV_GENX_ENABLE }} == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.DEV_GENX_FTP_SERVER }}
@@ -131,7 +131,7 @@ jobs:
           server-dir: ${{ secrets.DEV_GENX_SERVER_DIR }}
 
       - name: Deploy to STELLER Dev
-        if: ${{ env.environment == 'development' && secrets.DEV_STELLER_ENABLE == 'true' }}
+        if: env.environment == 'development' && ${{ secrets.DEV_STELLER_ENABLE }} == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.DEV_STELLER_FTP_SERVER }}
