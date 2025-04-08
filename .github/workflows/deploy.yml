@@ -115,7 +115,7 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_STELLER_SERVER_DIR }}
 
-      # ========== DEV DEPLOYMENTS ==========
+      # ========== DEV DEPLOYMENTS ===========
       - name: Deploy to Dev
         if: env.environment == 'development' && env.DEV_ENABLE == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
