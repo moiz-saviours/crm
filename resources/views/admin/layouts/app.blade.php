@@ -155,8 +155,10 @@
 
                     <!-- Brand logo -->
                     <a href="{{route('admin.dashboard')}}" class="brand-img stretched-link">
-                        <img src="{{asset('assets/img/favicon.png')}}" alt="Logo" class="logo" width="16"
-                             height="16">
+                        <img src="{{asset('assets/img/favicon.png')}}" alt="Logo" class="logo"
+{{--                             width="16"--}}
+{{--                             height="16"--}}
+                            style="width:110px;height:40px">
                     </a>
 
 
@@ -940,7 +942,7 @@
 <!-- SCROLL TO TOP BUTTON -->
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <div class="scroll-container">
-    <a href="#root" class="scroll-page ratio ratio-1x1" aria-label="Scroll button"></a>
+    <a href="javascript:void(0)" class="scroll-page ratio ratio-1x1" aria-label="Scroll button"></a>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 <!-- END - SCROLL TO TOP BUTTON -->
