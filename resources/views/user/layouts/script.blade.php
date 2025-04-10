@@ -46,6 +46,15 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
+
+<!-- Scroll Top -->
+<script>
+    $(".scroll-page").on("click", function () {
+        document.getElementById("root").scrollIntoView({behavior: 'smooth', block: 'start'});
+    })
+</script>
+<!-- Scroll Top -->
+
 <!-- Toaster -->
 <script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
 
@@ -513,7 +522,7 @@
             //     icon: 'error',
             //     confirmButtonText: 'OK'
             // });
-            console.log(jqXHR.responseJSON.error||jqXHR.responseJSON.message);
+            console.log(jqXHR.responseJSON.error || jqXHR.responseJSON.message);
         } else if (jqXHR.status === 419) {
             Swal.fire({
                 title: 'Unauthorized',
@@ -748,7 +757,7 @@
                     if (options.useToastr) {
                         if (jqXHR.status === 401) {
                             toastr['error']("You don\'t have permission to perform this action.");
-                        }else if (jqXHR.status !== 422 || !jqXHR.responseJSON.errors) {
+                        } else if (jqXHR.status !== 422 || !jqXHR.responseJSON.errors) {
                             toastr['error'](message);
                         }
                         if (options.useToastrReload) {
@@ -862,10 +871,13 @@
                 resetFields();
                 // Show message if no access
                 if ($(this).hasClass('void')) {
-                    $(this).attr('title', "You don't have access to create a company.")
+                    $(this).attr('title', "You don't have access to create a record.")
                         .tooltip({placement: 'bottom'}).tooltip('show');
                 } else {
                     formContainer.addClass('open');
+                    $('.form-body').animate({
+                        scrollTop: $('.form-body').offset().top - 500
+                    }, 500);
                 }
             });
         }
