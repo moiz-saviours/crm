@@ -6,9 +6,11 @@
     src="{{asset('assets/themes/nifty/assets/js/nifty.min.b960437305df20c97b96bfb28e62b7d655ad70041fcfed38fae70d11012b2b58.js')}}"></script>
 
 <!-- Plugin scripts [ OPTIONAL ] -->
-<script src="{{asset('assets/themes/nifty/assets/pages/dashboard-1.min.b651fbd1a6f6a43e11bc01617b4481ab0edc4ba4582106c466d7ae2a9a9ac178.js')}}"></script>
+<script
+    src="{{asset('assets/themes/nifty/assets/pages/dashboard-1.min.b651fbd1a6f6a43e11bc01617b4481ab0edc4ba4582106c466d7ae2a9a9ac178.js')}}"></script>
 <script src="{{asset('assets/js/jquery.min.js')}}"></script>
-<script id="_dm-jsOverlayScrollbars" src="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.browser.es6.min.js')}}"></script>
+<script id="_dm-jsOverlayScrollbars"
+        src="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.browser.es6.min.js')}}"></script>
 <!-- New -->
 {{--https://cdn.datatables.net/v/bs4/jszip-3.10.1/dt-2.1.8/b-3.2.0/b-colvis-3.2.0/b-html5-3.2.0/b-print-3.2.0/cr-2.0.4/date-1.5.4/fc-5.0.4/fh-4.0.1/sc-2.4.3/sp-2.3.3/sl-2.1.0/datatables.min.css--}}
 <link href="{{asset('assets/css/datatable/new/datatables.min.css')}}" rel="stylesheet">
@@ -43,6 +45,16 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
+
+
+<!-- Scroll Top -->
+<script>
+    $(".scroll-page").on("click", function () {
+        document.getElementById("root").scrollIntoView({behavior: 'smooth', block: 'start'});
+    })
+</script>
+<!-- Scroll Top -->
+
 <!-- Toaster -->
 <script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
 
@@ -131,7 +143,7 @@
             const transitionSelect = document.getElementById('_dm-transitionSelect');
             if (transitionSelect.value !== settings.transitions.transitionTiming) {
                 transitionSelect.value = settings.transitions.transitionTiming;
-                const changeEvent = new Event('change', { bubbles: true });
+                const changeEvent = new Event('change', {bubbles: true});
                 transitionSelect.dispatchEvent(changeEvent);
             }
         }
@@ -230,12 +242,11 @@
 
             if (fontSizeRange.value !== settings.font.fontSize) {
                 fontSizeRange.value = settings.font.fontSize;
-                const inputEvent = new Event('input', { bubbles: true });
+                const inputEvent = new Event('input', {bubbles: true});
                 fontSizeRange.dispatchEvent(inputEvent);
                 fontSizeValue.textContent = settings.font.fontSize;
             }
         }
-
 
         setTimeout(function () {
             if (settings.scrollbars) {
@@ -249,7 +260,7 @@
                     sidebarScrollbarCheckbox.click();
                 }
             }
-        },1000)
+        }, 1000)
     });
     document.getElementById('settingsForm').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -665,8 +676,11 @@
                             for (let field in response.errors) {
                                 firstError = true;
                                 const fieldSelector = $(isUpdate ? `#edit_${field}` : `#edit_${field}`).length > 0 ? `#edit_${field}` : `#${field}`;
-                                if(firstError){
-                                    document.getElementById(field).scrollIntoView({behavior: 'smooth', block: 'center'});
+                                if (firstError) {
+                                    document.getElementById(field).scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'center'
+                                    });
                                 }
 
                                 const errorMessages = response.errors[field];
@@ -834,10 +848,13 @@
                 resetFields();
                 // Show message if no access
                 if ($(this).hasClass('void')) {
-                    $(this).attr('title', "You don't have access to create a company.")
+                    $(this).attr('title', "You don't have access to create a record.")
                         .tooltip({placement: 'bottom'}).tooltip('show');
                 } else {
                     formContainer.addClass('open');
+                    $('.form-body').animate({
+                        scrollTop: $('.form-body').offset().top - 500
+                    }, 500);
                 }
             });
         }
