@@ -10,9 +10,11 @@ use App\Models\InvoiceMerchant;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class InvoiceController extends Controller
@@ -244,7 +246,17 @@ class InvoiceController extends Controller
             }
             DB::commit();
             $invoice->refresh();
-            $invoice->loadMissing('customer_contact', 'brand', 'team', 'agent', 'creator');
+            $invoice->load(['agent' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }, 'customer_contact' => function ($query) {
+                $query->select('id', 'name', 'email', 'phone', 'special_key');
+            }, 'brand' => function ($query) {
+                $query->select('id', 'brand_key', 'name');
+            }, 'team' => function ($query) {
+                $query->select('id', 'team_key', 'name',);
+            }, 'creator' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }]);
             $invoice->date = "Today at " . $invoice->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             $invoice->due_date = Carbon::parse($invoice->due_date)->format('Y-m-d');
             return response()->json(['data' => $invoice, 'success' => "Record created successfully!" .
@@ -259,47 +271,22 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
-        if (!$invoice->id) return response()->json(['error' => 'Invoice does not exist.']);
-        if ($invoice->status == 1) return response()->json(['error' => 'Oops! The Invoice is already paid.'], 400);
-        $user = auth()->user();
-        $isCreator = $invoice->creator && $invoice->creator->id == $user->id;
-        $isAgent = $invoice->agent && $invoice->agent->id == $user->id;
-        $isTeamLead = false;
-        if ($invoice->team_key) {
-            $team = Team::where('team_key', $invoice->team_key)->first();
-            if ($team && $team->lead_id == $user->id) {
-                $isTeamLead = true;
-            }
-        }
-        if (!$isCreator && !$isAgent && !$isTeamLead) {
-            return response()->json(['error' => 'You do not have permission to perform this action.'], 403);
-        }
-        $invoice->loadMissing('customer_contact', 'invoice_merchants');
-        $invoiceMerchants = [];
-        foreach ($invoice->invoice_merchants as $merchant) {
-            $invoiceMerchants[$merchant->merchant_type] = $merchant->merchant_id;
-        }
-        $invoice->merchant_types = $invoiceMerchants;
+        $this->authorize('edit', $invoice);
+
+        $invoice->load(['agent' => function ($query) {
+            $query->select('id', 'name', 'email');
+        }, 'customer_contact' => function ($query) {
+            $query->select('id', 'name', 'email', 'phone', 'special_key');
+        }, 'invoice_merchants']);
+
+
+        $invoice->merchant_types = $invoice->invoice_merchants->mapWithKeys(fn($merchant) => [$merchant->merchant_type => $merchant->merchant_id]);
         return response()->json(['invoice' => $invoice]);
     }
 
     public function update(Request $request, Invoice $invoice)
     {
-        if (!$invoice->id) return response()->json(['error' => 'Invoice does not exist.']);
-        if ($invoice->status == 1) return response()->json(['error' => 'Oops! The Invoice is already paid.'], 400);
-        $user = auth()->user();
-        $isCreator = $invoice->creator && $invoice->creator->id === $user->id;
-        $isAgent = $invoice->agent && $invoice->agent->id === $user->id;
-        $isTeamLead = false;
-        if ($invoice->team_key) {
-            $team = Team::where('team_key', $invoice->team_key)->first();
-            if ($team && $team->lead_id === $user->id) {
-                $isTeamLead = true;
-            }
-        }
-        if (!$isCreator && !$isAgent && !$isTeamLead) {
-            return response()->json(['error' => 'You do not have permission to perform this action.'], 403);
-        }
+        $this->authorize('update', $invoice);
         $validator = Validator::make($request->all(), [
             'brand_key' => 'required|integer|exists:brands,brand_key',
             'team_key' => 'required|integer|exists:teams,team_key',
@@ -483,6 +470,17 @@ class InvoiceController extends Controller
                 }
             }
             DB::commit();
+            $invoice->load(['agent' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }, 'customer_contact' => function ($query) {
+                $query->select('id', 'name', 'email', 'phone', 'special_key');
+            }, 'brand' => function ($query) {
+                $query->select('id', 'brand_key', 'name');
+            }, 'team' => function ($query) {
+                $query->select('id', 'team_key', 'name',);
+            }, 'creator' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }]);
             $invoice->loadMissing('customer_contact', 'brand', 'team', 'agent', 'creator');
             if ($invoice->created_at->isToday()) {
                 $date = "Today at " . $invoice->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
