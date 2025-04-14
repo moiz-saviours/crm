@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Services\GlobalService;
 use App\Services\Restrict\PaymentGatewayService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Invoice;
 use App\Policies\InvoicePolicy;
 
