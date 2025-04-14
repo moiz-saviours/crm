@@ -69,15 +69,12 @@ class InvoiceController extends Controller
                             if (empty($value)) {
                                 $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                             }
-
                             if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                                 $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                             }
-
                             if (strlen($value) < 8) {
                                 $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                             }
-
                             if (strlen($value) > 20) {
                                 $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                             }
@@ -277,17 +274,13 @@ class InvoiceController extends Controller
         if (!$isCreator && !$isAgent && !$isTeamLead) {
             return response()->json(['error' => 'You do not have permission to perform this action.'], 403);
         }
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
-        $users = User::where('status', 1)->get();
         $invoice->loadMissing('customer_contact', 'invoice_merchants');
         $invoiceMerchants = [];
         foreach ($invoice->invoice_merchants as $merchant) {
             $invoiceMerchants[$merchant->merchant_type] = $merchant->merchant_id;
         }
         $invoice->merchant_types = $invoiceMerchants;
-        return response()->json(['invoice' => $invoice, 'brands' => $brands, 'teams' => $teams, 'customer_contacts' => $customer_contacts, 'users' => $users]);
+        return response()->json(['invoice' => $invoice]);
     }
 
     public function update(Request $request, Invoice $invoice)
@@ -320,15 +313,12 @@ class InvoiceController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
