@@ -6,6 +6,8 @@ use App\Services\GlobalService;
 use App\Services\Restrict\PaymentGatewayService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Invoice;
+use App\Policies\InvoicePolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Invoice::class, InvoicePolicy::class);
+
 //        RateLimiter::for('global', function (Request $request) {
 //            return Limit::perMinute(1)->by(optional($request->user())->id ?: $request->ip());
 //        });
