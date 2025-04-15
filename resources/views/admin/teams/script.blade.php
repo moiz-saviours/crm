@@ -175,7 +175,7 @@
                                 <td class="align-middle text-center text-nowrap">${index}</td>
                                 <td class="align-middle text-center text-nowrap">${team_key}</td>
                                 <td class="align-middle text-center text-nowrap">${name}</td>
-                                <td class="align-middle text-center text-nowrap">${description}</td>
+                                <td class="align-middle text-center text-nowrap">${description??""}</td>
                                 <td class="align-middle text-center text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${assign_brands}">
                                     ${assign_brands}
                                 </td>

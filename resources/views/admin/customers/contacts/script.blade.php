@@ -175,12 +175,12 @@
                                     <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : '---'}</td>
                                     <td class="align-middle text-center text-nowrap"><a href="{{route('admin.customer.contact.index')}}" title="${company ? company.name : 'No associated company'}" >${name}</a></td>
                                     <td class="align-middle text-center text-nowrap">${email}</td>
-                                    <td class="align-middle text-center text-nowrap">${phone}</td>
-                                    <td class="align-middle text-center text-nowrap">${address}</td>
-                                    <td class="align-middle text-center text-nowrap">${city}</td>
-                                    <td class="align-middle text-center text-nowrap">${state}</td>
-                                    <td class="align-middle text-center text-nowrap">${country}</td>
-                                    <td class="align-middle text-center text-nowrap">${zipcode}</td>
+                                    <td class="align-middle text-center text-nowrap">${phone??""}</td>
+                                    <td class="align-middle text-center text-nowrap">${address??""}</td>
+                                    <td class="align-middle text-center text-nowrap">${city??""}</td>
+                                    <td class="align-middle text-center text-nowrap">${state??""}</td>
+                                    <td class="align-middle text-center text-nowrap">${country??""}</td>
+                                    <td class="align-middle text-center text-nowrap">${zipcode??""}</td>
 
 
                                     <td class="align-middle text-center text-nowrap">
