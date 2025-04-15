@@ -16,10 +16,12 @@ class CompanyController extends Controller
      */
     public function index()
     {
-
-        $all_contacts = CustomerContact::whereIn('brand_key', Auth::user()->teams()->with(['brands' => function ($query) {
-            $query->where('status', 1);
-        }])->get()->pluck('brands.*.brand_key')->flatten())->get();
+        $user = Auth::user();
+        $teams = $user->teams()->with('brands')->get();
+        $teamKeys = $teams->pluck('team_key')->toArray();
+        $all_contacts = CustomerContact::where(function ($query) use ($teamKeys) {
+            $query->whereIn('team_key', $teamKeys)->orWhereMorphedTo('creator', auth()->user());
+        })->active()->get();
         $my_contacts = $all_contacts->filter(function ($contact) {
             return $contact->creator_type === get_class(Auth::user()) && $contact->creator_id === Auth::id();
         });
@@ -27,25 +29,22 @@ class CompanyController extends Controller
             return substr(strrchr($contact->email, "@"), 1);
         })->unique();
         $existingDomains = CustomerCompany::whereIn('domain', $domains)->pluck('domain')->toArray();
-
         $domainsToFetch = $domains->diff($existingDomains);
-
         foreach ($domainsToFetch as $domain) {
             $response = Http::get('https://api.hunter.io/v2/domain-search', [
                 'domain' => $domain,
                 'api_key' => env('HUNTER_API_KEY'),
             ]);
-
             if ($response->successful() && isset($response->json()['data'])) {
                 $companyData = $response->json()['data'];
                 CustomerCompany::create([
                     'name' => $companyData['organization'] ?? $domain,
-                    'email' => 'no-reply@'.$domain,
+                    'email' => 'no-reply@' . $domain,
                     'domain' => $domain,
-                    'city' =>$companyData['city'],
-                    'state'=>$companyData['state'],
-                    'country'=>$companyData['country'],
-                    'zipcode'=>$companyData['postal_code'],
+                    'city' => $companyData['city'],
+                    'state' => $companyData['state'],
+                    'country' => $companyData['country'],
+                    'zipcode' => $companyData['postal_code'],
                     'response' => json_encode($companyData),
                     'status' => 1,
                 ]);
@@ -53,7 +52,6 @@ class CompanyController extends Controller
         }
         $companies = CustomerCompany::whereIn('domain', $domains)->where('status', 1)->get();
 //        $companies = Cache::remember('companies_list', config('cache.durations.short_lived'), fn() => CustomerCompany::whereIn('domain', $domains)->where('status', 1)->get());
-
         return view('user.customers.companies.index', compact('companies'));
     }
 
@@ -104,6 +102,4 @@ class CompanyController extends Controller
     {
         //
     }
-
-
 }
