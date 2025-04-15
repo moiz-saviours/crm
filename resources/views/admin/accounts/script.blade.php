@@ -79,7 +79,7 @@
                 order: [[1, 'asc']],
                 responsive: false,
                 scrollX: true,
-                scrollY:  ($(window).height() - 350),
+                scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
                 columnDefs: [
@@ -376,12 +376,16 @@
     });
 </script>
 
-    <script>
-        $(document).ready(function () {
-            $('.generatePassword').click(function () {
-                const closestPasswordInput = $(this).closest('form').find('input[name="password"]');
-                const randomPassword = generateRandomPassword(12);
-                closestPasswordInput.val(randomPassword);
-            });
+<script>
+    $(document).ready(function () {
+        $('.generatePassword').click(function () {
+            const form = $(this).closest('form');
+            const passwordInput = form.find('input[name="password"]').length ? form.find('input[name="password"]') : form.find('input[name="change_password"]');
+            if (passwordInput.length) {
+                passwordInput.val(generateRandomPassword(12)).trigger('change');
+            } else {
+                console.error('No password input field found');
+            }
         });
-    </script>
+    });
+</script>
