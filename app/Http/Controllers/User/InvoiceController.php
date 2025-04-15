@@ -253,7 +253,7 @@ class InvoiceController extends Controller
             }, 'brand' => function ($query) {
                 $query->select('id', 'brand_key', 'name');
             }, 'team' => function ($query) {
-                $query->select('id', 'team_key', 'name',);
+                $query->select('id', 'team_key', 'name','lead_id');
             }, 'creator' => function ($query) {
                 $query->select('id', 'name', 'email');
             }]);
@@ -477,11 +477,10 @@ class InvoiceController extends Controller
             }, 'brand' => function ($query) {
                 $query->select('id', 'brand_key', 'name');
             }, 'team' => function ($query) {
-                $query->select('id', 'team_key', 'name',);
+                $query->select('id', 'team_key', 'name','lead_id');
             }, 'creator' => function ($query) {
                 $query->select('id', 'name', 'email');
             }]);
-            $invoice->loadMissing('customer_contact', 'brand', 'team', 'agent', 'creator');
             if ($invoice->created_at->isToday()) {
                 $date = "Today at " . $invoice->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             } else {

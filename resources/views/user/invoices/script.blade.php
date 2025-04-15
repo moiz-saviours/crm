@@ -395,7 +395,7 @@
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
                                                             title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
-                            ${status != 1 ? '<button type="button" class="btn btn-sm btn-primary editBtn" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" > </i></button>' : ''}
+                            ${status == 0 ? '<button type="button" class="btn btn-sm btn-primary editBtn" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" > </i></button>' : ''}
                         </td>`;
 
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
@@ -418,6 +418,7 @@
                                 team,
                                 customer_contact,
                                 creator,
+                                creator_type,
                                 agent,
                                 amount, tax_type, tax_value,
                                 tax_amount, total_amount, currency,
@@ -511,12 +512,12 @@
                             }
 
                             // Column 12: Actions
+
                             let actionsHtml = '';
                             if (brand) {
                                 actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
                             }
-
-                            if (status != 1 && (agent?.id == {{auth()->user()->id}} || creator?.id == {{auth()->user()->id}})) {
+                            if (status == 0 && (agent?.id == {{auth()->user()->id}} || creator?.id == {{auth()->user()->id}} || team && team.lead_id == {{auth()->user()->id}}) && creator_type != 'App\\Models\\Admin') {
                                 actionsHtml += `<button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit"><i class="fas fa-edit"></i></button>`;
                             }
                             if (decodeHtml(rowData[11]) !== actionsHtml) {
