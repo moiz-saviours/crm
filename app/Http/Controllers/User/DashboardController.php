@@ -115,7 +115,7 @@ class DashboardController extends Controller
             });
         })
             ->with('brand')
-            ->status(1)
+            ->whereStatus(1)
             ->latest()
             ->limit(5)
             ->get();
