@@ -66,7 +66,8 @@
         "newestOnTop": false,
         "progressBar": true,
         "positionClass": "toast-top-right",
-        "preventDuplicates": false,
+        "preventDuplicates": true,
+        "preventOpenDuplicates": true,
         "onclick": null,
         "showDuration": "500",
         "hideDuration": "1000",
@@ -412,7 +413,7 @@
                 } else if (jqXHR.status === 403) {
                     Swal.fire({
                         title: 'Forbidden',
-                        text: jqXHR.responseJSON.error ?? 'You do not have permission to perform this action.',
+                        text: jqXHR.responseJSON.error ?? "You don\'t have permission to perform this action.",
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
@@ -536,8 +537,8 @@
                 }
             });
         } else if (jqXHR.status === 400) {
-            toastr.error(jqXHR.responseJSON.error);
-            console.log(jqXHR.responseJSON.error);
+            toastr.error(jqXHR.responseJSON.error || jqXHR.responseJSON.message);
+            console.log(jqXHR.responseJSON.error || jqXHR.responseJSON.message);
         } else {
             Swal.fire({
                 title: 'Error',
