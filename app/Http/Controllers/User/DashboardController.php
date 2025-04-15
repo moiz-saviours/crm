@@ -208,7 +208,9 @@ class DashboardController extends Controller
     protected function getCustomers()
     {
         $customers = CustomerContact::where(function ($query) {
-            $query->whereIn('team_key', $this->teamKeys)->orWhereIn('brand_key', $this->teamBrandKeys);
+            $query->whereIn('team_key', $this->teamKeys)
+//                ->orWhereIn('brand_key', $this->teamBrandKeys)
+            ;
             if (isset($this->user)) {
                 $query->orWhereMorphedTo('creator', $this->user);
             }

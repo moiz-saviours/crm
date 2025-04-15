@@ -81,6 +81,19 @@ jobs:
             echo "❌ STELLER Dev: DISABLED"
           fi
 
+          # DIGITAL ROOTS Status
+          if [[ "${{ secrets.LIVE_DIGITAL_ROOTS_ENABLE }}" == "true" ]]; then
+            echo "🚀 DIGITAL ROOTS Live: ENABLED"
+          else
+            echo "❌ DIGITAL ROOTS Live: DISABLED"
+          fi
+
+          if [[ "${{ secrets.DEV_DIGITAL_ROOTS_ENABLE }}" == "true" ]]; then
+            echo "🚀 DIGITAL ROOTS Dev: ENABLED"
+          else
+            echo "❌ DIGITAL ROOTS Dev: DISABLED"
+          fi
+
       # ========== LIVE DEPLOYMENTS ==========
       - name: Deploy to Live
         if: env.environment == 'live' && env.LIVE_ENABLE == 'true'
@@ -115,6 +128,17 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_STELLER_SERVER_DIR }}
 
+      - name: Deploy to DIGITAL ROOTS Live
+        if: env.environment == 'live' && env.LIVE_DIGITAL_ROOTS_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.LIVE_DIGITAL_ROOTS_FTP_SERVER }}
+          username: ${{ secrets.LIVE_DIGITAL_ROOTS_FTP_USERNAME }}
+          password: ${{ secrets.LIVE_DIGITAL_ROOTS_FTP_PASSWORD }}
+          port: ${{ secrets.LIVE_DIGITAL_ROOTS_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.LIVE_DIGITAL_ROOTS_SERVER_DIR }}
+
       # ========== DEV DEPLOYMENTS ==========
       - name: Deploy to Dev
         if: env.environment == 'development' && env.DEV_ENABLE == 'true'
@@ -148,3 +172,14 @@ jobs:
           port: ${{ secrets.DEV_STELLER_FTP_PORT || 21 }}
           local-dir: ./
           server-dir: ${{ secrets.DEV_STELLER_SERVER_DIR }}
+
+      - name: Deploy to DIGITAL ROOTS Dev
+        if: env.environment == 'development' && env.DEV_DIGITAL_ROOTS_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.DEV_DIGITAL_ROOTS_FTP_SERVER }}
+          username: ${{ secrets.DEV_DIGITAL_ROOTS_FTP_USERNAME }}
+          password: ${{ secrets.DEV_DIGITAL_ROOTS_FTP_PASSWORD }}
+          port: ${{ secrets.DEV_DIGITAL_ROOTS_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.DEV_DIGITAL_ROOTS_SERVER_DIR }}
