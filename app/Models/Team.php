@@ -83,4 +83,11 @@ class Team extends Model
             Cache::forget('teams_list');
         });
     }
+
+    /** Scope */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
+    /** Scope */
 }
