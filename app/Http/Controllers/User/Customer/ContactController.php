@@ -17,17 +17,16 @@ class ContactController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $teams = $user->teams()->with('brands')->get();
-        $brands = $teams->flatMap(function ($team) {
-            return $team->brands;
-        });
-        $countries = config('countries');
-        $all_contacts = CustomerContact::whereIn('brand_key', Auth::user()->teams()->with(['brands' => function ($query) {
+        $teams = $user->teams()->with(['brands' => function($query) {
             $query->where('status', 1);
-        }])->get()->pluck('brands.*.brand_key')->flatten())
-            ->whereIn('team_key', Auth::user()->teams()->pluck('teams.team_key')->flatten()->unique())
-            ->get();
-//        $contacts = CustomerContact::all();
+        }])->get();
+        $brands = $teams->pluck('brands')->flatten();
+        $teamKeys = $teams->pluck('team_key');
+        $teamBrandKeys = $brands->pluck('brand_key');
+        $countries = config('countries');
+        $all_contacts = CustomerContact::where(function ($query) use ($teamKeys) {
+            $query->whereIn('team_key', $teamKeys)->orWhereMorphedTo('creator', auth()->user());
+        })->get();
         $my_contacts = $all_contacts->filter(function ($contact) {
             return $contact->creator_type === get_class(Auth::user()) && $contact->creator_id === Auth::id();
 
