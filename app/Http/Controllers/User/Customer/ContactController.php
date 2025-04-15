@@ -17,7 +17,7 @@ class ContactController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $teams = $user->teams()->with(['brands' => function($query) {
+        $teams = $user->teams()->with(['brands' => function ($query) {
             $query->where('status', 1);
         }])->get();
         $brands = $teams->pluck('brands')->flatten();
@@ -26,7 +26,7 @@ class ContactController extends Controller
         $countries = config('countries');
         $all_contacts = CustomerContact::where(function ($query) use ($teamKeys) {
             $query->whereIn('team_key', $teamKeys)->orWhereMorphedTo('creator', auth()->user());
-        })->get();
+        })->active()->get();
         $my_contacts = $all_contacts->filter(function ($contact) {
             return $contact->creator_type === get_class(Auth::user()) && $contact->creator_id === Auth::id();
         });
@@ -54,15 +54,12 @@ class ContactController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -84,7 +81,7 @@ class ContactController extends Controller
                 'creator_id', 'status',
             ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
         $customer_contact->save();
-        $customer_contact->loadMissing('brand','company');
+        $customer_contact->loadMissing('brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Created Successfully!']);
     }
 
@@ -94,7 +91,7 @@ class ContactController extends Controller
         $brands = Brand::where('status', 1)->get();
         $teams = Team::where('status', 1)->get();
         $countries = config('countries');
-       // return view('user.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
+        // return view('user.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
         return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
     }
 
@@ -124,15 +121,12 @@ class ContactController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -153,8 +147,7 @@ class ContactController extends Controller
             'country', 'zipcode', 'ip_address', 'status',
         ]));
         $customer_contact->save();
-        $customer_contact->loadMissing('brand','company');
+        $customer_contact->loadMissing('brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Updated Successfully!']);
     }
-
 }
