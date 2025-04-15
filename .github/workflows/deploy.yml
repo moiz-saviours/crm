@@ -41,6 +41,8 @@ jobs:
           echo "DEV_GENX_ENABLE=${{ secrets.DEV_GENX_ENABLE }}" >> $GITHUB_ENV
           echo "LIVE_STELLER_ENABLE=${{ secrets.LIVE_STELLER_ENABLE }}" >> $GITHUB_ENV
           echo "DEV_STELLER_ENABLE=${{ secrets.DEV_STELLER_ENABLE }}" >> $GITHUB_ENV
+          echo "LIVE_DIGITAL_ROOTS_ENABLE=${{ secrets.LIVE_DIGITAL_ROOTS_ENABLE }}" >> $GITHUB_ENV
+          echo "DEV_DIGITAL_ROOTS_ENABLE=${{ secrets.DEV_DIGITAL_ROOTS_ENABLE }}" >> $GITHUB_ENV
 
           # Status
           if [[ "${{ secrets.LIVE_ENABLE }}" == "true" ]]; then
