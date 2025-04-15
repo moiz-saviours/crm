@@ -33,10 +33,11 @@
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
-                            <li class="tab-item active all-tab" data-tab="home">All Invoices <i class="fa fa-times close-icon"
-                                                                                        aria-hidden="true"></i></li>
+                            <li class="tab-item active all-tab" data-tab="home">All Invoices <i
+                                    class="fa fa-times close-icon"
+                                    aria-hidden="true"></i></li>
                             <li class="tab-item my-tab" data-tab="home">My Invoices <i class="fa fa-times close-icon"
-                                                                                   aria-hidden="true"></i></li>
+                                                                                       aria-hidden="true"></i></li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -197,10 +198,12 @@
                                                                 title="Copy Invoice Url"><i
                                                                 class="fas fa-copy"></i></button>
                                                     @endif
-                                                    @if($invoice->status != 1 && ((isset($invoice->agent) && $invoice->agent->id === auth()->user()->id) || (isset($invoice->creator) && $invoice->creator->id === auth()->user()->id)))
-                                                        <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                                data-id="{{ $invoice->id }}" title="Edit"><i
-                                                                class="fas fa-edit"></i></button>
+                                                    @if($invoice->status != 1)
+                                                        @can('edit',$invoice)
+                                                            <button type="button" class="btn btn-sm btn-primary editBtn"
+                                                                    data-id="{{ $invoice->id }}" title="Edit"><i
+                                                                    class="fas fa-edit"></i></button>
+                                                        @endcan
                                                     @endif
                                                 </td>
                                             </tr>
