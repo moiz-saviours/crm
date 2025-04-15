@@ -208,7 +208,7 @@
         }
         const formContainer = $('#formContainer');
         $('.open-form-btn').click(function () {
-            $(this).hasClass('void') ? $(this).attr('title', "You don't have access to create a company.").tooltip({placement: 'bottom'}).tooltip('show') : (formContainer.addClass('open'));
+            $(this).hasClass('void') ? $(this).attr('title', "You don't have access to create a record.").tooltip({placement: 'bottom'}).tooltip('show') : (formContainer.addClass('open'));
         });
 
         {{--/** Create Record */--}}
