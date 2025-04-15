@@ -33,7 +33,10 @@ class InvoiceController extends Controller
                 $query->where('status', 1);
             }])
             ->get()->pluck('brands.*.brand_key')->flatten()->unique();
-        $customer_contacts = CustomerContact::whereIn('brand_key', $brandKeys)->where('status', 1)->get();
+        $customer_contacts = CustomerContact::where(function ($query) use ($teamKeys) {
+            $query->whereIn('team_key', $teamKeys)->orWhereMorphedTo('creator', auth()->user());
+        })->active()->get();
+
         $all_invoices = Invoice::whereIn('brand_key', $brandKeys)
             ->whereIn('team_key', $teamKeys)
             ->orWhere(function ($query) use ($user) {
