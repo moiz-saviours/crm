@@ -93,7 +93,7 @@ class DashboardController extends Controller
             ->whereYear('created_at', $this->currentYear)
             ->count();
         $totalCustomers = CustomerContact::count();
-        $recentPayments = Payment::status(1)->latest()->limit(5)->get();
+        $recentPayments = Payment::latest()->limit(5)->get();
         $leadStatuses = LeadStatus::all();
         $leadCounts = [];
         foreach ($leadStatuses as $status) {
