@@ -51,9 +51,9 @@
             <div class="form-body">
 
                 <div class="form-group mb-3">
-                    <label for="changePassword" class="form-label">Password</label>
+                    <label for="change_password" class="form-label">Password</label>
                     <div class="d-fldex align-items-center">
-                        <input type="text" id="changePassword" name="password" class="form-control" placeholder="Generated Password">
+                        <input type="text" id="change_password" name="change_password" class="form-control" placeholder="Generated Password" required>
                         <i id="generatePassword" class="generatePassword generatePassword-update " title="Change Password">Generate Password</i>
                     </div>
                     @error('password')

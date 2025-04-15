@@ -389,10 +389,10 @@ class EmployeeController extends Controller
     public function update_password(Request $request, User $user)
     {
         $request->validate([
-            'password' => 'required|string|max:255',
+            'change_password' => 'required|string|max:255',
         ]);
         try {
-            $user->password = Hash::make($request->input('password'));
+            $user->password = Hash::make($request->input('change_password'));
             $user->save();
             return response()->json(['data' => $user, 'message' => 'Record password updated successfully.']);
         } catch (\Exception $e) {

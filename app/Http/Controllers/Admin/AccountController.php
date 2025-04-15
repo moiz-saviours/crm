@@ -150,10 +150,10 @@ class AccountController extends Controller
     public function update_password(Request $request, Admin $admin)
     {
         $request->validate([
-            'password' => 'required|string|max:255',
+            'change_password' => 'required|string|max:255',
         ]);
         try {
-            $admin->password = Hash::make($request->input('password'));
+            $admin->password = Hash::make($request->input('change_password'));
             $admin->save();
             return response()->json(['data' => $admin, 'message' => 'Record password updated successfully.']);
         } catch (\Exception $e) {
