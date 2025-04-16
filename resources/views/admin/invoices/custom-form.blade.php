@@ -228,8 +228,7 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="total_amount" class="form-label">Total Amount <small class="float-end">Max Limit :
-                            ( {{config('invoice.max_amount')}} )</small></label>
+                    <label for="total_amount" class="form-label">Total Amount</label>
                     <input type="number" class="form-control" id="total_amount" name="total_amount" step="0.01"
                            min="1"
                            readonly
