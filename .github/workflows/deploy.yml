@@ -43,6 +43,8 @@ jobs:
           echo "DEV_STELLER_ENABLE=${{ secrets.DEV_STELLER_ENABLE }}" >> $GITHUB_ENV
           echo "LIVE_DIGITAL_ROOTS_ENABLE=${{ secrets.LIVE_DIGITAL_ROOTS_ENABLE }}" >> $GITHUB_ENV
           echo "DEV_DIGITAL_ROOTS_ENABLE=${{ secrets.DEV_DIGITAL_ROOTS_ENABLE }}" >> $GITHUB_ENV
+          echo "LIVE_TRIFED_ENABLE=${{ secrets.LIVE_TRIFED_ENABLE }}" >> $GITHUB_ENV
+          echo "DEV_TRIFED_ENABLE=${{ secrets.DEV_TRIFED_ENABLE }}" >> $GITHUB_ENV
 
           # Status
           if [[ "${{ secrets.LIVE_ENABLE }}" == "true" ]]; then
@@ -96,6 +98,19 @@ jobs:
             echo "❌ DIGITAL ROOTS Dev: DISABLED"
           fi
 
+          # TRIFED Status
+          if [[ "${{ secrets.LIVE_TRIFED_ENABLE }}" == "true" ]]; then
+            echo "🚀 TRIFED Live: ENABLED"
+          else
+            echo "❌ TRIFED Live: DISABLED"
+          fi
+
+          if [[ "${{ secrets.DEV_TRIFED_ENABLE }}" == "true" ]]; then
+            echo "🚀 TRIFED Dev: ENABLED"
+          else
+            echo "❌ TRIFED Dev: DISABLED"
+          fi
+
       # ========== LIVE DEPLOYMENTS ==========
       - name: Deploy to Live
         if: env.environment == 'live' && env.LIVE_ENABLE == 'true'
@@ -141,6 +156,18 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_DIGITAL_ROOTS_SERVER_DIR }}
 
+
+      - name: Deploy to TRIFED Live
+        if: env.environment == 'live' && env.LIVE_TRIFED_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.LIVE_TRIFED_FTP_SERVER }}
+          username: ${{ secrets.LIVE_TRIFED_FTP_USERNAME }}
+          password: ${{ secrets.LIVE_TRIFED_FTP_PASSWORD }}
+          port: ${{ secrets.LIVE_TRIFED_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.LIVE_TRIFED_SERVER_DIR }}
+
       # ========== DEV DEPLOYMENTS ==========
       - name: Deploy to Dev
         if: env.environment == 'development' && env.DEV_ENABLE == 'true'
@@ -185,3 +212,15 @@ jobs:
           port: ${{ secrets.DEV_DIGITAL_ROOTS_FTP_PORT || 21 }}
           local-dir: ./
           server-dir: ${{ secrets.DEV_DIGITAL_ROOTS_SERVER_DIR }}
+
+
+      - name: Deploy to TRIFED Dev
+        if: env.environment == 'development' && env.DEV_TRIFED_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.DEV_TRIFED_FTP_SERVER }}
+          username: ${{ secrets.DEV_TRIFED_FTP_USERNAME }}
+          password: ${{ secrets.DEV_TRIFED_FTP_PASSWORD }}
+          port: ${{ secrets.DEV_TRIFED_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.DEV_TRIFED_SERVER_DIR }}
