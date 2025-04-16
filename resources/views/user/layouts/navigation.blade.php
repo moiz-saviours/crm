@@ -12,7 +12,7 @@
                 <div class="mininav-toggle text-center py-2">
                     <img class="mainnav__avatar img-md rounded-circle hv-oc"
                          style="background-color: var(--bs-secondary);"
-                         src="{{auth()->guard('web')->user()->image && file_exists(public_path('assets/images/employees/'.auth()->guard('web')->user()->image)) ? asset('assets/images/employees/'.auth()->guard('web')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
+                         src="{{auth()->guard('web')->user()->image ? (filter_var(auth()->guard('web')->user()->image, FILTER_VALIDATE_URL) ? auth()->guard('web')->user()->image : (file_exists(public_path('assets/images/employees/'.auth()->guard('web')->user()->image)) ? asset('assets/images/employees/'.auth()->guard('web')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png'))) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
                          alt="{{auth()->guard('web')->user()->name}}" title="Dashboard" loading="lazy">
                 </div>
                 <div class="mininav-content collapse d-mn-max">
