@@ -27,7 +27,7 @@
     </style>
 @endpush
 <div class="custom-form">
-    <form id="manage-form" method="POST" enctype="multipart/form-data" autocomplete="off">
+    <form id="manage-form" class="manage-form" method="POST" enctype="multipart/form-data" autocomplete="off">
         <div class="form-container" id="formContainer">
             <label for="crsf_token" class="form-label d-none">Crsf Token</label>
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
@@ -72,9 +72,7 @@
                     <label for="type" class="form-label">Type</label>
                     <select class="form-control" id="type" name="type" title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
-                        @if($customer_contacts->count() > 0)
-                            <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
-                        @endif
+                        <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
                     </select>
                     @error('type')
                     <span class="text-danger">{{ $message }}</span>
@@ -130,7 +128,8 @@
                     <select class="form-control searchable" id="agent_id" name="agent_id" title="Please select agent">
                         <option value="" disabled>Select Agent</option>
                         @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('agent_id',auth()->user()->id) == $user->id ? 'selected' : '' }}>
+                            <option
+                                value="{{ $user->id }}" {{ old('agent_id',auth()->user()->id) == $user->id ? 'selected' : '' }}>
                                 {{ $user->name }} ({{ $user->email }})
                             </option>
                         @endforeach
@@ -142,7 +141,9 @@
 
                 <div class="form-group mb-3">
                     <label for="due_date" class="form-label">Due Date</label>
-                    <input type="date" class="form-control" id="due_date" name="due_date" value="{{ old('due_date', now()->addDays(5)->format('Y-m-d')) }}" min="{{now()->format('Y-m-d')}}" max="{{ now()->addYear()->format('Y-m-d') }}">
+                    <input type="date" class="form-control" id="due_date" name="due_date"
+                           value="{{ old('due_date', now('Pacific/Honolulu')->addDays(5)->format('Y-m-d')) }}"
+                           min="{{now('Pacific/Honolulu')->format('Y-m-d')}}" max="{{ now('Pacific/Honolulu')->addYear()->format('Y-m-d') }}">
                     @error('due_date')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -188,10 +189,10 @@
                     @enderror
                 </div>
 
-                <div class="form-group mb-3" id="tax-fields" style="display: none;">
+                <div class="form-group mb-3 second-fields" id="tax-fields" style="display: none;">
                     <div>
                         <label for="tax_type" class="form-label">Tax Type</label>
-                        <select class="form-control" id="tax_type" name="tax_type">
+                        <select class="form-control second-field-inputs" id="tax_type" name="tax_type">
                             <option value="" disabled selected>Select Tax Type</option>
                             <option value="percentage" {{ old('tax_type') == 'percentage' ? 'selected' : '' }}>
                                 Percentage
@@ -205,7 +206,7 @@
 
                     <div class="mt-3">
                         <label for="tax_value" class="form-label">Tax Value</label>
-                        <input type="number" class="form-control" id="tax_value" name="tax_value" min="1"
+                        <input type="number" class="form-control second-field-inputs" id="tax_value" name="tax_value" min="1"
                                value="{{ old('tax_value') }}">
                         @error('tax_value')
                         <span class="text-danger">{{ $message }}</span>
@@ -214,7 +215,7 @@
 
                     <div class="mt-3">
                         <label for="tax_amount" class="form-label">Tax Amount</label>
-                        <input type="number" class="form-control" id="tax_amount" name="tax_amount" step="0.01" min="1"
+                        <input type="number" class="form-control second-field-inputs" id="tax_amount" name="tax_amount" step="0.01" min="1"
                                readonly
                                value="{{ old('tax_amount') }}">
                         @error('tax_amount')
@@ -255,6 +256,9 @@
         <!------- CUSTOM FORM -------->
         <script>
             $(document).ready(function () {
+                @if($customer_contacts->count() < 1)
+                $('#type').val(0).trigger('change')
+                @endif
                 $('#type').on('change', function () {
                     const type = $(this).val();
                     if (type == 0) {
@@ -352,22 +356,6 @@
                     $('#total_amount').val(totalAmount.toFixed(2));
                 }
             });
-
-            $(document).on('click', function (event) {
-                if (
-                    (!$(event.target).closest('.form-container').length &&
-                        !$(event.target).is('.form-container') &&
-                        !$(event.target).closest('.open-form-btn').length &&
-                        !$(event.target).is('.editBtn') &&
-                        !$(event.target).is('.changePwdBtn')
-                    ) ||
-                    $(event.target).is('.form-container .close-btn')
-                ) {
-                    $('#merchant-types-container').empty();
-                }
-            });
-
-
         </script>
         <!------- CUSTOM FORM -------->
     @endpush
