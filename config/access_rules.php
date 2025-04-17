@@ -3,6 +3,7 @@ return [
     'sales' => [
         'routes' => [
             'user.dashboard',
+            'user.profile',
             'customer.company.index',
             'customer.contact.index',
             'customer.contact.store',
@@ -30,6 +31,7 @@ return [
     'marketing' => [
         'routes' => [
             'user.dashboard', // Marketing dashboard
+            'user.profile',
         ],
     ],
     'humanresources' => [
@@ -45,6 +47,7 @@ return [
             'Accounts' => [
                 'routes' => [
                     'user.dashboard',
+                    'user.profile',
                     'user.client.contact.index',
                     'user.client.contact.store',
                     'user.client.contact.edit',
