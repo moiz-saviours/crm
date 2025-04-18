@@ -10,7 +10,7 @@
 
                 <!-- Profile picture  -->
                 <div class="mininav-toggle text-center py-2">
-                    <img class="mainnav__avatar img-md rounded-circle hv-oc"
+                    <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
                          style="background-color: var(--bs-secondary);"
                          src="{{auth()->guard('web')->user()->image ? (filter_var(auth()->guard('web')->user()->image, FILTER_VALIDATE_URL) ? auth()->guard('web')->user()->image : (file_exists(public_path('assets/images/employees/'.auth()->guard('web')->user()->image)) ? asset('assets/images/employees/'.auth()->guard('web')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png'))) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
                          alt="{{auth()->guard('web')->user()->name}}" title="Dashboard" loading="lazy">
@@ -40,7 +40,7 @@
                             {{--                                            class="ms-1">Messages</span></span>--}}
                             {{--                                <span class="badge bg-danger rounded-pill">14</span>--}}
                             {{--                            </a>--}}
-                            <a href="javascript:void(0)" class="nav-link">
+                            <a href="{{route('user.profile')}}" class="nav-link">
                                 <i class="demo-pli-male fs-5 me-2"></i>
                                 <span class="ms-1">Profile</span>
                             </a>
