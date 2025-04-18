@@ -4,6 +4,8 @@ return [
         'routes' => [
             'user.dashboard',
             'user.profile',
+            'user.profile.image.update',
+            'user.profile.update',
             'customer.company.index',
             'customer.contact.index',
             'customer.contact.store',
@@ -32,6 +34,8 @@ return [
         'routes' => [
             'user.dashboard', // Marketing dashboard
             'user.profile',
+            'user.profile.image.update',
+            'user.profile.update',
         ],
     ],
     'humanresources' => [
@@ -48,6 +52,8 @@ return [
                 'routes' => [
                     'user.dashboard',
                     'user.profile',
+                    'user.profile.image.update',
+                    'user.profile.update',
                     'user.client.contact.index',
                     'user.client.contact.store',
                     'user.client.contact.edit',
