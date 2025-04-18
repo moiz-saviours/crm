@@ -36,8 +36,8 @@ Route::middleware(['auth', 'verified', 'throttle:60,1', 'dynamic.access'])->grou
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard')//->middleware('can:dashboard_view')
     ;
     Route::get('/profile', [ProfileController::class, 'edit'])->name('user.profile');
-    Route::get('/profile/image-update', [ProfileController::class, 'image_update'])->name('user.profile.image.update');
-    Route::patch('/profile/update', [ProfileController::class, 'update'])->name('user.profile.update');
+    Route::post('/profile/image-update', [ProfileController::class, 'image_update'])->name('user.profile.image.update');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('user.profile.update');
     /** Customer Routes */
     Route::name('customer.')->group(function () {
         /** Contacts Routes */
@@ -122,7 +122,7 @@ Route::middleware(['auth', 'verified', 'throttle:60,1', 'dynamic.access'])->grou
             });
         });
         /** Payment Merchant Routes */
-        /** Payment Merchant Routes */ 
+        /** Payment Merchant Routes */
         Route::name('account.')->group(function () {
             Route::get('/client/accounts', [UserClientPaymentMerchantController::class, 'index'])->name('index');
             Route::prefix('client/account')->group(function () {

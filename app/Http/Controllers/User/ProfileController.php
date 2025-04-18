@@ -46,20 +46,24 @@ class ProfileController extends Controller
     /**
      * Handle profile image update via AJAX
      */
-    public function image_update(ProfileUpdateRequest $request)
+    public function image_update(Request $request)
     {
-        if ($request->hasFile('image')) {
-            $user = $request->user();
-            $originalFileName = time() . '_' . $request->file('image')->getClientOriginalName();
-            $request->file('image')->move(public_path('assets/images/employees'), $originalFileName);
-            $user->image = $originalFileName;
-            $user->save();
-            return response()->json([
-                'success' => true,
-                'image_url' => asset('storage/assets/images/employees/' . $originalFileName)
-            ]);
+        try {
+            if ($request->hasFile('image')) {
+                $user = $request->user();
+                $originalFileName = time() . '_' . $request->file('image')->getClientOriginalName();
+                $request->file('image')->move(public_path('assets/images/employees'), $originalFileName);
+                $user->image = $originalFileName;
+                $user->save();
+                return response()->json([
+                    'message' => 'Profile image updated successfully.',
+                    'image_url' => asset('storage/assets/images/employees/' . $originalFileName)
+                ]);
+            }
         }
-        return response()->json(['success' => false], 400);
+        catch (\Exception $e) {
+            return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
+        }
     }
 
     /**

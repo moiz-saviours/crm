@@ -67,75 +67,102 @@
     @endpush
 
     <section id="content" class="content">
-        <div class="content__boxed rounded-0">
-            <div class="content__wrap d-md-flex align-items-start">
-                <div class="col-md-4 mb-3">
-                    <div class="profile-card">
-                        <div class="d-flex flex-column align-items-center text-center">
-                            <div class="img-box">
-                                <img id="profile-img" src="{{ auth()->user()->profile_image ?? 'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Profile Image" class="rounded-circle">
-                                <label for="file-input" class="edit-icon">✏️</label>
-                                <input type="file" id="file-input" style="display: none;" accept="image/*">
-                            </div>
-                            <div class="mt-3">
-                                <h4>{{ auth()->user()->name }}</h4>
-                                <p class="text-muted font-size-sm">{{ auth()->user()->designation }}</p>
-                                <button class="btn btn-primary" id="edit-profile-btn">Edit Profile</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+       <div class="row">
+           <div class="content__boxed rounded-0">
+               <div class="content__wrap d-md-flex align-items-start">
+                   <div class="col-md-4 mb-3">
+                       <div class="profile-card">
+                           <div class="d-flex flex-column align-items-center text-center">
+                               <div class="img-box">
+                                   <img id="profile-img" src="{{ auth()->user()->profile_image ?? 'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Profile Image" class="rounded-circle">
+                                   <label for="file-input" class="edit-icon">✏️</label>
+                                   <input type="file" id="file-input" style="display: none;" accept="image/*">
+                               </div>
+                               <div class="mt-3">
+                                   <h4>{{ auth()->user()->name }}</h4>
+                                   <p class="text-muted font-size-sm">{{ auth()->user()->designation }}</p>
+                                   <button class="btn btn-primary" id="edit-profile-btn">Edit Profile</button>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
 
-        <div class="row profile-sec">
-            <div class="col-md-6">
-                <form id="profile-form" action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Pseudo Name</label>
-                            <input type="text" class="form-control" name="name" id="name" value="{{ auth()->user()->pseudo_name }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Pseudo Email Address</label>
-                            <input type="email" class="form-control" name="email" id="email" value="{{ auth()->user()->pseudo_email }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">Pseudo Phone No.</label>
-                            <input type="text" class="form-control" name="phone" id="phone" value="{{ auth()->user()->pseudo_phone }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="department" class="form-label">Designation</label>
-                            <input type="text" class="form-control" name="department" id="department" value="{{ auth()->user()->designation }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="target" class="form-label">Monthly Target</label>
-                            <input type="text" class="form-control" name="target" id="target" value="{{ auth()->user()->target }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="dob" class="form-label">Date Of Birth</label>
-                            <input type="date" class="form-control" name="dob" id="dob"
-                                   value="{{ auth()->user()->dob ? \Carbon\Carbon::parse(auth()->user()->dob)->format('Y-m-d') : '' }}"
-                                   disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="doj" class="form-label">Date Of Joining</label>
-                            <input type="date" class="form-control" name="doj" id="doj"
-                                   value="{{ auth()->user()->date_of_joining ? \Carbon\Carbon::parse(auth()->user()->date_of_joining)->format('Y-m-d') : '' }}"
-                                   disabled>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary profile-save-btn" style="display: none;">Save Profile</button>
-                </form>
-            </div>
-        </div>
+           <div class="row justify-content-around profile-sec">
+               <div class="col-md-6">
+                   <form id="profile-form" action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
+                       @csrf
+                       <div class="row">
+                           <div class="col-md-6 mb-3">
+                               <label for="name" class="form-label">Pseudo Name</label>
+                               <input type="text" class="form-control" name="name" id="name" value="{{ auth()->user()->pseudo_name }}" disabled>
+                           </div>
+                           <div class="col-md-6 mb-3">
+                               <label for="email" class="form-label">Pseudo Email Address</label>
+                               <input type="email" class="form-control" name="email" id="email" value="{{ auth()->user()->pseudo_email }}" disabled>
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-md-6 mb-3">
+                               <label for="phone" class="form-label">Pseudo Phone No.</label>
+                               <input type="text" class="form-control" name="phone" id="phone" value="{{ auth()->user()->pseudo_phone }}" disabled>
+                           </div>
+                           <div class="col-md-6 mb-3">
+                               <label for="department" class="form-label">Designation</label>
+                               <input type="text" class="form-control" name="department" id="department" value="{{ auth()->user()->designation }}" disabled>
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-md-6 mb-3">
+                               <label for="target" class="form-label">Monthly Target</label>
+                               <input type="text" class="form-control" name="target" id="target" value="{{ auth()->user()->target }}" disabled>
+                           </div>
+                           <div class="col-md-6 mb-3">
+                               <label for="gender" class="form-label">Gender</label>
+                               <input type="text" class="form-control" name="gender" id="gender" value="{{ auth()->user()->gender }}" disabled>
+                           </div>
+                       </div>
+                       <div class="row">
+                           <div class="col-md-6 mb-3">
+                               <label for="dob" class="form-label">Date Of Birth</label>
+                               <input type="date" class="form-control" name="dob" id="dob"
+                                      value="{{ auth()->user()->dob ? \Carbon\Carbon::parse(auth()->user()->dob)->format('Y-m-d') : '' }}"
+                                      disabled>
+                           </div>
+                           <div class="col-md-6 mb-3">
+                               <label for="doj" class="form-label">Date Of Joining</label>
+                               <input type="date" class="form-control" name="doj" id="doj"
+                                      value="{{ auth()->user()->date_of_joining ? \Carbon\Carbon::parse(auth()->user()->date_of_joining)->format('Y-m-d') : '' }}"
+                                      disabled>
+                           </div>
+                       </div>
+                       <button type="submit" class="btn btn-primary profile-save-btn" style="display: none;">Save Profile</button>
+                   </form>
+               </div>
+
+               <div class="col-md-4">
+                   <div class="pass-sec">
+                       <h1>Change Password</h1>
+                       <form id="profile-form" action="" class="pass-sec-form">
+                               <div class="col-md-10 mb-3">
+                                   <label for="old-password" class="form-label">Old Password</label>
+                                   <input type="text" class="form-control" name="old-password" id="old-password" value="" disabled>
+                               </div>
+                           <div class="col-md-10 mb-3">
+                               <label for="new-password" class="form-label">Password</label>
+                               <input type="text" class="form-control" name="new-password" id="new-password" value="" disabled>
+                           </div>
+                           <div class="col-md-10 mb-3">
+                               <label for="confirm-password" class="form-label">Confirm Password</label>
+                               <input type="text" class="form-control" name="confirm-password" id="confirm-password" value="" disabled>
+                           </div>
+                           <button type="submit" class="btn btn-primary">Update Password</button>
+                       </form>
+                   </div>
+               </div>
+           </div>
+       </div>
     </section>
 
     @push('script')
@@ -169,18 +196,16 @@
 
                             // Upload image immediately when selected
                             const formData = new FormData();
-                            formData.append('profile_image', $('#file-input')[0].files[0]);
+                            formData.append('image', $('#file-input')[0].files[0]);
                             formData.append('_token', '{{ csrf_token() }}');
 
                             const url = '{{ route("user.profile.image.update") }}';
 
                             AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
                                 .then(response => {
-                                    toastr.success('Profile image updated successfully');
                                 })
                                 .catch(error => {
                                     console.log(error);
-                                    toastr.error('Failed to update profile image');
                                 });
                         }
 
