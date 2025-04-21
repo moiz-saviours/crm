@@ -1,378 +1,257 @@
 @extends('admin.layouts.app')
 @section('title','Profile')
-@section('bg',true)
+
 @section('content')
     @push('style')
         <style>
-            .image-container {
+            .profile-sec {
+                margin: 30px 30px;
+            }
+
+            .profile-card img {
+                border: 1px solid #2d3e50;
+                padding: 10px;
+            }
+
+            .card {
                 position: relative;
-                width: 200px;
-                height: 200px;
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                word-wrap: break-word;
+                background-color: transparent;
+                border-radius: .25rem;
             }
 
-            .profile-page-image {
-                width: 100%;
-                height: 100%;
-                border-radius: 10px;
+            .mb-3, .my-3 {
+                margin-bottom: 1rem !important;
             }
 
-            .overlay-text {
-                display: none;
+            .img-box {
+                position: relative;
+                display: inline-block;
+            }
+
+            .img-box img {
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+            }
+
+            .edit-icon {
                 position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 12px;
-                background-color: rgba(0, 0, 0, 0.5);
+                bottom: 0;
+                right: 0;
+                background: #000000aa;
+                color: white;
+                border-radius: 50%;
                 padding: 8px;
-                border-radius: 10px;
+                cursor: pointer;
+                display: none;
             }
 
-            .image-container:hover .overlay-text {
+            .img-box:hover .edit-icon {
                 display: block;
             }
 
-            #imageUpload {
-                display: none;
+            .profile-save-btn {
+                margin-top: 20px;
             }
 
-            p.text-white {
-                font-size: 11px;
-                width: 58px;
-                height: 57px;
+            .form-control:disabled {
+                background-color: #e9ecef;
+                opacity: 1;
+            }
+
+            .editable-field {
+                background-color: #fff !important;
+                border: 1px solid #ced4da !important;
             }
         </style>
     @endpush
-    <div class="card shadow-lg mx-4 card-profile-bottom">
-        <div class="card-body p-3">
-            <div class="row gx-4">
-                <div class="col-auto">
-                    <div class="avatar avatar-xl position-relative image-container">
-                        <img
-                            src="{{$user->image && file_exists(public_path('assets/images/admins/'.$user->image)) ? asset('assets/images/admins/'.$user->image) : asset('assets/img/team-1.jpg')}}"
-                            alt="{{$user->name}}" title="change image"
-                            class="w-100 border-radius-lg shadow-sm profile-page-image profile-image">
-                        <div class="overlay-text position-absolute top-50 start-50 translate-middle">
-                            <p class="text-white mb-0">Click to update image</p>
-                        </div>
 
-                    </div>
-                    <input type="file" id="imageUpload" class="d-none" accept="image/*">
-                </div>
-                <div class="col-auto my-auto">
-                    <div class="h-100">
-                        <h5 class="mb-1">
-                            {{$user->name}}
-                        </h5>
-                        <p class="mb-0 font-weight-bold text-sm">
-                            {{$user->designation}}
-                        </p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
-                    <div class="nav-wrapper position-relative end-0">
-                        <ul class="nav nav-pills nav-fill p-1" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link mb-0 px-0 py-1 active d-flex align-items-center justify-content-center "
-                                   data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="true">
-                                    <i class="ni ni-app"></i>
-                                    <span class="ms-2">App</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center "
-                                   data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="false">
-                                    <i class="ni ni-email-83"></i>
-                                    <span class="ms-2">Messages</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link mb-0 px-0 py-1 d-flex align-items-center justify-content-center "
-                                   data-bs-toggle="tab" href="javascript:;" role="tab" aria-selected="false">
-                                    <i class="ni ni-settings-gear-65"></i>
-                                    <span class="ms-2">Settings</span>
-                                </a>
-                            </li>
-                        </ul>
+    <section id="content" class="content">
+        <div class="row">
+            <div class="content__boxed rounded-0">
+                <div class="content__wrap d-md-flex align-items-center">
+                    <div class="col-md-12 mb-3">
+                        <div class="profile-card">
+                            <div class="d-flex flex-column align-items-center text-center">
+                                <div class="img-box">
+                                    <img id="profile-img"
+                                         src="{{ auth()->guard('admin')->user()->image ? (filter_var(auth()->guard('admin')->user()->image, FILTER_VALIDATE_URL) ? auth()->guard('admin')->user()->image : (file_exists(public_path('assets/images/admins/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/admins/'.auth()->guard('admin')->user()->image) : (file_exists(public_path('assets/images/admins/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/admins/'.auth()->guard('admin')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')))) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
+                                         alt="Profile Image" class="rounded-circle profile-image">
+                                    <label for="file-input" class="edit-icon">✏️</label>
+                                    <input type="file" id="file-input" style="display: none;" accept="image/*">
+                                </div>
+                                <div class="mt-3">
+                                    <h4>{{ auth()->user()->name }}</h4>
+                                    <p class="text-muted font-size-sm">{{ auth()->user()->designation }}</p>
+{{--                                    <button class="btn btn-primary" id="edit-profile-btn">Edit Profile</button>--}}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header pb-0">
-                        <div class="d-flex align-items-center">
-                            <p class="mb-0">Edit Profile</p>
-                            <button class="btn btn-primary btn-sm ms-auto">Settings</button>
-                        </div>
-                    </div>
-                    <form action="{{ route('admin.profile.update') }}" method="post">
+
+            <div class="row justify-content-around profile-sec">
+                <div class="col-md-6">
+                    <form id="profile-form" action="{{ route('admin.profile.update') }}" method="POST"
+                          enctype="multipart/form-data">
                         @csrf
-                        <div class="card-body">
-                            <p class="text-uppercase text-sm">User Information</p>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Name</label>
-                                        <input class="form-control" type="text" id="name" name="name"
-                                               value="{{ old('name', $user->name) }}">
-                                        @if($errors->has('name'))
-                                            <div class="text-danger">{{ $errors->first('name') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Email address</label>
-                                        <input class="form-control" type="email" id="email"
-                                               value="{{$user->email}}" readonly>
-                                        @if($errors->has('email'))
-                                            <div class="text-danger">{{ $errors->first('email') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Designation</label>
-                                        <input class="form-control" type="text" id="designation" name="designation"
-                                               value="{{ old('designation', $user->designation) }}">
-                                        @if($errors->has('designation'))
-                                            <div class="text-danger">{{ $errors->first('designation') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Phone Number</label>
-                                        <input class="form-control" type="text" id="phone_number" name="phone_number"
-                                               value="{{ old('phone_number', $user->phone_number) }}">
-                                        @if($errors->has('phone_number'))
-                                            <div class="text-danger">{{ $errors->first('phone_number') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Gender</label>
-                                        <select class="form-control" id="gender" name="gender" required>
-                                            <option value="" disabled {{ !$user->gender ? 'selected' : '' }}>Select
-                                                Gender
-                                            </option>
-                                            <option value="male" {{$user->gender == 'male' ? "selected":""}}>Male
-                                            </option>
-                                            <option value="female" {{$user->gender == 'female' ? "selected":""}}>Female
-                                            </option>
-                                        </select>
-                                        @if($errors->has('gender'))
-                                            <div class="text-danger">{{ $errors->first('gender') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Date of Birth</label>
-                                        <input class="form-control" type="date" id="dob" name="dob"
-                                               value="{{ old('dob', $user->dob) }}">
-                                        @if($errors->has('dob'))
-                                            <div class="text-danger">{{ $errors->first('dob') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label"> Name</label>
+                                <input type="text" class="form-control" name="name" id="name"
+                                       value="{{ auth()->user()->name }}" disabled>
                             </div>
-                            <hr class="horizontal dark">
-                            <p class="text-uppercase text-sm">Contact Information</p>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Address</label>
-                                        <input class="form-control" type="text" id="address" name="address"
-                                               value="{{ old('address', $user->address) }}">
-                                        @if($errors->has('address'))
-                                            <div class="text-danger">{{ $errors->first('address') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">City</label>
-                                        <input class="form-control" type="text" id="city" name="city"
-                                               value="{{ old('city', $user->city) }}">
-                                        @if($errors->has('city'))
-                                            <div class="text-danger">{{ $errors->first('city') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Country</label>
-                                        <input class="form-control" type="text" id="country" name="country"
-                                               value="{{ old('country', $user->country) }}">
-                                        @if($errors->has('country'))
-                                            <div class="text-danger">{{ $errors->first('country') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Postal code</label>
-                                        <input class="form-control" type="text" id="postal_code" name="postal_code"
-                                               value="{{ old('postal_code', $user->postal_code) }}">
-                                        @if($errors->has('postal_code'))
-                                            <div class="text-danger">{{ $errors->first('postal_code') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label"> Email Address</label>
+                                <input type="email" class="form-control" name="email" id="email"
+                                       value="{{ auth()->user()->email }}" disabled>
                             </div>
-                            <hr class="horizontal dark">
-                            <p class="text-uppercase text-sm">About me</p>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">About me</label>
-                                        <input class="form-control" type="text" id="about" name="about"
-                                               value="{{ old('about', $user->about) }}">
-                                        @if($errors->has('about'))
-                                            <div class="text-danger">{{ $errors->first('about') }}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                </div>
-                            </div>
+
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone_number" class="form-label"> Phone No.</label>
+                                <input type="text" class="form-control" name="phone_number" id="phone_number"
+                                       value="{{ auth()->user()->phone_number }}" disabled>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="designation" class="form-label">Designation</label>
+                                <input type="text" class="form-control" id="designation"
+                                       value="{{ auth()->user()->designation }}" disabled>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <input type="text" class="form-control" id="gender"
+                                       value="{{ auth()->user()->gender }}" disabled>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="dob" class="form-label">Date Of Birth</label>
+                                <input type="date" class="form-control" id="dob"
+                                       value="{{ auth()->user()->dob ? \Carbon\Carbon::parse(auth()->user()->dob)->format('Y-m-d') : '' }}"
+                                       disabled>
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="btn btn-primary profile-save-btn" style="display: none;">Save
+                            Profile
+                        </button>
                     </form>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-profile">
-                    <img src="../assets/img/bg-profile.jpg" alt="Image placeholder" class="card-img-top">
-                    <div class="row justify-content-center">
-                        <div class="col-4 col-lg-4 order-lg-2">
-                            <div class="mt-n4 mt-lg-n6 mb-4 mb-lg-0">
-                                <a href="javascript:;">
-                                    <img src="../assets/img/team-2.jpg"
-                                         class="rounded-circle img-fluid border border-2 border-white">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-header text-center border-0 pt-0 pt-lg-2 pb-4 pb-lg-3">
-                        <div class="d-flex justify-content-between">
-                            <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-none d-lg-block">Connect</a>
-                            <a href="javascript:;" class="btn btn-sm btn-info mb-0 d-block d-lg-none"><i
-                                    class="ni ni-collection"></i></a>
-                            <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-none d-lg-block">Message</a>
-                            <a href="javascript:;" class="btn btn-sm btn-dark float-right mb-0 d-block d-lg-none"><i
-                                    class="ni ni-email-83"></i></a>
-                        </div>
-                    </div>
-                    <div class="card-body pt-0">
-                        <div class="row">
-                            <div class="col">
-                                <div class="d-flex justify-content-center">
-                                    <div class="d-grid text-center">
-                                        <span class="text-lg font-weight-bolder">22</span>
-                                        <span class="text-sm opacity-8">Friends</span>
-                                    </div>
-                                    <div class="d-grid text-center mx-4">
-                                        <span class="text-lg font-weight-bolder">10</span>
-                                        <span class="text-sm opacity-8">Photos</span>
-                                    </div>
-                                    <div class="d-grid text-center">
-                                        <span class="text-lg font-weight-bolder">89</span>
-                                        <span class="text-sm opacity-8">Comments</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center mt-4">
-                            <h5>
-                                Mark Davis<span class="font-weight-light">, 35</span>
-                            </h5>
-                            <div class="h6 font-weight-300">
-                                <i class="ni location_pin mr-2"></i>Bucharest, Romania
-                            </div>
-                            <div class="h6 mt-4">
-                                <i class="ni business_briefcase-24 mr-2"></i>Solution Manager - Officer
-                            </div>
-                            <div>
-                                <i class="ni education_hat mr-2"></i>University of Computer Science
-                            </div>
-                        </div>
-                    </div>
-                </div>
+{{--                                           <div class="col-md-4">--}}
+{{--                                               <div class="pass-sec">--}}
+{{--                                                   <h1>Change Password</h1>--}}
+{{--                                                   <form id="profile-form" action="" class="pass-sec-form">--}}
+{{--                                                           <div class="col-md-10 mb-3">--}}
+{{--                                                               <label for="old-password" class="form-label">Old Password</label>--}}
+{{--                                                               <input type="text" class="form-control" name="old-password" id="old-password" value="" disabled>--}}
+{{--                                                           </div>--}}
+{{--                                                       <div class="col-md-10 mb-3">--}}
+{{--                                                           <label for="new-password" class="form-label">Password</label>--}}
+{{--                                                           <input type="text" class="form-control" name="new-password" id="new-password" value="" disabled>--}}
+{{--                                                       </div>--}}
+{{--                                                       <div class="col-md-10 mb-3">--}}
+{{--                                                           <label for="confirm-password" class="form-label">Confirm Password</label>--}}
+{{--                                                           <input type="text" class="form-control" name="confirm-password" id="confirm-password" value="" disabled>--}}
+{{--                                                       </div>--}}
+{{--                                                       <button type="submit" class="btn btn-primary">Update Password</button>--}}
+{{--                                                   </form>--}}
+{{--                                               </div>--}}
+{{--                                           </div>--}}
             </div>
         </div>
-        <footer class="footer pt-3  ">
-            <div class="container-fluid">
-                <div class="row align-items-center justify-content-lg-between">
-                    <div class="col-lg-6 mb-lg-0 mb-4">
-                        <div class="copyright text-center text-sm text-muted text-lg-start">
-                            ©
-                            <script>
-                                document.write(new Date().getFullYear())
-                            </script>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                            <li class="nav-item">
-                                <a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative
-                                    Tim</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted"
-                                   target="_blank">About Us</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="https://www.creative-tim.com/blog" class="nav-link text-muted" target="_blank">Blog</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted"
-                                   target="_blank">License</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
+    </section>
+
+    @push('script')
+        <script>
+             $(document).ready(function () {
+            //     let isEditMode = false;
+            //     $('#edit-profile-btn').click(function () {
+            //         isEditMode = !isEditMode;
+            //         if (isEditMode) {
+            //             $(this).text('Cancel');
+            //             $('.profile-save-btn').show();
+            //             $('#name, #email, #phone_number')
+            //                 .prop('disabled', false)
+            //                 .addClass('editable-field');
+            //         } else {
+            //             $(this).text('Edit Profile');
+            //             $('.profile-save-btn').hide();
+            //             $('#profile-form input').prop('disabled', true).removeClass('editable-field');
+            //         }
+            //     });
+
+                // Profile image upload with revert on error and nav update
+                $('#file-input').change(function () {
+                    if (this.files && this.files[0]) {
+                        const originalImageSrc = $('#profile-img').attr('src');
+                        const navProfileImages = $('.profile-image').not('#profile-img').map(function () {
+                            return {
+                                element: this,
+                                originalSrc: $(this).attr('src')
+                            };
+                        }).get();
+
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            const newImageSrc = e.target.result;
+                            $('#profile-img').attr('src', newImageSrc);
+                            $('.profile-image').not('#profile-img').attr('src', newImageSrc);
+
+                            const formData = new FormData();
+                            formData.append('image', $('#file-input')[0].files[0]);
+                            formData.append('_token', '{{ csrf_token() }}');
+
+                            const url = '{{ route("admin.profile.image.update") }}';
+
+                            AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
+                                .then(response => {
+                                    const finalImageUrl = response.image_url || newImageSrc;
+                                    $('#profile-img').attr('src', finalImageUrl);
+                                    $('.profile-image').not('#profile-img').attr('src', finalImageUrl);
+                                })
+                                .catch(error => {
+                                    $('#profile-img').attr('src', originalImageSrc);
+                                    navProfileImages.forEach(img => {
+                                        $(img.element).attr('src', img.originalSrc);
+                                    });
+                                    console.log(error);
+                                });
+                        };
+
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+
+                // Form submission - only pseudo fields will be submitted
+                // $('#profile-form').submit(function (e) {
+                //     e.preventDefault();
+                //
+                //     const formData = new FormData(this);
+                //     const url = $(this).attr('action');
+                //
+                //     AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
+                //         .then(response => {
+                //             $('#edit-profile-btn').text('Edit Profile');
+                //             $('.profile-save-btn').hide();
+                //             $('#profile-form input').prop('disabled', true).removeClass('editable-field');
+                //             isEditMode = false;
+                //         })
+                //         .catch(error => {
+                //             console.log(error);
+                //         });
+                // });
+            });
+        </script>
+    @endpush
 @endsection
-@push('script')
-    <script>
-        $(document).ready(function () {
-            $('.image-container').click(function () {
-                $('#imageUpload').trigger('click');
-            });
-
-            $('#imageUpload').change(function (event) {
-                var file = event.target.files[0];
-                if (file) {
-
-                    var formData = new FormData();
-                    formData.append('image', file);
-
-                    AjaxPostRequestPromise(`{{route('admin.profile.image.update')}}`, formData)
-                        .then(function (response) {
-                            $('.profile-image').attr('src', response.imageUrl);
-                        })
-                        .catch(function (error) {
-                        });
-                    // var reader = new FileReader();
-                    // reader.onload = function (e) {
-                    //     $('.profile-image').attr('src', e.target.result);
-                    // };
-                    // reader.readAsDataURL(file);
-                }
-            });
-
-        });
-
-    </script>
-@endpush

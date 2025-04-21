@@ -10,8 +10,8 @@
 
                 <!-- Profile picture  -->
                 <div class="mininav-toggle text-center py-2">
-                    <img class="mainnav__avatar img-md rounded-circle hv-oc" style="background-color: var(--bs-secondary);"
-                         src="{{ auth()->guard('admin')->user()->image ? (filter_var(auth()->guard('admin')->user()->image, FILTER_VALIDATE_URL) ? auth()->guard('admin')->user()->image : (file_exists(public_path('assets/images/employees/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/employees/'.auth()->guard('admin')->user()->image) : (file_exists(public_path('assets/images/admins/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/admins/'.auth()->guard('admin')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')))) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
+                    <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image" style="background-color: var(--bs-secondary);"
+                         src="{{ auth()->guard('admin')->user()->image ? (filter_var(auth()->guard('admin')->user()->image, FILTER_VALIDATE_URL) ? auth()->guard('admin')->user()->image : (file_exists(public_path('assets/images/admins/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/admins/'.auth()->guard('admin')->user()->image) : (file_exists(public_path('assets/images/admins/'.auth()->guard('admin')->user()->image)) ? asset('assets/images/admins/'.auth()->guard('admin')->user()->image) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')))) : asset('assets/themes/nifty/assets/img/profile-photos/2.png')}}"
                          alt="{{auth()->guard('admin')->user()->name}}" title="Dashboard" loading="lazy">
                 </div>
                 <div class="mininav-content collapse d-mn-max">
