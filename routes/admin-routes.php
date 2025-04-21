@@ -29,7 +29,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
     /** Profile Routes */
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [AdminProfileController::class, 'edit'])->name('edit');
-        Route::post('/update', [AdminProfileController::class, 'update'])->name('update');
+        //Route::post('/update', [AdminProfileController::class, 'update'])->name('update');
         Route::post('/image-update', [AdminProfileController::class, 'image_update'])->name('image.update');
     });
     /** Admin Accounts Routes */
