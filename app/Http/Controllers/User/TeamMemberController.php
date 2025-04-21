@@ -12,7 +12,9 @@ class TeamMemberController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $teams = $user->teams()->with('users')->get();
+        $teams = $user->teams()->with(['users' => function($query) {
+            $query->where('status', 1);
+        }])->get();
         return view('user.team-members.index', compact('teams'));
     }
 }
