@@ -305,7 +305,7 @@ class EmployeeController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'pseudo_email' => 'nullable|email|max:255|unique:users,pseudo_email,' . $user->id,
             'designation' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8192',
             'target' => 'nullable|integer',
             'status' => 'required|in:0,1',
             'password' => 'nullable|string|max:255',
