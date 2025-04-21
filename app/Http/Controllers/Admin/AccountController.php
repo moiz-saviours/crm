@@ -46,7 +46,7 @@ class AccountController extends Controller
             'dob' => 'nullable|date',
             'about' => 'nullable|string',
             'status' => 'required|in:0,1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8192',
             'password' => 'nullable|string|max:255',
             'phone_number' => 'nullable|regex:/^(\+?\d{1,3})[\d\s().-]+$/|min:8|max:20',
         ]);
