@@ -579,6 +579,6 @@ Detailed information and more samples can be found in the documentation.
     }
 
     .profile-image{
-        object-fit: cover;
+        object-fit: contain;
     }
 </style>

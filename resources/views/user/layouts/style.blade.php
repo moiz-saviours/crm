@@ -332,7 +332,7 @@
     }
 
     .profile-image{
-        object-fit: cover;
+        object-fit: contain;
     }
 
 </style>
