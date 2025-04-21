@@ -537,8 +537,7 @@ Detailed information and more samples can be found in the documentation.
     .table a:hover {
         text-decoration: underline;
     }
-</style>
-<style>
+
     table object.avatar.avatar-sm.me-3 {
         max-width: 50px;
         max-height: 50px;
@@ -577,5 +576,9 @@ Detailed information and more samples can be found in the documentation.
 
     button.btn.btn-sm {
         /*padding: 0px;*/
+    }
+
+    .profile-image{
+        object-fit: cover;
     }
 </style>

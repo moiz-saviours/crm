@@ -331,6 +331,10 @@
         display: none;
     }
 
+    .profile-image{
+        object-fit: cover;
+    }
+
 </style>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
