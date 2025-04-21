@@ -78,6 +78,9 @@ class ProfileController extends Controller
      */
     public function image_update(Request $request)
     {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:8192',
+        ]);
         try {
             if ($request->hasFile('image')) {
                 $user = $request->user();
@@ -90,6 +93,7 @@ class ProfileController extends Controller
                     'image_url' => asset('assets/images/employees/' . $originalFileName)
                 ]);
             }
+            return response()->json(['success' => false, 'message' => 'Failed to upload the profile image.'], 400);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
