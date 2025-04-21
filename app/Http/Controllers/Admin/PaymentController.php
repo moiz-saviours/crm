@@ -26,7 +26,7 @@ class PaymentController extends Controller
         $agents = User::where('status', 1)->get();
 //        $all_payments = Payment::where('status', 1)->get();
         $payments = Payment::with(['brand', 'team', 'agent'])->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $users = User::where('status', 1)->get();
         return view('admin.payments.index', compact('payments', 'brands', 'teams', 'agents', 'customer_contacts', 'users'));
     }
@@ -39,7 +39,7 @@ class PaymentController extends Controller
         $brands = Brand::where('status', 1)->get();
         $teams = Team::where('status', 1)->get();
         $agents = User::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $users = User::where('status', 1)->get();
         return view('admin.payments.create', compact('brands', 'teams', 'agents', 'customer_contacts', 'users'));
     }
@@ -186,7 +186,7 @@ class PaymentController extends Controller
             //$teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
             $brands = Brand::where('status', 1)->get();
             $teams = Team::where('status', 1)->get();
-            $customer_contacts = CustomerContact::where('status', 1)->get();
+            $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
             $users = User::where('status', 1)->get();
             $payment->loadMissing('customer_contact');
             return response()->json(['payment' => $payment, 'brands' => $brands, 'teams' => $teams, 'customer_contacts' => $customer_contacts, 'users' => $users]);

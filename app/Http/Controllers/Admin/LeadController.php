@@ -27,7 +27,7 @@ class LeadController extends Controller
     {
         $brands = Brand::where('status', 1)->get();
         $teams = Team::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $leads = Lead::with('customer_contact')->get();
         return view('admin.leads.index', compact('leads', 'brands', 'teams', 'customer_contacts'));
     }
@@ -41,7 +41,7 @@ class LeadController extends Controller
 //        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
         $teams = Team::where('status', 1)->get();
         $brands = Brand::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         return view('admin.leads.create', compact('brands', 'teams', 'customer_contacts'));
     }
 
@@ -153,7 +153,7 @@ class LeadController extends Controller
         //$teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
         $brands = Brand::where('status', 1)->get();
         $teams = Team::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         return response()->json(['lead' => $lead, 'brands' => $brands, 'teams' => $teams, 'customer_contacts' => $customer_contacts]);
     }
 

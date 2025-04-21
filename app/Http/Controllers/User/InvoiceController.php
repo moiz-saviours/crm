@@ -35,7 +35,7 @@ class InvoiceController extends Controller
             ->get()->pluck('brands.*.brand_key')->flatten()->unique();
         $customer_contacts = CustomerContact::where(function ($query) use ($teamKeys) {
             $query->whereIn('team_key', $teamKeys)->orWhereMorphedTo('creator', auth()->user());
-        })->active()->get();
+        })->active()->orderBy('name')->get();
 
         $all_invoices = Invoice::whereIn('brand_key', $brandKeys)
             ->whereIn('team_key', $teamKeys)

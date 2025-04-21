@@ -59,7 +59,7 @@ class InvoiceController extends Controller
                 });
         }
         $teams = Team::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $users = User::where('status', 1)->get();
         return view('admin.invoices.index', compact('invoices', 'groupedMerchants', 'brands', 'teams', 'customer_contacts', 'users'));
     }
@@ -71,7 +71,7 @@ class InvoiceController extends Controller
     {
         $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
         $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $users = User::where('status', 1)->get();
         return view('admin.invoices.create', compact('brands', 'teams', 'customer_contacts', 'users'));
     }
@@ -294,7 +294,7 @@ class InvoiceController extends Controller
         if (!$invoice->id) return response()->json(['error' => 'Invoice does not exist.']);
         $brands = Brand::where('status', 1)->get();
         $teams = Team::where('status', 1)->get();
-        $customer_contacts = CustomerContact::where('status', 1)->get();
+        $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $users = User::where('status', 1)->get();
         $invoice->loadMissing('customer_contact', 'invoice_merchants');
         $invoiceMerchants = [];
