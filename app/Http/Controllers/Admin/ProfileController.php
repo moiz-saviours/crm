@@ -28,45 +28,38 @@ class ProfileController extends Controller
     {
 
         $request->user()->fill($request->validated());
-
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
-
         $request->user()->save();
-
         return Redirect::route('admin.profile.edit')->with('success', 'Profile successfully updated.');
     }
 
-
-        /**
-         * Update the user's profile image.
-         */
-        public function image_update(Request $request)
-        {
-            $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
-
-            if ($request->hasFile('image')) {
-                $originalFileName = time() . '_' . $request->file('image')->getClientOriginalName();
-                $publicPath = public_path('assets/images/admins');
-                $request->file('image')->move($publicPath, $originalFileName);
-                auth()->user()->image = $originalFileName;
-                auth()->user()->save();
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Profile image successfully uploaded',
-                    'imageUrl' => asset('assets/images/admins/' . $originalFileName),
-                ]);
-            }
-
+    /**
+     * Update the user's profile image.
+     */
+    public function image_update(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:8192',
+        ]);
+        if ($request->hasFile('image')) {
+            $originalFileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $publicPath = public_path('assets/images/admins');
+            $request->file('image')->move($publicPath, $originalFileName);
+            auth()->user()->image = $originalFileName;
+            auth()->user()->save();
             return response()->json([
-                'success' => false,
-                'message' => 'Failed to upload the profile image.'
+                'success' => true,
+                'message' => 'Profile image successfully uploaded',
+                'imageUrl' => asset('assets/images/admins/' . $originalFileName),
             ]);
         }
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to upload the profile image.'
+        ], 400);
+    }
 
     /**
      * Delete the user's account.
@@ -76,16 +69,11 @@ class ProfileController extends Controller
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
-
         $user = $request->user();
-
         Auth::logout();
-
         $user->delete();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return Redirect::to('/');
     }
 }
