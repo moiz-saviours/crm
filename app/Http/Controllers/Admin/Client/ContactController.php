@@ -19,7 +19,7 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $brands = Brand::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
         $client_contacts = ClientContact::all();
         return view('admin.clients.contacts.index', compact('client_contacts', 'brands'));
     }
