@@ -18,7 +18,7 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $brands = Brand::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
         $client_companies = ClientCompany::get();
         $client_contacts = ClientContact::where('status', 1)->get();
         return view('admin.clients.companies.index', compact('client_companies', 'client_contacts', 'brands'));
