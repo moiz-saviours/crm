@@ -25,8 +25,8 @@ class LeadController extends Controller
      */
     public function index()
     {
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $leads = Lead::with('customer_contact')->get();
         return view('admin.leads.index', compact('leads', 'brands', 'teams', 'customer_contacts'));
@@ -37,10 +37,10 @@ class LeadController extends Controller
      */
     public function create()
     {
-//        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
-//        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
-        $teams = Team::where('status', 1)->get();
-        $brands = Brand::where('status', 1)->get();
+//        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->orderBy('name')->get());
+//        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->orderBy('name')->get());
+        $teams = Team::where('status', 1)->orderBy('name')->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         return view('admin.leads.create', compact('brands', 'teams', 'customer_contacts'));
     }
@@ -149,10 +149,10 @@ class LeadController extends Controller
      */
     public function edit(Lead $lead)
     {
-        //$brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
-        //$teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
+        //$brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->orderBy('name')->get());
+        //$teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->orderBy('name')->get());
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         return response()->json(['lead' => $lead, 'brands' => $brands, 'teams' => $teams, 'customer_contacts' => $customer_contacts]);
     }
