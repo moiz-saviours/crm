@@ -28,8 +28,8 @@ class ContactController extends Controller
      */
     public function create()
     {
-        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
-        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
+        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->orderBy('name')->get());
+        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->orderBy('name')->get());
         $countries = Cache::rememberForever('countries_list', fn() => config('countries'));
         return view('admin.customers.contacts.create', compact('brands', 'teams', 'countries'));
     }
@@ -107,8 +107,8 @@ class ContactController extends Controller
     {
         if (!$customer_contact->id) return response()->json(['error' => 'Oops! Customer contact not found!']);
         $customer_contact->load('creator', 'company', 'invoices', 'payments','notes');
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         $countries = config('countries');
         return view('admin.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
 //        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
