@@ -17,8 +17,8 @@ class TeamController extends Controller
     public function index()
     {
         $teams = Team::all();
-        $brands = Brand::where('status', 1)->get();
-        $users = User::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
         return view('admin.teams.index', compact('teams', 'brands', 'users'));
     }
 
@@ -28,8 +28,8 @@ class TeamController extends Controller
     public function create()
     {
         try {
-            $brands = Brand::where('status', 1)->get();
-            $users = User::where('status', 1)->with('teams')->get();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->with('teams')->get();
             return view('admin.teams.create', compact('brands', 'users'));
         } catch (\Exception $e) {
             return redirect()->route('admin.team.index')->with('error', $e->getMessage());
@@ -128,8 +128,8 @@ class TeamController extends Controller
             if (request()->ajax()) {
                 return response()->json(['data' => array_merge($team->toArray(), ['assign_user_ids' => $assign_user_ids], ['assign_brand_keys' => $assign_brand_keys]), 'message' => 'Record fetched successfully.']);
             }
-            $brands = Brand::where('status', 1)->get();
-            $users = User::where('status', 1)->get();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get();
             return view('admin.teams.edit', compact('team', 'brands', 'users', 'assign_brand_keys', 'assign_user_ids'));
 
         } catch (\Exception $e) {
