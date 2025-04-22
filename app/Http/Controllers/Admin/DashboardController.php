@@ -143,8 +143,8 @@ class DashboardController extends Controller
 
     public function index_2()
     {
-        $teams = Team::where('status', 1)->get();
-        $brands = Brand::where('status', 1)->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
         return view('admin.dashboard.index-2', ['teams' => $teams, 'brands' => $brands]);
     }
 
