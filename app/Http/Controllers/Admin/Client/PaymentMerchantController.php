@@ -25,12 +25,12 @@ class PaymentMerchantController extends Controller
      */
     public function index()
     {
-        $brands = Brand::active()->get();
+        $brands = Brand::active()->orderBy('name')->get();
         $payment_merchants = PaymentMerchant::withMonthlyUsage()->get();
         $payment_merchants->each(function ($merchant) {
             $merchant->usage = number_format($merchant->payments->sum('total_amount') ?? 0);
         });
-        $client_contacts = ClientContact::active()->get();
+        $client_contacts = ClientContact::active()->orderBy('name')->get();
         return view('admin.payment-merchants.index', compact('payment_merchants', 'client_contacts', 'brands'));
     }
 
