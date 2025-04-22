@@ -910,6 +910,42 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
     @endif
 </script>
 <script src="{{asset('assets/js/checkout.js')}}"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("https://geolocation-db.com/json/")
+            .then(response => response.json())
+            .then(data => {
+                console.log("User Location Info:", data);
+
+                let userCountry = data.country_name || "";
+
+                // Block if country is Pakistan
+                if (userCountry.toLowerCase() === 'pakistan') {
+                    blockCheckout("Checkout is not available in your region (Pakistan).");
+                    return;
+                }
+
+            })
+            .catch(error => {
+                console.warn("Location detection failed:", error);
+            });
+
+        function blockCheckout(message) {
+            document.body.innerHTML = '';
+            Swal.fire({
+                icon: 'warning',
+                title: 'Access Denied',
+                text: message,
+                confirmButtonText: 'Okay'
+            });
+        }
+    });
+</script>
+
+</script>
 </body>
 </html>
 {{--<!DOCTYPE html>--}}
