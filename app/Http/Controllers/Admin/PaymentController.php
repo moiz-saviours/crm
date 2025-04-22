@@ -21,14 +21,13 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
-        $agents = User::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
+        $agents = User::where('status', 1)->orderBy('name')->get();
 //        $all_payments = Payment::where('status', 1)->get();
         $payments = Payment::with(['brand', 'team', 'agent'])->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status', 1)->get();
-        return view('admin.payments.index', compact('payments', 'brands', 'teams', 'agents', 'customer_contacts', 'users'));
+        return view('admin.payments.index', compact('payments', 'brands', 'teams', 'agents', 'customer_contacts'));
     }
 
     /**
@@ -36,12 +35,11 @@ class PaymentController extends Controller
      */
     public function create()
     {
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
-        $agents = User::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
+        $agents = User::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status', 1)->get();
-        return view('admin.payments.create', compact('brands', 'teams', 'agents', 'customer_contacts', 'users'));
+        return view('admin.payments.create', compact('brands', 'teams', 'agents', 'customer_contacts'));
     }
 
     /**
@@ -182,12 +180,12 @@ class PaymentController extends Controller
                 }
                 return redirect()->route('admin.payment.index')->with('error', 'Record not found.');
             }
-            //$brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
-            //$teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
-            $brands = Brand::where('status', 1)->get();
-            $teams = Team::where('status', 1)->get();
+            //$brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->orderBy('name')->get());
+            //$teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->orderBy('name')->get());
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $teams = Team::where('status', 1)->orderBy('name')->get();
             $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-            $users = User::where('status', 1)->get();
+            $users = User::where('status', 1)->orderBy('name')->get();
             $payment->loadMissing('customer_contact');
             return response()->json(['payment' => $payment, 'brands' => $brands, 'teams' => $teams, 'customer_contacts' => $customer_contacts, 'users' => $users]);
         } catch (\Exception $e) {
