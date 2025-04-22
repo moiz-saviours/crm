@@ -15,7 +15,7 @@ class TeamController extends Controller
      */
     public function index()
     {
-        $teams = Team::where('status', 1)->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         return view('developer.teams.index', compact('teams'));
     }
 
@@ -25,8 +25,8 @@ class TeamController extends Controller
     public function create()
     {
         try {
-            $brands = Brand::where('status', 1)->get();
-            $users = User::where('status', 1)->get();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get();
             return view('developer.teams.create', compact('brands', 'users'));
         } catch (\Exception $e) {
             return redirect()->route('developer.team.index')->with('error', $e->getMessage());
@@ -107,8 +107,8 @@ class TeamController extends Controller
             if (!$team->id) {
                 return redirect()->route('developer.team.index')->with('error', 'Team not found.');
             }
-            $brands = Brand::where('status', 1)->get();
-            $users = User::where('status', 1)->get();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get();
 
             $teamEmployees = $team->users->pluck('id')->toArray();
             $teamBrands = $team->brands->pluck('brand_key')->toArray();

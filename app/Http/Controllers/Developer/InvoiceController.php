@@ -27,10 +27,10 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
-        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
+        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->orderBy('name')->get());
+        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->orderBy('name')->get());
         $clients = CustomerContact::where('status', 1)->get();
-        $users = User::where('status', 1)->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
         return view('developer.invoices.create', compact('brands', 'teams', 'clients', 'users'));
     }
 
@@ -134,10 +134,10 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         if (!$invoice->id) return redirect()->route('developer.invoice.index')->with('error', 'Record not found.');
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         $clients = CustomerContact::where('status', 1)->get();
-        $users = User::where('status', 1)->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
         return view('developer.invoices.edit', compact('invoice', 'brands', 'teams', 'clients', 'users'));
     }
 

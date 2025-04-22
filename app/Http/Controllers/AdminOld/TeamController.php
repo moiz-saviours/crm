@@ -15,7 +15,7 @@ class TeamController extends Controller
      */
     public function index()
     {
-        $teams = Team::where('status', 1)->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         return view('admin.teams.index', compact('teams'));
     }
 
@@ -25,8 +25,8 @@ class TeamController extends Controller
     public function create()
     {
         try {
-            $brands = Brand::where('status', 1)->get();
-            $users = User::where('status', 1)->get();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get();
             return view('admin-old.teams.create', compact('brands', 'users'));
         } catch (\Exception $e) {
             return redirect()->route('admin.team.index')->with('error', $e->getMessage());
@@ -110,8 +110,8 @@ class TeamController extends Controller
                 }
                 return redirect()->route('admin.team.index')->with('error', 'Team not found.');
             }
-            $brands = Brand::where('status', 1)->get();
-            $users = User::where('status', 1)->get();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get();
             if (request()->ajax()) {
                 $assign_brands = $team->brands->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
                 return response()->json(['data' => array_merge($team->toArray(), ['assign_brands' => $assign_brands]), 'message' => 'Record updated successfully.']);

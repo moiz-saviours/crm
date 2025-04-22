@@ -23,7 +23,7 @@ class PaymentMerchantController extends Controller
      */
     public function create()
     {
-        $brands = Brand::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
         return view('admin.payment-merchants.create', compact('brands'));
     }
 
