@@ -41,6 +41,7 @@ class Payment extends Model
         'card_month_expiry',
         'card_year_expiry',
         'status',
+        'payment_environment',
     ];
 
     protected $casts = [
