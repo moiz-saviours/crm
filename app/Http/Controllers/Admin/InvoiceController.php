@@ -24,7 +24,7 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::all();
-        $brands = Brand::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
         $groupedMerchants = [];
         foreach ($brands as $brand) {
             $client_accounts = $brand->client_accounts;
@@ -58,9 +58,9 @@ class InvoiceController extends Controller
                     });
                 });
         }
-        $teams = Team::where('status', 1)->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status', 1)->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
         return view('admin.invoices.index', compact('invoices', 'groupedMerchants', 'brands', 'teams', 'customer_contacts', 'users'));
     }
 
@@ -69,10 +69,10 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->get());
-        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->get());
+        $brands = Cache::remember('brands_list', config('cache.durations.short_lived'), fn() => Brand::where('status', 1)->orderBy('name')->get());
+        $teams = Cache::remember('teams_list', config('cache.durations.short_lived'), fn() => Team::where('status', 1)->orderBy('name')->get());
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status', 1)->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
         return view('admin.invoices.create', compact('brands', 'teams', 'customer_contacts', 'users'));
     }
 
@@ -292,10 +292,10 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         if (!$invoice->id) return response()->json(['error' => 'Invoice does not exist.']);
-        $brands = Brand::where('status', 1)->get();
-        $teams = Team::where('status', 1)->get();
+        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $users = User::where('status', 1)->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
         $invoice->loadMissing('customer_contact', 'invoice_merchants');
         $invoiceMerchants = [];
         foreach ($invoice->invoice_merchants as $merchant) {
