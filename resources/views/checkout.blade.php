@@ -157,14 +157,14 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
         // }
 
         const showLoading = () => {
-            Swal.fire({
-                title: 'Verifying Access',
-                html: 'Checking regional availability...',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                didOpen: () => Swal.showLoading()
-            });
+            // Swal.fire({
+            //     title: 'Verifying Access',
+            //     html: 'Checking regional availability...',
+            //     allowOutsideClick: false,
+            //     allowEscapeKey: false,
+            //     showConfirmButton: false,
+            //     didOpen: () => Swal.showLoading()
+            // });
         };
         const blockAccess = (message) => {
             document.body.innerHTML = '';
