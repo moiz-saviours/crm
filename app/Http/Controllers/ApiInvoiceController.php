@@ -21,7 +21,10 @@ class ApiInvoiceController extends Controller
     {
         try {
             $this->validateInvoiceKey($invoice_key);
-            $invoice = Invoice::where('invoice_key', $invoice_key)->firstOrFail();
+            $invoice = Invoice::where('invoice_key', $invoice_key)->first();
+            if (!$invoice) {
+                return response()->json(['success' => false, 'message' => 'Invoice not found for the given key.',], 404);
+            }
             $invoice->loadMissing('brand', 'team', 'customer_contact', 'agent');
             $brand = optional($invoice->brand);
             $customer = optional($invoice->customer_contact);
@@ -80,7 +83,7 @@ class ApiInvoiceController extends Controller
         } catch (ValidationException $exception) {
             return response()->json(['success' => false, 'error' => $exception->getMessage()], 422);
         } catch (ModelNotFoundException $exception) {
-            return response()->json(['success' => false, 'message' => 'Oops! Invoice not found.',], 404);
+            return response()->json(['success' => false, 'message' => 'Invoice not found.',], 404);
         } catch (\Exception $exception) {
             return response()->json(['success' => false, 'error' => 'Internal server error.', 'message' => $exception->getMessage(),], 500);
         }
