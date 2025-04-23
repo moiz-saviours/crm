@@ -40,7 +40,6 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
                 exit();
             }
         }
-
 //        $vpnCheck = curl_init();
 //        curl_setopt($vpnCheck, CURLOPT_URL, "https://vpnapi.io/api/{$ip}?key=4239106e6b264bcda480cf535d7aee57");
 //        curl_setopt($vpnCheck, CURLOPT_RETURNTRANSFER, true);
@@ -104,8 +103,6 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
 //                exit();
 //            }
 //        }
-
-
     } catch (Exception $e) {
         file_put_contents('geolocation_errors.log', date('Y-m-d H:i:s') . ' - ' . $e->getMessage() . "\n", FILE_APPEND);
     }
@@ -138,6 +135,58 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
 
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
+
+    <!-- Toaster -->
+    <script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+
+    <script>
+        // Toastr options
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "500",
+            "hideDuration": "1000",
+            "timeOut": "3000", // 5 seconds
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        @if(session('success'))
+        setTimeout(function () {
+            toastr.success("{{ session('success') }}");
+        }, 1500);
+        @php session()->forget('success'); @endphp
+        @endif
+
+        // Display error messages (multiple)
+        @if(session('errors') && session('errors')->any())
+        let errorMessages = {!! json_encode(session('errors')->all()) !!};
+        let displayedCount = 0;
+
+        setTimeout(function () {
+            errorMessages.forEach((message, index) => {
+                if (displayedCount < 5) {
+                    toastr.error(message);
+                    displayedCount++;
+                } else {
+                    setTimeout(() => toastr.error(message), index * 1000);
+                }
+            });
+        }, 1500);
+
+        @php session()->forget('errors'); @endphp
+        @endif
+    </script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -219,56 +268,6 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
 </div>
 <div id="toaster-container"></div>
 <?php if (!isset($invoiceDetails['success']) || !$invoiceDetails['success']): ?>
-<!-- Toaster -->
-<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
-
-<script>
-    // Toastr options
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "500",
-        "hideDuration": "1000",
-        "timeOut": "3000", // 5 seconds
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-
-    @if(session('success'))
-    setTimeout(function () {
-        toastr.success("{{ session('success') }}");
-    }, 1500);
-    @php session()->forget('success'); @endphp
-    @endif
-
-    // Display error messages (multiple)
-    @if(session('errors') && session('errors')->any())
-    let errorMessages = {!! json_encode(session('errors')->all()) !!};
-    let displayedCount = 0;
-
-    setTimeout(function () {
-        errorMessages.forEach((message, index) => {
-            if (displayedCount < 5) {
-                toastr.error(message);
-                displayedCount++;
-            } else {
-                setTimeout(() => toastr.error(message), index * 1000);
-            }
-        });
-    }, 1500);
-
-    @php session()->forget('errors'); @endphp
-    @endif
-</script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById('toaster-container');
@@ -1092,59 +1091,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
     }
 
 </script>
-
-<!-- Toaster -->
-<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
-
-<script>
-    // Toastr options
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "500",
-        "hideDuration": "1000",
-        "timeOut": "3000", // 5 seconds
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-
-    @if(session('success'))
-    setTimeout(function () {
-        toastr.success("{{ session('success') }}");
-    }, 1500);
-    @php session()->forget('success'); @endphp
-    @endif
-
-    // Display error messages (multiple)
-    @if(session('errors') && session('errors')->any())
-    let errorMessages = {!! json_encode(session('errors')->all()) !!};
-    let displayedCount = 0;
-
-    setTimeout(function () {
-        errorMessages.forEach((message, index) => {
-            if (displayedCount < 5) {
-                toastr.error(message);
-                displayedCount++;
-            } else {
-                setTimeout(() => toastr.error(message), index * 1000);
-            }
-        });
-    }, 1500);
-
-    @php session()->forget('errors'); @endphp
-    @endif
-</script>
 <script src="{{asset('assets/js/checkout.js')}}"></script>
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
 {{--<!DOCTYPE html>--}}
