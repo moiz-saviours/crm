@@ -219,6 +219,56 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
 </div>
 <div id="toaster-container"></div>
 <?php if (!isset($invoiceDetails['success']) || !$invoiceDetails['success']): ?>
+<!-- Toaster -->
+<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+
+<script>
+    // Toastr options
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "500",
+        "hideDuration": "1000",
+        "timeOut": "3000", // 5 seconds
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
+    @if(session('success'))
+    setTimeout(function () {
+        toastr.success("{{ session('success') }}");
+    }, 1500);
+    @php session()->forget('success'); @endphp
+    @endif
+
+    // Display error messages (multiple)
+    @if(session('errors') && session('errors')->any())
+    let errorMessages = {!! json_encode(session('errors')->all()) !!};
+    let displayedCount = 0;
+
+    setTimeout(function () {
+        errorMessages.forEach((message, index) => {
+            if (displayedCount < 5) {
+                toastr.error(message);
+                displayedCount++;
+            } else {
+                setTimeout(() => toastr.error(message), index * 1000);
+            }
+        });
+    }, 1500);
+
+    @php session()->forget('errors'); @endphp
+    @endif
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById('toaster-container');
