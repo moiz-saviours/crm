@@ -4,7 +4,7 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
 
         $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "http://ip-api.com/json/146.70.186.158?fields=countryCode");
+        curl_setopt($ch, CURLOPT_URL, "http://ip-api.com/json/{$ip}?fields=countryCode");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 3);
         $response = curl_exec($ch);
