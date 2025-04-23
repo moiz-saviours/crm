@@ -25,7 +25,7 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
                                 Swal.fire({
                                     icon: "error",
                                     title: "Access Denied",
-                                    html: "<p style=\"margin: 1rem 0\">Our services are not available in your region due to regulatory restrictions. We apologize for any inconvenience.</p>",
+                                    html: "<p style=\"margin: 1rem 0\">Our services are not available in your region due to regulatory restrictions. We apologize for any inconvenience..</p>",
                                     showConfirmButton: false,
                                     allowOutsideClick: false,
                                     allowEscapeKey: false,
