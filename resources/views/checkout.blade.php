@@ -1,4 +1,117 @@
-<!DOCTYPE html>
+<?php
+if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
+    try {
+
+        $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "http://ip-api.com/json/146.70.186.158?fields=countryCode");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($httpCode === 200) {
+            $data = json_decode($response, true);
+            if (isset($data['countryCode']) && $data['countryCode'] === 'PK') {
+                echo '<!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Access Restricted</title>
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    </head>
+                    <body>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Access Denied",
+                                    html: "<p style=\"margin: 1rem 0\">Our services are not available in your region due to regulatory restrictions. We apologize for any inconvenience.</p>",
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false,
+                                    allowEscapeKey: false,
+                                    willClose: () => {
+                                        document.body.innerHTML = "<h1 style=\"text-align:center;margin-top:50px;\">Access Restricted</h1>";
+                                    }
+                                });
+                            });
+                        </script>
+                    </body>
+                    </html>';
+                exit();
+            }
+        }
+
+//        $vpnCheck = curl_init();
+//        curl_setopt($vpnCheck, CURLOPT_URL, "https://vpnapi.io/api/{$ip}?key=4239106e6b264bcda480cf535d7aee57");
+//        curl_setopt($vpnCheck, CURLOPT_RETURNTRANSFER, true);
+//        curl_setopt($vpnCheck, CURLOPT_TIMEOUT, 3);
+//        $vpnResponse = curl_exec($vpnCheck);
+//        $vpnHttpCode = curl_getinfo($vpnCheck, CURLINFO_HTTP_CODE);
+//        curl_close($vpnCheck);
+//
+//        if ($vpnHttpCode === 200) {
+//            $vpnData = json_decode($vpnResponse, true);
+//            if (($vpnData['security']['vpn'] ?? false) || ($vpnData['security']['proxy'] ?? false)) {
+//                echo '<!DOCTYPE html>
+//                    <html>
+//                    <head>
+//                        <title>Security Notice</title>
+//                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+//                        <style>
+//                            .swal2-confirm {
+//                                background-color: #3085d6 !important;
+//                            }
+//                            .swal2-cancel {
+//                                background-color: #d33 !important;
+//                            }
+//                        </style>
+//                    </head>
+//                    <body>
+//                        <script>
+//                            document.addEventListener("DOMContentLoaded", function() {
+//                                Swal.fire({
+//                                    icon: "warning",
+//                                    title: "Security Notice",
+//                                    html: `<div style="text-align:left;">
+//                                        <p style="margin-bottom:1rem;">We\'ve detected you\'re using a VPN or proxy service.</p>
+//                                        <p style="margin-bottom:1rem;">For your security and compliance with regional regulations:</p>
+//                                        <ul style="margin-left:1.5rem;margin-bottom:1.5rem;">
+//                                            <li>Transactions via VPN may be flagged as suspicious</li>
+//                                            <li>Some features may not work as expected</li>
+//                                            <li>Your account may require additional verification</li>
+//                                        </ul>
+//                                        <p>Do you want to continue with VPN enabled?</p>
+//                                    </div>`,
+//                                    showCancelButton: true,
+//                                    confirmButtonText: "Continue Anyway",
+//                                    cancelButtonText: "Disable VPN",
+//                                    allowOutsideClick: false,
+//                                    allowEscapeKey: false,
+//                                    backdrop: "rgba(0,0,0,0.7)",
+//                                    customClass: {
+//                                        popup: "vpn-warning-popup"
+//                                    }
+//                                }).then((result) => {
+//                                    if (result.isDismissed) {
+//                                        window.location.href = "https://support.example.com/vpn-guide";
+//                                    }
+//                                    // If confirmed, continue loading page
+//                                });
+//                            });
+//                        </script>
+//                    </body>
+//                    </html>';
+//                exit();
+//            }
+//        }
+
+
+    } catch (Exception $e) {
+        file_put_contents('geolocation_errors.log', date('Y-m-d H:i:s') . ' - ' . $e->getMessage() . "\n", FILE_APPEND);
+    }
+}
+?>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,27 +140,97 @@
 
 </head>
 <body>
+
+<script>
+    (function () {
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s';
+
+        const isLocalhost = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+        const blockedCountries = ['AF', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'KH', 'CN', 'CY', 'GE', 'IN', 'ID', 'IR', 'IQ', 'IL', 'JP', 'JO', 'KZ', 'KW', 'KG', 'LA', 'LB', 'MY', 'MV', 'MN', 'MM', 'NP', 'KP', 'OM', 'PK', 'PS', 'PH', 'QA', 'SA', 'SG', 'KR', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TL', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE'];
+        const accessDeniedMessage = 'Our services are not available in your region due to regulatory restrictions. We apologize for any inconvenience.';
+
+        // if (isLocalhost) {
+        //     console.debug('Geolocation check bypassed: Local development environment detected');
+        //     document.body.style.opacity = '1';
+        //     return;
+        // }
+
+        const showLoading = () => {
+            Swal.fire({
+                title: 'Verifying Access',
+                html: 'Checking regional availability...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => Swal.showLoading()
+            });
+        };
+        const blockAccess = (message) => {
+            document.body.innerHTML = '';
+            document.body.style.opacity = '1';
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Access Denied',
+                html: `<p style="margin: 1rem 0">${message}</p>`,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            });
+        };
+
+        const verifyAccess = async () => {
+            showLoading();
+
+            try {
+                const response = await fetch("https://geolocation-db.com/json/");
+
+                if (!response.ok) {
+                    throw new Error(`Geolocation API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.debug('Geolocation data:', data?.IPv4, data?.country_code);
+
+                const userCountry = (data.country_code || '').toUpperCase();
+                console.debug('user country:', userCountry);
+
+                if (blockedCountries.includes(userCountry)) {
+                    blockAccess(accessDeniedMessage);
+                } else {
+                    Swal.close();
+                    document.body.style.opacity = '1';
+                }
+            } catch (error) {
+                console.error('Geolocation check failed:', error);
+                Swal.close();
+                document.body.style.opacity = '1';
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", verifyAccess);
+    })();
+</script>
 <div class="loader-container loader-light" style="display: none">
     <div class="loader"></div>
     <div class="loading-text">Processing Payment...</div>
     <div class="funny-message">Counting coins...</div>
 </div>
 <div id="toaster-container"></div>
+<?php if (!isset($invoiceDetails['success']) || !$invoiceDetails['success']): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('toaster-container');
+        const toast = document.createElement('div');
+        toast.className = 'toaster error';
+        toast.textContent = <?= json_encode($invoiceDetails['message'] ?? $invoiceDetails['error'] ?? 'An unknown error occurred') ?>;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    });
+</script>
+    <?php exit(); endif; ?>
 <?php
-if (!$invoiceDetails['success']) {
-    $message = json_encode($invoiceDetails['error']);
-    echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const container = document.getElementById('toaster-container');
-                const toast = document.createElement('div');
-                toast.className = 'toaster error';
-                toast.textContent = '$message';
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 4000);
-            });
-        </script>";
-    exit();
-}
 $invoiceData = $invoiceDetails['invoice'] ?? [];
 $currency = $invoiceDetails['invoice']['currency'] ?? "";
 $currency = [
@@ -106,7 +289,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     <div class="brand-logo">
                                         <img
                                             src="<?= htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                                            class="img-fluid images">
+                                            class="img-fluid images" alt="<?= $brandData['name'] ?>">
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-8 text-right ">
@@ -912,40 +1095,6 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
 <script src="{{asset('assets/js/checkout.js')}}"></script>
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        fetch("https://geolocation-db.com/json/")
-            .then(response => response.json())
-            .then(data => {
-                console.log("User Location Info:", data);
-
-                let userCountry = data.country_name || "";
-
-                // Block if country is Pakistan
-                if (userCountry.toLowerCase() === 'pakistan') {
-                    blockCheckout("Checkout is not available in your region (Pakistan).");
-                    return;
-                }
-
-            })
-            .catch(error => {
-                console.warn("Location detection failed:", error);
-            });
-
-        function blockCheckout(message) {
-            document.body.innerHTML = '';
-            Swal.fire({
-                icon: 'warning',
-                title: 'Access Denied',
-                text: message,
-                confirmButtonText: 'Okay'
-            });
-        }
-    });
-</script>
-
-</script>
 </body>
 </html>
 {{--<!DOCTYPE html>--}}
