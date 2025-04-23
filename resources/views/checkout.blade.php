@@ -33,19 +33,21 @@
     <div class="funny-message">Counting coins...</div>
 </div>
 <div id="toaster-container"></div>
-<?php if (!isset($invoiceDetails['success']) || !$invoiceDetails['success']): ?>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const container = document.getElementById('toaster-container');
-        const toast = document.createElement('div');
-        toast.className = 'toaster error';
-        toast.textContent = <?= json_encode($invoiceDetails['message'] ?? $invoiceDetails['error'] ?? 'An unknown error occurred') ?>;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-    });
-</script>
-    <?php exit(); endif; ?>
 <?php
+if (!$invoiceDetails['success']) {
+    $message = json_encode($invoiceDetails['error']);
+    echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const container = document.getElementById('toaster-container');
+                const toast = document.createElement('div');
+                toast.className = 'toaster error';
+                toast.textContent = '$message';
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            });
+        </script>";
+    exit();
+}
 $invoiceData = $invoiceDetails['invoice'] ?? [];
 $currency = $invoiceDetails['invoice']['currency'] ?? "";
 $currency = [
@@ -913,10 +915,6 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-            console.log("Geolocation check skipped on localhost");
-            return;
-        }
         fetch("https://geolocation-db.com/json/")
             .then(response => response.json())
             .then(data => {
