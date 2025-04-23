@@ -80,7 +80,7 @@ class ApiInvoiceController extends Controller
         } catch (ValidationException $exception) {
             return response()->json(['success' => false, 'error' => $exception->getMessage()], 422);
         } catch (ModelNotFoundException $exception) {
-            return response()->json(['success' => false, 'message' => 'Oops! Invoice not found.',], 404);
+            return response()->json(['success' => false, 'error' => 'Oops! Invoice not found.',], 404);
         } catch (\Exception $exception) {
             return response()->json(['success' => false, 'error' => 'Internal server error.', 'message' => $exception->getMessage(),], 500);
         }
