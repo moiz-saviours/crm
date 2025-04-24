@@ -46,7 +46,10 @@ class CompanyController extends Controller
                     ]
                 );
                 CustomerContact::where('email', 'LIKE', "%@$domain")->whereNull('cus_company_key')->update(['cus_company_key' => $company->special_key]);
-                $company->contacts()->syncWithoutDetaching(CustomerContact::where('email', 'LIKE', "%@$domain")->pluck('special_key'));
+                $contactIds = CustomerContact::where('email', 'LIKE', "%@{$domain}")->pluck('special_key')->toArray();
+                if (!empty($contactIds)) {
+                    $company->contacts()->syncWithoutDetaching($contactIds);
+                }
                 $fetchedCompanies[] = $company;
             } else {
                 Log::error('Hunter.io API failed', ['domain' => $domain, 'response' => $response->body()]);
@@ -63,7 +66,15 @@ class CompanyController extends Controller
 
         $all_contacts = CustomerContact::where('status', 1)->get();
         $domains = $all_contacts->map(fn($contact) => substr(strrchr($contact->email, "@"), 1))->unique();
-        $existingDomains = CustomerCompany::whereIn('domain', $domains)->pluck('domain');
+        $existingCompanies = CustomerCompany::whereIn('domain', $domains)->get();
+        foreach ($existingCompanies as $company) {
+            CustomerContact::where('email', 'LIKE', "%@{$company->domain}")->whereNull('cus_company_key')->update(['cus_company_key' => $company->special_key]);
+            $contactIds = CustomerContact::where('email', 'LIKE', "%@{$company->domain}")->pluck('special_key')->toArray();
+            if (!empty($contactIds)) {
+                $company->contacts()->syncWithoutDetaching($contactIds);
+            }
+        }
+        $existingDomains = $existingCompanies->pluck('domain');
         $domainsToFetch = $domains->diff($existingDomains);
         if ($domainsToFetch->isNotEmpty()) {
             $this->fetchCompaniesFromDomains($domainsToFetch);
