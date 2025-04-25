@@ -621,6 +621,10 @@
                     // $('#loading').show();
                 },
                 success: function (response) {
+                    if (typeof response === 'string' && response.startsWith('<!DOCTYPE html>')) {
+                        toastr['error']("It looks like you've been disconnected. Please reload the page.");
+                        return reject(error);
+                    }
                     const message = response.message || response.success || options.message || 'Request was successful.';
 
                     if (options.useSwal) {
