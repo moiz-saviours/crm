@@ -189,7 +189,11 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invo
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-
+<?php
+$isLocalhost = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']);
+$isInvoicePaid = isset($invoiceDetails['invoice']['status']) && $invoiceDetails['invoice']['status'] == 1;
+$shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
+?>
 <script>
     (function () {
         document.body.style.opacity = '0';
@@ -199,11 +203,20 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invo
         const blockedCountries = ['AF', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'KH', 'CN', 'CY', 'GE', 'IN', 'ID', 'IR', 'IQ', 'IL', 'JP', 'JO', 'KZ', 'KW', 'KG', 'LA', 'LB', 'MY', 'MV', 'MN', 'MM', 'NP', 'KP', 'OM', 'PK', 'PS', 'PH', 'QA', 'SA', 'SG', 'KR', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TL', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE'];
         const accessDeniedMessage = 'Our services are not available in your region due to regulatory restrictions. We apologize for any inconvenience.';
 
-        // if (isLocalhost) {
-        //     console.debug('Geolocation check bypassed: Local development environment detected');
-        //     document.body.style.opacity = '1';
-        //     return;
-        // }
+        const shouldCheckGeolocation = <?php echo $shouldCheckGeolocation ? 'true' : 'false'; ?>;
+
+        if (!shouldCheckGeolocation) {
+            console.debug('Geolocation check bypassed:',
+                isLocalhost ? 'Local development environment detected' : 'Invoice is paid');
+            document.body.style.opacity = '1';
+            return;
+        }
+
+        if (isLocalhost) {
+            console.debug('Geolocation check bypassed: Local development environment detected');
+            document.body.style.opacity = '1';
+            return;
+        }
 
         const showLoading = () => {
             // Swal.fire({
