@@ -1,5 +1,5 @@
 <?php
-if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1'])) {
+if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invoiceDetails['invoice']['status']) && $invoiceDetails['invoice']['status'] != 1)) {
     try {
 
         $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
