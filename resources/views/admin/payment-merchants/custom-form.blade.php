@@ -24,21 +24,16 @@
                     <!-- Assign Brands Section -->
                     <div class="assign-brands">
                         <div class="mb-3">
-                            @php
-                                $allBrandsSelected = count(old('brands', [])) === $brands->count();
-                            @endphp
-
                                 <!-- Select All Toggle Section -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="font-weight-bold mb-0 text-center">Brands</h5>
                                 <div
                                     class="form-check form-check-update d-flex align-items-center form-check-inline">
                                     <input type="checkbox" id="select-all-brands"
-                                           class="form-check-input" {{ $allBrandsSelected ? 'checked' : '' }}>
+                                           class="form-check-input">
                                     <label class="form-check-label" for="select-all-brands">
                                         <small
-                                            id="select-all-label">{{ $allBrandsSelected ? 'Unselect' : 'Select' }}
-                                            All</small>
+                                            id="select-all-label"></small>
                                     </label>
                                 </div>
                             </div>
