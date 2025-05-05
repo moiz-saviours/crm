@@ -206,7 +206,6 @@ class PaymentMerchantController extends Controller
                 if (!empty($request->brands)) {
                     foreach ($request->brands as $brandKey) {
                         AssignBrandAccount::create([
-                        AssignBrandAccount::firstOrCreate([
                             'brand_key' => $brandKey,
                             'assignable_type' => PaymentMerchant::class,
                             'assignable_id' => $client_account->id,
