@@ -138,7 +138,7 @@ class PaymentMerchantController extends Controller
     public function edit(Request $request, PaymentMerchant $client_account)
     {
 
-        $assign_brand_keys = $client_account->brands()->pluck('assign_brand_accounts.brand_key')->toArray();
+        $assign_brand_keys = $client_account->brands()->distinct()->pluck('assign_brand_accounts.brand_key')->toArray();
         if ($request->ajax()) {
             if (!$client_account) {
                 return response()->json(['error' => 'Record not found!'], 404);
@@ -201,7 +201,7 @@ class PaymentMerchantController extends Controller
                 $brandKeys = $request->brands;
                 AssignBrandAccount::where('assignable_type', PaymentMerchant::class)
                     ->where('assignable_id', $client_account->id)
-                    ->whereNotIn('brand_key', $brandKeys)
+//                    ->whereNotIn('brand_key', $brandKeys)
                     ->delete();
                 if (!empty($request->brands)) {
                     foreach ($request->brands as $brandKey) {
