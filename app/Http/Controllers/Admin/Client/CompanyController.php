@@ -92,12 +92,14 @@ class CompanyController extends Controller
      */
     public function edit(Request $request, ClientCompany $client_company)
     {
-
-        $assign_brand_keys = $client_company->brands()->pluck('assign_brand_accounts.brand_key')->toArray();
+        if (!$client_company) {
+            return response()->json(['error' => 'Record not found!'], 404);
+        }
+        $assign_brand_keys = $client_company->brands()->distinct()->pluck('assign_brand_accounts.brand_key')->toArray();
         if ($request->ajax()) {
             return response()->json(['client_company' => $client_company, 'assign_brand_keys' => $assign_brand_keys]);
         }
-        return view('admin.client.companies.edit', compact('client_company','assign_brand_keys'));
+        return view('admin.client.companies.edit', compact('client_company', 'assign_brand_keys'));
     }
 
     /**
@@ -133,13 +135,11 @@ class CompanyController extends Controller
                     $client_company->logo = $originalFileName;
                 }
                 $client_company->save();
-                if ($request->has('brands')) {
-                    $brandKeys = $request->brands;
-                    AssignBrandAccount::where('assignable_type', ClientCompany::class)
-                        ->where('assignable_id', $client_company->special_key)
-                        ->whereNotIn('brand_key', $brandKeys)
-                        ->delete();
-                    foreach ($brandKeys as $brandKey) {
+                AssignBrandAccount::where('assignable_type', ClientCompany::class)
+                    ->where('assignable_id', $client_company->special_key)
+                    ->delete();
+                if ($request->has('brands') && !empty($request->brands)) {
+                    foreach ($request->brands as $brandKey) {
                         AssignBrandAccount::firstOrCreate([
                             'brand_key' => $brandKey,
                             'assignable_type' => ClientCompany::class,
