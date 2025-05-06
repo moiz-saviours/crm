@@ -142,10 +142,12 @@
             });
 
             $('#brands').val(data.assign_brand_keys);
-            if (data.assign_brand_keys.length === $('#brands option').length) {
+            if (Array.isArray(data.assign_brand_keys) && data.assign_brand_keys.length === $('#brands option').length) {
                 $('#select-all-brands').prop('checked', true);
+                $('#select-all-label').text('Unselect All');
             } else {
                 $('#select-all-brands').prop('checked', false);
+                $('#select-all-label').text('Select All');
             }
 
             $('#status').val(data.status);

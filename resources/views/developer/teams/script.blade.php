@@ -74,8 +74,10 @@
         $('.brand-checkbox').change(function () {
             if ($('.brand-checkbox:checked').length === $('.brand-checkbox').length) {
                 $('#select-all-brands').prop('checked', true);
+                $('#select-all-label').text('Unselect All');
             } else {
                 $('#select-all-brands').prop('checked', false);
+                $('#select-all-label').text('Select All');
             }
         });
 
