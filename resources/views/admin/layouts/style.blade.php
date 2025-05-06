@@ -581,4 +581,8 @@ Detailed information and more samples can be found in the documentation.
     .profile-image{
         object-fit: contain;
     }
+
+    select#brands {
+        height: 250px;
+    }
 </style>
