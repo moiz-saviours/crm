@@ -34,11 +34,9 @@
                                 <div
                                     class="form-check form-check-update d-flex align-items-center form-check-inline">
                                     <input type="checkbox" id="select-all-brands"
-                                           class="form-check-input" {{ $allBrandsSelected ? 'checked' : '' }}>
+                                           class="form-check-input">
                                     <label class="form-check-label" for="select-all-brands">
-                                        <small
-                                            id="select-all-label">{{ $allBrandsSelected ? 'Unselect' : 'Select' }}
-                                            All</small>
+                                        <small id="select-all-label">Select All</small>
                                     </label>
                                 </div>
                             </div>
@@ -190,6 +188,19 @@
                 $('#select-all-brands').prop('checked', false);
                 $('#select-all-label').text('Select All');
             }
+        });
+        var $formContainer = $('.form-container');
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.attributeName === 'class') {
+                    if (!$formContainer.hasClass('open')) {
+                        $('#select-all-label').text($('#select-all-brands').checked ? 'Unselect All' : 'Select All');
+                    }
+                }
+            });
+        });
+        observer.observe($formContainer[0], {
+            attributes: true
         });
     </script>
 @endpush
