@@ -123,7 +123,7 @@ class TeamController extends Controller
                 }
                 return redirect()->route('admin.team.index')->with('error', 'Team not found.');
             }
-            $assign_brand_keys = $team->brands()->pluck('brands.brand_key')->toArray();
+            $assign_brand_keys = $team->brands()->distinct()->pluck('brands.brand_key')->toArray();
             $assign_user_ids = $team->users()->pluck('users.id')->toArray();
             if (request()->ajax()) {
                 return response()->json(['data' => array_merge($team->toArray(), ['assign_user_ids' => $assign_user_ids], ['assign_brand_keys' => $assign_brand_keys]), 'message' => 'Record fetched successfully.']);
