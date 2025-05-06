@@ -160,8 +160,10 @@
             $('#brands').val(data.assign_brand_keys);
             if (Array.isArray(data.assign_brand_keys) && data.assign_brand_keys.length === $('#brands option').length) {
                 $('#select-all-brands').prop('checked', true);
+                $('#select-all-label').text('Unselect All');
             } else {
                 $('#select-all-brands').prop('checked', false);
+                $('#select-all-label').text('Select All');
             }
 
             $('#c_contact_key').val(client_company.c_contact_key);
