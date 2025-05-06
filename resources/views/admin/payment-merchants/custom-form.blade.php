@@ -32,8 +32,7 @@
                                     <input type="checkbox" id="select-all-brands"
                                            class="form-check-input">
                                     <label class="form-check-label" for="select-all-brands">
-                                        <small
-                                            id="select-all-label"></small>
+                                        <small id="select-all-label">Select All</small>
                                     </label>
                                 </div>
                             </div>
@@ -122,7 +121,7 @@
                     <select class="form-control" id="payment_method" name="payment_method" required>
                         <option value="" disabled>Select Payment Method</option>
                         <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>Authorize</option>
-{{--                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }} disabled>Stripe</option>--}}
+                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>Stripe</option>
 {{--                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}disabled>PayPal</option>--}}
                         <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>EDP</option>
 {{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>Credit Card</option>--}}
@@ -247,6 +246,7 @@
                 mutations.forEach(function (mutation) {
                     if (mutation.attributeName === 'class') {
                         if (!$formContainer.hasClass('open')) {
+                            $('#select-all-label').text($('#select-all-brands').checked ? 'Unselect All' : 'Select All');
                             const $companyDropdown = $('#client_company');
                             $companyDropdown.empty();
                             $companyDropdown.append('<option value="" selected disabled>Select Client Company</option>');
