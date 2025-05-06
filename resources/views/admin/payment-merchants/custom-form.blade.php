@@ -226,7 +226,6 @@
         $(document).ready(function () {
 
             var storedCompanyKey;
-            /** For Assign brand to team */
             $('#select-all-brands').change(function () {
                 const isChecked = this.checked;
                 $('#brands option').prop('selected', isChecked);
@@ -236,8 +235,10 @@
             $('#brands option').click(function () {
                 if ($('#brands option:checked').length === $('#brands option').length) {
                     $('#select-all-brands').prop('checked', true);
+                    $('#select-all-label').text('Unselect All');
                 } else {
                     $('#select-all-brands').prop('checked', false);
+                    $('#select-all-label').text('Select All');
                 }
             });
 
