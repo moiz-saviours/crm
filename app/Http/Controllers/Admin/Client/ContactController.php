@@ -98,13 +98,16 @@ class ContactController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ClientContact $client_contact)
+    public function edit(Request $request, ClientContact $client_contact)
     {
         if (!$client_contact) {
             return response()->json(['error' => 'Record not found!'], 404);
         }
-        $assign_brand_keys = $client_contact->brands()->pluck('assign_brand_accounts.brand_key')->toArray();
-        return response()->json(['client_contact' => $client_contact, 'assign_brand_keys' => $assign_brand_keys]);
+        $assign_brand_keys = $client_contact->brands()->distinct()->pluck('assign_brand_accounts.brand_key')->toArray();
+        if ($request->ajax()) {
+            return response()->json(['client_contact' => $client_contact, 'assign_brand_keys' => $assign_brand_keys]);
+        }
+        return view('admin.clients.contacts.edit', compact('client_contact', 'assign_brand_keys'));
     }
 
     /**
@@ -135,13 +138,11 @@ class ContactController extends Controller
                 'name', 'email', 'phone', 'address', 'city', 'state',
                 'country', 'zipcode', 'ip_address', 'status',
             ]));
-            if ($request->has('brands')) {
-                $brandKeys = $request->brands;
-                AssignBrandAccount::where('assignable_type', ClientContact::class)
-                    ->where('assignable_id', $client_contact->special_key)
-                    ->whereNotIn('brand_key', $brandKeys)
-                    ->delete();
-                foreach ($brandKeys as $brandKey) {
+            AssignBrandAccount::where('assignable_type', ClientContact::class)
+                ->where('assignable_id', $client_contact->special_key)
+                ->delete();
+            if ($request->has('brands') && !empty($request->brands)) {
+                foreach ($request->brands as $brandKey) {
                     AssignBrandAccount::firstOrCreate([
                         'brand_key' => $brandKey,
                         'assignable_type' => ClientContact::class,
