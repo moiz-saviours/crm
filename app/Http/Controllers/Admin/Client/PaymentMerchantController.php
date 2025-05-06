@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Client;
 
 use App\Constants\PaymentMerchantConstants;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\AssignBrandAccount;
 use App\Models\Brand;
 use App\Models\ClientCompany;
@@ -11,6 +12,7 @@ use App\Models\ClientContact;
 use App\Models\Payment;
 use App\Models\PaymentMerchant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -197,22 +199,29 @@ class PaymentMerchantController extends Controller
                 'environment' => $request->environment,
                 'status' => $request->status,
             ]);
-            if ($request->has('brands')) {
-                $brandKeys = $request->brands;
-                AssignBrandAccount::where('assignable_type', PaymentMerchant::class)
-                    ->where('assignable_id', $client_account->id)
-//                    ->whereNotIn('brand_key', $brandKeys)
-                    ->delete();
-                if (!empty($request->brands)) {
-                    foreach ($request->brands as $brandKey) {
-                        AssignBrandAccount::firstOrCreate([
-                            'brand_key' => $brandKey,
-                            'assignable_type' => PaymentMerchant::class,
-                            'assignable_id' => $client_account->id,
-                        ]);
-                    }
-                }
-            }
+            $current = $client_account->brands()->distinct()->pluck('assign_brand_accounts.brand_key')->toArray();
+            $user = Auth::user();
+            $requestBrands = $request->input('brands', []);
+            $added = array_diff($requestBrands, $current);
+            $removed = array_diff($current, $requestBrands);
+            $allBrandKeys = array_unique(array_merge($requestBrands, $current));
+            $brandNames = Brand::whereIn('brand_key', $allBrandKeys)->pluck('name', 'brand_key')->toArray();
+            $client_account->brands()->sync($requestBrands);
+            $this->logBrandSyncChanges($client_account, $added, $removed, $user, $brandNames);
+//
+//            AssignBrandAccount::where('assignable_type', PaymentMerchant::class)
+//                ->where('assignable_id', $client_account->id)
+////                    ->whereNotIn('brand_key', $brandKeys)
+//                ->delete();
+//            if ($request->has('brands') && !empty($request->brands)) {
+//                    foreach ($request->brands as $brandKey) {
+//                        AssignBrandAccount::firstOrCreate([
+//                            'brand_key' => $brandKey,
+//                            'assignable_type' => PaymentMerchant::class,
+//                            'assignable_id' => $client_account->id,
+//                        ]);
+//                    }
+//            }
             DB::commit();
             $client_account->refresh();
             $total_amount = Payment::where('merchant_id', $client_account->id)
@@ -225,6 +234,40 @@ class PaymentMerchantController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
+        }
+    }
+
+    protected function logBrandSyncChanges($model, $added, $removed, $user, $brandNames)
+    {
+        $addedNames = array_map(function ($key) use ($brandNames) {
+            return $brandNames[$key] ?? $key;
+        }, $added);
+        $removedNames = array_map(function ($key) use ($brandNames) {
+            return $brandNames[$key] ?? $key;
+        }, $removed);
+        if (!empty($added) || !empty($removed)) {
+            ActivityLog::create([
+                'action' => 'synced',
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'actor_type' => get_class($user),
+                'actor_id' => $user->id,
+                'description' => "{$user->name} updated brands for Client Account {$model->name}",
+//                'description' => sprintf(
+//                    "%s updated brands for %s \nAdded: %s\\nRemoved: %s",
+//                    $user->name,
+//                    $model->name,
+//                    implode(', ', $addedNames) ?: 'none',
+//                    implode(', ', $removedNames) ?: 'none'
+//                ),
+                'details' => json_encode([
+                    'added' => array_values($addedNames),
+                    'removed' => array_values($removedNames),
+                    'added_keys' => array_values($added),
+                    'removed_keys' => array_values($removed)
+                ]),
+                'ip_address' => request()->ip(),
+            ]);
         }
     }
 
