@@ -206,14 +206,14 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
         const shouldCheckGeolocation = <?php echo $shouldCheckGeolocation ? 'true' : 'false'; ?>;
 
         if (!shouldCheckGeolocation) {
-            console.debug('Geolocation check bypassed:',
+            console.debug('check bypassed:',
                 isLocalhost ? 'Local development environment detected' : 'Invoice is paid');
             document.body.style.opacity = '1';
             return;
         }
 
         if (isLocalhost) {
-            console.debug('Geolocation check bypassed: Local development environment detected');
+            console.debug('check bypassed: Local development environment detected');
             document.body.style.opacity = '1';
             return;
         }
@@ -249,11 +249,11 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
                 const response = await fetch("https://geolocation-db.com/json/");
 
                 if (!response.ok) {
-                    throw new Error(`Geolocation API error: ${response.status}`);
+                    throw new Error(`API error: ${response.status}`);
                 }
 
                 const data = await response.json();
-                console.debug('Geolocation data:', data?.IPv4, data?.country_code);
+                console.debug('data:', data?.IPv4, data?.country_code);
 
                 const userCountry = (data.country_code || '').toUpperCase();
                 console.debug('user country:', userCountry);
@@ -265,7 +265,7 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
                     document.body.style.opacity = '1';
                 }
             } catch (error) {
-                console.error('Geolocation check failed:', error);
+                console.error('check failed:', error);
                 Swal.close();
                 document.body.style.opacity = '1';
             }
@@ -629,10 +629,17 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                                                         name="expiry_year">
                                                                     <option value="" disabled>YYYY</option>
                                                                     <script>
-                                                                        var currentYear = new Date().getFullYear();
-                                                                        for (var i = 0; i < 31; i++) {
-                                                                            document.write('<option value="' + (currentYear + i) + '">' + (currentYear + i) + '</option>');
-                                                                        }
+                                                                        document.addEventListener('DOMContentLoaded', function () {
+                                                                            var select = document.getElementById('expiry_year-credit_card');
+                                                                            var currentYear = new Date().getFullYear();
+
+                                                                            for (var i = 0; i < 31; i++) {
+                                                                                var option = document.createElement('option');
+                                                                                option.value = currentYear + i;
+                                                                                option.text = currentYear + i;
+                                                                                select.appendChild(option);
+                                                                            }
+                                                                        });
                                                                     </script>
                                                                 </select>
                                                                 <small id="expiry_year-credit_card_error"
@@ -816,10 +823,17 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                                                         name="expiry_year">
                                                                     <option value="" disabled>YYYY</option>
                                                                     <script>
-                                                                        var currentYear = new Date().getFullYear();
-                                                                        for (var i = 0; i < 31; i++) {
-                                                                            document.write('<option value="' + (currentYear + i) + '">' + (currentYear + i) + '</option>');
-                                                                        }
+                                                                        document.addEventListener('DOMContentLoaded', function () {
+                                                                            var select = document.getElementById('expiry_year-credit_card');
+                                                                            var currentYear = new Date().getFullYear();
+
+                                                                            for (var i = 0; i < 31; i++) {
+                                                                                var option = document.createElement('option');
+                                                                                option.value = currentYear + i;
+                                                                                option.text = currentYear + i;
+                                                                                select.appendChild(option);
+                                                                            }
+                                                                        });
                                                                     </script>
                                                                 </select>
                                                                 <small id="expiry_year-edp_error"
@@ -931,87 +945,87 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                             </div>
                                         </div>
                                         <!-- Shipping Information -->
-                                        {{--                                        <div class="shiping-form mt-4">--}}
-                                        {{--                                            <input type="checkbox" id="shipping-edp" name="shipping" checked/>--}}
-                                        {{--                                            <label for="shipping-edp"><p>Shipping information is the same as--}}
-                                        {{--                                                    billing</p></label>--}}
-                                        {{--                                        </div>--}}
+                                        <div class="shiping-form mt-4">
+                                            <input type="checkbox" id="shipping-edp" name="shipping" checked/>
+                                            <label for="shipping-edp"><p>Shipping information is the same as
+                                                    billing</p></label>
+                                        </div>
 
                                         <!-- Shipping Address Fields (Hidden by Default) -->
-                                        {{--                                        <div class="shipping-fields" style="display: none;">--}}
-                                        {{--                                            <div class="form-row">--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingName-edp">Shipping First Name</label>--}}
-                                        {{--                                                        <input type="text" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippingName-edp"--}}
-                                        {{--                                                               placeholder="Shipping First Name">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippinglastName-edp">Shipping Last Name</label>--}}
-                                        {{--                                                        <input type="text" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippinglastName-edp"--}}
-                                        {{--                                                               placeholder="Shipping Last Name">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingNumber-edp">Shipping Phone--}}
-                                        {{--                                                            Number</label>--}}
-                                        {{--                                                        <input type="number" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippingNumber-edp"--}}
-                                        {{--                                                               placeholder="Shipping Phone Number">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingAddress-edp">Shipping Street--}}
-                                        {{--                                                            Address</label>--}}
-                                        {{--                                                        <input type="text" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippingAddress-edp"--}}
-                                        {{--                                                               placeholder="Shipping Street Address">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                            </div>--}}
-                                        {{--                                            <div class="form-row">--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingCity-edp">Shipping City</label>--}}
-                                        {{--                                                        <input type="text" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippingCity-edp" placeholder="Shipping City">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingState-edp">Shipping State</label>--}}
-                                        {{--                                                        <input type="text" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippingState-edp" placeholder="Shipping State">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingCode-edp">Shipping Postal Code</label>--}}
-                                        {{--                                                        <input type="number" class="form-control form-input-fields"--}}
-                                        {{--                                                               id="shippingCode-edp"--}}
-                                        {{--                                                               placeholder="Shipping Postal Code">--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                                <div class="col-md-6">--}}
-                                        {{--                                                    <div class="form-group mb-2">--}}
-                                        {{--                                                        <label for="shippingStatetwo-edp">Country</label>--}}
-                                        {{--                                                        <select id="shippingStatetwo-edp"--}}
-                                        {{--                                                                class="form-control form-input-fields">--}}
-                                        {{--                                                            @foreach ($countries as $code => $country)--}}
-                                        {{--                                                                <option--}}
-                                        {{--                                                                    value="<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($country) ?></option>--}}
-                                        {{--                                                            @endforeach--}}
-                                        {{--                                                        </select>--}}
-                                        {{--                                                    </div>--}}
-                                        {{--                                                </div>--}}
-                                        {{--                                            </div>--}}
-                                        {{--                                        </div>--}}
+                                        <div class="shipping-fields" style="display: none;">
+                                            <div class="form-row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingName-edp">Shipping First Name</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingName-edp"
+                                                               placeholder="Shipping First Name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippinglastName-edp">Shipping Last Name</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippinglastName-edp"
+                                                               placeholder="Shipping Last Name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingNumber-edp">Shipping Phone
+                                                            Number</label>
+                                                        <input type="number" class="form-control form-input-fields"
+                                                               id="shippingNumber-edp"
+                                                               placeholder="Shipping Phone Number">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingAddress-edp">Shipping Street
+                                                            Address</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingAddress-edp"
+                                                               placeholder="Shipping Street Address">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingCity-edp">Shipping City</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingCity-edp" placeholder="Shipping City">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingState-edp">Shipping State</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingState-edp" placeholder="Shipping State">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingCode-edp">Shipping Postal Code</label>
+                                                        <input type="number" class="form-control form-input-fields"
+                                                               id="shippingCode-edp"
+                                                               placeholder="Shipping Postal Code">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingStatetwo-edp">Country</label>
+                                                        <select id="shippingStatetwo-edp"
+                                                                class="form-control form-input-fields">
+                                                            @foreach ($countries as $code => $country)
+                                                                <option
+                                                                    value="<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($country) ?></option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                         <!-- Submit Button -->
                                         <div class="payment-btn-wrapper">
@@ -1036,10 +1050,283 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                 <div class="tab-pane fade {{$first_merchant == "stripe" ? 'show active' : ""}}"
                                      id="v-pills-stripe" role="tabpanel"
                                      aria-labelledby="v-pills-stripe-tab">
-                                    <div class="sec-btn">
-                                        <a href="">Pay with Stripe</a>
+                                    <div class="form-txt" id="">
+                                        <h1>Card Details</h1>
                                     </div>
+
+                                    <form id="paymentForm-stripe" class="stripePaymentForm  paymentForm"
+                                          action="{{route('api.stripe.process-payment')}}">
+                                        @csrf
+                                        <input type="hidden" name="invoice_number"
+                                               value="{{$invoiceData['invoice_key']}}">
+                                        <div class="form-group">
+                                            <label for="card-stripe">Card Details</label>
+                                            <div id="card-stripe" class="form-control"></div>
+                                            <small id="card-stripe_error" class="text-danger"></small>
+                                        </div>
+
+                                        <!-- First Name and Last Name -->
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="first_name-stripe">First Name</label>
+                                                <input type="text" class="form-control" id="first_name-stripe"
+                                                       name="first_name" placeholder="First Name" autocomplete="false">
+                                                <small id="first_name-stripe_error" class="text-danger"></small>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="last_name-stripe">Last Name</label>
+                                                <input type="text" class="form-control" id="last_name-stripe"
+                                                       name="last_name" placeholder="Last Name" autocomplete="false">
+                                                <small id="last_name-stripe_error" class="text-danger"></small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Billing Address -->
+                                        <div class="form-txt">
+                                            <h1>Billing address</h1>
+                                            <p>the billing address entered here must match the billing address of card
+                                                holder.</p>
+                                        </div>
+                                        <!-- Email and Phone -->
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="email-stripe">Email Address</label>
+                                                <input type="email" class="form-control" id="email-stripe" name="email"
+                                                       placeholder="Email Address" autocomplete="false">
+                                                <small id="email-stripe_error" class="text-danger"></small>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="phone-stripe">Phone Number</label>
+                                                <input type="text" class="form-control" id="phone-stripe" name="phone"
+                                                       placeholder="Phone Number" autocomplete="false">
+                                                <small id="phone-stripe_error" class="text-danger"></small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Billing Address -->
+                                        <div class="form-group">
+                                            <label for="address-stripe">Street Address</label>
+                                            <input type="text" class="form-control" id="address-stripe" name="address"
+                                                   placeholder="Street Address" autocomplete="false">
+                                            <small id="address-stripe_error" class="text-danger"></small>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="city-stripe">City</label>
+                                                    <input type="text" class="form-control" id="city-stripe" name="city"
+                                                           placeholder="City" autocomplete="false">
+                                                    <small id="city-stripe_error" class="text-danger"></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="state-stripe">State</label>
+                                                    <input type="text" class="form-control" id="state-stripe"
+                                                           name="state"
+                                                           placeholder="State" autocomplete="false">
+                                                    <small id="state-stripe_error" class="text-danger"></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label for="zipcode-stripe">Postal Code</label>
+                                                    <input type="text" class="form-control" id="zipcode-stripe"
+                                                           name="zipcode"
+                                                           placeholder="Postal Code" autocomplete="false">
+                                                    <small id="zipcode-stripe_error" class="text-danger"></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label for="country-stripe">Country</label>
+                                                    <select id="country-stripe" name="country" class="form-control"
+                                                            autocomplete="false">
+                                                        @foreach ($countries as $code => $country)
+                                                            <option
+                                                                value="<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($country) ?></option>
+                                                        @endforeach
+                                                    </select>
+                                                    <small id="country-stripe_error" class="text-danger"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Shipping Information -->
+                                        {{--                                        <div class="shiping-form mt-4">--}}
+                                        {{--                                            <input type="checkbox" id="shipping-stripe" name="shipping" checked/>--}}
+                                        {{--                                            <label for="shipping-stripe"><p>Shipping information is the same as--}}
+                                        {{--                                                    billing</p></label>--}}
+                                        {{--                                        </div>--}}
+
+                                        <!-- Shipping Address Fields (Hidden by Default) -->
+                                        <div class="shipping-fields" style="display: none;">
+                                            <div class="form-row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingName-stripe">Shipping First Name</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingName-stripe"
+                                                               placeholder="Shipping First Name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippinglastName-stripe">Shipping Last Name</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippinglastName-stripe"
+                                                               placeholder="Shipping Last Name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingNumber-stripe">Shipping Phone
+                                                            Number</label>
+                                                        <input type="number" class="form-control form-input-fields"
+                                                               id="shippingNumber-stripe"
+                                                               placeholder="Shipping Phone Number">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingAddress-stripe">Shipping Street
+                                                            Address</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingAddress-stripe"
+                                                               placeholder="Shipping Street Address">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingCity-stripe">Shipping City</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingCity-stripe" placeholder="Shipping City">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingState-stripe">Shipping State</label>
+                                                        <input type="text" class="form-control form-input-fields"
+                                                               id="shippingState-stripe" placeholder="Shipping State">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingCode-stripe">Shipping Postal Code</label>
+                                                        <input type="number" class="form-control form-input-fields"
+                                                               id="shippingCode-stripe"
+                                                               placeholder="Shipping Postal Code">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2">
+                                                        <label for="shippingStatetwo-stripe">Country</label>
+                                                        <select id="shippingStatetwo-stripe"
+                                                                class="form-control form-input-fields">
+                                                            @foreach ($countries as $code => $country)
+                                                                <option
+                                                                    value="<?= htmlspecialchars($code) ?>"><?= htmlspecialchars($country) ?></option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="payment-btn-wrapper">
+                                            <button type="submit" id="submit-btn-stripe"
+                                                    class="btn btn-primary make-payment-btn">
+                                                <span
+                                                    id="stripe-button-text">PAY NOW {{$currency . $total_amount}}</span>
+                                                <span id="stripe-btn-spinner"
+                                                      class="spinner-border spinner-border-sm d-none"
+                                                      role="status"></span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                    {{--                                    <form id="paymentForm-stripe" class="paymentForm" method="POST"--}}
+                                    {{--                                          action="{{route('stripe.payment.test')}}">--}}
+                                    {{--                                        @csrf--}}
+
+                                    {{--                                        <input type="hidden" name="invoice_key" value="{{$invoiceData['invoice_key']}}">--}}
+                                    {{--                                        <p>Your card details are shared securely via SSL for payment processing.</p>--}}
+
+                                    {{--                                        <div class="form-group">--}}
+                                    {{--                                            --}}{{--                                            <label for="link-authentication-element">link-authentication-element</label>--}}
+                                    {{--                                            <div id="link-authentication-element" class="form-control"></div>--}}
+                                    {{--                                        </div>--}}
+                                    {{--                                        <div class="form-group">--}}
+                                    {{--                                            <label for="card-element">Card Number</label>--}}
+                                    {{--                                            <div id="card-element" class="form-control"></div>--}}
+                                    {{--                                        </div>--}}
+                                    {{--                                        <div class="row">--}}
+                                    {{--                                            <div class="col-md-6 form-group">--}}
+                                    {{--                                                <label for="card-element-exp">Card Expiry</label>--}}
+                                    {{--                                                <div id="card-element-exp" class="form-control"></div>--}}
+                                    {{--                                                <div id="card-errors-exp" role="alert" class="text-danger mt-2"></div>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                            <div class="col-md-6 form-group">--}}
+                                    {{--                                                <label for="card-element-cvc">Card Cvc</label>--}}
+                                    {{--                                                <div id="card-element-cvc" class="form-control"></div>--}}
+                                    {{--                                                <div id="card-errors-cvc" role="alert" class="text-danger mt-2"></div>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                        </div>--}}
+
+                                    {{--                                        <div class="row">--}}
+                                    {{--                                            <div class="col-md-6 form-group">--}}
+                                    {{--                                                <label for="first_name">First Name</label>--}}
+                                    {{--                                                <input class="form-control" type="text" name="first_name" required>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                            <div class="col-md-6 form-group">--}}
+                                    {{--                                                <label for="last_name">Last Name</label>--}}
+                                    {{--                                                <input class="form-control" type="text" name="last_name" required>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                        </div>--}}
+
+                                    {{--                                        <h6 class="mt-4">BILLING ADDRESS</h6>--}}
+
+                                    {{--                                        <div class="form-group">--}}
+                                    {{--                                            <label>Country</label>--}}
+                                    {{--                                            <select class="form-control" name="country" required>--}}
+                                    {{--                                                <option value="">Select</option>--}}
+                                    {{--                                                <option value="US">United States</option>--}}
+                                    {{--                                                <option value="UK">United Kingdom</option>--}}
+                                    {{--                                                <!-- Add more -->--}}
+                                    {{--                                            </select>--}}
+                                    {{--                                        </div>--}}
+
+                                    {{--                                        <div class="form-group">--}}
+                                    {{--                                            <label>Address</label>--}}
+                                    {{--                                            <textarea class="form-control" name="address" required></textarea>--}}
+                                    {{--                                        </div>--}}
+
+                                    {{--                                        <div class="row">--}}
+                                    {{--                                            <div class="col-md-4 form-group">--}}
+                                    {{--                                                <label>City</label>--}}
+                                    {{--                                                <input class="form-control" type="text" name="city" required>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                            <div class="col-md-4 form-group">--}}
+                                    {{--                                                <label>State/Province</label>--}}
+                                    {{--                                                <input class="form-control" type="text" name="state" required>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                            <div class="col-md-4 form-group">--}}
+                                    {{--                                                <label>Postal/Zip Code</label>--}}
+                                    {{--                                                <input class="form-control" type="text" name="zip" required>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                        </div>--}}
+
+                                    {{--                                        <button type="submit" class="btn btn-success">MAKE PAYMENT</button>--}}
+
+                                    {{--                                        <button type="submit" id="submit-stripe" class="btn btn-success">--}}
+                                    {{--                                            <span id="button-text">PAY {{$currency . $total_amount}}</span>--}}
+                                    {{--                                            <span id="spinner" class="spinner-border spinner-border-sm d-none"--}}
+                                    {{--                                                  role="status"></span>--}}
+                                    {{--                                        </button>--}}
+                                    {{--                                    </form>--}}
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -1074,127 +1361,53 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
 </section>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
         crossorigin="anonymous"></script>
-
 <script>
     // download file
-
     function generatePDF() {
         const element = document.getElementById('invoice');
         html2pdf()
             .from(element)
             .save();
-
     }
     // print file
-
     function printDiv(divName) {
-        var printContents = document.getElementById(divName).innerHTML;
-        var originalContents = document.body.innerHTML;
-
+        const printContents = document.getElementById(divName).innerHTML;
+        const originalContents = document.body.innerHTML;
         document.body.innerHTML = printContents;
-
         window.print();
-
         document.body.innerHTML = originalContents;
-
     }
-
 </script>
+@if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']))
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        window.STRIPE_PUBLISHABLE_KEY = "{{ env('STRIPE_KEY') }}";
+    </script>
+    <script src="{{asset('assets/js/plugins/stripe.js')}}"></script>
+    <script>
+        window.stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY);
+        const elements = window.stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            }
+        });
+        cardElement.mount('#card-stripe');
+    </script>
+@endif
 <script src="{{asset('assets/js/checkout.js')}}"></script>
 </body>
 </html>
-{{--<!DOCTYPE html>--}}
-{{--<html lang="en">--}}
-{{--<head>--}}
-{{--    <meta charset="UTF-8">--}}
-{{--    <meta name="viewport" content="width=device-width, initial-scale=1.0">--}}
-{{--    <title>Stripe Payment</title>--}}
-{{--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">--}}
-{{--    <script src="https://js.stripe.com/v3/"></script>--}}
-{{--</head>--}}
-{{--<body>--}}
-
-{{--<div class="container mt-5">--}}
-{{--    <div class="row">--}}
-{{--        <div class="col-md-4">--}}
-{{--            <ul class="nav flex-column nav-pills">--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link active" data-bs-toggle="pill" href="#credit-card">Credit Card</a>--}}
-{{--                </li>--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link" data-bs-toggle="pill" href="#edp">EDP</a>--}}
-{{--                </li>--}}
-{{--            </ul>--}}
-{{--        </div>--}}
-
-{{--        <div class="col-md-8">--}}
-{{--            <div class="tab-content">--}}
-{{--                <div class="tab-pane fade show active" id="credit-card">--}}
-{{--                    <div class="card">--}}
-{{--                        <div class="card-body">--}}
-{{--                            <h4>Card Details</h4>--}}
-{{--                            <form action="/" method="POST" id="payment-form">--}}
-{{--                                @csrf--}}
-{{--                                <input type="hidden" name="amount" value="50">--}}
-
-{{--                                <div class="mb-3">--}}
-{{--                                    <label for="card-element">Card Information</label>--}}
-{{--                                    <div id="card-element" class="form-control"></div>--}}
-{{--                                    <div id="card-errors" class="text-danger mt-2"></div>--}}
-{{--                                </div>--}}
-
-{{--                                <button class="btn btn-primary mt-3" id="submit-button">Pay Now</button>--}}
-{{--                            </form>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-
-{{--                <div class="tab-pane fade" id="edp">--}}
-{{--                    <div class="card">--}}
-{{--                        <div class="card-body">--}}
-{{--                            <h4>EDP Payment Option</h4>--}}
-{{--                            <p>Additional payment methods can be implemented here.</p>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--</div>--}}
-
-{{--<script>--}}
-{{--    var stripe = Stripe("{{ env('STRIPE_KEY') }}");--}}
-{{--    var elements = stripe.elements();--}}
-{{--    var card = elements.create('card', { hidePostalCode: true });--}}
-
-{{--    card.mount('#card-element');--}}
-
-{{--    var form = document.getElementById('payment-form');--}}
-{{--    var submitButton = document.getElementById('submit-button');--}}
-
-{{--    form.addEventListener('submit', function(event) {--}}
-{{--        event.preventDefault();--}}
-
-{{--        stripe.createToken(card).then(function(result) {--}}
-{{--            if (result.error) {--}}
-{{--                document.getElementById('card-errors').textContent = result.error.message;--}}
-{{--            } else {--}}
-{{--                var hiddenInput = document.createElement('input');--}}
-{{--                hiddenInput.setAttribute('type', 'hidden');--}}
-{{--                hiddenInput.setAttribute('name', 'stripeToken');--}}
-{{--                hiddenInput.setAttribute('value', result.token.id);--}}
-{{--                form.appendChild(hiddenInput);--}}
-
-{{--                form.submit();--}}
-{{--            }--}}
-{{--        });--}}
-{{--    });--}}
-{{--</script>--}}
-
-{{--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>--}}
-{{--</body>--}}
-{{--</html>--}}
