@@ -188,21 +188,17 @@ Route::middleware(['restrict.dev'])->group(function () {
         ], 403);
     })->middleware('restrict.dev')->name('model.command');
 });
-Route::controller(StripePaymentController::class)->group(function () {
-    Route::get('stripe', 'stripe');
-    Route::post('stripe', 'stripePost')->name('stripe.post');
-    Route::get('/stripe-payment', 'createPaymentIntent')->name('stripe.payment.form');
-    Route::post('/stripe-payment', 'handlePayment')->name('stripe.payment');
-    Route::post('/stripe/custom/submit', 'submitPayment')->name('stripe.custom.submit');
 
-});
-Route::fallback(function () {
+Route::fallback(function (Request $request) {
     $attempts = session('fallback_attempts', 0) + 1;
     session(['fallback_attempts' => $attempts]);
     if ($attempts < 2 && auth()->check()) {
         return back();
     }
-    return redirect('/login');
+    if((!str_contains(url()->current(), 'checkout') && !$request->has('InvoiceID')) && (!str_contains(url()->current(), 'invoice') && !$request->has('InvoiceID'))){
+        return redirect('/login');
+    }
+    abort(404, 'Page not found');
 });
 Route::get('invoice', [CheckoutController::class, 'index'])->name('invoice');
 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout');
