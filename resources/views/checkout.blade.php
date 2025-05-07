@@ -559,8 +559,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         aria-selected="true">Paypal
                                     </button>
                                 @endif
-
-                                @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']))
+                                @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "stripe" ? 'active' : ""}}"
                                         id="v-pills-stripe-tab" data-toggle="pill"
@@ -1047,7 +1046,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                 </div>
 
                                 <!-- Stripe Tab -->
-                                <div class="tab-pane fade {{$first_merchant == "stripe" ? 'show active' : ""}}"
+                                <div class="tab-pane fade {{in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']) && $first_merchant == "stripe" ? 'show active' : ""}}"
                                      id="v-pills-stripe" role="tabpanel"
                                      aria-labelledby="v-pills-stripe-tab">
                                     <div class="form-txt" id="">
@@ -1381,12 +1380,11 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
         document.body.innerHTML = originalContents;
     }
 </script>
-@if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']))
+@if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
     <script src="https://js.stripe.com/v3/"></script>
     <script>
-        window.STRIPE_PUBLISHABLE_KEY = "{{ env('STRIPE_KEY') }}";
+        window.STRIPE_PUBLISHABLE_KEY = `{{$invoiceDetails['invoice']['payment_method_keys']['stripe']}}`;
     </script>
-    <script src="{{asset('assets/js/plugins/stripe.js')}}"></script>
     <script>
         window.stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY);
         const elements = window.stripe.elements();
