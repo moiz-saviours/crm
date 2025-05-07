@@ -51,9 +51,8 @@ class PaymentMerchantController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
         try {
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'brands' => 'nullable|array',
                 'brands.*' => 'exists:brands,brand_key',
                 'c_contact_key' => 'required|exists:client_contacts,special_key',
@@ -66,7 +65,7 @@ class PaymentMerchantController extends Controller
                 'transaction_key' => 'nullable|string|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp',
+                'payment_method' => 'required|string|in:authorize,edp,stripe',
 //                'payment_method' => 'required|string|in:authorize,stripe,credit card,bank transfer,paypal,cash,other',
                 'environment' => [
                     'required',
@@ -80,6 +79,10 @@ class PaymentMerchantController extends Controller
                 'brands.array' => 'Brands must be selected as an array.',
                 'brands.*.exists' => 'One or more selected brands are invalid.',
             ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            DB::beginTransaction();
             $data = [
                 'c_contact_key' => $request->c_contact_key,
                 'c_company_key' => $request->c_company_key,
@@ -100,6 +103,9 @@ class PaymentMerchantController extends Controller
                 /** Note : For testing purpose only when environment is on sandbox (in testing) */
                 $data['test_login_id'] = "4N9sW62gpb";
                 $data['test_transaction_key'] = "22H7H58sx8NZjM5C";
+            } elseif ($request->input('payment_method') == 'stripe') {
+                $data['test_login_id'] = env('STRIPE_KEY');
+                $data['test_transaction_key'] = env('STRIPE_SECRET');
             }
             $client_account = PaymentMerchant::create($data);
             if ($request->has('brands') && !empty($request->brands)) {
