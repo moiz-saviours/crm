@@ -29,10 +29,14 @@ class ApiInvoiceController extends Controller
 
             isset($invoice->invoice_merchants) ? $invoice->invoice_merchants->sortBy('merchant_type')->pluck('merchant_type')->toArray() : [];
             $payment_methods = [];
+            $payment_method_keys = [];
             if (isset($invoice->invoice_merchants)) {
                 foreach ($invoice->invoice_merchants->sortBy('merchant_type') as $invoice_merchant) {
                     $merchant = $invoice_merchant->merchant;
                     if ($merchant && $merchant->status == 'active' && $merchant->limit >= $invoice->total_amount && $merchant->hasSufficientLimitAndCapacity($merchant->id, $invoice->total_amount)->exists()) {
+                        if ($invoice_merchant->merchant_type === 'stripe') {
+                            $payment_method_keys['stripe'] = $merchant->environment == 'sandbox' ? $merchant->test_login_id : $merchant->login_id;
+                        }
                         $payment_methods[] = $invoice_merchant->merchant_type;
                     }
                 }
@@ -75,6 +79,7 @@ class ApiInvoiceController extends Controller
                     "email" => $agent->email,
                 ],
                 'payment_methods' => $payment_methods,
+                'payment_method_keys' => $payment_method_keys,
             ];
             return response()->json(['success' => true, 'invoice' => $data, 'current_date' => Carbon::now()->format('jS F Y')]);
         } catch (ValidationException $exception) {
