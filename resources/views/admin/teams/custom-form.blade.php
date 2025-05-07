@@ -143,9 +143,9 @@
                         gap: 7px;
                         flex-wrap: wrap;
                         align-items: center;
-                        height: 150px;
                         overflow-y: scroll;
                         overflow-x: hidden;
+                        height: 250px;
                     }
 
                     .main-img-box {
