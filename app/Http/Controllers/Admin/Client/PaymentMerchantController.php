@@ -176,7 +176,7 @@ class PaymentMerchantController extends Controller
                 'transaction_key' => 'nullable|string|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp',
+                'payment_method' => 'required|string|in:authorize,edp,stripe',
 //                'payment_method' => 'required|string|in:authorize,stripe,credit card,bank transfer,paypal,cash,other',
                 'environment' => [
                     'required',
