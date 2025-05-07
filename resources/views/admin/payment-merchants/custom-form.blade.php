@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="login_id" class="form-label">Login ID</label>
+                    <label for="login_id" class="form-label">Login ID / Publish Key</label>
                     <input type="text" class="form-control" id="login_id" name="login_id"
                            value="{{ old('login_id') }}" required>
                     @error('login_id')
@@ -144,7 +144,7 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="transaction_key" class="form-label">Transaction Key</label>
+                    <label for="transaction_key" class="form-label">Transaction Key / Secret Key</label>
                     <input type="text" class="form-control" id="transaction_key"
                            name="transaction_key"
                            value="{{ old('transaction_key') }}" required>
