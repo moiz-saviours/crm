@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\PostalCode;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -35,7 +36,7 @@ class PaymentValidatorRequest extends FormRequest
             'state' => 'required|string|max:100',
             'country' => 'required|string|max:100',
             'phone' => 'required|string|regex:/^\+?\d{0,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/',
-            'zipcode' => 'required|string|regex:/^\d{5}(-\d{4})?$/',
+            'zipcode' => ['required', 'string', new PostalCode($this->input('country'))],
         ];
     }
 
