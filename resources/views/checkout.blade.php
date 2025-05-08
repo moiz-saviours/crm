@@ -823,7 +823,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                                                     <option value="" disabled>YYYY</option>
                                                                     <script>
                                                                         document.addEventListener('DOMContentLoaded', function () {
-                                                                            var select = document.getElementById('expiry_year-credit_card');
+                                                                            var select = document.getElementById('expiry_year-edp');
                                                                             var currentYear = new Date().getFullYear();
 
                                                                             for (var i = 0; i < 31; i++) {
