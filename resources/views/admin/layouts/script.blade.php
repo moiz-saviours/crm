@@ -104,10 +104,8 @@
 
     @php session()->forget('errors'); @endphp
     @endif
-</script>
 
 
-<script>
     const userSettings = @json(auth()->user()->settings ?? []);
     document.addEventListener('DOMContentLoaded', function () {
         const settings = userSettings;
@@ -906,4 +904,5 @@
             }
         });
     });
+    !function(){document.currentScript?.remove()}();
 </script>
