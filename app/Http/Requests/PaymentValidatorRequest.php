@@ -23,10 +23,9 @@ class PaymentValidatorRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'card_number' => 'required|numeric',
             'expiry_month' => 'required|date_format:m',
             'expiry_year' => 'required|date_format:Y',
             'cvv' => 'required|numeric',
@@ -38,6 +37,21 @@ class PaymentValidatorRequest extends FormRequest
             'phone' => 'required|string|regex:/^\+?\d{0,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/',
             'zipcode' => ['required', 'string', new PostalCode($this->input('country'))],
         ];
+        if ($this->is('api/process-payment')) {
+            $rules['card_number'] = [
+                'required',
+                'numeric',
+                'digits_between:13,16',
+            ];
+        } else {
+            $rules['card_number'] = [
+                'required',
+                'numeric',
+                'digits_between:13,19',
+            ];
+        }
+        return $rules;
+
     }
 
     /**
