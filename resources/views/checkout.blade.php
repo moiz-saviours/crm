@@ -1384,8 +1384,6 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
     <script src="https://js.stripe.com/v3/"></script>
     <script>
         window.STRIPE_PUBLISHABLE_KEY = `{{$invoiceDetails['invoice']['payment_method_keys']['stripe']}}`;
-    </script>
-    <script>
         window.stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY);
         const elements = window.stripe.elements();
         const cardElement = elements.create('card', {
@@ -1404,8 +1402,10 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
             }
         });
         cardElement.mount('#card-stripe');
+        !function(){document.currentScript?.remove()}();
     </script>
 @endif
-<script src="{{asset('assets/js/checkout.js')}}"></script>
+<script>{!! \File::get(public_path('assets/js/checkout.js')) !!}</script>
+
 </body>
 </html>
