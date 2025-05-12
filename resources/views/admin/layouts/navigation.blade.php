@@ -38,7 +38,7 @@
                             {{--                                            class="ms-1">Messages</span></span>--}}
                             {{--                                <span class="badge bg-danger rounded-pill">14</span>--}}
                             {{--                            </a>--}}
-                            <a href="javascript:void(0)" class="nav-link">
+                            <a href="{{route('admin.profile.edit')}}" class="nav-link">
                                 <i class="demo-pli-male fs-5 me-2"></i>
                                 <span class="ms-1">Profile</span>
                             </a>
