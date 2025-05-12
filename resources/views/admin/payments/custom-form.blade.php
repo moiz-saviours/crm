@@ -148,7 +148,7 @@
                         <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>
                             Authorize
                         </option>
-                        <option value="stripe" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>
+                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>
                             Edp
                         </option>
                         <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>
