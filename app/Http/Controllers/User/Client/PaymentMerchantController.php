@@ -121,7 +121,7 @@ class PaymentMerchantController extends Controller
      */
     public function update(Request $request, PaymentMerchant $client_account): JsonResponse
     {
-        $this->authorize('update', $client_account);
+//        $this->authorize('update', $client_account);
 
         DB::beginTransaction();
         try {
