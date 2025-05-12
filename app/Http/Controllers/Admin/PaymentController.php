@@ -59,7 +59,7 @@ class PaymentController extends Controller
             'customer_contact_name' => 'required_if:type,0|nullable|string|max:255',
             'customer_contact_email' => 'required_if:type,0|nullable|email|max:255',
             'customer_contact_phone' => 'required_if:type,0|nullable|string|max:15',
-            'payment_method' => 'required|string|in:authorize,stripe,credit card,bank transfer,paypal,cash,other',
+            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
             'payment_date' => 'required|date',
         ], [
             'brand_key.required' => 'The brand field is required.',
@@ -214,7 +214,7 @@ class PaymentController extends Controller
             'customer_contact_name' => 'required_if:type,0|nullable|string|max:255',
             'customer_contact_email' => 'required_if:type,0|nullable|email|max:255|unique:customer_contacts,email,' . $payment->cus_contact_key . ',special_key',
             'customer_contact_phone' => 'required_if:type,0|nullable|string|max:15',
-            'payment_method' => 'required|string|in:authorize,stripe,credit card,bank transfer,paypal,cash,other',
+            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
             'payment_date' => 'required|date',
         ], [
             'brand_key.required' => 'The brand field is required.',
