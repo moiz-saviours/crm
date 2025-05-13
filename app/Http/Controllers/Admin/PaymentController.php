@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\ClientContact;
 use App\Models\CustomerContact;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentMerchant;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -27,7 +29,15 @@ class PaymentController extends Controller
 //        $all_payments = Payment::where('status', 1)->get();
         $payments = Payment::with(['brand', 'team', 'agent'])->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        return view('admin.payments.index', compact('payments', 'brands', 'teams', 'agents', 'customer_contacts'));
+        $client_contacts = ClientContact::select('id', 'special_key', 'name')
+            ->with([
+                'companies:id,special_key,c_contact_key,name',
+                'companies.client_accounts:id,c_contact_key,c_company_key,name,payment_method',
+            ])
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+        return view('admin.payments.index', compact('payments', 'brands', 'teams', 'agents', 'customer_contacts', 'client_contacts'));
     }
 
     /**
@@ -48,6 +58,7 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'client_account' => 'required|integer|exists:payment_merchants,id',
             'brand_key' => 'required|integer|exists:brands,brand_key',
             'team_key' => 'required|integer|exists:teams,team_key',
             'agent_id' => 'required|integer|exists:users,id',
@@ -59,9 +70,11 @@ class PaymentController extends Controller
             'customer_contact_name' => 'required_if:type,0|nullable|string|max:255',
             'customer_contact_email' => 'required_if:type,0|nullable|email|max:255',
             'customer_contact_phone' => 'required_if:type,0|nullable|string|max:15',
-            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
+//            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
             'payment_date' => 'required|date',
         ], [
+            'client_account.required' => 'The client account field is required.',
+            'client_account.integer' => 'The client account must be a valid integer.',
             'brand_key.required' => 'The brand field is required.',
             'brand_key.integer' => 'The brand must be a valid integer.',
             'team_key.required' => 'The team field is required.',
@@ -113,6 +126,10 @@ class PaymentController extends Controller
             if (!$customer_contact->special_key) {
                 return response()->json(['error' => 'The selected customer contact does not exist. Please select a different or create a new one.'], 404);
             }
+            $account = PaymentMerchant::where('id', $request->input('client_account'))->first();
+            if (!$account->exists()) {
+                return response()->json(['error' => 'The selected client account does not exist. Please select a different or create a new one.'], 404);
+            }
             $invoiceData = [
                 'brand_key' => $request->input('brand_key'),
                 'team_key' => $request->input('team_key'),
@@ -137,7 +154,8 @@ class PaymentController extends Controller
                 'amount' => $request->amount,
                 'transaction_id' => $request->transaction_id,
                 'payment_type' => $request->input('type'),
-                'payment_method' => $request->input('payment_method'),
+                'merchant_id' => $account->id,
+                'payment_method' => $account->payment_method,
                 'payment_date' => $request->input('payment_date'),
             ];
             if ($request->has('agent_id')) {
@@ -146,12 +164,10 @@ class PaymentController extends Controller
             }
             $payment = Payment::create($paymentData);
             $payment->refresh();
-
             DB::commit();
-            $payment->loadMissing('invoice','customer_contact', 'brand', 'team', 'agent');
+            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent');
             $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             return response()->json(['data' => $payment, 'success' => 'Record created successfully!']);
-            return response()->json(['success' => 'Payment Created Successfully.']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while creating the record', 'message' => $e->getMessage()], 500);
@@ -173,7 +189,6 @@ class PaymentController extends Controller
     {
         try {
             return response()->json(['error' => 'Harmful Behaviour Detected!.']);
-
             if (!$payment->exists) {
                 if (request()->ajax()) {
                     return response()->json(['error' => 'Oops! Record not found.']);
@@ -203,6 +218,7 @@ class PaymentController extends Controller
     {
         return response()->json(['error' => 'Harmful Behaviour Detected!.']);
         $request->validate([
+            'client_account' => 'required|integer|exists:payment_merchants,id',
             'brand_key' => 'required|integer|exists:brands,brand_key',
             'team_key' => 'required|integer|exists:teams,team_key',
             'agent_id' => 'required|integer|exists:users,id',
@@ -214,9 +230,11 @@ class PaymentController extends Controller
             'customer_contact_name' => 'required_if:type,0|nullable|string|max:255',
             'customer_contact_email' => 'required_if:type,0|nullable|email|max:255|unique:customer_contacts,email,' . $payment->cus_contact_key . ',special_key',
             'customer_contact_phone' => 'required_if:type,0|nullable|string|max:15',
-            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
+//            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
             'payment_date' => 'required|date',
         ], [
+            'client_account.required' => 'The client account field is required.',
+            'client_account.integer' => 'The client account must be a valid integer.',
             'brand_key.required' => 'The brand field is required.',
             'team_key.required' => 'The team field is required.',
             'agent_id.required' => 'The agent field is required.',
@@ -260,6 +278,10 @@ class PaymentController extends Controller
             if (!$invoice || !$invoice->invoice_key) {
                 return response()->json(['error' => 'Oops! The invoice does not exist.']);
             }
+            $account = PaymentMerchant::where('id', $request->input('client_account'))->first();
+            if (!$account->exists()) {
+                return response()->json(['error' => 'The selected client account does not exist. Please select a different or create a new one.'], 404);
+            }
             $invoice->update([
                 'brand_key' => $request->input('brand_key'),
                 'team_key' => $request->input('team_key'),
@@ -278,11 +300,12 @@ class PaymentController extends Controller
                 'amount' => $request->amount,
                 'transaction_id' => $request->transaction_id,
                 'payment_type' => $request->input('type'),
-                'payment_method' => $request->input('payment_method'),
+                'merchant_id' => $account->id,
+                'payment_method' => $account->payment_method,
                 'payment_date' => $request->input('payment_date'),
             ]);
             DB::commit();
-            $payment->loadMissing('invoice','customer_contact', 'brand', 'team', 'agent');
+            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent');
             if ($payment->created_at->isToday()) {
                 $date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             } else {
