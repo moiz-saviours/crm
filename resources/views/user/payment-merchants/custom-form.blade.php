@@ -82,13 +82,13 @@
                     <select class="form-control" id="payment_method" name="payment_method" required>
                         <option value="" disabled>Select Payment Method</option>
                         <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>Authorize</option>
-{{--                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }} disabled>Stripe</option>--}}
-{{--                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}disabled>PayPal</option>--}}
                         <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>EDP</option>
-{{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>Credit Card</option>--}}
-{{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>Bank Transfer</option>--}}
-{{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
-{{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
+                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
+                        {{--                        <option value="credit card" {{ old('payment_method') == 'credit ca rd' ? 'selected' : '' }}>Credit Card</option>--}}
+                        {{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>Bank Transfer</option>--}}
+                        {{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
+                        {{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
                     </select>
                     @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
