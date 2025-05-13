@@ -83,6 +83,7 @@
                                             <th class="align-middle text-center text-nowrap">CUSTOMER</th>
                                             <th class="align-middle text-center text-nowrap">AMOUNT</th>
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
+                                            <th class="align-middle text-center text-nowrap">PAYMENT DATE</th>
                                             <th class="align-middle text-center text-nowrap">CREATE DATE</th>
 {{--                                            <th class="align-middle text-center text-nowrap">ACTION</th>--}}
                                         </tr>
@@ -115,6 +116,10 @@
                                                     @elseif($payment->status == 2)
                                                         <span class="badge bg-danger">Refund</span>
                                                     @endif
+                                                </td>
+                                                <td class="align-middle text-center text-nowrap">
+                                                    {{$payment->created_at->timezone('GMT+5')->format('M d, Y g:i A')}}
+                                                    GMT+5
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if ($payment->created_at->isToday())
