@@ -165,7 +165,7 @@ class PaymentController extends Controller
             $payment = Payment::create($paymentData);
             $payment->refresh();
             DB::commit();
-            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent');
+            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent','payment_gateway:id,c_contact_key,c_company_key,name,payment_method,name,descriptor');
             $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             return response()->json(['data' => $payment, 'success' => 'Record created successfully!']);
         } catch (\Exception $e) {
