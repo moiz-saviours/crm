@@ -50,7 +50,7 @@ class PaymentMerchantController extends Controller
                 'email' => 'nullable|email|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp',
+                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal',
                 'environment' => [
                     'required',
                     Rule::in([PaymentMerchantConstants::ENVIRONMENT_SANDBOX, PaymentMerchantConstants::ENVIRONMENT_PRODUCTION]),
@@ -122,7 +122,6 @@ class PaymentMerchantController extends Controller
     public function update(Request $request, PaymentMerchant $client_account): JsonResponse
     {
 //        $this->authorize('update', $client_account);
-
         DB::beginTransaction();
         try {
             $validatedData = $request->validate([
@@ -134,7 +133,7 @@ class PaymentMerchantController extends Controller
                 'email' => 'nullable|email|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp',
+                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal',
                 'environment' => [
                     'required',
                     Rule::in([PaymentMerchantConstants::ENVIRONMENT_SANDBOX, PaymentMerchantConstants::ENVIRONMENT_PRODUCTION]),
