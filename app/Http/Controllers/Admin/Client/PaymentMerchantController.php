@@ -110,6 +110,9 @@ class PaymentMerchantController extends Controller
             }elseif ($request->input('payment_method') == 'stripe') {
                 $data['test_login_id'] = env('STRIPE_TEST_KEY');
                 $data['test_transaction_key'] = env('STRIPE_TEST_SECRET');
+            }elseif ($request->input('payment_method') == 'paypal') {
+                $data['test_login_id'] = env('PAYPAL_CLIENT_ID');
+                $data['test_transaction_key'] = env('PAYPAL_CLIENT_SECRET');
             }
             /** Note : For testing purpose only when environment is on sandbox (in testing) */
 
