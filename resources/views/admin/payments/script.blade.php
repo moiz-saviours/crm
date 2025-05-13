@@ -185,12 +185,14 @@
                                 customer_contact,
                                 amount,
                                 status,
+                                payment_date,
                                 created_at
                             } = response.data;
 
                             const index = table.rows().count() + 1;
                             const statusBadge = getStatusBadge(status); // Function to get status HTML
                             const formattedDate = formatDate(created_at); // Function to format the date
+                            const formattedPaymentDate = formatDate2(payment_date); // Function to format the date
 
                             const columns = `
                         <td class="align-middle text-center text-nowrap"></td>
@@ -208,6 +210,7 @@
                         <td class="align-middle text-center text-nowrap">${customer_contact?.name ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">$${amount ?? "0.00"}</td>
                         <td class="align-middle text-center text-nowrap">${statusBadge}</td>
+                        <td class="align-middle text-center text-nowrap">${formattedPaymentDate}</td>
                         <td class="align-middle text-center text-nowrap">${formattedDate}</td>
                         `;
 
@@ -240,6 +243,7 @@
                                 customer_contact,
                                 amount,
                                 status,
+                                payment_date,
                                 created_at
                             } = response.data;
 
@@ -247,6 +251,7 @@
                             const rowData = table.row(index).data();
                             const statusBadge = getStatusBadge(status);
                             const formattedDate = formatDate(created_at);
+                            const formattedPaymentDate = formatDate2(payment_date); // Function to format the date
 
                             // Column 3: Invoice Number & Invoice Key
                             if (decodeHtml(rowData[2]) !== `${invoice?.invoice_number}<br>${invoice?.invoice_key}`) {
@@ -301,8 +306,13 @@
                             }
 
                             // Column 13: Created At
-                            if (decodeHtml(rowData[12]) !== formattedDate) {
-                                table.cell(index, 12).data(formattedDate).draw();
+                            if (decodeHtml(rowData[12]) !== formattedPaymentDate) {
+                                table.cell(index, 12).data(formattedPaymentDate).draw();
+                            }
+
+                            // Column 13: Created At
+                            if (decodeHtml(rowData[13]) !== formattedDate) {
+                                table.cell(index, 13).data(formattedDate).draw();
                             }
 
                             $('#manage-form')[0].reset();
@@ -344,6 +354,21 @@
                     ' ' +
                     date.toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true}) +
                     ' GMT+5';
+            }
+        }
+        function formatDate2(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            if (
+                date.toDateString() === today.toDateString()
+            ) {
+                return `Today at ${date.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                })} GMT+5`;
+            } else {
+                return date.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
             }
         }
 
