@@ -142,37 +142,79 @@
                 {{--                </div>--}}
 
                 <div class="form-group mb-3">
-                    <label for="payment_method" class="form-label">Payment Method</label>
-                    <select class="form-control" id="payment_method" name="payment_method" required>
-                        <option value="">Select Payment Method</option>
-                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>
-                            Authorize
-                        </option>
-                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>
-                            Edp
-                        </option>
-                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>
-                            Stripe
-                        </option>
-                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>
-                            Credit Card
-                        </option>
-                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>
-                            Bank Transfer
-                        </option>
-                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
-                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>
+                    <label for="client_account" class="form-label">Client Account</label>
+                    <select class="form-control" id="client_account" name="client_account" required>
+                        <option value="">Select Client Account</option>
+
+                        @foreach($client_contacts as $client_contact)
+                            @php
+                                $contactKey = $client_contact['special_key'] ?? $client_contact->special_key;
+                                $contactName = $client_contact['name'] ?? $client_contact->name;
+                                $companies = $client_contact['companies'] ?? $client_contact->companies;
+                            @endphp
+
+                            <optgroup label="🧍 {{ $contactName }}">
+                            @foreach($companies as $company)
+                                @php
+                                    $companyKey = $company['special_key'] ?? $company->special_key;
+                                    $companyName = $company['name'] ?? $company->name;
+                                    $accounts = $company['client_accounts'] ?? $company->client_accounts;
+                                @endphp
+
+                                <optgroup label="🏢 {{ $companyName }}">
+                                    @foreach($accounts as $account)
+                                        @php
+                                            $accountKey = $account['id'] ?? $account->id;
+                                            $accountName = $account['name'] ?? $account->name;
+                                            $accountPaymentMethod = $account['payment_method'] ?? $account->payment_method;
+                                        @endphp
+                                        <option value="{{ $accountKey }}" {{ old('client_account') == $accountKey ? 'selected' : '' }}>
+                                            💳 {{ $accountName }} - {{$accountPaymentMethod}}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                            </optgroup>
+                        @endforeach
                     </select>
-                    @error('payment_method')
+                    @error('client_account')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
 
+
+{{--                <div class="form-group mb-3">--}}
+{{--                    <label for="payment_method" class="form-label">Payment Method</label>--}}
+{{--                    <select class="form-control" id="payment_method" name="payment_method" required>--}}
+{{--                        <option value="">Select Payment Method</option>--}}
+{{--                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>--}}
+{{--                            Authorize--}}
+{{--                        </option>--}}
+{{--                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>--}}
+{{--                            Edp--}}
+{{--                        </option>--}}
+{{--                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>--}}
+{{--                            Stripe--}}
+{{--                        </option>--}}
+{{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>--}}
+{{--                            Credit Card--}}
+{{--                        </option>--}}
+{{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>--}}
+{{--                            Bank Transfer--}}
+{{--                        </option>--}}
+{{--                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>--}}
+{{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
+{{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
+{{--                    </select>--}}
+{{--                    @error('payment_method')--}}
+{{--                    <span class="text-danger">{{ $message }}</span>--}}
+{{--                    @enderror--}}
+{{--                </div>--}}
+
                 <div class="form-group mb-3">
                     <label for="payment_date" class="form-label">Payment Date</label>
                     <input type="date" class="form-control" id="payment_date" name="payment_date"
-                           value="{{ old('payment_date') }}" required>
+                           value="{{ old('payment_date') }}" max="{{now()->toDateString()}}" required>
                     @error('payment_date')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
