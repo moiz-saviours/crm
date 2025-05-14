@@ -550,15 +550,15 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     </button>
                                 @endif
 
-                                {{--                                @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']))--}}
-                                <button
-                                    class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
-                                    id="v-pills-paypal-tab" data-toggle="pill"
-                                    data-target="#v-pills-paypal" type="button" role="tab"
-                                    aria-controls="v-pills-paypal"
-                                    aria-selected="true">Paypal
-                                </button>
-                                {{--                                @endif--}}
+                                @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']))
+                                    <button
+                                        class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
+                                        id="v-pills-paypal-tab" data-toggle="pill"
+                                        data-target="#v-pills-paypal" type="button" role="tab"
+                                        aria-controls="v-pills-paypal"
+                                        aria-selected="true">Paypal
+                                    </button>
+                                @endif
                                 @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "stripe" ? 'active' : ""}}"
@@ -1041,63 +1041,14 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                      id="v-pills-paypal" role="tabpanel"
                                      aria-labelledby="v-pills-paypal-tab">
                                     <div class="sec-btn">
-                                        <div id="paypal-button-container"></div>
-
-                                        <!-- Include the PayPal JavaScript SDK -->
-                                        <script
-                                            src="https://www.paypal.com/sdk/js?client-id=BAAFJEOzUXJcS6Dni-m5EmT3kzSOhDhTE7jzQ3JIiekp6SsBF1oRvKFTwa4D2RWRdsNyaV2uQD4h2AeC50&currency=USD&components=buttons,card-fields&disable-funding=venmo,paylater,card"></script>
-                                        <script>
-                                            // Render the PayPal button into #paypal-button-container
-                                            paypal.Buttons({
-                                                style: {
-                                                    layout: 'vertical',
-                                                    color: 'gold',
-                                                    shape: 'rect',
-                                                    label: 'paypal'
-                                                },
-                                                createOrder: function (data, actions) {
-                                                    return actions.order.create({
-                                                        purchase_units: [{
-                                                            amount: {
-                                                                value: '10.00'
-                                                            }
-                                                        }]
-                                                    });
-                                                },
-                                                onApprove: function (data, actions) {
-                                                    return actions.order.capture().then(function (details) {
-                                                        // ✅ Payment successful on client side
-                                                        // 👉 Now POST to your Laravel backend
-                                                        fetch('/api/paypal-process-payment', {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json',
-                                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                                            },
-                                                            body: JSON.stringify({
-                                                                orderID: data.orderID,
-                                                                payerID: data.payerID,
-                                                                paymentDetails: details
-                                                            })
-                                                        }).then(response => {
-                                                            if (response.ok) {
-                                                                alert('Payment completed successfully!');
-                                                            } else {
-                                                                alert('Error recording payment.');
-                                                            }
-                                                        });
-                                                    });
-                                                }
-                                            }).render('#paypal-button-container');
-                                        </script>
+                                        <a href="">Pay with PayPal</a>
                                     </div>
                                 </div>
 
                                 <!-- Stripe Tab -->
-                                <div
-                                    class="tab-pane fade {{in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']) && $first_merchant == "stripe" ? 'show active' : ""}}"
-                                    id="v-pills-stripe" role="tabpanel"
-                                    aria-labelledby="v-pills-stripe-tab">
+                                <div class="tab-pane fade {{in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']) && $first_merchant == "stripe" ? 'show active' : ""}}"
+                                     id="v-pills-stripe" role="tabpanel"
+                                     aria-labelledby="v-pills-stripe-tab">
                                     <div class="form-txt" id="">
                                         <h1>Card Details</h1>
                                     </div>
@@ -1451,9 +1402,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
             }
         });
         cardElement.mount('#card-stripe');
-        !function () {
-            document.currentScript?.remove()
-        }();
+        !function(){document.currentScript?.remove()}();
     </script>
 @endif
 <script>{!! \File::get(public_path('assets/js/checkout.js')) !!}</script>
