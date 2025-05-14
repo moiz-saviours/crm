@@ -36,6 +36,12 @@ Route::post('login', function (Request $request) {
 Route::post('process-payment', [ApiAuthorizePaymentController::class, 'processPayment'])->name('api.authorize.process-payment');
 Route::post('secure-process-payment', [ApiSecurePaymentController::class, 'processPayment'])->name('api.secure.process-payment');
 Route::post('stripe-process-payment', [ApiStripePaymentController::class, 'processPayment'])->name('api.stripe.process-payment');
+Route::post('paypal-process-payment', function (){
+    return response()->json(['status' => 'success']);
+})->name('api.paypal.process-payment');
+
+
+
 //});
 Route::get('fetch-invoice/{invoice?}', [ApiInvoiceController::class, 'fetch_invoice'])->missing(function (Request $request) {
     return response()->json(['error' => 'Invalid url.'], 404);
@@ -43,3 +49,5 @@ Route::get('fetch-invoice/{invoice?}', [ApiInvoiceController::class, 'fetch_invo
 Route::fallback(function () {
     return response()->json(['error' => 'Controller or function not found'], 404);
 });
+
+
