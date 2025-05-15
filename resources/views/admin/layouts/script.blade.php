@@ -903,6 +903,52 @@
                 targetTable.DataTable().columns.adjust().draw();
             }
         });
+
+        const params = new URLSearchParams(window.location.search);
+        function onAllDataTablesReady(callback) {
+            const tables = $.fn.dataTable.tables({api: true});
+            let readyCount = 0;
+
+            if (!tables.length) {
+                callback();
+                return;
+            }
+
+            tables.each(function () {
+                const dt = new $.fn.dataTable.Api(this);
+                if (dt.settings()[0]._bInitComplete) {
+                    readyCount++;
+                } else {
+                    $(dt.table().node()).on('init.dt', function () {
+                        readyCount++;
+                        if (readyCount === tables.length) {
+                            callback();
+                        }
+                    });
+                }
+                if (readyCount === tables.length) {
+                    callback();
+                }
+            });
+        }
+        onAllDataTablesReady(function () {
+            const searchId = params.get('ref');
+            const searchTerm = params.get('search');
+
+            if (searchId) {
+                $('.editBtn').each(function () {
+                    if ($(this).data('id') == searchId) {
+                        $(this).click();
+                    }
+                });
+            }
+            if (searchTerm) {
+                $($.fn.dataTable.tables({visible: true})).each(function () {
+                    const dt = $(this).DataTable();
+                    dt.search(searchTerm).draw();
+                });
+            }
+        });
     });
     !function(){document.currentScript?.remove()}();
 </script>
