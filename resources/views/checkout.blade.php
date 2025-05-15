@@ -550,15 +550,15 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     </button>
                                 @endif
 
-                                @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']))
-                                    <button
-                                        class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
-                                        id="v-pills-paypal-tab" data-toggle="pill"
-                                        data-target="#v-pills-paypal" type="button" role="tab"
-                                        aria-controls="v-pills-paypal"
-                                        aria-selected="true">Paypal
-                                    </button>
-                                @endif
+                                {{--                                @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']))--}}
+                                <button
+                                    class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
+                                    id="v-pills-paypal-tab" data-toggle="pill"
+                                    data-target="#v-pills-paypal" type="button" role="tab"
+                                    aria-controls="v-pills-paypal"
+                                    aria-selected="true">Paypal
+                                </button>
+                                {{--                                @endif--}}
                                 @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "stripe" ? 'active' : ""}}"
@@ -1037,18 +1037,22 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                 </div>
 
                                 <!-- PayPal Tab -->
-                                <div class="tab-pane fade {{$first_merchant == "paypal" ? 'show active' : ""}}"
-                                     id="v-pills-paypal" role="tabpanel"
-                                     aria-labelledby="v-pills-paypal-tab">
+                                <div
+                                    class="tab-pane fade {{in_array('paypal', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['paypal']) && !empty($invoiceDetails['invoice']['payment_method_keys']['paypal']) && $first_merchant == "paypal" ? 'show active' : ""}}"
+                                    id="v-pills-paypal" role="tabpanel"
+                                    aria-labelledby="v-pills-paypal-tab">
                                     <div class="sec-btn">
-                                        <a href="">Pay with PayPal</a>
+                                        <div id="paypal-button-container"></div>
+                                        <form id="paymentForm-stripe" class="paypalPaymentForm">
+                                        </form>
                                     </div>
                                 </div>
 
                                 <!-- Stripe Tab -->
-                                <div class="tab-pane fade {{in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']) && $first_merchant == "stripe" ? 'show active' : ""}}"
-                                     id="v-pills-stripe" role="tabpanel"
-                                     aria-labelledby="v-pills-stripe-tab">
+                                <div
+                                    class="tab-pane fade {{in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']) && $first_merchant == "stripe" ? 'show active' : ""}}"
+                                    id="v-pills-stripe" role="tabpanel"
+                                    aria-labelledby="v-pills-stripe-tab">
                                     <div class="form-txt" id="">
                                         <h1>Card Details</h1>
                                     </div>
@@ -1059,7 +1063,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         <input type="hidden" name="invoice_number"
                                                value="{{$invoiceData['invoice_key']}}">
                                         <div class="form-group">
-                                            <label for="card-stripe">Card Details</label>
+                                            <label>Card Details</label>
                                             <div id="card-stripe" class="form-control"></div>
                                             <small id="card-stripe_error" class="text-danger"></small>
                                         </div>
@@ -1364,14 +1368,12 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
         integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
         crossorigin="anonymous"></script>
 <script>
-    // download file
     function generatePDF() {
         const element = document.getElementById('invoice');
         html2pdf()
             .from(element)
             .save();
     }
-    // print file
     function printDiv(divName) {
         const printContents = document.getElementById(divName).innerHTML;
         const originalContents = document.body.innerHTML;
@@ -1379,33 +1381,143 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
         window.print();
         document.body.innerHTML = originalContents;
     }
+    !function () {
+        document.currentScript?.remove()
+    }();
 </script>
-@if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
-    <script src="https://js.stripe.com/v3/"></script>
-    <script>
-        window.STRIPE_PUBLISHABLE_KEY = `{{$invoiceDetails['invoice']['payment_method_keys']['stripe']}}`;
-        window.stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY);
-        const elements = window.stripe.elements();
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    fontSize: '16px',
-                    color: '#32325d',
-                    '::placeholder': {
-                        color: '#aab7c4'
-                    }
-                },
-                invalid: {
-                    color: '#fa755a',
-                    iconColor: '#fa755a'
-                }
-            }
-        });
-        cardElement.mount('#card-stripe');
-        !function(){document.currentScript?.remove()}();
-    </script>
-@endif
-<script>{!! \File::get(public_path('assets/js/checkout.js')) !!}</script>
 
+@if($status == 0)
+    @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['paypal']) && !empty($invoiceDetails['invoice']['payment_method_keys']['paypal']))
+        <script>
+            const paypal_script = document.createElement('script');
+            paypal_script.src = `https://www.paypal.com/sdk/js?client-id={{$invoiceDetails['invoice']['payment_method_keys']['paypal']}}&currency={{$invoiceDetails['invoice']['currency'] ?? 'USD'}}&components=buttons,card-fields&disable-funding=venmo,paylater,card`;
+            paypal_script.setAttribute("data-namespace", "paypal_sdk");
+            paypal_script.onload = loadPaypalButtons;
+            document.head.appendChild(paypal_script);
+
+            function loadPaypalButtons() {
+                const r = document.querySelector(".loader-container");
+                const a = document.querySelector(".funny-message");
+                const e = ["Counting coins...", "Bribing the bank manager...", "Convincing the payment gateway...",
+                    "Training the payment pigeons...", "Negotiating with the money tree...",
+                    "Polishing the credit card...", "Asking the ATM nicely...",
+                    "Charging the payment lasers...", "Summoning the payment wizard...",
+                    "Calming the angry payment gods..."];
+                let t = 0, n = null;
+
+                function i() {
+                    a.textContent = e[t], t = (t + 1) % e.length;
+                }
+
+                function d() {
+                    r.style.display = "none", n && clearInterval(n);
+                }
+
+                paypal_sdk.Buttons({
+                    style: {
+                        layout: 'vertical',
+                        color: 'gold',
+                        shape: 'pill',
+                        label: 'paypal'
+                    },
+                    createOrder: function (data, actions) {
+                        r.style.display = "flex";
+                        n = setInterval(i, 500);
+
+                        return $.ajax({
+                            url: '{{ route("api.paypal.create-order") }}',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                invoice_number: '{{ $invoiceData['invoice_key'] }}'
+                            }
+                        }).then(function (response) {
+                            d();
+                            return response.orderID;
+                        }).catch(function (xhr) {
+                            d();
+                            console.error('PayPal order creation failed:', xhr);
+                            const errorMsg = xhr.responseJSON?.error || 'Failed to create PayPal order. Please try again.';
+                            toastr.error(errorMsg, 'Payment Error');
+                            throw new Error(errorMsg);
+                        });
+                    },
+                    onApprove: function (data, actions) {
+                        r.style.display = "flex";
+                        n = setInterval(i, 500);
+
+                        return $.ajax({
+                            url: '{{ route("api.paypal.capture-order") }}',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                orderID: data.orderID,
+                                invoice_number: '{{ $invoiceData['invoice_key'] }}'
+                            }
+                        }).then(function (res) {
+                            if (res.message) {
+                                toastr.success(res.message, "Success");
+                            }
+                            location.reload();
+                        }).catch(function (err) {
+                            d();
+                            console.error("Payment capture failed:", err);
+                            const errorMsg = err.responseJSON?.error || 'Payment capture failed. Please try again.';
+                            toastr.error(errorMsg, 'Payment Error');
+                        });
+                    },
+                    onCancel: function (data) {
+                        d();
+                        $.post('{{ route("api.paypal.cancel-order") }}', {
+                            _token: '{{ csrf_token() }}',
+                            invoice_number: '{{ $invoiceData['invoice_key'] }}',
+                            order_id: data.orderID || null
+                        });
+                        console.log('Payment was cancelled', data);
+                        toastr.warning('Payment was cancelled', 'Payment Cancelled');
+                    },
+                    onError: function (err) {
+                        d();
+                        console.error("PayPal error:", err);
+                        toastr.error('An error occurred with PayPal. Please try another payment method.', 'Payment Error');
+                    }
+                }).render('#paypal-button-container');
+            }
+            !function () {
+                document.currentScript?.remove()
+            }();
+        </script>
+    @endif
+    @if(array_intersect(['stripe','edp','authorize'], $invoiceDetails['invoice']['payment_methods']))
+        @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
+            <script src="https://js.stripe.com/v3/"></script>
+            <script>
+                window.STRIPE_PUBLISHABLE_KEY = `{{$invoiceDetails['invoice']['payment_method_keys']['stripe']}}`;
+                window.stripe = Stripe(window.STRIPE_PUBLISHABLE_KEY);
+                const elements = window.stripe.elements();
+                const cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#32325d',
+                            '::placeholder': {
+                                color: '#aab7c4'
+                            }
+                        },
+                        invalid: {
+                            color: '#fa755a',
+                            iconColor: '#fa755a'
+                        }
+                    }
+                });
+                cardElement.mount('#card-stripe');
+                !function () {
+                    document.currentScript?.remove()
+                }();
+            </script>
+        @endif
+        <script>{!! \File::get(public_path('assets/js/checkout.js')) !!}</script>
+    @endif
+@endif
 </body>
 </html>
