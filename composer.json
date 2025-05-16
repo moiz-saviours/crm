@@ -6,12 +6,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-curl": "*",
         "authorizenet/authorizenet": "^2.0",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "stripe/stripe-php": "^16.4",
-        "ext-curl": "*"
+        "paypal/paypal-checkout-sdk": "^1.0",
+        "stripe/stripe-php": "^16.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
