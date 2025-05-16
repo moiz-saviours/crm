@@ -118,7 +118,7 @@
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    {{$payment->created_at->timezone('GMT+5')->format('M d, Y g:i A')}}
+                                                    {{\carbon\carbon::parse($payment->payment_date)->timezone('GMT+5')->format('M d, Y g:i A')}}
                                                     GMT+5
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
