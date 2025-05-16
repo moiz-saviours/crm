@@ -182,7 +182,7 @@ class DashboardController extends Controller
                 $mtdSales = Invoice::where('status', Invoice::STATUS_PAID)
 //                    ->whereBetween('created_at', [$mtdStartDate, $mtdEndDate])
                     ->whereHas('payment', function ($query) use ($mtdStartDate, $mtdEndDate) {
-                        $query->whereBetween('created_at', [$mtdStartDate, $mtdEndDate]);
+                        $query->whereBetween('payment_date', [$mtdStartDate, $mtdEndDate]);
                     })
                     ->when($teamKey != 'all', function ($query) use ($teamKey) {
                         return $query->where('team_key', $teamKey);
@@ -197,7 +197,7 @@ class DashboardController extends Controller
                 $previousMtdSales = Invoice::where('status', Invoice::STATUS_PAID)
 //                    ->whereBetween('created_at', [$previousMtdStartDate, $previousMtdEndDate])
                     ->whereHas('payment', function($query) use ($previousMtdStartDate, $previousMtdEndDate) {
-                        $query->whereBetween('created_at', [$previousMtdStartDate, $previousMtdEndDate]);
+                        $query->whereBetween('payment_date', [$previousMtdStartDate, $previousMtdEndDate]);
                     })
                     ->when($teamKey != 'all', function ($query) use ($teamKey) {
                         return $query->where('team_key', $teamKey);
