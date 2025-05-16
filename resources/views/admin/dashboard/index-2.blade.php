@@ -157,7 +157,7 @@
             }
 
             table th {
-                font-size: 13px !important;
+                font-size: 0.813rem !important;
                 color: #000;
 
                 text-transform: capitalize;

@@ -50,7 +50,7 @@
             .date-by-order {
                 text-align: left;
                 padding-left: 15px;
-                font-size: 17px;
+                font-size: 1.063rem;
                 color: #2d3e50;
                 padding-top: 10px
             }
@@ -70,7 +70,8 @@
             .nav-tabs .nav-link.main-tabs-view {
                 border-radius: 0px;
                 font-weight: 400;
-                font-size: 13px;
+                font-size: var(--nf-profile-para-size);;
+                /*font-size: 0.813rem;*/
                 padding: 12px 28px;
                 color: rgb(51, 71, 91);
                 position: relative;
@@ -87,6 +88,7 @@
             .nav-tabs .nav-link.customize {
                 background-color: transparent !important;
                 border: 0px;
+                font-size: var(--nf-profile-para-size);
             }
 
             .nav-tabs .nav-link.customize.active {
@@ -101,9 +103,11 @@
                 border: none;
                 padding: 0;
                 color: #2d3e50;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
+                /*font-size: 0.75rem;*/
                 /* border-radius: 5px; */
                 font-weight: 600;
+                text-align: left;
 
             }
 
@@ -127,9 +131,10 @@
                 background-color: #EAF0F6;
                 border: 1px solid #CBD6E2;
                 color: #506E91;
-                padding: 9px;
+                padding: 12px;
                 border-radius: 31px;
-                font-size: 9px;
+                /*font-size: 9px;*/
+                font-size: 0.9rem;
             }
 
 
@@ -167,9 +172,12 @@
 
                 color: #0091ae !important;
                 font-weight: 600;
+                font-size: var(--nf-profile-para-size);
+                /*font-size: 12px;*/
                 margin: 0px !important;
-                font-size: 12px;
                 padding-top: 11px;
+                text-decoration: none;
+                text-transform: capitalize;
 
             }
 
@@ -188,11 +196,12 @@
                 border-radius: 50%;
                 background: #F2F5F8;
                 /* padding-top: 10px; */
-                max-height: 50px;
-                max-width: 50px;
-                /* height: 58px;
-            width: 98px; */
-                padding: 17px 0px 0px;
+                max-height: 3rem;
+                max-width: 3rem;
+                /*height: 40px;*/
+                /*width: 47px;*/
+                padding: 9px 0px 0px;
+
             }
 
             .avatar-icon {
@@ -228,14 +237,16 @@
 
             .contact-info {
                 /* text-align: center; */
-                margin-left: 8px;
+                /*margin-left: 8px;*/
+                margin: auto 5px;
+
             }
 
             .email-box-container {
                 background-color: rgb(255, 255, 255);
                 border: 1px solid rgb(223, 227, 235);
                 border-radius: 4px;
-                padding: 16px 21px;
+                padding: 16px 17px;
                 margin-bottom: 20px;
             }
 
@@ -250,9 +261,14 @@
 
             .contact-info h2 {
                 margin: 0;
-                font-size: 18px;
-                text-align: left;
+                /*font-size: var(--nf-profile-title-size);*/
+                /*font-weight: var(--nf-profile-title-weight);*/
+                /*font-size: 1.125rem;*/
+                /*font-size: var(--nf-profile-heading-size);*/
+
                 font-weight: 400;
+                text-align: left;
+
                 color: #2d3e50;
                 /* margin-bottom: -3px; */
             }
@@ -260,21 +276,23 @@
             .recent-filters {
                 color: rgb(81, 111, 144);
                 font-weight: 400;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 line-height: 24px;
             }
 
             .contact-info p {
                 /* margin: 5px 0; */
-                font-size: 10px;
+                /*font-size: 10px;*/
+                font-size: 0.9rem;
                 font-weight: 400;
                 color: gray;
-                margin: 0;
+                margin: 3px 0px;
                 line-break: anywhere;
             }
 
             .profile_actions p {
-                font-size: 10px;
+                font-size: 0.75rem;
+                /*font-size: 10px;*/
                 margin: 0px 8px;
                 color: gray;
             }
@@ -388,10 +406,10 @@
             }
 
             .contact-card-details-head {
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 color: gray;
-                font-weight: 400;
-                margin: 0;
+                /*font-weight: 400;*/
+                margin: 5px 0px;
             }
 
             .custom-right-detail-column {
@@ -399,7 +417,7 @@
 
             .contact-card-details-para {
                 font-weight: 500;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
             }
 
             .contact-details-input-fields {
@@ -415,7 +433,7 @@
             }
 
             .custom-contact-detail-dropdown {
-                font-size: 12px !important;
+                font-size: var(--nf-profile-para-size) !important;
                 color: gray !important;
                 font-weight: 400 !important;
                 margin: 0;
@@ -435,7 +453,7 @@
             }
 
             .contact-card-subscription-para {
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 font-weight: 400;
                 line-height: 24px;
                 color: #33475B;
@@ -502,8 +520,13 @@
 
             .data-highlights h2,
             .recent-activities h2 {
-                margin: 0 0 10px 0;
-                font-size: 18px;
+                margin: 0 0 0px 0;
+                /*margin: 0 0 10px 0;*/
+                font-size: 1.125rem;
+            }
+
+            .data-highlights p {
+                font-size: var(--nf-profile-para-size);
             }
 
             .data-row {
@@ -539,7 +562,7 @@
             .recent-activities h2 {
                 text-align: left;
                 /* padding-left: 15px; */
-                font-size: 14px;
+                font-size: var(--nf-profile-heading-size);
                 color: #2d3e50;
                 padding-top: 10px;
             }
@@ -547,14 +570,15 @@
             .activities-seprater {
                 color: #0091ae !important;
                 font-weight: 600;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 margin: 0px !important;
             }
 
             .activities-addition-links {
                 color: #0091ae !important;
                 font-weight: 600;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
+                /*font-size: 12px;*/
                 margin: 0px !important;
                 text-decoration: none;
             }
@@ -640,18 +664,20 @@
                 display: flex;
                 padding: 12px 13px 0px;
                 /* align-items: center; */
-                gap: 9px;
+                /*gap: 9px;*/
                 /*align-items: center;*/
             }
 
             .profile_actions {
                 display: flex;
                 align-items: center;
-                justify-content: center;
+                justify-content: space-evenly;
                 border-bottom: 1px solid #ddd;
                 /* padding-bottom: 30px; */
-                padding: 20px 20px;
-                /*gap: 11px;*/
+                padding: 20px 13px;
+                /* gap: 11px; */
+                flex-wrap: wrap;
+                margin: 10px 0px;
             }
 
 
@@ -673,7 +699,7 @@
                 text-align: left;
                 /* padding-left: 15px;
             padding-bottom: 15px; */
-                font-size: 14px;
+                font-size: var(--nf-profile-heading-size);
                 color: #2d3e50;
             }
 
@@ -688,7 +714,7 @@
             .activ_head p {
                 color: gray;
                 margin: 0px;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
             }
 
             span.user_name {
@@ -745,7 +771,7 @@
                 outline: none;
                 padding: 6px 0;
                 padding-left: 14px;
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 width: 136px;
                 /* width: 0; */
                 transition: width 0.4s ease;
@@ -778,7 +804,9 @@
                 border: 1px solid #ccc;
                 border-radius: 0;
                 padding: 8px 16px;
-                font-size: 13px;
+                font-size: var(--nf-profile-para-size);
+                /*font-size: 0.813rem;*/
+                /*font-size: 13px;*/
             }
 
             .new-activity-dropdown:hover {
@@ -834,7 +862,8 @@
                 color: #0c96b2;
                 font-weight: 600;
                 padding: 0;
-                font-size: 13px;
+                /*font-size: 13px;*/
+                font-size: var(--nf-profile-para-size);
                 text-align: left;
             }
 
@@ -892,7 +921,7 @@
 
             .user_profile_text p {
                 margin-bottom: -3px;
-                font-size: 11px;
+                font-size: 0.75rem;
                 font-weight: 700;
                 margin-top: 4px;
                 padding-left: 8px;
@@ -906,14 +935,14 @@
             }
 
             .user_cont p {
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 color: gray;
                 margin: 0;
             }
 
 
             .user_cont {
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 color: gray;
                 margin: 0;
                 /* padding: 16px 6px; */
@@ -926,7 +955,8 @@
                 /*color: #2d3e50;*/
                 padding: 5px;
                 border-radius: 5px;
-                font-size: 11px;
+                font-size: var(--nf-profile-para-size);
+                /*font-size: 11px;*/
                 cursor: pointer;
             }
 
@@ -936,7 +966,8 @@
 
             .prof-edit-icons {
                 color: #0091ae !important;
-                font-size: 12px;
+                font-size: 11px;
+                margin: auto 0px auto 8px;
             }
 
             .edit-icons-kit {
@@ -1055,7 +1086,7 @@
             }
 
             .user_cont h4 {
-                font-size: 13px;
+                font-size: 0.813rem;
                 font-weight: 600;
                 color: #2d3e50;
                 margin-bottom: 4px;
@@ -1099,7 +1130,8 @@
                 background-color: #dddddd;
                 border-color: #ccc;
                 color: gray;
-                font-size: 12px;
+                font-size: 0.813rem;
+                /*font-size: 12px;*/
                 font-weight: 400;
                 line-height: 14px;
                 padding: 6px 14px;
@@ -1112,7 +1144,7 @@
                 background-color: #2d3f4f;
                 border-color: #2d3f4f;
                 color: #fff;
-                font-size: 12px;
+                font-size: 0.813rem;
                 font-weight: 400;
                 line-height: 14px;
                 padding: 6px 14px;
@@ -1248,6 +1280,7 @@
                 color: #fff;
                 border: none;
                 background: transparent;
+                font-size: var(--nf-profile-para-size);
             }
 
             .moretext {
@@ -1259,23 +1292,30 @@
                 padding: 5px 10px;
                 border: 1px solid #ddd;
                 margin: 10px 0px;
+                font-size: var(--nf-profile-para-size);
             }
 
             .invoice_sec .invoice_num {
                 color: #0091ae;
                 font-weight: 600;
                 padding-bottom: 5px;
+                display: flex;
+                justify-content: space-between;
             }
+
             .cstm_note_cont {
                 display: flex;
                 justify-content: space-between;
             }
+
             .cstm_right_icon {
                 display: flex;
             }
+
             .cstm_btn {
                 background: transparent;
             }
+
             .cstm_right_icon {
                 opacity: 0;
                 transition: opacity 0.3s ease-in-out;
@@ -1284,16 +1324,47 @@
             .data-highlights:hover .cstm_right_icon {
                 opacity: 1;
             }
+
             .cstm_right_icon i {
-                color:#0091ae;
+                color: #0091ae;
             }
+
+
+            /*NEw STYLE*/
+            .profile_box img {
+                background-color: #dedede;
+            }
+
+            .company_sec {
+                display: grid;
+                padding: 5px 10px;
+                border: 1px solid #ddd;
+                margin: 10px 0px;
+                font-size: var(--nf-profile-para-size);
+            }
+
+            .company_sec span {
+                font-size: 0.8rem;
+            }
+
+            .invoice_sec span {
+                font-size: 0.8rem;
+            }
+
+            .cstm_bdge {
+                padding: 5px 10px;
+                font-weight: 400;
+                font-size: 0.7rem !important;
+                border-radius: 3px;
+            }
+
         </style>
 
     @endpush
     <div class="new-class-hide-scroll">
-        <section id="content" class="content new-box-main-wrapper">
+        <section id="content" class="content new-box-main-wrapper ">
 
-            <div class="container-fluid p-0">
+            <div class="container-fluid p-0 ">
 
                 <div class="">
                     <div class="row ">
@@ -1305,62 +1376,72 @@
                                             <span><i class="fa fa-angle-left " aria-hidden="true"></i>
                                                 contacts</span>
                                     </a>
-                                    <a href="#" class="view-subscription-link">
-                                        <span>Actions</span>
-                                    </a>
+                                    {{--                                    <a href="#" class="view-subscription-link">--}}
+                                    {{--                                        <span>Actions</span>--}}
+                                    {{--                                    </a>--}}
 
                                 </div>
-                                <div>
+                                <div class="left_side_sec">
                                     <div class="profile_box">
                                         <!-- <div class="avatar">MM</div> -->
                                         <div class="avatar-img-box">
-                                            <img class="img-fluid avatar-img"
+                                            <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
                                                  src="{{asset ('assets/images/user.png')}}">
                                             <!-- <img class="img-fluid avatar-img" src="{{asset ('assets/images/user.png')}}"> -->
                                         </div>
                                         <div class="contact-info">
                                             <h2>{{$customer_contact->name ?? "---"}}</h2>
                                             <!-- <h5>Business Development Executive</h5> -->
-                                            <p id="customerEmail">{{$customer_contact->email}}</p>
+                                            <style>
+                                                .email_sec {
+                                                    display: flex;
+                                                }
+                                            </style>
+                                            <div class="email_sec">
+                                                <p id="customerEmail">{{$customer_contact->email}}</p>
+                                                <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   title="Copy email to clipboard"></i>
+                                            </div>
                                         </div>
                                         <div>
 
-{{--                                            <button class="custom-contact-detail-dropdown" type="button"--}}
-{{--                                                    id="dropdownMenuButtonedit" data-bs-toggle="dropdown"--}}
-{{--                                                    aria-expanded="false">--}}
-{{--                                                <i class="fa fa-pencil prof-edit-icons edit-icons-kit"--}}
-{{--                                                   aria-hidden="true"></i>--}}
-{{--                                            </button>--}}
-{{--                                            <ul class="dropdown-menu custom-edit-detail-dropdown-show"--}}
-{{--                                                aria-labelledby="dropdownMenuButtonedit">--}}
-{{--                                                <li>--}}
-{{--                                                    <p class="edit-prof-head">First Name</p>--}}
-{{--                                                    <input class="edit-input-fields " type="text"--}}
-{{--                                                           placeholder="Hanny">--}}
-{{--                                                </li>--}}
-{{--                                                <li>--}}
-{{--                                                    <p class="edit-prof-head">Last Name</p>--}}
-{{--                                                    <input class="edit-input-fields " type="text"--}}
-{{--                                                           placeholder="Hanny">--}}
-{{--                                                </li>--}}
-{{--                                                <li>--}}
-{{--                                                    <p class="edit-prof-head">Job Title</p>--}}
-{{--                                                    <input class="edit-input-fields " type="text"--}}
-{{--                                                           placeholder="Hanny">--}}
-{{--                                                </li>--}}
-{{--                                                <li>--}}
-{{--                                                    <div class="main-edit-btn-box">--}}
-{{--                                                        <button class="edit-prof-btn">--}}
-{{--                                                            Save--}}
-{{--                                                        </button>--}}
-{{--                                                        <button class="edit-prof-btn canel-edition-btn">--}}
-{{--                                                            Cancel--}}
-{{--                                                        </button>--}}
-{{--                                                    </div>--}}
-{{--                                                </li>--}}
+                                            {{--                                            <button class="custom-contact-detail-dropdown" type="button"--}}
+                                            {{--                                                    id="dropdownMenuButtonedit" data-bs-toggle="dropdown"--}}
+                                            {{--                                                    aria-expanded="false">--}}
+                                            {{--                                                <i class="fa fa-pencil prof-edit-icons edit-icons-kit"--}}
+                                            {{--                                                   aria-hidden="true"></i>--}}
+                                            {{--                                            </button>--}}
+                                            {{--                                            <ul class="dropdown-menu custom-edit-detail-dropdown-show"--}}
+                                            {{--                                                aria-labelledby="dropdownMenuButtonedit">--}}
+                                            {{--                                                <li>--}}
+                                            {{--                                                    <p class="edit-prof-head">First Name</p>--}}
+                                            {{--                                                    <input class="edit-input-fields " type="text"--}}
+                                            {{--                                                           placeholder="Hanny">--}}
+                                            {{--                                                </li>--}}
+                                            {{--                                                <li>--}}
+                                            {{--                                                    <p class="edit-prof-head">Last Name</p>--}}
+                                            {{--                                                    <input class="edit-input-fields " type="text"--}}
+                                            {{--                                                           placeholder="Hanny">--}}
+                                            {{--                                                </li>--}}
+                                            {{--                                                <li>--}}
+                                            {{--                                                    <p class="edit-prof-head">Job Title</p>--}}
+                                            {{--                                                    <input class="edit-input-fields " type="text"--}}
+                                            {{--                                                           placeholder="Hanny">--}}
+                                            {{--                                                </li>--}}
+                                            {{--                                                <li>--}}
+                                            {{--                                                    <div class="main-edit-btn-box">--}}
+                                            {{--                                                        <button class="edit-prof-btn">--}}
+                                            {{--                                                            Save--}}
+                                            {{--                                                        </button>--}}
+                                            {{--                                                        <button class="edit-prof-btn canel-edition-btn">--}}
+                                            {{--                                                            Cancel--}}
+                                            {{--                                                        </button>--}}
+                                            {{--                                                    </div>--}}
+                                            {{--                                                </li>--}}
 
-{{--                                            </ul>--}}
-                                            <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard"></i>
+                                            {{--                                            </ul>--}}
+
                                         </div>
                                     </div>
                                 </div>
@@ -1389,15 +1470,15 @@
                                             <i class="fa fa-calendar sidebar-icons" aria-hidden="true"></i>
                                             <p>Meeting</p>
                                         </div>
-                                        <div class="text-center">
-                                            <i class="fa fa-list sidebar-icons" aria-hidden="true"></i>
-                                            <p>Task</p>
-                                        </div>
+                                        {{--                                        <div class="text-center">--}}
+                                        {{--                                            <i class="fa fa-list sidebar-icons" aria-hidden="true"></i>--}}
+                                        {{--                                            <p>Task</p>--}}
+                                        {{--                                        </div>--}}
 
-                                        <div class="text-center">
-                                            <i class="fa fa-calendar-check-o sidebar-icons" aria-hidden="true"></i>
-                                            <p>More</p>
-                                        </div>
+                                        {{--                                        <div class="text-center">--}}
+                                        {{--                                            <i class="fa fa-calendar-check-o sidebar-icons" aria-hidden="true"></i>--}}
+                                        {{--                                            <p>More</p>--}}
+                                        {{--                                        </div>--}}
                                     </div>
                                 </div>
 
@@ -1420,367 +1501,362 @@
 
                                         <div class="collapse show" id="collapseExamplecontact">
                                             <div class="card custom-contact-cards card-body">
-                                                <div>
+                                                <div class="mb-2">
                                                     <p class="contact-card-details-head">Email</p>
                                                     <p class="contact-card-details-para">{{$customer_contact->email}}</p>
                                                 </div>
-                                                <div class="mb-4">
+                                                <div class="mb-2">
                                                     <p class="contact-card-details-head">Phone</p>
                                                     <p class="contact-card-details-para">{{$customer_contact->phone}}</p>
                                                     {{--                                                <input class="contact-details-input-fields " type="number"--}}
                                                     {{--                                                       placeholder="">--}}
                                                 </div>
-                                                <div class="mb-4">
+                                                <div class="mb-2">
                                                     <p class="contact-card-details-head">Contact Owner</p>
                                                     <p class="contact-card-details-para">{{($customer_contact->creator)->name ?? "---"}}</p>
                                                 </div>
-                                                <div class="mb-4">
-                                                    <p class="contact-card-details-head">Last contacted</p>
-                                                    <input class="contact-details-input-fields " type="text"
-                                                           placeholder="">
-                                                </div>
-                                                <div class="mb-4">
-                                                    <div class="">
-                                                        <button
-                                                            class="custom-contact-detail-dropdown dropdown-toggle"
-                                                            type="button" id="dropdownMenuButtonlead"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            Lead
-                                                        </button>
-                                                        <ul class="dropdown-menu custom-contact-detail-dropdown-show"
-                                                            aria-labelledby="dropdownMenuButtonlead">
-                                                            <li><a class="dropdown-item" href="#">Action</a>
-                                                            </li>
-                                                            <li><a class="dropdown-item" href="#">Another
-                                                                    action</a>
-                                                            </li>
-                                                            <li><a class="dropdown-item" href="#">Something else
-                                                                    here</a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                                {{--                                                <div class="mb-4">--}}
+                                                {{--                                                    <p class="contact-card-details-head">Last contacted</p>--}}
+                                                {{--                                                    <input class="contact-details-input-fields " type="text"--}}
+                                                {{--                                                           placeholder="">--}}
+                                                {{--                                                </div>--}}
+                                                {{--                                                <div class="mb-4">--}}
+                                                {{--                                                    <div class="">--}}
+                                                {{--                                                        <button--}}
+                                                {{--                                                            class="custom-contact-detail-dropdown dropdown-toggle"--}}
+                                                {{--                                                            type="button" id="dropdownMenuButtonlead"--}}
+                                                {{--                                                            data-bs-toggle="dropdown" aria-expanded="false">--}}
+                                                {{--                                                            Lead--}}
+                                                {{--                                                        </button>--}}
+                                                {{--                                                        <ul class="dropdown-menu custom-contact-detail-dropdown-show"--}}
+                                                {{--                                                            aria-labelledby="dropdownMenuButtonlead">--}}
+                                                {{--                                                            <li><a class="dropdown-item" href="#">Action</a>--}}
+                                                {{--                                                            </li>--}}
+                                                {{--                                                            <li><a class="dropdown-item" href="#">Another--}}
+                                                {{--                                                                    action</a>--}}
+                                                {{--                                                            </li>--}}
+                                                {{--                                                            <li><a class="dropdown-item" href="#">Something else--}}
+                                                {{--                                                                    here</a>--}}
+                                                {{--                                                            </li>--}}
+                                                {{--                                                        </ul>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                </div>--}}
                                             </div>
                                         </div>
 
-                                        <div class="collpase-divider mb-3 mt-3"></div>
+                                        {{--                                        <div class="collpase-divider mb-3 mt-3"></div>--}}
 
 
-                                        <div class="collapse-header-prent-box">
-                                            <div class="collapse-header-box">
+                                        {{--                                        <div class="collapse-header-prent-box">--}}
+                                        {{--                                            <div class="collapse-header-box">--}}
 
-                                                <button class="btn custom-btn-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplesubscriptions"
-                                                        aria-expanded="true"
-                                                        aria-controls="collapseExamplesubscriptions">
-                                                    <i class="fa fa-caret-down" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
-                                                    Communication subscriptions
-                                                </button>
-                                            </div>
-                                        </div>
+                                        {{--                                                <button class="btn custom-btn-collapse" type="button"--}}
+                                        {{--                                                        data-bs-toggle="collapse"--}}
+                                        {{--                                                        data-bs-target="#collapseExamplesubscriptions"--}}
+                                        {{--                                                        aria-expanded="true"--}}
+                                        {{--                                                        aria-controls="collapseExamplesubscriptions">--}}
+                                        {{--                                                    <i class="fa fa-caret-down" aria-hidden="true"--}}
+                                        {{--                                                       style="padding-right: 5px;"></i>--}}
+                                        {{--                                                    Communication subscriptions--}}
+                                        {{--                                                </button>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </div>--}}
 
-                                        <div class="collapse" id="collapseExamplesubscriptions">
-                                            <div class="card custom-contact-cards card-body">
-                                                <p class="contact-card-subscription-para">
-                                                    Use subscription types to manage the communication this
-                                                    contact
-                                                    receives
-                                                    from you
-                                                </p>
-                                                <a href="#" class="view-subscription-link">
-                                                    <span>View Subscription</span>
-                                                </a>
-                                            </div>
-                                        </div>
+                                        {{--                                        <div class="collapse" id="collapseExamplesubscriptions">--}}
+                                        {{--                                            <div class="card custom-contact-cards card-body">--}}
+                                        {{--                                                <p class="contact-card-subscription-para">--}}
+                                        {{--                                                    Use subscription types to manage the communication this--}}
+                                        {{--                                                    contact--}}
+                                        {{--                                                    receives--}}
+                                        {{--                                                    from you--}}
+                                        {{--                                                </p>--}}
+                                        {{--                                                <a href="#" class="view-subscription-link">--}}
+                                        {{--                                                    <span>View Subscription</span>--}}
+                                        {{--                                                </a>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </div>--}}
 
-                                        <div class="collpase-divider mb-3 mt-3"></div>
-                                        <div class="collapse-header-prent-box">
-                                            <div class="collapse-header-box">
+                                        {{--                                        <div class="collpase-divider mb-3 mt-3"></div>--}}
+                                        {{--                                        <div class="collapse-header-prent-box">--}}
+                                        {{--                                            <div class="collapse-header-box">--}}
 
-                                                <button class="btn custom-btn-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"
-                                                        aria-expanded="true" aria-controls="collapseExampleweb">
-                                                    <i class="fa fa-caret-down" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
-                                                    Website Activity
-                                                </button>
-                                            </div>
-                                        </div>
+                                        {{--                                                <button class="btn custom-btn-collapse" type="button"--}}
+                                        {{--                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"--}}
+                                        {{--                                                        aria-expanded="true" aria-controls="collapseExampleweb">--}}
+                                        {{--                                                    <i class="fa fa-caret-down" aria-hidden="true"--}}
+                                        {{--                                                       style="padding-right: 5px;"></i>--}}
+                                        {{--                                                    Website Activity--}}
+                                        {{--                                                </button>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </div>--}}
 
                                         <div class="collapse" id="collapseExampleweb">
                                             <div class="card custom-contact-cards card-body">
                                                 <p class="contact-card-subscription-para ">
-                                                    Use subscription types to manage the communication this
-                                                    contact
-                                                    receives
-                                                    from you
+                                                    Use subscription types to manage the communication this contact
+                                                    receives from you
                                                 </p>
 
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>
 
                         </div>
-                        <div class="col-lg-6">
-
+                        <div class="col-lg-6 p-0">
 
                             <div class="custom-tabs-row custom-tabs-row-scroll">
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
-{{--                                    <li class="nav-item" role="presentation">--}}
-{{--                                        <button class="nav-link main-tabs-view active" id="home-tab"--}}
-{{--                                                data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab"--}}
-{{--                                                aria-controls="home" aria-selected="true">Overview--}}
-{{--                                        </button>--}}
-{{--                                    </li>--}}
+                                    {{--                                    <li class="nav-item" role="presentation">--}}
+                                    {{--                                        <button class="nav-link main-tabs-view active" id="home-tab"--}}
+                                    {{--                                                data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab"--}}
+                                    {{--                                                aria-controls="home" aria-selected="true">Overview--}}
+                                    {{--                                        </button>--}}
+                                    {{--                                    </li>--}}
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link main-tabs-view" id="profile-tab"
+                                        <button class="nav-link main-tabs-view active" id="profile-tab"
                                                 data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab"
-                                                aria-controls="profile" aria-selected="false" tabindex="-1">Activities
+                                                aria-controls="profile" aria-selected="true">Activities
                                         </button>
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="myTabContent">
-{{--                                    <div class="tab-pane fade active show" id="home" role="tabpanel"--}}
-{{--                                         aria-labelledby="home-tab">--}}
-{{--                                        <div>--}}
+                                    {{--                                    <div class="tab-pane fade active show" id="home" role="tabpanel"--}}
+                                    {{--                                         aria-labelledby="home-tab">--}}
+                                    {{--                                        <div>--}}
 
-{{--                                            <div class="data-highlights">--}}
-{{--                                                <div class="data-top-heading-header">--}}
-{{--                                                    <h2>Data highlights</h2>--}}
-{{--                                                    <p class="contact-card-details-head">12/03/2024 4:48 PM--}}
-{{--                                                        GMT+5--}}
-{{--                                                    </p>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="data-row">--}}
-{{--                                                    <div>--}}
-{{--                                                        <h5>CREATE DATE</h5>--}}
-{{--                                                        <p>{{$customer_contact->created_at}}</p>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div>--}}
-{{--                                                        <h5>LIFECYCLE STAGE</h5>--}}
-{{--                                                        <p>Lead</p>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div>--}}
-{{--                                                        <h5>LAST ACTIVITY DATE</h5>--}}
-{{--                                                        <p>12/03/2024 4:48 PM GMT+5</p>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
-{{--                                            <div class="recent-activities">--}}
+                                    {{--                                            <div class="data-highlights">--}}
+                                    {{--                                                <div class="data-top-heading-header">--}}
+                                    {{--                                                    <h2>Data highlights</h2>--}}
+                                    {{--                                                    <p class="contact-card-details-head">12/03/2024 4:48 PM--}}
+                                    {{--                                                        GMT+5--}}
+                                    {{--                                                    </p>--}}
+                                    {{--                                                </div>--}}
+                                    {{--                                                <div class="data-row">--}}
+                                    {{--                                                    <div>--}}
+                                    {{--                                                        <h5>CREATE DATE</h5>--}}
+                                    {{--                                                        <p>{{$customer_contact->created_at}}</p>--}}
+                                    {{--                                                    </div>--}}
+                                    {{--                                                    <div>--}}
+                                    {{--                                                        <h5>LIFECYCLE STAGE</h5>--}}
+                                    {{--                                                        <p>Lead</p>--}}
+                                    {{--                                                    </div>--}}
+                                    {{--                                                    <div>--}}
+                                    {{--                                                        <h5>LAST ACTIVITY DATE</h5>--}}
+                                    {{--                                                        <p>12/03/2024 4:48 PM GMT+5</p>--}}
+                                    {{--                                                    </div>--}}
+                                    {{--                                                </div>--}}
+                                    {{--                                            </div>--}}
+                                    {{--                                            <div class="recent-activities">--}}
 
-{{--                                                <div class="activity">--}}
-{{--                                                    <h2>Recent activities</h2>--}}
-{{--                                                    <div>--}}
-{{--                                                        <p class="recent-filters"> Filter by: <span--}}
-{{--                                                                class="activities-seprater">7--}}
-{{--                                                                    activities</span></p>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="email-box-container">--}}
-{{--                                                        <div class="activ_head"--}}
-{{--                                                             onclick="toggleContent('toggledContent1')">--}}
-{{--                                                            <div class="email-child-wrapper">--}}
-{{--                                                                <i class="fa fa-caret-right" aria-hidden="true"></i>--}}
-{{--                                                                <i class="fa fa-envelope-o new-sidebar-icons"--}}
-{{--                                                                   aria-hidden="true"></i>--}}
+                                    {{--                                                <div class="activity">--}}
+                                    {{--                                                    <h2>Recent activities</h2>--}}
+                                    {{--                                                    <div>--}}
+                                    {{--                                                        <p class="recent-filters"> Filter by: <span--}}
+                                    {{--                                                                class="activities-seprater">7--}}
+                                    {{--                                                                    activities</span></p>--}}
+                                    {{--                                                    </div>--}}
+                                    {{--                                                    <div class="email-box-container">--}}
+                                    {{--                                                        <div class="activ_head"--}}
+                                    {{--                                                             onclick="toggleContent('toggledContent1')">--}}
+                                    {{--                                                            <div class="email-child-wrapper">--}}
+                                    {{--                                                                <i class="fa fa-caret-right" aria-hidden="true"></i>--}}
+                                    {{--                                                                <i class="fa fa-envelope-o new-sidebar-icons"--}}
+                                    {{--                                                                   aria-hidden="true"></i>--}}
 
-{{--                                                                <p>--}}
-{{--                                                                    Inbound email from--}}
-{{--                                                                    <span--}}
-{{--                                                                        class="activities-seprater">{{$customer_contact->name}}</span>--}}
-{{--                                                                </p>--}}
-{{--                                                            </div>--}}
-{{--                                                            <p class="usre_date">Dec 3, 2024 at 4:48 PM GMT+5--}}
-{{--                                                            </p>--}}
-{{--                                                        </div>--}}
+                                    {{--                                                                <p>--}}
+                                    {{--                                                                    Inbound email from--}}
+                                    {{--                                                                    <span--}}
+                                    {{--                                                                        class="activities-seprater">{{$customer_contact->name}}</span>--}}
+                                    {{--                                                                </p>--}}
+                                    {{--                                                            </div>--}}
+                                    {{--                                                            <p class="usre_date">Dec 3, 2024 at 4:48 PM GMT+5--}}
+                                    {{--                                                            </p>--}}
+                                    {{--                                                        </div>--}}
 
-{{--                                                        <div class="collpase-divider mt-2 mb-2"></div>--}}
-
-
-{{--                                                        <div>--}}
-{{--                                                            <div class="contact-us-text">--}}
-{{--                                                                <p>contact us</p>--}}
-
-{{--                                                            </div>--}}
-{{--                                                            <div class="user_profile-hidden" id="toggledContent1">--}}
-{{--                                                                <div class="user_profile_img">--}}
-{{--                                                                    <div class="avatarr">MM</div>--}}
-{{--                                                                </div>--}}
-{{--                                                                <div class="user_profile_text">--}}
-{{--                                                                    <p>Mike Stewar mikestewar1932@outlook.com--}}
-{{--                                                                    </p>--}}
-{{--                                                                    <p style="font-weight: 500">to--}}
-{{--                                                                        info@phototouchexpert.com--}}
-{{--                                                                    </p>--}}
-{{--                                                                </div>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                        <div class="user_cont">--}}
-{{--                                                            <p>--}}
-{{--                                                                Hi there, I hope you're doing well. I specialize--}}
-{{--                                                                in--}}
-{{--                                                                online reputation management and can help boost--}}
-{{--                                                                your--}}
-{{--                                                                business's presence by generating positive--}}
-{{--                                                                reviews--}}
-{{--                                                                and--}}
-{{--                                                                addressing any negative feedback.--}}
-{{--                                                            </p>--}}
-{{--                                                        </div>--}}
+                                    {{--                                                        <div class="collpase-divider mt-2 mb-2"></div>--}}
 
 
-{{--                                                        <div>--}}
-{{--                                                            <div class="comment-active_head" id="toggledContent1">--}}
+                                    {{--                                                        <div>--}}
+                                    {{--                                                            <div class="contact-us-text">--}}
+                                    {{--                                                                <p>contact us</p>--}}
+
+                                    {{--                                                            </div>--}}
+                                    {{--                                                            <div class="user_profile-hidden" id="toggledContent1">--}}
+                                    {{--                                                                <div class="user_profile_img">--}}
+                                    {{--                                                                    <div class="avatarr">MM</div>--}}
+                                    {{--                                                                </div>--}}
+                                    {{--                                                                <div class="user_profile_text">--}}
+                                    {{--                                                                    <p>Mike Stewar mikestewar1932@outlook.com--}}
+                                    {{--                                                                    </p>--}}
+                                    {{--                                                                    <p style="font-weight: 500">to--}}
+                                    {{--                                                                        info@phototouchexpert.com--}}
+                                    {{--                                                                    </p>--}}
+                                    {{--                                                                </div>--}}
+                                    {{--                                                            </div>--}}
+                                    {{--                                                        </div>--}}
+                                    {{--                                                        <div class="user_cont">--}}
+                                    {{--                                                            <p>--}}
+                                    {{--                                                                Hi there, I hope you're doing well. I specialize--}}
+                                    {{--                                                                in--}}
+                                    {{--                                                                online reputation management and can help boost--}}
+                                    {{--                                                                your--}}
+                                    {{--                                                                business's presence by generating positive--}}
+                                    {{--                                                                reviews--}}
+                                    {{--                                                                and--}}
+                                    {{--                                                                addressing any negative feedback.--}}
+                                    {{--                                                            </p>--}}
+                                    {{--                                                        </div>--}}
 
 
-{{--                                                                <div>--}}
-
-{{--                                                                    <div class="email-child-wrapper"--}}
-{{--                                                                         id="toggleButton">--}}
-{{--                                                                        <i class="fa fa-commenting-o add-coment-icon"--}}
-{{--                                                                           aria-hidden="true"></i>--}}
-{{--                                                                        <span class="activities-addition-links">Add--}}
-{{--                                                                                Comments</span>--}}
-{{--                                                                    </div>--}}
+                                    {{--                                                        <div>--}}
+                                    {{--                                                            <div class="comment-active_head" id="toggledContent1">--}}
 
 
-{{--                                                                    <div id="contents" class="hidden comment-box">--}}
-{{--                                                                        <div class="editor-container">--}}
-{{--                                                                            <div class="avatarr">MM</div>--}}
-{{--                                                                            <div>--}}
-{{--                                                                                <!-- editor -->--}}
+                                    {{--                                                                <div>--}}
 
-{{--                                                                                <!-- <div class="editor-container">--}}
-{{--                                                                            <button--}}
-{{--                                                                                class="your-create-contact create-contact">comment</button>--}}
-{{--                                                                            <button--}}
-{{--                                                                                class="your-comment-cancel">Cancel</button>--}}
-{{--                                                                        </div> -->--}}
-{{--                                                                            </div>--}}
-{{--                                                                        </div>--}}
-{{--                                                                    </div>--}}
-{{--                                                                </div>--}}
+                                    {{--                                                                    <div class="email-child-wrapper"--}}
+                                    {{--                                                                         id="toggleButton">--}}
+                                    {{--                                                                        <i class="fa fa-commenting-o add-coment-icon"--}}
+                                    {{--                                                                           aria-hidden="true"></i>--}}
+                                    {{--                                                                        <span class="activities-addition-links">Add--}}
+                                    {{--                                                                                Comments</span>--}}
+                                    {{--                                                                    </div>--}}
 
 
-{{--                                                                <button type="button"--}}
-{{--                                                                        class="dropdown-toggle custom-drop-btn-design"--}}
-{{--                                                                        id="dropdownMenuButtonassociate"--}}
-{{--                                                                        data-bs-toggle="dropdown"--}}
-{{--                                                                        aria-expanded="false">--}}
-{{--                                                                    3--}}
-{{--                                                                    association--}}
-{{--                                                                </button>--}}
-{{--                                                                <ul class="dropdown-menu"--}}
-{{--                                                                    aria-labelledby="dropdownMenuButtonassociate">--}}
-{{--                                                                    <div>--}}
+                                    {{--                                                                    <div id="contents" class="hidden comment-box">--}}
+                                    {{--                                                                        <div class="editor-container">--}}
+                                    {{--                                                                            <div class="avatarr">MM</div>--}}
+                                    {{--                                                                            <div>--}}
+                                    {{--                                                                                <!-- editor -->--}}
 
-{{--                                                                        <div--}}
-{{--                                                                            class="dropdown-content-wraper">--}}
-{{--                                                                            <ul--}}
-{{--                                                                                class="nested-select-list">--}}
-{{--                                                                                <li--}}
-{{--                                                                                    class="checkbox-item">--}}
-
-{{--                                                                                    <label>Companies--}}
-{{--                                                                                        0</label>--}}
-{{--                                                                                </li>--}}
-{{--                                                                                <li--}}
-{{--                                                                                    class="checkbox-item">--}}
-
-{{--                                                                                    <label>Carts--}}
-{{--                                                                                        0</label>--}}
-{{--                                                                                </li>--}}
-{{--                                                                                <li--}}
-{{--                                                                                    class="checkbox-item">--}}
-
-{{--                                                                                    <label>Contacts--}}
-{{--                                                                                        0</label>--}}
-{{--                                                                                </li>--}}
-{{--                                                                                <li--}}
-{{--                                                                                    class="checkbox-item">--}}
-
-{{--                                                                                    <label>Leads--}}
-{{--                                                                                        0</label>--}}
-{{--                                                                                </li>--}}
-{{--                                                                                <li--}}
-{{--                                                                                    class="checkbox-item">--}}
-
-{{--                                                                                    <label>Deals--}}
-{{--                                                                                        0</label>--}}
-{{--                                                                                </li>--}}
-{{--                                                                                <li--}}
-{{--                                                                                    class="checkbox-item">--}}
-
-{{--                                                                                    <label>Orders--}}
-{{--                                                                                        0</label>--}}
-{{--                                                                                </li>--}}
-{{--                                                                                <!-- Add more items as needed -->--}}
-{{--                                                                            </ul>--}}
-{{--                                                                            <div>--}}
-{{--                                                                                <div--}}
-{{--                                                                                    class="search-box-select">--}}
-{{--                                                                                    <input--}}
-{{--                                                                                        type="text"--}}
-{{--                                                                                        placeholder="Search current associations"--}}
-{{--                                                                                        class="search-input">--}}
-{{--                                                                                </div>--}}
-{{--                                                                                <div--}}
-{{--                                                                                    class="select-contact-box-space">--}}
-{{--                                                                                    <p--}}
-{{--                                                                                        class="select-contact">--}}
-{{--                                                                                        Contacts--}}
-{{--                                                                                    </p>--}}
-
-{{--                                                                                    <input--}}
-{{--                                                                                        type="checkbox"--}}
-{{--                                                                                        id="contact2">--}}
-{{--                                                                                    <label--}}
-{{--                                                                                        for="contact2">HoeoSQMLp--}}
-{{--                                                                                        becelhmerthewatt@yahoo.com</label>--}}
-{{--                                                                                </div>--}}
-{{--                                                                            </div>--}}
-
-{{--                                                                        </div>--}}
-{{--                                                                    </div>--}}
-{{--                                                                </ul>--}}
+                                    {{--                                                                                <!-- <div class="editor-container">--}}
+                                    {{--                                                                            <button--}}
+                                    {{--                                                                                class="your-create-contact create-contact">comment</button>--}}
+                                    {{--                                                                            <button--}}
+                                    {{--                                                                                class="your-comment-cancel">Cancel</button>--}}
+                                    {{--                                                                        </div> -->--}}
+                                    {{--                                                                            </div>--}}
+                                    {{--                                                                        </div>--}}
+                                    {{--                                                                    </div>--}}
+                                    {{--                                                                </div>--}}
 
 
-{{--                                                            </div>--}}
-{{--                                                            <div class="collpase-divider mt-2 mb-2"></div>--}}
-{{--                                                            <div class=" mt-2 mb-2">--}}
-{{--                                                                <a href="#" class="activities-addition-links">View--}}
-{{--                                                                    full--}}
-{{--                                                                    activity</a>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
+                                    {{--                                                                <button type="button"--}}
+                                    {{--                                                                        class="dropdown-toggle custom-drop-btn-design"--}}
+                                    {{--                                                                        id="dropdownMenuButtonassociate"--}}
+                                    {{--                                                                        data-bs-toggle="dropdown"--}}
+                                    {{--                                                                        aria-expanded="false">--}}
+                                    {{--                                                                    3--}}
+                                    {{--                                                                    association--}}
+                                    {{--                                                                </button>--}}
+                                    {{--                                                                <ul class="dropdown-menu"--}}
+                                    {{--                                                                    aria-labelledby="dropdownMenuButtonassociate">--}}
+                                    {{--                                                                    <div>--}}
 
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
+                                    {{--                                                                        <div--}}
+                                    {{--                                                                            class="dropdown-content-wraper">--}}
+                                    {{--                                                                            <ul--}}
+                                    {{--                                                                                class="nested-select-list">--}}
+                                    {{--                                                                                <li--}}
+                                    {{--                                                                                    class="checkbox-item">--}}
+
+                                    {{--                                                                                    <label>Companies--}}
+                                    {{--                                                                                        0</label>--}}
+                                    {{--                                                                                </li>--}}
+                                    {{--                                                                                <li--}}
+                                    {{--                                                                                    class="checkbox-item">--}}
+
+                                    {{--                                                                                    <label>Carts--}}
+                                    {{--                                                                                        0</label>--}}
+                                    {{--                                                                                </li>--}}
+                                    {{--                                                                                <li--}}
+                                    {{--                                                                                    class="checkbox-item">--}}
+
+                                    {{--                                                                                    <label>Contacts--}}
+                                    {{--                                                                                        0</label>--}}
+                                    {{--                                                                                </li>--}}
+                                    {{--                                                                                <li--}}
+                                    {{--                                                                                    class="checkbox-item">--}}
+
+                                    {{--                                                                                    <label>Leads--}}
+                                    {{--                                                                                        0</label>--}}
+                                    {{--                                                                                </li>--}}
+                                    {{--                                                                                <li--}}
+                                    {{--                                                                                    class="checkbox-item">--}}
+
+                                    {{--                                                                                    <label>Deals--}}
+                                    {{--                                                                                        0</label>--}}
+                                    {{--                                                                                </li>--}}
+                                    {{--                                                                                <li--}}
+                                    {{--                                                                                    class="checkbox-item">--}}
+
+                                    {{--                                                                                    <label>Orders--}}
+                                    {{--                                                                                        0</label>--}}
+                                    {{--                                                                                </li>--}}
+                                    {{--                                                                                <!-- Add more items as needed -->--}}
+                                    {{--                                                                            </ul>--}}
+                                    {{--                                                                            <div>--}}
+                                    {{--                                                                                <div--}}
+                                    {{--                                                                                    class="search-box-select">--}}
+                                    {{--                                                                                    <input--}}
+                                    {{--                                                                                        type="text"--}}
+                                    {{--                                                                                        placeholder="Search current associations"--}}
+                                    {{--                                                                                        class="search-input">--}}
+                                    {{--                                                                                </div>--}}
+                                    {{--                                                                                <div--}}
+                                    {{--                                                                                    class="select-contact-box-space">--}}
+                                    {{--                                                                                    <p--}}
+                                    {{--                                                                                        class="select-contact">--}}
+                                    {{--                                                                                        Contacts--}}
+                                    {{--                                                                                    </p>--}}
+
+                                    {{--                                                                                    <input--}}
+                                    {{--                                                                                        type="checkbox"--}}
+                                    {{--                                                                                        id="contact2">--}}
+                                    {{--                                                                                    <label--}}
+                                    {{--                                                                                        for="contact2">HoeoSQMLp--}}
+                                    {{--                                                                                        becelhmerthewatt@yahoo.com</label>--}}
+                                    {{--                                                                                </div>--}}
+                                    {{--                                                                            </div>--}}
+
+                                    {{--                                                                        </div>--}}
+                                    {{--                                                                    </div>--}}
+                                    {{--                                                                </ul>--}}
 
 
-{{--                                                <div class="activity">--}}
-{{--                                                    <div class="association-activities-box">--}}
-{{--                                                        <h2>Companies</h2>--}}
-{{--                                                        <div>--}}
-{{--                                                            <i class="fa fa-plus companies-add-forms open-form-btn"--}}
-{{--                                                               aria-hidden="true"> Add</i>--}}
-{{--                                                        </div>--}}
+                                    {{--                                                            </div>--}}
+                                    {{--                                                            <div class="collpase-divider mt-2 mb-2"></div>--}}
+                                    {{--                                                            <div class=" mt-2 mb-2">--}}
+                                    {{--                                                                <a href="#" class="activities-addition-links">View--}}
+                                    {{--                                                                    full--}}
+                                    {{--                                                                    activity</a>--}}
+                                    {{--                                                            </div>--}}
+                                    {{--                                                        </div>--}}
 
-{{--                                                    </div>--}}
-{{--                                                    <p class="user_cont text-center"> No associated objects of--}}
-{{--                                                        this--}}
-{{--                                                        type--}}
-{{--                                                        exist or you don't have permission to view them.</p>--}}
-{{--                                                </div>--}}
+                                    {{--                                                    </div>--}}
+                                    {{--                                                </div>--}}
 
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
+
+                                    {{--                                                <div class="activity">--}}
+                                    {{--                                                    <div class="association-activities-box">--}}
+                                    {{--                                                        <h2>Companies</h2>--}}
+                                    {{--                                                        <div>--}}
+                                    {{--                                                            <i class="fa fa-plus companies-add-forms open-form-btn"--}}
+                                    {{--                                                               aria-hidden="true"> Add</i>--}}
+                                    {{--                                                        </div>--}}
+
+                                    {{--                                                    </div>--}}
+                                    {{--                                                    <p class="user_cont text-center"> No associated objects of--}}
+                                    {{--                                                        this--}}
+                                    {{--                                                        type--}}
+                                    {{--                                                        exist or you don't have permission to view them.</p>--}}
+                                    {{--                                                </div>--}}
+
+                                    {{--                                            </div>--}}
+                                    {{--                                        </div>--}}
+                                    {{--                                    </div>--}}
 
 
                                     <div class="tab-pane fade active show" id="profile" role="tabpanel"
@@ -1801,18 +1877,18 @@
 
                                             <!-- dropdown  -->
                                             <div class="dropdown">
-                                                <button class="new-activity-dropdown btn-secondary dropdown-toggle"
-                                                        type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                    Collapse all
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                    <li><a class="dropdown-item" href="#">Action</a></li>
-                                                    <li><a class="dropdown-item" href="#">Another action</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item" href="#">Something else
-                                                            here</a></li>
-                                                </ul>
+                                                {{--                                                <button class="new-activity-dropdown btn-secondary dropdown-toggle"--}}
+                                                {{--                                                        type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"--}}
+                                                {{--                                                        aria-expanded="false">--}}
+                                                {{--                                                    Collapse all--}}
+                                                {{--                                                </button>--}}
+                                                {{--                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">--}}
+                                                {{--                                                    <li><a class="dropdown-item" href="#">Action</a></li>--}}
+                                                {{--                                                    <li><a class="dropdown-item" href="#">Another action</a>--}}
+                                                {{--                                                    </li>--}}
+                                                {{--                                                    <li><a class="dropdown-item" href="#">Something else--}}
+                                                {{--                                                            here</a></li>--}}
+                                                {{--                                                </ul>--}}
                                             </div>
 
 
@@ -1820,205 +1896,209 @@
 
                                         <div class="custom-tabs-row">
                                             <ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
+                                                {{--                                                <li class="nav-item" role="presentation">--}}
+                                                {{--                                                    <button class="nav-link customize active" id="act-tab"--}}
+                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"--}}
+                                                {{--                                                            role="tab" aria-controls="act" aria-selected="true">Activity--}}
+                                                {{--                                                    </button>--}}
+                                                {{--                                                </li>--}}
                                                 <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize active" id="act-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                            role="tab" aria-controls="act" aria-selected="true">Activity
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize" id="notes-tab"
+                                                    <button class="nav-link customize active" id="notes-tab"
                                                             data-bs-toggle="tab" data-bs-target="#notes" type="button"
-                                                            role="tab" aria-controls="notes" aria-selected="false"
-                                                            tabindex="-1">Notes
+                                                            role="tab" aria-controls="notes" aria-selected="true"
+                                                    >Notes
                                                     </button>
                                                 </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize" id="email-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#email" type="button"
-                                                            role="tab" aria-controls="email" aria-selected="false"
-                                                            tabindex="-1">Emails
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize" id="call-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#call" type="button"
-                                                            role="tab" aria-controls="call" aria-selected="false"
-                                                            tabindex="-1">Calls
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize" id="task-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#task" type="button"
-                                                            role="tab" aria-controls="task" aria-selected="false"
-                                                            tabindex="-1">Tasks
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize" id="meeting-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#meeting" type="button"
-                                                            role="tab" aria-controls="meeting" aria-selected="false"
-                                                            tabindex="-1">Meetings
-                                                    </button>
-                                                </li>
+                                                {{--                                                <li class="nav-item" role="presentation">--}}
+                                                {{--                                                    <button class="nav-link customize" id="email-tab"--}}
+                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#email" type="button"--}}
+                                                {{--                                                            role="tab" aria-controls="email" aria-selected="false"--}}
+                                                {{--                                                            tabindex="-1">Emails--}}
+                                                {{--                                                    </button>--}}
+                                                {{--                                                </li>--}}
+                                                {{--                                                <li class="nav-item" role="presentation">--}}
+                                                {{--                                                    <button class="nav-link customize" id="call-tab"--}}
+                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#call" type="button"--}}
+                                                {{--                                                            role="tab" aria-controls="call" aria-selected="false"--}}
+                                                {{--                                                            tabindex="-1">Calls--}}
+                                                {{--                                                    </button>--}}
+                                                {{--                                                </li>--}}
+                                                {{--                                                <li class="nav-item" role="presentation">--}}
+                                                {{--                                                    <button class="nav-link customize" id="task-tab"--}}
+                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#task" type="button"--}}
+                                                {{--                                                            role="tab" aria-controls="task" aria-selected="false"--}}
+                                                {{--                                                            tabindex="-1">Tasks--}}
+                                                {{--                                                    </button>--}}
+                                                {{--                                                </li>--}}
+                                                {{--                                                <li class="nav-item" role="presentation">--}}
+                                                {{--                                                    <button class="nav-link customize" id="meeting-tab"--}}
+                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#meeting" type="button"--}}
+                                                {{--                                                            role="tab" aria-controls="meeting" aria-selected="false"--}}
+                                                {{--                                                            tabindex="-1">Meetings--}}
+                                                {{--                                                    </button>--}}
+                                                {{--                                                </li>--}}
                                             </ul>
                                             <div class="tab-content" id="myTabContent">
-                                                <div class="tab-pane fade show active" id="act" role="tabpanel"
-                                                     aria-labelledby="act-tab">
+                                                {{--                                                <div class="tab-pane fade show active" id="act" role="tabpanel"--}}
+                                                {{--                                                     aria-labelledby="act-tab">--}}
 
 
-                                                    <div>
-                                                        <div>
-                                                            <p class="recent-filters"> Filter by:
-                                                                <span class="activities-seprater">7
-                                                                        activities</span>
-                                                            </p>
-                                                        </div>
-                                                        <p class="date-by-order"> May 2021</p>
-                                                        <div class="data-highlights">
-                                                            <div class="data-top-heading-header">
-                                                                <h2>Life Cycle</h2>
-                                                                <p>12/03/2024 4:48 PM GMT+5</p>
-                                                            </div>
-                                                            <p class="user_cont"> No associated objects of this
-                                                                type
-                                                                exist or you don't have permission to view them.
-                                                                <span class="activities-seprater"> View detail
-                                                                        <i class="fa fa-external-link"
-                                                                           aria-hidden="true"></i>
-                                                                    </span>
-                                                            </p>
-                                                        </div>
+                                                {{--                                                    <div>--}}
+                                                {{--                                                        <div>--}}
+                                                {{--                                                            <p class="recent-filters"> Filter by:--}}
+                                                {{--                                                                <span class="activities-seprater">7--}}
+                                                {{--                                                                        activities</span>--}}
+                                                {{--                                                            </p>--}}
+                                                {{--                                                        </div>--}}
+                                                {{--                                                        <p class="date-by-order"> May 2021</p>--}}
+                                                {{--                                                        <div class="data-highlights">--}}
+                                                {{--                                                            <div class="data-top-heading-header">--}}
+                                                {{--                                                                <h2>Life Cycle</h2>--}}
+                                                {{--                                                                <p>12/03/2024 4:48 PM GMT+5</p>--}}
+                                                {{--                                                            </div>--}}
+                                                {{--                                                            <p class="user_cont"> No associated objects of this--}}
+                                                {{--                                                                type--}}
+                                                {{--                                                                exist or you don't have permission to view them.--}}
+                                                {{--                                                                <span class="activities-seprater"> View detail--}}
+                                                {{--                                                                        <i class="fa fa-external-link"--}}
+                                                {{--                                                                           aria-hidden="true"></i>--}}
+                                                {{--                                                                    </span>--}}
+                                                {{--                                                            </p>--}}
+                                                {{--                                                        </div>--}}
 
-                                                        <div class="recent-activities">
-
-
-                                                            <div class="email-box-container ">
-                                                                <div class="toggle-btnss">
-                                                                    <div class="activ_head ">
-                                                                        <div class="email-child-wrapper">
-                                                                            <i class="fa fa-caret-right"
-                                                                               aria-hidden="true"></i>
-                                                                            <h2>
-                                                                                Email - #Professional Image
-                                                                                Editing
-                                                                                <span class="user_cont">from
-                                                                                        Harry
-                                                                                        Brown</span>
-                                                                            </h2>
-                                                                        </div>
-                                                                        <p>12/03/2024 4:48 PM GMT+5</p>
-                                                                    </div>
-                                                                </div>
+                                                {{--                                                        <div class="recent-activities">--}}
 
 
-                                                                <div>
-                                                                    <!-- <div class="contact-us-text">
-                                                                    --
-                                                                </div> -->
-                                                                    <div class="contentdisplay ">
-
-                                                                        <div class="new-profile-parent-wrapper">
-                                                                            <div class="new-profile-email-wrapper">
-                                                                                <div class="user_profile_img">
-                                                                                    <div class="avatarr">MS
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="user_profile_text">
-                                                                                    <p>Mike Stewar</p>
-                                                                                    <p style="font-weight: 500">
-                                                                                        --
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div
-                                                                                class="new-profile-email-wrapper open-email-form"
-                                                                                style="position: relative">
-                                                                                <div class="activities-seprater ">
-                                                                                    Reply
-                                                                                </div>
-
-                                                                                <div
-                                                                                    class="activities-seprater open-form-btn">
-                                                                                    Forward
-                                                                                </div>
-                                                                                <div
-                                                                                    class="activities-seprater open-form-btn">
-                                                                                    Delete
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <!-- <div class="user_profile-hidden activ_head "
-                                                                    id="toggledContent01">
-                                                                    <div class="">
-                                                                        <div class="user_profile_img">
-                                                                            <div class="avatarr">MM</div>
-                                                                        </div>
-                                                                        <div class="user_profile_text">
-                                                                            <p>Mike Stewar mikestewar1932@outlook.com
-                                                                            </p>
-                                                                            <p style="font-weight: 500">--
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div>
-                                                                        <i class="fa fa-plus companies-add-forms open-form-btn"
-                                                                            aria-hidden="true"> Add</i>
-                                                                    </div>
-                                                                </div> -->
-                                                                </div>
-                                                                <div class="user_cont user-email-template">
-                                                                    <p>
-                                                                        Hi, <br> I hope you're doing well. I
-                                                                        specialize
-                                                                        in
-                                                                        online reputation management and can
-                                                                        help
-                                                                        boost
-                                                                        your
-                                                                        business's presence by generating
-                                                                        positive
-                                                                        reviews
-                                                                        and
-                                                                        addressing any negative feedback.
-                                                                    </p>
-                                                                </div>
-                                                                <!-- <div class="user_cont-toggler">
-                                                                <p>
-                                                                    Hi, <br> I hope you're doing well. I specialize in
-                                                                    online reputation management and can help boost your
-                                                                    business's presence by generating positive reviews
-                                                                    and
-                                                                    addressing any negative feedback.
-                                                                </p>
-                                                            </div> -->
+                                                {{--                                                            <div class="email-box-container ">--}}
+                                                {{--                                                                <div class="toggle-btnss">--}}
+                                                {{--                                                                    <div class="activ_head ">--}}
+                                                {{--                                                                        <div class="email-child-wrapper">--}}
+                                                {{--                                                                            <i class="fa fa-caret-right"--}}
+                                                {{--                                                                               aria-hidden="true"></i>--}}
+                                                {{--                                                                            <di>--}}
+                                                {{--                                                                                <h2>--}}
+                                                {{--                                                                                    Email - #Professional Image--}}
+                                                {{--                                                                                    Editing--}}
+                                                {{--                                                                                    --}}{{--                                                                                <span class="user_cont">from--}}
+                                                {{--                                                                                    --}}{{--                                                                                        Harry--}}
+                                                {{--                                                                                    --}}{{--                                                                                        Brown</span>--}}
+                                                {{--                                                                                </h2>--}}
+                                                {{--                                                                                <p class="user_cont">from Harry--}}
+                                                {{--                                                                                    Brown</p>--}}
+                                                {{--                                                                            </di>--}}
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                        <p>12/03/2024 4:48 PM GMT+5</p>--}}
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                </div>--}}
 
 
-                                                            </div>
+                                                {{--                                                                <div>--}}
+                                                {{--                                                                    <!-- <div class="contact-us-text">--}}
+                                                {{--                                                                    ----}}
+                                                {{--                                                                </div> -->--}}
+                                                {{--                                                                    <div class="contentdisplay ">--}}
 
-                                                            <div class="data-highlights">
-                                                                <div class="data-top-heading-header">
-                                                                    <h2>Life Cycle</h2>
-                                                                    <p>This contact was created </p>
-                                                                </div>
-                                                                <p class="user_cont"> No associated objects of
-                                                                    this
-                                                                    type
-                                                                    exist or you don't have permission to view
-                                                                    them.
-                                                                    <span class="activities-seprater"> View
-                                                                            detail
-                                                                            <i class="fa fa-external-link"
-                                                                               aria-hidden="true"></i>
-                                                                        </span>
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="tab-pane fade" id="notes" role="tabpanel"
+                                                {{--                                                                        <div class="new-profile-parent-wrapper">--}}
+                                                {{--                                                                            <div class="new-profile-email-wrapper">--}}
+                                                {{--                                                                                <div class="user_profile_img">--}}
+                                                {{--                                                                                    <div class="avatarr">MS--}}
+                                                {{--                                                                                    </div>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div class="user_profile_text">--}}
+                                                {{--                                                                                    <p>Mike Stewar</p>--}}
+                                                {{--                                                                                    <p style="font-weight: 500">--}}
+                                                {{--                                                                                        ----}}
+                                                {{--                                                                                    </p>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </div>--}}
+
+                                                {{--                                                                            <div--}}
+                                                {{--                                                                                class="new-profile-email-wrapper open-email-form"--}}
+                                                {{--                                                                                style="position: relative">--}}
+                                                {{--                                                                                <div class="activities-seprater ">--}}
+                                                {{--                                                                                    Reply--}}
+                                                {{--                                                                                </div>--}}
+
+                                                {{--                                                                                <div--}}
+                                                {{--                                                                                    class="activities-seprater open-form-btn">--}}
+                                                {{--                                                                                    Forward--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div--}}
+                                                {{--                                                                                    class="activities-seprater open-form-btn">--}}
+                                                {{--                                                                                    Delete--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </div>--}}
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                    <!-- <div class="user_profile-hidden activ_head "--}}
+                                                {{--                                                                    id="toggledContent01">--}}
+                                                {{--                                                                    <div class="">--}}
+                                                {{--                                                                        <div class="user_profile_img">--}}
+                                                {{--                                                                            <div class="avatarr">MM</div>--}}
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                        <div class="user_profile_text">--}}
+                                                {{--                                                                            <p>Mike Stewar mikestewar1932@outlook.com--}}
+                                                {{--                                                                            </p>--}}
+                                                {{--                                                                            <p style="font-weight: 500">----}}
+                                                {{--                                                                            </p>--}}
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                    <div>--}}
+                                                {{--                                                                        <i class="fa fa-plus companies-add-forms open-form-btn"--}}
+                                                {{--                                                                            aria-hidden="true"> Add</i>--}}
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                </div> -->--}}
+                                                {{--                                                                </div>--}}
+                                                {{--                                                                <div class="user_cont user-email-template">--}}
+                                                {{--                                                                    <p>--}}
+                                                {{--                                                                        Hi, <br> I hope you're doing well. I--}}
+                                                {{--                                                                        specialize--}}
+                                                {{--                                                                        in--}}
+                                                {{--                                                                        online reputation management and can--}}
+                                                {{--                                                                        help--}}
+                                                {{--                                                                        boost--}}
+                                                {{--                                                                        your--}}
+                                                {{--                                                                        business's presence by generating--}}
+                                                {{--                                                                        positive--}}
+                                                {{--                                                                        reviews--}}
+                                                {{--                                                                        and--}}
+                                                {{--                                                                        addressing any negative feedback.--}}
+                                                {{--                                                                    </p>--}}
+                                                {{--                                                                </div>--}}
+                                                {{--                                                                <!-- <div class="user_cont-toggler">--}}
+                                                {{--                                                                <p>--}}
+                                                {{--                                                                    Hi, <br> I hope you're doing well. I specialize in--}}
+                                                {{--                                                                    online reputation management and can help boost your--}}
+                                                {{--                                                                    business's presence by generating positive reviews--}}
+                                                {{--                                                                    and--}}
+                                                {{--                                                                    addressing any negative feedback.--}}
+                                                {{--                                                                </p>--}}
+                                                {{--                                                            </div> -->--}}
+
+
+                                                {{--                                                            </div>--}}
+
+                                                {{--                                                            <div class="data-highlights">--}}
+                                                {{--                                                                <div class="data-top-heading-header">--}}
+                                                {{--                                                                    <h2>Life Cycle</h2>--}}
+                                                {{--                                                                    <p>This contact was created </p>--}}
+                                                {{--                                                                </div>--}}
+                                                {{--                                                                <p class="user_cont"> No associated objects of--}}
+                                                {{--                                                                    this--}}
+                                                {{--                                                                    type--}}
+                                                {{--                                                                    exist or you don't have permission to view--}}
+                                                {{--                                                                    them.--}}
+                                                {{--                                                                    <span class="activities-seprater"> View--}}
+                                                {{--                                                                            detail--}}
+                                                {{--                                                                            <i class="fa fa-external-link"--}}
+                                                {{--                                                                               aria-hidden="true"></i>--}}
+                                                {{--                                                                        </span>--}}
+                                                {{--                                                                </p>--}}
+                                                {{--                                                            </div>--}}
+                                                {{--                                                        </div>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                </div>--}}
+                                                <div class="tab-pane fade show active" id="notes" role="tabpanel"
                                                      aria-labelledby="notes-tab">
                                                     <div class="email-threading-row">
 
@@ -2048,21 +2128,28 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12 cstm_note_cont">
 
-                                                                            <p class="user_cont" id="note-text-{{$note->id}}">
-                                                                                {{ $note->note ?? "No Note Available" }}
-                                                                            </p>
+                                                                        <p class="user_cont"
+                                                                           id="note-text-{{$note->id}}">
+                                                                            {{ $note->note ?? "No Note Available" }}
+                                                                        </p>
                                                                         <div class="cstm_right_icon">
                                                                             <!-- Edit Icon -->
                                                                             <button class="p-0 border-0 cstm_btn">
                                                                                 <i class="fas fa-edit me-2 editNoteModal "
-                                                                                   style="cursor: pointer;" data-bs-toggle="modal"
-                                                                                   data-bs-target="#editNoteModal" data-id="{{$note->id}}" data-note="{{$note->note}}"></i>
+                                                                                   style="cursor: pointer;"
+                                                                                   data-bs-toggle="modal"
+                                                                                   data-bs-target="#editNoteModal"
+                                                                                   data-id="{{$note->id}}"
+                                                                                   data-note="{{$note->note}}"></i>
                                                                             </button>
                                                                             <!-- Delete Form -->
-                                                                           <form action="{{ route('admin.customer.contact.note.delete', $note->id) }}" method="POST" class="deleteNoteForm">
+                                                                            <form
+                                                                                action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
+                                                                                method="POST" class="deleteNoteForm">
                                                                                 @csrf
-                                                                                 @method('DELETE')
-                                                                                <button type="submit" class=" p-0 border-0 cstm_btn">
+                                                                                @method('DELETE')
+                                                                                <button type="submit"
+                                                                                        class=" p-0 border-0 cstm_btn">
                                                                                     <i class="fas fa-trash"></i>
                                                                                 </button>
                                                                             </form>
@@ -2075,740 +2162,745 @@
                                                 </div>
 
 
-                                                <div class="tab-pane fade" id="email" role="tabpanel"
-                                                     aria-labelledby="email-tab">
-                                                    <div class="email-threading-row">
-                                                        <p class="activities-seprater"> Thread email replies
-                                                        </p>
-                                                        <button class="threading-email-btn-one">
-                                                            Log Email
-                                                        </button>
-                                                        <button class="threading-email-btn-two">
-                                                            Create Email
-                                                        </button>
-                                                    </div>
-
-                                                    <div>
-                                                        <p class="date-by-order"> May 2021</p>
-
-                                                        <div class="recent-activities">
-                                                            <div class="email-box-container"
-                                                                 style="margin: 0; border-radius: 0;">
-                                                                <div class="toggle-btnss">
-                                                                    <div class="activ_head ">
-                                                                        <div class="email-child-wrapper">
-                                                                            <i class="fa fa-caret-right"
-                                                                               aria-hidden="true"></i>
-                                                                            <h2>
-                                                                                Email - #Professional Image
-                                                                                Editing
-                                                                                <span
-                                                                                    class="user_cont">from Harry Brown</span>
-                                                                            </h2>
-                                                                        </div>
-                                                                        <p>12/03/2024 4:48 PM GMT+5</p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div>
-
-                                                                    <div class="contentdisplay">
-
-                                                                        <div class="new-profile-parent-wrapper">
-                                                                            <div class="new-profile-email-wrapper">
-                                                                                <div class="user_profile_img">
-                                                                                    <div class="avatarr">MS
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="user_profile_text">
-                                                                                    <p>Mike Stewar</p>
-                                                                                    <p style="font-weight: 500">
-                                                                                        --
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="new-profile-email-wrapper">
-                                                                                <div class="activities-seprater ">
-                                                                                    Reply
-                                                                                </div>
-                                                                                <div
-                                                                                    class="activities-seprater open-form-btn">
-                                                                                    Forward
-                                                                                </div>
-                                                                                <div
-                                                                                    class="activities-seprater open-form-btn">
-                                                                                    Delete
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                </div>
-                                                                <!-- <div class="user-cont-hide">
-                                                                    <div class="user_cont user-cont-hide">
-                                                                        <p >
-                                                                            Hi, <br> I hope you're doing well. I specialize in
-                                                                            online reputation management and can help boost your
-                                                                            business's presence by generating positive reviews
-                                                                            and
-                                                                            addressing any negative feedback.
-                                                                        </p>
-                                                                    </div>
-                                                                </div> -->
-                                                                <div class="contentdisplaytwo">
-                                                                    <div class="user_cont user-email-template ">
-                                                                        <p>
-                                                                            Hi Apex Web Team, <br>
-
-                                                                        <p class="email-body-text">
-                                                                            I hope you're doing well. I specialize
-                                                                            in
-                                                                            online
-                                                                            reputation management and can help boost
-                                                                            your
-                                                                            business's presence by generating
-                                                                            positive
-                                                                            reviews
-                                                                            and addressing any negative feedback. I
-                                                                            specialize
-                                                                            in online
-                                                                            reputation management and can help boost
-                                                                            your
-                                                                            business.
-
-                                                                        </p>
-                                                                        <p class="email-body-text">
-                                                                            All the best <br>
-                                                                            Harry Daniel <br>
-                                                                            <span class="activities-seprater">
-                                                                                +1-97-676552
-                                                                            </span>
-                                                                        </p>
-                                                                        <img
-                                                                            src="{{asset ('assets/images/email-dummy.jpg')}}"
-                                                                            class="img-fluid">
-                                                                        <br>
-                                                                        <br>
-
-                                                                        <p class="email-body-text">
-                                                                            <span style="font-weight: 600;"> Lorem
-                                                                                Ipsum
-                                                                                |
-                                                                                Promotion/Marketing Manager
-                                                                            </span><br>
-                                                                            Street Hospitality <br>
-                                                                            <a href="#" class="email-client-site-link">
-                                                                                Visit our website!</a>
-                                                                        </p>
-
-                                                                        <img
-                                                                            src="{{asset ('assets/images/logo-img.png')}}"
-                                                                            class="img-fluid client-email-logo">
-
-                                                                        <br>
-                                                                        <br>
-
-                                                                        <div class="collapse " id="collapseEmail">
-                                                                            <div
-                                                                                class="card custom-email-reply-collapse card-body">
-                                                                                <p
-                                                                                    class="contact-card-subscription-para">
-                                                                                    On Mon, jan 13, 2025 at 3:45PM
-                                                                                    deveon
-                                                                                    word
-                                                                                </p>
-                                                                                <p class="activities-seprater">
-                                                                                    devon@hudsonstreethospitality.com
-                                                                                </p>
-                                                                            </div>
-                                                                            <div
-                                                                                class="custom-email-reply-collapse-body">
-                                                                                <p>
-                                                                                    Hi Apex Web Team, <br>
-
-                                                                                <p class="email-body-text">
-                                                                                    I hope you're doing well. I
-                                                                                    specialize
-                                                                                    in online
-                                                                                    reputation management and can
-                                                                                    help
-                                                                                    boost
-                                                                                    your
-                                                                                    business's presence by
-                                                                                    generating
-                                                                                    positive reviews
-                                                                                    and addressing any negative
-                                                                                    feedback.
-
-                                                                                </p>
-                                                                                <p class="email-body-text">
-                                                                                    I hope you're doing well. I
-                                                                                    specialize
-                                                                                    in online
-                                                                                    reputation management and can
-                                                                                    help
-                                                                                    boost
-                                                                                    your
-                                                                                    business's presence by
-                                                                                    generating
-                                                                                    positive reviews
-                                                                                    and addressing any negative
-                                                                                    feedback. I
-                                                                                    specialize
-                                                                                    in online
-                                                                                    reputation management and can
-                                                                                    help
-                                                                                    boost
-                                                                                    your
-                                                                                    business.
-
-                                                                                </p>
-                                                                                <p class="email-body-text">
-                                                                                    I hope you're doing well. I
-                                                                                    specialize
-                                                                                    in online
-                                                                                    reputation management and can
-                                                                                    help
-                                                                                    boost
-                                                                                    your
-                                                                                    business's presence by
-                                                                                    generating
-                                                                                    positive reviews
-                                                                                    and addressing any negative
-                                                                                    feedback. I
-                                                                                    specialize
-                                                                                    in online
-                                                                                    reputation management and can
-                                                                                    help
-                                                                                    boost
-                                                                                    your
-                                                                                    business.
-
-                                                                                </p>
-                                                                                <br>
-                                                                                <p>--</p>
-
-                                                                                <p class="email-body-text">
-                                                                                    <span style="font-weight: 600;">
-                                                                                        Lorem
-                                                                                        Ipsum |
-                                                                                        Promotion/Marketing Manager
-                                                                                    </span><br>
-                                                                                    Street Hospitality <br>
-                                                                                    <a href="#"
-                                                                                       class="email-client-site-link">
-                                                                                        Visit our website!</a>
-                                                                                </p>
-
-                                                                                <img
-                                                                                    src="{{asset ('assets/images/logo-img.png')}}"
-                                                                                    class="img-fluid client-email-logo">
-
-                                                                                <br>
-                                                                                <br>
-                                                                            </div>
-                                                                        </div>
-                                                                        <button class="view-full-email-reply-btn"
-                                                                                type="button" data-bs-toggle="collapse"
-                                                                                data-bs-target="#collapseEmail"
-                                                                                aria-expanded="true"
-                                                                                aria-controls="collapseEmail">
-                                                                            <i class="fa fa-ellipsis-h "
-                                                                               aria-hidden="true"></i>
-                                                                        </button>
-
-                                                                        <div class="comment-active_head">
-
-
-                                                                            <div>
-
-                                                                                <!-- <div class="email-child-wrapper">
-                                                                                <span class="activities-addition-links">View
-                                                                                Thread (2)</span>
-                                                                                </div> -->
-
-                                                                                <div>
-
-                                                                                    <div class="email-child-wrapper"
-                                                                                         id="toggleButtonThread">
-
-                                                                                        <span
-                                                                                            class="activities-addition-links">View
-                                                                                            Thread (2) </span>
-                                                                                    </div>
-
-
-                                                                                </div>
-
-
-                                                                            </div>
-
-                                                                            <button type="button"
-                                                                                    class="dropdown-toggle custom-drop-btn-design"
-                                                                                    id="dropdownMenuButtonthreadd"
-                                                                                    data-bs-toggle="dropdown"
-                                                                                    aria-expanded="false">
-                                                                                3
-                                                                                association
-                                                                            </button>
-                                                                            <ul class="dropdown-menu"
-                                                                                aria-labelledby="dropdownMenuButtonthreadd">
-                                                                                <div>
-
-                                                                                    <div
-                                                                                        class="dropdown-content-wraper">
-                                                                                        <ul
-                                                                                            class="nested-select-list">
-                                                                                            <li
-                                                                                                class="checkbox-item">
-
-                                                                                                <label>Companies
-                                                                                                    0</label>
-                                                                                            </li>
-                                                                                            <li
-                                                                                                class="checkbox-item">
-
-                                                                                                <label>Carts
-                                                                                                    0</label>
-                                                                                            </li>
-                                                                                            <li
-                                                                                                class="checkbox-item">
-
-                                                                                                <label>Contacts
-                                                                                                    0</label>
-                                                                                            </li>
-                                                                                            <li
-                                                                                                class="checkbox-item">
-
-                                                                                                <label>Leads
-                                                                                                    0</label>
-                                                                                            </li>
-                                                                                            <li
-                                                                                                class="checkbox-item">
-
-                                                                                                <label>Deals
-                                                                                                    0</label>
-                                                                                            </li>
-                                                                                            <li
-                                                                                                class="checkbox-item">
-
-                                                                                                <label>Orders
-                                                                                                    0</label>
-                                                                                            </li>
-                                                                                            <!-- Add more items as needed -->
-                                                                                        </ul>
-                                                                                        <div>
-                                                                                            <div
-                                                                                                class="search-box-select">
-                                                                                                <input
-                                                                                                    type="text"
-                                                                                                    placeholder="Search current associations"
-                                                                                                    class="search-input">
-                                                                                            </div>
-                                                                                            <div
-                                                                                                class="select-contact-box-space">
-                                                                                                <p
-                                                                                                    class="select-contact">
-                                                                                                    Contacts
-                                                                                                </p>
-
-                                                                                                <input
-                                                                                                    type="checkbox"
-                                                                                                    id="contact2">
-                                                                                                <label
-                                                                                                    for="contact2">HoeoSQMLp
-                                                                                                    becelhmerthewatt@yahoo.com</label>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                    </div>
-                                                                                </div>
-                                                                            </ul>
-
-
-                                                                        </div>
-
-
-                                                                    </div>
-                                                                </div>
-
-
-                                                            </div>
-
-                                                            <div id="thread" class="hidden">
-                                                                <div class="email-box-container"
-                                                                     style="margin: 0; border-radius: 0;">
-
-
-                                                                    <div>
-                                                                        <div class="new-profile-parent-wrapper">
-                                                                            <div class="new-profile-email-wrapper">
-                                                                                <div class="user_profile_img">
-                                                                                    <div class="avatarr">MS
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="user_profile_text">
-                                                                                    <h2
-                                                                                        style="padding: 0; margin: 0;">
-                                                                                        Devod
-                                                                                        Word </h2>
-
-                                                                                    <p
-                                                                                        style="font-weight: 500; padding-left: 0;">
-                                                                                        to
-                                                                                        info@opexwebdesign.com,
-                                                                                        bett@hudsoninfo.com
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
-
-
-                                                                            <div>
-                                                                                <div
-                                                                                    class="new-profile-email-thread-wrapper">
-
-                                                                                    <div
-                                                                                        class="activities-seprater ">
-                                                                                        Reply all
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="activities-seprater ">
-                                                                                        Reply
-                                                                                    </div>
-
-                                                                                    <div
-                                                                                        class="activities-seprater open-form-btn">
-                                                                                        Forward
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="activities-seprater open-form-btn">
-                                                                                        Delete
-                                                                                    </div>
-
-
-                                                                                </div>
-                                                                                <div>
-                                                                                    <p>12/03/2024 4:48 PM GMT+5
-                                                                                    </p>
-                                                                                </div>
-
-                                                                            </div>
-
-
-                                                                        </div>
-
-
-                                                                    </div>
-                                                                    <div class="user_cont user-email-template">
-                                                                        <p>
-                                                                            Hi Apex Web Team, <br>
-
-                                                                        <p class="email-body-text">
-                                                                            I hope you're doing well. I
-                                                                            specialize
-                                                                            in
-                                                                            online
-                                                                            reputation management and can help
-                                                                            boost
-                                                                            your
-                                                                            business's presence by generating
-                                                                            positive
-                                                                            reviews
-                                                                            and addressing any negative
-                                                                            feedback.
-
-                                                                        </p>
-                                                                        <div class="moretext">
-                                                                            <p class="email-body-text">
-                                                                                I hope you're doing well. I
-                                                                                specialize
-                                                                                in online
-                                                                                reputation management and can
-                                                                                help
-                                                                                boost
-                                                                                your
-                                                                                business's presence by
-                                                                                generating
-                                                                                positive reviews
-                                                                                and addressing any negative
-                                                                                feedback. I
-                                                                                specialize
-                                                                                in online
-                                                                                reputation management and can
-                                                                                help
-                                                                                boost
-                                                                                your
-                                                                                business.
-
-                                                                            </p>
-                                                                            <p class="email-body-text">
-                                                                                I hope you're doing well. I
-                                                                                specialize
-                                                                                in online
-                                                                                reputation management and can
-                                                                                help
-                                                                                boost
-                                                                                your
-                                                                                business's presence by
-                                                                                generating
-                                                                                positive reviews
-                                                                                and addressing any negative
-                                                                                feedback. I
-                                                                                specialize
-                                                                                in online
-                                                                                reputation management and can
-                                                                                help
-                                                                                boost
-                                                                                your
-                                                                                business.
-
-                                                                            </p>
-                                                                            <br>
-                                                                            <p>--</p>
-
-                                                                            <p class="email-body-text">
-                                                                                    <span style="font-weight: 600;">
-                                                                                        Lorem
-                                                                                        Ipsum |
-                                                                                        Promotion/Marketing Manager
-                                                                                    </span><br>
-                                                                                Street Hospitality <br>
-                                                                                <span class="activities-seprater">
-                                                                                        +1-97-676552
-                                                                                    </span> <br>
-                                                                                <a href="#"
-                                                                                   class="email-client-site-link">
-                                                                                    Visit our website!</a>
-                                                                            </p>
-
-                                                                            <img
-                                                                                src="{{asset ('assets/images/logo-img.png')}}"
-                                                                                class="img-fluid client-email-logo">
-
-                                                                            <br>
-                                                                            <br>
-                                                                        </div>
-
-
-                                                                        <div class="doc-attachment-container">
-                                                                            <a href="path/to/your/file.pdf"
-                                                                               class="doc-attachment">
-                                                                                <div class="icon-doc">
-                                                                                    📎
-                                                                                </div>
-                                                                                <div class="file-info-doc">
-                                                                                    <p class="file-name-doc">
-                                                                                        Document.pdf
-                                                                                    </p>
-                                                                                    <p class="file-size-doc">2
-                                                                                        MB
-                                                                                    </p>
-                                                                                </div>
-                                                                            </a>
-                                                                        </div>
-
-                                                                        <div class="comment-head-thread-wrapper">
-
-
-                                                                            <div>
-
-                                                                                <div class="email-child-wrapper">
-                                                                                    <!-- <a
-                                                                                class="moreless-button activities-addition-links">
-                                                                                Read more</a> -->
-                                                                                    <a
-                                                                                        class="moreless-button activities-addition-links">See
-                                                                                        more</a>
-                                                                                </div>
-
-
-                                                                            </div>
-
-
-                                                                            <div>
-
-                                                                                <div
-                                                                                    class="thread-dropdown-display">
-                                                                                    <button type="button"
-                                                                                            class="dropdown-toggle custom-drop-btn-design"
-                                                                                            id="dropdownMenuButtonthread"
-                                                                                            data-bs-toggle="dropdown"
-                                                                                            aria-expanded="false">
-                                                                                        3
-                                                                                        association
-                                                                                    </button>
-                                                                                    <ul class="dropdown-menu"
-                                                                                        aria-labelledby="dropdownMenuButtonthread">
-                                                                                        <div>
-
-                                                                                            <div
-                                                                                                class="dropdown-content-wraper">
-                                                                                                <ul
-                                                                                                    class="nested-select-list">
-                                                                                                    <li
-                                                                                                        class="checkbox-item">
-
-                                                                                                        <label>Companies
-                                                                                                            0</label>
-                                                                                                    </li>
-                                                                                                    <li
-                                                                                                        class="checkbox-item">
-
-                                                                                                        <label>Carts
-                                                                                                            0</label>
-                                                                                                    </li>
-                                                                                                    <li
-                                                                                                        class="checkbox-item">
-
-                                                                                                        <label>Contacts
-                                                                                                            0</label>
-                                                                                                    </li>
-                                                                                                    <li
-                                                                                                        class="checkbox-item">
-
-                                                                                                        <label>Leads
-                                                                                                            0</label>
-                                                                                                    </li>
-                                                                                                    <li
-                                                                                                        class="checkbox-item">
-
-                                                                                                        <label>Deals
-                                                                                                            0</label>
-                                                                                                    </li>
-                                                                                                    <li
-                                                                                                        class="checkbox-item">
-
-                                                                                                        <label>Orders
-                                                                                                            0</label>
-                                                                                                    </li>
-                                                                                                    <!-- Add more items as needed -->
-                                                                                                </ul>
-                                                                                                <div>
-                                                                                                    <div
-                                                                                                        class="search-box-select">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            placeholder="Search current associations"
-                                                                                                            class="search-input">
-                                                                                                    </div>
-                                                                                                    <div
-                                                                                                        class="select-contact-box-space">
-                                                                                                        <p
-                                                                                                            class="select-contact">
-                                                                                                            Contacts
-                                                                                                        </p>
-
-                                                                                                        <input
-                                                                                                            type="checkbox"
-                                                                                                            id="contact2">
-                                                                                                        <label
-                                                                                                            for="contact2">HoeoSQMLp
-                                                                                                            becelhmerthewatt@yahoo.com</label>
-                                                                                                    </div>
-                                                                                                </div>
-
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </ul>
-                                                                                </div>
-                                                                            </div>
-
-
-                                                                        </div>
-
-
-                                                                    </div>
-
-                                                                </div>
-                                                                <div class="collapse-all-content-container">
-                                                                    <button class="all-collapse-thread-emails-btn">
-                                                                        <i class="fa fa-caret-down"
-                                                                           style="padding-right: 5px;"
-                                                                           aria-hidden="true"></i>
-                                                                        <span style="text-decoration: underline;">
-                                                                                Collapse threads
-                                                                            </span></button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-
-                                                <div class="tab-pane fade" id="call" role="tabpanel"
-                                                     aria-labelledby="call-tab">
-                                                    <div class="email-threading-row">
-
-                                                        <button class="threading-email-btn-two">
-                                                            Make a call
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-highlights">
-                                                        <div class="data-top-heading-header">
-                                                            <h2>Life Cycle</h2>
-                                                            <p>This contact was created </p>
-                                                        </div>
-                                                        <p class="user_cont"> No associated objects of this
-                                                            type
-                                                            exist or you don't have permission to view them.
-                                                            <span class="activities-seprater"> View detail <i
-                                                                    class="fa fa-external-link"
-                                                                    aria-hidden="true"></i>
-                                                                </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="tab-pane fade" id="task" role="tabpanel"
-                                                     aria-labelledby="task-tab">
-                                                    <div class="email-threading-row">
-
-                                                        <button class="threading-email-btn-two">
-                                                            Create a Task
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-highlights">
-                                                        <div class="data-top-heading-header">
-                                                            <h2>Life Cycle</h2>
-                                                            <p>This contact was created </p>
-                                                        </div>
-                                                        <p class="user_cont"> No associated objects of this
-                                                            type
-                                                            exist or you don't have permission to view them.
-                                                            <span class="activities-seprater"> View detail <i
-                                                                    class="fa fa-external-link"
-                                                                    aria-hidden="true"></i>
-                                                                </span>
-                                                        </p>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="tab-pane fade" id="meeting" role="tabpanel"
-                                                     aria-labelledby="meeting-tab">
-                                                    <div class="email-threading-row">
-
-                                                        <button class="threading-email-btn-two">
-                                                            Call a Meeting
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-highlights">
-                                                        <div class="data-top-heading-header">
-                                                            <h2>Life Cycle</h2>
-                                                            <p>This contact was created </p>
-                                                        </div>
-                                                        <p class="user_cont"> No associated objects of this
-                                                            type
-                                                            exist or you don't have permission to view them.
-                                                            <span class="activities-seprater"> View detail <i
-                                                                    class="fa fa-external-link"
-                                                                    aria-hidden="true"></i>
-                                                                </span>
-                                                        </p>
-                                                    </div>
-
-                                                </div>
+                                                {{--                                                <div class="tab-pane fade" id="email" role="tabpanel"--}}
+                                                {{--                                                     aria-labelledby="email-tab">--}}
+                                                {{--                                                    <div class="email-threading-row">--}}
+                                                {{--                                                        <p class="activities-seprater"> Thread email replies--}}
+                                                {{--                                                        </p>--}}
+                                                {{--                                                        <button class="threading-email-btn-one">--}}
+                                                {{--                                                            Log Email--}}
+                                                {{--                                                        </button>--}}
+                                                {{--                                                        <button class="threading-email-btn-two">--}}
+                                                {{--                                                            Create Email--}}
+                                                {{--                                                        </button>--}}
+                                                {{--                                                    </div>--}}
+
+                                                {{--                                                    <div>--}}
+                                                {{--                                                        <p class="date-by-order"> May 2021</p>--}}
+
+                                                {{--                                                        <div class="recent-activities">--}}
+                                                {{--                                                            <div class="email-box-container"--}}
+                                                {{--                                                                 style="margin: 0; border-radius: 0;">--}}
+                                                {{--                                                                <div class="toggle-btnss">--}}
+                                                {{--                                                                    <div class="activ_head ">--}}
+                                                {{--                                                                        <div class="email-child-wrapper">--}}
+                                                {{--                                                                            <i class="fa fa-caret-right"--}}
+                                                {{--                                                                               aria-hidden="true"></i>--}}
+                                                {{--                                                                            <div>--}}
+                                                {{--                                                                                <h2>--}}
+                                                {{--                                                                                    Email - #Professional Image--}}
+                                                {{--                                                                                    Editing--}}
+                                                {{--                                                                                    --}}{{--                                                                                <span--}}
+                                                {{--                                                                                    --}}{{--                                                                                    class="user_cont">from Harry Brown</span>--}}
+                                                {{--                                                                                </h2>--}}
+                                                {{--                                                                                <p class="user_cont">from Harry--}}
+                                                {{--                                                                                    Brown</p>--}}
+                                                {{--                                                                            </div>--}}
+
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                        <p>12/03/2024 4:48 PM GMT+5</p>--}}
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                </div>--}}
+
+                                                {{--                                                                <div>--}}
+
+                                                {{--                                                                    <div class="contentdisplay">--}}
+
+                                                {{--                                                                        <div class="new-profile-parent-wrapper">--}}
+                                                {{--                                                                            <div class="new-profile-email-wrapper">--}}
+                                                {{--                                                                                <div class="user_profile_img">--}}
+                                                {{--                                                                                    <div class="avatarr">MS--}}
+                                                {{--                                                                                    </div>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div class="user_profile_text">--}}
+                                                {{--                                                                                    <p>Mike Stewar</p>--}}
+                                                {{--                                                                                    <p style="font-weight: 500">--}}
+                                                {{--                                                                                        ----}}
+                                                {{--                                                                                    </p>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </div>--}}
+
+                                                {{--                                                                            <div class="new-profile-email-wrapper">--}}
+                                                {{--                                                                                <div class="activities-seprater ">--}}
+                                                {{--                                                                                    Reply--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div--}}
+                                                {{--                                                                                    class="activities-seprater open-form-btn">--}}
+                                                {{--                                                                                    Forward--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div--}}
+                                                {{--                                                                                    class="activities-seprater open-form-btn">--}}
+                                                {{--                                                                                    Delete--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </div>--}}
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                    </div>--}}
+
+                                                {{--                                                                </div>--}}
+                                                {{--                                                                <!-- <div class="user-cont-hide">--}}
+                                                {{--                                                                    <div class="user_cont user-cont-hide">--}}
+                                                {{--                                                                        <p >--}}
+                                                {{--                                                                            Hi, <br> I hope you're doing well. I specialize in--}}
+                                                {{--                                                                            online reputation management and can help boost your--}}
+                                                {{--                                                                            business's presence by generating positive reviews--}}
+                                                {{--                                                                            and--}}
+                                                {{--                                                                            addressing any negative feedback.--}}
+                                                {{--                                                                        </p>--}}
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                </div> -->--}}
+                                                {{--                                                                <div class="contentdisplaytwo">--}}
+                                                {{--                                                                    <div class="user_cont user-email-template ">--}}
+                                                {{--                                                                        <p>--}}
+                                                {{--                                                                            Hi Apex Web Team, <br>--}}
+
+                                                {{--                                                                        <p class="email-body-text">--}}
+                                                {{--                                                                            I hope you're doing well. I specialize--}}
+                                                {{--                                                                            in--}}
+                                                {{--                                                                            online--}}
+                                                {{--                                                                            reputation management and can help boost--}}
+                                                {{--                                                                            your--}}
+                                                {{--                                                                            business's presence by generating--}}
+                                                {{--                                                                            positive--}}
+                                                {{--                                                                            reviews--}}
+                                                {{--                                                                            and addressing any negative feedback. I--}}
+                                                {{--                                                                            specialize--}}
+                                                {{--                                                                            in online--}}
+                                                {{--                                                                            reputation management and can help boost--}}
+                                                {{--                                                                            your--}}
+                                                {{--                                                                            business.--}}
+
+                                                {{--                                                                        </p>--}}
+                                                {{--                                                                        <p class="email-body-text">--}}
+                                                {{--                                                                            All the best <br>--}}
+                                                {{--                                                                            Harry Daniel <br>--}}
+                                                {{--                                                                            <span class="activities-seprater">--}}
+                                                {{--                                                                                +1-97-676552--}}
+                                                {{--                                                                            </span>--}}
+                                                {{--                                                                        </p>--}}
+                                                {{--                                                                        <img--}}
+                                                {{--                                                                            src="{{asset ('assets/images/email-dummy.jpg')}}"--}}
+                                                {{--                                                                            class="img-fluid">--}}
+                                                {{--                                                                        <br>--}}
+                                                {{--                                                                        <br>--}}
+
+                                                {{--                                                                        <p class="email-body-text">--}}
+                                                {{--                                                                            <span style="font-weight: 600;"> Lorem--}}
+                                                {{--                                                                                Ipsum--}}
+                                                {{--                                                                                |--}}
+                                                {{--                                                                                Promotion/Marketing Manager--}}
+                                                {{--                                                                            </span><br>--}}
+                                                {{--                                                                            Street Hospitality <br>--}}
+                                                {{--                                                                            <a href="#" class="email-client-site-link">--}}
+                                                {{--                                                                                Visit our website!</a>--}}
+                                                {{--                                                                        </p>--}}
+
+                                                {{--                                                                        <img--}}
+                                                {{--                                                                            src="{{asset ('assets/images/logo-img.png')}}"--}}
+                                                {{--                                                                            class="img-fluid client-email-logo">--}}
+
+                                                {{--                                                                        <br>--}}
+                                                {{--                                                                        <br>--}}
+
+                                                {{--                                                                        <div class="collapse " id="collapseEmail">--}}
+                                                {{--                                                                            <div--}}
+                                                {{--                                                                                class="card custom-email-reply-collapse card-body">--}}
+                                                {{--                                                                                <p--}}
+                                                {{--                                                                                    class="contact-card-subscription-para">--}}
+                                                {{--                                                                                    On Mon, jan 13, 2025 at 3:45PM--}}
+                                                {{--                                                                                    deveon--}}
+                                                {{--                                                                                    word--}}
+                                                {{--                                                                                </p>--}}
+                                                {{--                                                                                <p class="activities-seprater">--}}
+                                                {{--                                                                                    devon@hudsonstreethospitality.com--}}
+                                                {{--                                                                                </p>--}}
+                                                {{--                                                                            </div>--}}
+                                                {{--                                                                            <div--}}
+                                                {{--                                                                                class="custom-email-reply-collapse-body">--}}
+                                                {{--                                                                                <p>--}}
+                                                {{--                                                                                    Hi Apex Web Team, <br>--}}
+
+                                                {{--                                                                                <p class="email-body-text">--}}
+                                                {{--                                                                                    I hope you're doing well. I--}}
+                                                {{--                                                                                    specialize--}}
+                                                {{--                                                                                    in online--}}
+                                                {{--                                                                                    reputation management and can--}}
+                                                {{--                                                                                    help--}}
+                                                {{--                                                                                    boost--}}
+                                                {{--                                                                                    your--}}
+                                                {{--                                                                                    business's presence by--}}
+                                                {{--                                                                                    generating--}}
+                                                {{--                                                                                    positive reviews--}}
+                                                {{--                                                                                    and addressing any negative--}}
+                                                {{--                                                                                    feedback.--}}
+
+                                                {{--                                                                                </p>--}}
+                                                {{--                                                                                <p class="email-body-text">--}}
+                                                {{--                                                                                    I hope you're doing well. I--}}
+                                                {{--                                                                                    specialize--}}
+                                                {{--                                                                                    in online--}}
+                                                {{--                                                                                    reputation management and can--}}
+                                                {{--                                                                                    help--}}
+                                                {{--                                                                                    boost--}}
+                                                {{--                                                                                    your--}}
+                                                {{--                                                                                    business's presence by--}}
+                                                {{--                                                                                    generating--}}
+                                                {{--                                                                                    positive reviews--}}
+                                                {{--                                                                                    and addressing any negative--}}
+                                                {{--                                                                                    feedback. I--}}
+                                                {{--                                                                                    specialize--}}
+                                                {{--                                                                                    in online--}}
+                                                {{--                                                                                    reputation management and can--}}
+                                                {{--                                                                                    help--}}
+                                                {{--                                                                                    boost--}}
+                                                {{--                                                                                    your--}}
+                                                {{--                                                                                    business.--}}
+
+                                                {{--                                                                                </p>--}}
+                                                {{--                                                                                <p class="email-body-text">--}}
+                                                {{--                                                                                    I hope you're doing well. I--}}
+                                                {{--                                                                                    specialize--}}
+                                                {{--                                                                                    in online--}}
+                                                {{--                                                                                    reputation management and can--}}
+                                                {{--                                                                                    help--}}
+                                                {{--                                                                                    boost--}}
+                                                {{--                                                                                    your--}}
+                                                {{--                                                                                    business's presence by--}}
+                                                {{--                                                                                    generating--}}
+                                                {{--                                                                                    positive reviews--}}
+                                                {{--                                                                                    and addressing any negative--}}
+                                                {{--                                                                                    feedback. I--}}
+                                                {{--                                                                                    specialize--}}
+                                                {{--                                                                                    in online--}}
+                                                {{--                                                                                    reputation management and can--}}
+                                                {{--                                                                                    help--}}
+                                                {{--                                                                                    boost--}}
+                                                {{--                                                                                    your--}}
+                                                {{--                                                                                    business.--}}
+
+                                                {{--                                                                                </p>--}}
+                                                {{--                                                                                <br>--}}
+                                                {{--                                                                                <p>--</p>--}}
+
+                                                {{--                                                                                <p class="email-body-text">--}}
+                                                {{--                                                                                    <span style="font-weight: 600;">--}}
+                                                {{--                                                                                        Lorem--}}
+                                                {{--                                                                                        Ipsum |--}}
+                                                {{--                                                                                        Promotion/Marketing Manager--}}
+                                                {{--                                                                                    </span><br>--}}
+                                                {{--                                                                                    Street Hospitality <br>--}}
+                                                {{--                                                                                    <a href="#"--}}
+                                                {{--                                                                                       class="email-client-site-link">--}}
+                                                {{--                                                                                        Visit our website!</a>--}}
+                                                {{--                                                                                </p>--}}
+
+                                                {{--                                                                                <img--}}
+                                                {{--                                                                                    src="{{asset ('assets/images/logo-img.png')}}"--}}
+                                                {{--                                                                                    class="img-fluid client-email-logo">--}}
+
+                                                {{--                                                                                <br>--}}
+                                                {{--                                                                                <br>--}}
+                                                {{--                                                                            </div>--}}
+                                                {{--                                                                        </div>--}}
+                                                {{--                                                                        <button class="view-full-email-reply-btn"--}}
+                                                {{--                                                                                type="button" data-bs-toggle="collapse"--}}
+                                                {{--                                                                                data-bs-target="#collapseEmail"--}}
+                                                {{--                                                                                aria-expanded="true"--}}
+                                                {{--                                                                                aria-controls="collapseEmail">--}}
+                                                {{--                                                                            <i class="fa fa-ellipsis-h "--}}
+                                                {{--                                                                               aria-hidden="true"></i>--}}
+                                                {{--                                                                        </button>--}}
+
+                                                {{--                                                                        <div class="comment-active_head">--}}
+
+
+                                                {{--                                                                            <div>--}}
+
+                                                {{--                                                                                <!-- <div class="email-child-wrapper">--}}
+                                                {{--                                                                                <span class="activities-addition-links">View--}}
+                                                {{--                                                                                Thread (2)</span>--}}
+                                                {{--                                                                                </div> -->--}}
+
+                                                {{--                                                                                <div>--}}
+
+                                                {{--                                                                                    <div class="email-child-wrapper"--}}
+                                                {{--                                                                                         id="toggleButtonThread">--}}
+
+                                                {{--                                                                                        <span--}}
+                                                {{--                                                                                            class="activities-addition-links">View--}}
+                                                {{--                                                                                            Thread (2) </span>--}}
+                                                {{--                                                                                    </div>--}}
+
+
+                                                {{--                                                                                </div>--}}
+
+
+                                                {{--                                                                            </div>--}}
+
+                                                {{--                                                                            <button type="button"--}}
+                                                {{--                                                                                    class="dropdown-toggle custom-drop-btn-design"--}}
+                                                {{--                                                                                    id="dropdownMenuButtonthreadd"--}}
+                                                {{--                                                                                    data-bs-toggle="dropdown"--}}
+                                                {{--                                                                                    aria-expanded="false">--}}
+                                                {{--                                                                                3--}}
+                                                {{--                                                                                association--}}
+                                                {{--                                                                            </button>--}}
+                                                {{--                                                                            <ul class="dropdown-menu"--}}
+                                                {{--                                                                                aria-labelledby="dropdownMenuButtonthreadd">--}}
+                                                {{--                                                                                <div>--}}
+
+                                                {{--                                                                                    <div--}}
+                                                {{--                                                                                        class="dropdown-content-wraper">--}}
+                                                {{--                                                                                        <ul--}}
+                                                {{--                                                                                            class="nested-select-list">--}}
+                                                {{--                                                                                            <li--}}
+                                                {{--                                                                                                class="checkbox-item">--}}
+
+                                                {{--                                                                                                <label>Companies--}}
+                                                {{--                                                                                                    0</label>--}}
+                                                {{--                                                                                            </li>--}}
+                                                {{--                                                                                            <li--}}
+                                                {{--                                                                                                class="checkbox-item">--}}
+
+                                                {{--                                                                                                <label>Carts--}}
+                                                {{--                                                                                                    0</label>--}}
+                                                {{--                                                                                            </li>--}}
+                                                {{--                                                                                            <li--}}
+                                                {{--                                                                                                class="checkbox-item">--}}
+
+                                                {{--                                                                                                <label>Contacts--}}
+                                                {{--                                                                                                    0</label>--}}
+                                                {{--                                                                                            </li>--}}
+                                                {{--                                                                                            <li--}}
+                                                {{--                                                                                                class="checkbox-item">--}}
+
+                                                {{--                                                                                                <label>Leads--}}
+                                                {{--                                                                                                    0</label>--}}
+                                                {{--                                                                                            </li>--}}
+                                                {{--                                                                                            <li--}}
+                                                {{--                                                                                                class="checkbox-item">--}}
+
+                                                {{--                                                                                                <label>Deals--}}
+                                                {{--                                                                                                    0</label>--}}
+                                                {{--                                                                                            </li>--}}
+                                                {{--                                                                                            <li--}}
+                                                {{--                                                                                                class="checkbox-item">--}}
+
+                                                {{--                                                                                                <label>Orders--}}
+                                                {{--                                                                                                    0</label>--}}
+                                                {{--                                                                                            </li>--}}
+                                                {{--                                                                                            <!-- Add more items as needed -->--}}
+                                                {{--                                                                                        </ul>--}}
+                                                {{--                                                                                        <div>--}}
+                                                {{--                                                                                            <div--}}
+                                                {{--                                                                                                class="search-box-select">--}}
+                                                {{--                                                                                                <input--}}
+                                                {{--                                                                                                    type="text"--}}
+                                                {{--                                                                                                    placeholder="Search current associations"--}}
+                                                {{--                                                                                                    class="search-input">--}}
+                                                {{--                                                                                            </div>--}}
+                                                {{--                                                                                            <div--}}
+                                                {{--                                                                                                class="select-contact-box-space">--}}
+                                                {{--                                                                                                <p--}}
+                                                {{--                                                                                                    class="select-contact">--}}
+                                                {{--                                                                                                    Contacts--}}
+                                                {{--                                                                                                </p>--}}
+
+                                                {{--                                                                                                <input--}}
+                                                {{--                                                                                                    type="checkbox"--}}
+                                                {{--                                                                                                    id="contact2">--}}
+                                                {{--                                                                                                <label--}}
+                                                {{--                                                                                                    for="contact2">HoeoSQMLp--}}
+                                                {{--                                                                                                    becelhmerthewatt@yahoo.com</label>--}}
+                                                {{--                                                                                            </div>--}}
+                                                {{--                                                                                        </div>--}}
+
+                                                {{--                                                                                    </div>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </ul>--}}
+
+
+                                                {{--                                                                        </div>--}}
+
+
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                </div>--}}
+
+
+                                                {{--                                                            </div>--}}
+
+                                                {{--                                                            <div id="thread" class="hidden">--}}
+                                                {{--                                                                <div class="email-box-container"--}}
+                                                {{--                                                                     style="margin: 0; border-radius: 0;">--}}
+
+
+                                                {{--                                                                    <div>--}}
+                                                {{--                                                                        <div class="new-profile-parent-wrapper">--}}
+                                                {{--                                                                            <div class="new-profile-email-wrapper">--}}
+                                                {{--                                                                                <div class="user_profile_img">--}}
+                                                {{--                                                                                    <div class="avatarr">MS--}}
+                                                {{--                                                                                    </div>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div class="user_profile_text">--}}
+                                                {{--                                                                                    <h2--}}
+                                                {{--                                                                                        style="padding: 0; margin: 0;">--}}
+                                                {{--                                                                                        Devod--}}
+                                                {{--                                                                                        Word </h2>--}}
+
+                                                {{--                                                                                    <p--}}
+                                                {{--                                                                                        style="font-weight: 500; padding-left: 0;">--}}
+                                                {{--                                                                                        to--}}
+                                                {{--                                                                                        info@opexwebdesign.com,--}}
+                                                {{--                                                                                        bett@hudsoninfo.com--}}
+                                                {{--                                                                                    </p>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </div>--}}
+
+
+                                                {{--                                                                            <div>--}}
+                                                {{--                                                                                <div--}}
+                                                {{--                                                                                    class="new-profile-email-thread-wrapper">--}}
+
+                                                {{--                                                                                    <div--}}
+                                                {{--                                                                                        class="activities-seprater ">--}}
+                                                {{--                                                                                        Reply all--}}
+                                                {{--                                                                                    </div>--}}
+                                                {{--                                                                                    <div--}}
+                                                {{--                                                                                        class="activities-seprater ">--}}
+                                                {{--                                                                                        Reply--}}
+                                                {{--                                                                                    </div>--}}
+
+                                                {{--                                                                                    <div--}}
+                                                {{--                                                                                        class="activities-seprater open-form-btn">--}}
+                                                {{--                                                                                        Forward--}}
+                                                {{--                                                                                    </div>--}}
+                                                {{--                                                                                    <div--}}
+                                                {{--                                                                                        class="activities-seprater open-form-btn">--}}
+                                                {{--                                                                                        Delete--}}
+                                                {{--                                                                                    </div>--}}
+
+
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div>--}}
+                                                {{--                                                                                    <p>12/03/2024 4:48 PM GMT+5--}}
+                                                {{--                                                                                    </p>--}}
+                                                {{--                                                                                </div>--}}
+
+                                                {{--                                                                            </div>--}}
+
+
+                                                {{--                                                                        </div>--}}
+
+
+                                                {{--                                                                    </div>--}}
+                                                {{--                                                                    <div class="user_cont user-email-template">--}}
+                                                {{--                                                                        <p>--}}
+                                                {{--                                                                            Hi Apex Web Team, <br>--}}
+
+                                                {{--                                                                        <p class="email-body-text">--}}
+                                                {{--                                                                            I hope you're doing well. I--}}
+                                                {{--                                                                            specialize--}}
+                                                {{--                                                                            in--}}
+                                                {{--                                                                            online--}}
+                                                {{--                                                                            reputation management and can help--}}
+                                                {{--                                                                            boost--}}
+                                                {{--                                                                            your--}}
+                                                {{--                                                                            business's presence by generating--}}
+                                                {{--                                                                            positive--}}
+                                                {{--                                                                            reviews--}}
+                                                {{--                                                                            and addressing any negative--}}
+                                                {{--                                                                            feedback.--}}
+
+                                                {{--                                                                        </p>--}}
+                                                {{--                                                                        <div class="moretext">--}}
+                                                {{--                                                                            <p class="email-body-text">--}}
+                                                {{--                                                                                I hope you're doing well. I--}}
+                                                {{--                                                                                specialize--}}
+                                                {{--                                                                                in online--}}
+                                                {{--                                                                                reputation management and can--}}
+                                                {{--                                                                                help--}}
+                                                {{--                                                                                boost--}}
+                                                {{--                                                                                your--}}
+                                                {{--                                                                                business's presence by--}}
+                                                {{--                                                                                generating--}}
+                                                {{--                                                                                positive reviews--}}
+                                                {{--                                                                                and addressing any negative--}}
+                                                {{--                                                                                feedback. I--}}
+                                                {{--                                                                                specialize--}}
+                                                {{--                                                                                in online--}}
+                                                {{--                                                                                reputation management and can--}}
+                                                {{--                                                                                help--}}
+                                                {{--                                                                                boost--}}
+                                                {{--                                                                                your--}}
+                                                {{--                                                                                business.--}}
+
+                                                {{--                                                                            </p>--}}
+                                                {{--                                                                            <p class="email-body-text">--}}
+                                                {{--                                                                                I hope you're doing well. I--}}
+                                                {{--                                                                                specialize--}}
+                                                {{--                                                                                in online--}}
+                                                {{--                                                                                reputation management and can--}}
+                                                {{--                                                                                help--}}
+                                                {{--                                                                                boost--}}
+                                                {{--                                                                                your--}}
+                                                {{--                                                                                business's presence by--}}
+                                                {{--                                                                                generating--}}
+                                                {{--                                                                                positive reviews--}}
+                                                {{--                                                                                and addressing any negative--}}
+                                                {{--                                                                                feedback. I--}}
+                                                {{--                                                                                specialize--}}
+                                                {{--                                                                                in online--}}
+                                                {{--                                                                                reputation management and can--}}
+                                                {{--                                                                                help--}}
+                                                {{--                                                                                boost--}}
+                                                {{--                                                                                your--}}
+                                                {{--                                                                                business.--}}
+
+                                                {{--                                                                            </p>--}}
+                                                {{--                                                                            <br>--}}
+                                                {{--                                                                            <p>--</p>--}}
+
+                                                {{--                                                                            <p class="email-body-text">--}}
+                                                {{--                                                                                    <span style="font-weight: 600;">--}}
+                                                {{--                                                                                        Lorem--}}
+                                                {{--                                                                                        Ipsum |--}}
+                                                {{--                                                                                        Promotion/Marketing Manager--}}
+                                                {{--                                                                                    </span><br>--}}
+                                                {{--                                                                                Street Hospitality <br>--}}
+                                                {{--                                                                                <span class="activities-seprater">--}}
+                                                {{--                                                                                        +1-97-676552--}}
+                                                {{--                                                                                    </span> <br>--}}
+                                                {{--                                                                                <a href="#"--}}
+                                                {{--                                                                                   class="email-client-site-link">--}}
+                                                {{--                                                                                    Visit our website!</a>--}}
+                                                {{--                                                                            </p>--}}
+
+                                                {{--                                                                            <img--}}
+                                                {{--                                                                                src="{{asset ('assets/images/logo-img.png')}}"--}}
+                                                {{--                                                                                class="img-fluid client-email-logo">--}}
+
+                                                {{--                                                                            <br>--}}
+                                                {{--                                                                            <br>--}}
+                                                {{--                                                                        </div>--}}
+
+
+                                                {{--                                                                        <div class="doc-attachment-container">--}}
+                                                {{--                                                                            <a href="path/to/your/file.pdf"--}}
+                                                {{--                                                                               class="doc-attachment">--}}
+                                                {{--                                                                                <div class="icon-doc">--}}
+                                                {{--                                                                                    📎--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                                <div class="file-info-doc">--}}
+                                                {{--                                                                                    <p class="file-name-doc">--}}
+                                                {{--                                                                                        Document.pdf--}}
+                                                {{--                                                                                    </p>--}}
+                                                {{--                                                                                    <p class="file-size-doc">2--}}
+                                                {{--                                                                                        MB--}}
+                                                {{--                                                                                    </p>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </a>--}}
+                                                {{--                                                                        </div>--}}
+
+                                                {{--                                                                        <div class="comment-head-thread-wrapper">--}}
+
+
+                                                {{--                                                                            <div>--}}
+
+                                                {{--                                                                                <div class="email-child-wrapper">--}}
+                                                {{--                                                                                    <!-- <a--}}
+                                                {{--                                                                                class="moreless-button activities-addition-links">--}}
+                                                {{--                                                                                Read more</a> -->--}}
+                                                {{--                                                                                    <a--}}
+                                                {{--                                                                                        class="moreless-button activities-addition-links">See--}}
+                                                {{--                                                                                        more</a>--}}
+                                                {{--                                                                                </div>--}}
+
+
+                                                {{--                                                                            </div>--}}
+
+
+                                                {{--                                                                            <div>--}}
+
+                                                {{--                                                                                <div--}}
+                                                {{--                                                                                    class="thread-dropdown-display">--}}
+                                                {{--                                                                                    <button type="button"--}}
+                                                {{--                                                                                            class="dropdown-toggle custom-drop-btn-design"--}}
+                                                {{--                                                                                            id="dropdownMenuButtonthread"--}}
+                                                {{--                                                                                            data-bs-toggle="dropdown"--}}
+                                                {{--                                                                                            aria-expanded="false">--}}
+                                                {{--                                                                                        3--}}
+                                                {{--                                                                                        association--}}
+                                                {{--                                                                                    </button>--}}
+                                                {{--                                                                                    <ul class="dropdown-menu"--}}
+                                                {{--                                                                                        aria-labelledby="dropdownMenuButtonthread">--}}
+                                                {{--                                                                                        <div>--}}
+
+                                                {{--                                                                                            <div--}}
+                                                {{--                                                                                                class="dropdown-content-wraper">--}}
+                                                {{--                                                                                                <ul--}}
+                                                {{--                                                                                                    class="nested-select-list">--}}
+                                                {{--                                                                                                    <li--}}
+                                                {{--                                                                                                        class="checkbox-item">--}}
+
+                                                {{--                                                                                                        <label>Companies--}}
+                                                {{--                                                                                                            0</label>--}}
+                                                {{--                                                                                                    </li>--}}
+                                                {{--                                                                                                    <li--}}
+                                                {{--                                                                                                        class="checkbox-item">--}}
+
+                                                {{--                                                                                                        <label>Carts--}}
+                                                {{--                                                                                                            0</label>--}}
+                                                {{--                                                                                                    </li>--}}
+                                                {{--                                                                                                    <li--}}
+                                                {{--                                                                                                        class="checkbox-item">--}}
+
+                                                {{--                                                                                                        <label>Contacts--}}
+                                                {{--                                                                                                            0</label>--}}
+                                                {{--                                                                                                    </li>--}}
+                                                {{--                                                                                                    <li--}}
+                                                {{--                                                                                                        class="checkbox-item">--}}
+
+                                                {{--                                                                                                        <label>Leads--}}
+                                                {{--                                                                                                            0</label>--}}
+                                                {{--                                                                                                    </li>--}}
+                                                {{--                                                                                                    <li--}}
+                                                {{--                                                                                                        class="checkbox-item">--}}
+
+                                                {{--                                                                                                        <label>Deals--}}
+                                                {{--                                                                                                            0</label>--}}
+                                                {{--                                                                                                    </li>--}}
+                                                {{--                                                                                                    <li--}}
+                                                {{--                                                                                                        class="checkbox-item">--}}
+
+                                                {{--                                                                                                        <label>Orders--}}
+                                                {{--                                                                                                            0</label>--}}
+                                                {{--                                                                                                    </li>--}}
+                                                {{--                                                                                                    <!-- Add more items as needed -->--}}
+                                                {{--                                                                                                </ul>--}}
+                                                {{--                                                                                                <div>--}}
+                                                {{--                                                                                                    <div--}}
+                                                {{--                                                                                                        class="search-box-select">--}}
+                                                {{--                                                                                                        <input--}}
+                                                {{--                                                                                                            type="text"--}}
+                                                {{--                                                                                                            placeholder="Search current associations"--}}
+                                                {{--                                                                                                            class="search-input">--}}
+                                                {{--                                                                                                    </div>--}}
+                                                {{--                                                                                                    <div--}}
+                                                {{--                                                                                                        class="select-contact-box-space">--}}
+                                                {{--                                                                                                        <p--}}
+                                                {{--                                                                                                            class="select-contact">--}}
+                                                {{--                                                                                                            Contacts--}}
+                                                {{--                                                                                                        </p>--}}
+
+                                                {{--                                                                                                        <input--}}
+                                                {{--                                                                                                            type="checkbox"--}}
+                                                {{--                                                                                                            id="contact2">--}}
+                                                {{--                                                                                                        <label--}}
+                                                {{--                                                                                                            for="contact2">HoeoSQMLp--}}
+                                                {{--                                                                                                            becelhmerthewatt@yahoo.com</label>--}}
+                                                {{--                                                                                                    </div>--}}
+                                                {{--                                                                                                </div>--}}
+
+                                                {{--                                                                                            </div>--}}
+                                                {{--                                                                                        </div>--}}
+                                                {{--                                                                                    </ul>--}}
+                                                {{--                                                                                </div>--}}
+                                                {{--                                                                            </div>--}}
+
+
+                                                {{--                                                                        </div>--}}
+
+
+                                                {{--                                                                    </div>--}}
+
+                                                {{--                                                                </div>--}}
+                                                {{--                                                                <div class="collapse-all-content-container">--}}
+                                                {{--                                                                    <button class="all-collapse-thread-emails-btn">--}}
+                                                {{--                                                                        <i class="fa fa-caret-down"--}}
+                                                {{--                                                                           style="padding-right: 5px;"--}}
+                                                {{--                                                                           aria-hidden="true"></i>--}}
+                                                {{--                                                                        <span style="text-decoration: underline;">--}}
+                                                {{--                                                                                Collapse threads--}}
+                                                {{--                                                                            </span></button>--}}
+                                                {{--                                                                </div>--}}
+                                                {{--                                                            </div>--}}
+                                                {{--                                                        </div>--}}
+
+                                                {{--                                                    </div>--}}
+                                                {{--                                                </div>--}}
+
+                                                {{--                                                <div class="tab-pane fade" id="call" role="tabpanel"--}}
+                                                {{--                                                     aria-labelledby="call-tab">--}}
+                                                {{--                                                    <div class="email-threading-row">--}}
+
+                                                {{--                                                        <button class="threading-email-btn-two">--}}
+                                                {{--                                                            Make a call--}}
+                                                {{--                                                        </button>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                    <div class="data-highlights">--}}
+                                                {{--                                                        <div class="data-top-heading-header">--}}
+                                                {{--                                                            <h2>Life Cycle</h2>--}}
+                                                {{--                                                            <p>This contact was created </p>--}}
+                                                {{--                                                        </div>--}}
+                                                {{--                                                        <p class="user_cont"> No associated objects of this--}}
+                                                {{--                                                            type--}}
+                                                {{--                                                            exist or you don't have permission to view them.--}}
+                                                {{--                                                            <span class="activities-seprater"> View detail <i--}}
+                                                {{--                                                                    class="fa fa-external-link"--}}
+                                                {{--                                                                    aria-hidden="true"></i>--}}
+                                                {{--                                                                </span>--}}
+                                                {{--                                                        </p>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                </div>--}}
+
+                                                {{--                                                <div class="tab-pane fade" id="task" role="tabpanel"--}}
+                                                {{--                                                     aria-labelledby="task-tab">--}}
+                                                {{--                                                    <div class="email-threading-row">--}}
+
+                                                {{--                                                        <button class="threading-email-btn-two">--}}
+                                                {{--                                                            Create a Task--}}
+                                                {{--                                                        </button>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                    <div class="data-highlights">--}}
+                                                {{--                                                        <div class="data-top-heading-header">--}}
+                                                {{--                                                            <h2>Life Cycle</h2>--}}
+                                                {{--                                                            <p>This contact was created </p>--}}
+                                                {{--                                                        </div>--}}
+                                                {{--                                                        <p class="user_cont"> No associated objects of this--}}
+                                                {{--                                                            type--}}
+                                                {{--                                                            exist or you don't have permission to view them.--}}
+                                                {{--                                                            <span class="activities-seprater"> View detail <i--}}
+                                                {{--                                                                    class="fa fa-external-link"--}}
+                                                {{--                                                                    aria-hidden="true"></i>--}}
+                                                {{--                                                                </span>--}}
+                                                {{--                                                        </p>--}}
+                                                {{--                                                    </div>--}}
+
+                                                {{--                                                </div>--}}
+
+                                                {{--                                                <div class="tab-pane fade" id="meeting" role="tabpanel"--}}
+                                                {{--                                                     aria-labelledby="meeting-tab">--}}
+                                                {{--                                                    <div class="email-threading-row">--}}
+
+                                                {{--                                                        <button class="threading-email-btn-two">--}}
+                                                {{--                                                            Call a Meeting--}}
+                                                {{--                                                        </button>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                    <div class="data-highlights">--}}
+                                                {{--                                                        <div class="data-top-heading-header">--}}
+                                                {{--                                                            <h2>Life Cycle</h2>--}}
+                                                {{--                                                            <p>This contact was created </p>--}}
+                                                {{--                                                        </div>--}}
+                                                {{--                                                        <p class="user_cont"> No associated objects of this--}}
+                                                {{--                                                            type--}}
+                                                {{--                                                            exist or you don't have permission to view them.--}}
+                                                {{--                                                            <span class="activities-seprater"> View detail <i--}}
+                                                {{--                                                                    class="fa fa-external-link"--}}
+                                                {{--                                                                    aria-hidden="true"></i>--}}
+                                                {{--                                                                </span>--}}
+                                                {{--                                                        </p>--}}
+                                                {{--                                                    </div>--}}
+
+                                                {{--                                                </div>--}}
                                             </div>
                                         </div>
 
@@ -2821,7 +2913,7 @@
                             <div class="main">
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 ps-0">
 
                             <div class="right-sidebarr">
                                 <div class="collaborators ">
@@ -2841,18 +2933,31 @@
 
                                         </div>
 
-                                        <div class="right_collab open-form-btn">
-                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true">
-                                            </i>
-                                            <span>Add</span>
-                                        </div>
+                                        {{--                                        <div class="right_collab open-form-btn">--}}
+                                        {{--                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true">--}}
+                                        {{--                                            </i>--}}
+                                        {{--                                            <span>Add</span>--}}
+                                        {{--                                        </div>--}}
 
                                     </div>
                                     <div class="collapse" id="collapseExample">
                                         <div class="card custom-collapse-cards card-body">
-                                            <p class="contact-card-subscription-para">
-                                                {{($customer_contact->company)->domain ?? "---"}}
-                                            </p>
+                                            <div class="col-md-12">
+                                                <div class="company_sec">
+                                                    <span>Name : {{($customer_contact->company)->name ?? "---"}}</span>
+                                                    {{--                                                   <span>Domain : {{($customer_contact->company)->domain ?? "---"}}</span>--}}
+                                                    <span> Domain :
+                                                        @if(!empty(($customer_contact->company)->domain))
+                                                            <a href="https://{{ ($customer_contact->company)->domain }}" target="_blank">
+                                                                {{ ($customer_contact->company)->domain }}
+            </a>
+                                                        @else
+                                                            ---
+                                                        @endif
+    </span>
+                                                    <span>Phone No : {{($customer_contact->company)->phone ?? "---"}}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -2874,10 +2979,10 @@
                                             </div>
 
                                         </div>
-                                        <div class="right_collab open-form-btn">
-                                            <i class="fa fa-plus create-contact " aria-hidden="true"> </i>
-                                            <span>Add</span>
-                                        </div>
+                                        {{--                                        <div class="right_collab open-form-btn">--}}
+                                        {{--                                            <i class="fa fa-plus create-contact " aria-hidden="true"> </i>--}}
+                                        {{--                                            <span>Add</span>--}}
+                                        {{--                                        </div>--}}
                                     </div>
 
                                     <div class="collapse " id="collapseExamplepayment">
@@ -2916,24 +3021,43 @@
                                                 @foreach($customer_contact->payments as $payment)
 
                                                     <div class=" invoice_sec">
-                                                        <span
-                                                            class="invoice_num">{{ ($payment->invoice)->invoice_number ?? "---" }}</span>
-                                                        <span>Status :
-                                                      @if($payment->status == 0)
-                                                                <span>Due</span>
+                                                        <span class="invoice_num">{{ ($payment->invoice)->invoice_number ?? "---" }}
+
+                                                            {{--                                                      @if($payment->status == 0)--}}
+                                                            {{--                                                                <span>Due</span>--}}
+                                                            {{--                                                            @elseif($payment->status == 1)--}}
+                                                            {{--                                                                <span>Paid</span>--}}
+                                                            {{--                                                            @elseif($payment->status == 2)--}}
+                                                            {{--                                                                <span>Refund</span>--}}
+                                                            {{--                                                            @elseif($payment->status == 3)--}}
+                                                            {{--                                                                <span>Charge Back</span>--}}
+                                                            {{--                                                            @else--}}
+                                                            {{--                                                                <span>Unknown</span>--}}
+                                                            {{--                                                            @endif--}}
+                                                            @if($payment->status == 0)
+                                                                <span
+                                                                    class="badge bg-warning text-dark cstm_bdge">Due</span>
                                                             @elseif($payment->status == 1)
-                                                                <span>Paid</span>
+                                                                <span class="badge bg-success cstm_bdge">Paid</span>
                                                             @elseif($payment->status == 2)
-                                                                <span>Refund</span>
+                                                                <span class="badge bg-danger cstm_bdge">Refund</span>
                                                             @elseif($payment->status == 3)
-                                                                <span>Charge Back</span>
-                                                            @else
-                                                                <span>Unknown</span>
+                                                                <span
+                                                                    class="badge bg-primary cstm_bdge">Charge Back</span>
                                                             @endif
-                                                    </span>
-                                                        <span>Total Amount : {{ $payment->amount ?? "---" }}</span>
-                                                        <span>Due Date : {{ $payment->payment_date ?? "---" }}</span>
-                                                        <span>Create Date : {{ $payment->created_at ?? "---" }}</span>
+                                                        </span>
+                                                        <span>TXIDs : {{ $payment->transaction_id ?? "---" }}</span>
+                                                        <span>Brand : {{ $payment->brand->name }}</span>
+                                                        <span>Method : {{ $payment->payment_method ?? "---" }}</span>
+                                                        <span>Amount : {{ $payment->amount }}$
+
+                                                        </span>
+                                                        <span data-toggle="tooltip" title="Due Date">
+                                                                 Due: {{ ($payment->payment_date)->format('d M Y') ?? "---" }}
+                                                        </span>
+
+                                                        <span data-toggle="tooltip"
+                                                              title="Create Date">Date : {{ ($payment->created_at)->format('d M Y') ?? "---" }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -2957,10 +3081,10 @@
                                             </div>
 
                                         </div>
-                                        <div class="right_collab open-form-btn">
-                                            <i class="fa fa-plus create-contact " aria-hidden="true"> </i>
-                                            <span>Add</span>
-                                        </div>
+                                        {{--                                        <div class="right_collab open-form-btn">--}}
+                                        {{--                                            <i class="fa fa-plus create-contact " aria-hidden="true"> </i>--}}
+                                        {{--                                            <span>Add</span>--}}
+                                        {{--                                        </div>--}}
                                     </div>
 
                                     <div class="collapse" id="collapseExampleinvoice">
@@ -2969,24 +3093,32 @@
                                                 @foreach($customer_contact->invoices as $invoice)
 
                                                     <div class=" invoice_sec">
-                                                        <span
-                                                            class="invoice_num">{{ $invoice->invoice_number ?? "---" }}</span>
-                                                        <span>Status :
-                                                      @if($invoice->status == 0)
-                                                                <span>Due</span>
+                                                        <span class="invoice_num">{{ $invoice->invoice_number ?? "---" }}
+
+
+                                                            @if($invoice->status == 0)
+                                                                <span class="badge bg-warning cstm_bdge">Due</span>
                                                             @elseif($invoice->status == 1)
-                                                                <span>Paid</span>
+                                                                <span class="badge bg-success cstm_bdge">Paid</span>
                                                             @elseif($invoice->status == 2)
-                                                                <span>Refund</span>
+                                                                <span class="badge bg-danger cstm_bdge">Refund</span>
                                                             @elseif($invoice->status == 3)
-                                                                <span>Charge Back</span>
-                                                            @else
-                                                                <span>Unknown</span>
+                                                                <span
+                                                                    class="badge bg-primary cstm_bdge">Charge Back</span>
                                                             @endif
-                                                    </span>
-                                                        <span>Total Amount : {{ $invoice->amount ?? "---" }}</span>
-                                                        <span>Due Date : {{ $invoice->due_date ?? "---" }}</span>
-                                                        <span>Create Date : {{ $invoice->created_at ?? "---" }}</span>
+                                                        </span>
+                                                        <span>Brand :{{$invoice->brand->name}} </span>
+                                                        <span>
+                                                            Amount : {{ $invoice->total_amount}}$
+                                                            @if($invoice->taxable == 1)
+                                                                (Incl. Tax {{$invoice->tax_value}}%)
+                                                            @endif
+
+                                                            </span>
+                                                        <span data-toggle="tooltip"
+                                                              title="Due Date">Due : {{ ($invoice->due_date) ?? "---" }}</span>
+                                                        <span data-toggle="tooltip"
+                                                              title="Create Date">Date : {{ ($invoice->created_at)->format('d M Y') ?? "---" }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -3011,37 +3143,37 @@
                                     <div class="collpase-divider mt-2 mb-2"></div>
 
 
-                                    <div class="right_collaboratrs-box">
-                                        <div class="collapse-header-prent-box">
-                                            <div class="collapse-header-box">
+                                    {{--                                    <div class="right_collaboratrs-box">--}}
+                                    {{--                                        <div class="collapse-header-prent-box">--}}
+                                    {{--                                            <div class="collapse-header-box">--}}
 
-                                                <button class="btn custom-btn-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"
-                                                        aria-expanded="true" aria-controls="collapseExampleatt">
-                                                    <i class="fa fa-caret-down" style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
-                                                    Attachments
-                                                </button>
-                                            </div>
+                                    {{--                                                <button class="btn custom-btn-collapse" type="button"--}}
+                                    {{--                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"--}}
+                                    {{--                                                        aria-expanded="true" aria-controls="collapseExampleatt">--}}
+                                    {{--                                                    <i class="fa fa-caret-down" style="padding-right: 5px;"--}}
+                                    {{--                                                       aria-hidden="true"></i>--}}
+                                    {{--                                                    Attachments--}}
+                                    {{--                                                </button>--}}
+                                    {{--                                            </div>--}}
 
-                                        </div>
+                                    {{--                                        </div>--}}
 
-                                        <div class="right_collab open-form-btn">
-                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true">
-                                            </i>
-                                            <span>Add</span>
-                                        </div>
+                                    {{--                                        <div class="right_collab open-form-btn">--}}
+                                    {{--                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true">--}}
+                                    {{--                                            </i>--}}
+                                    {{--                                            <span>Add</span>--}}
+                                    {{--                                        </div>--}}
 
-                                    </div>
-                                    <div class="collapse " id="collapseExampleatt">
-                                        <div class="card custom-collapse-cards card-body">
-                                            <p class="contact-card-subscription-para">
-                                                See the businesses or organizations associated with this record.
-                                            </p>
-                                        </div>
-                                    </div>
+                                    {{--                                    </div>--}}
+                                    {{--                                    <div class="collapse " id="collapseExampleatt">--}}
+                                    {{--                                        <div class="card custom-collapse-cards card-body">--}}
+                                    {{--                                            <p class="contact-card-subscription-para">--}}
+                                    {{--                                                See the businesses or organizations associated with this record.--}}
+                                    {{--                                            </p>--}}
+                                    {{--                                        </div>--}}
+                                    {{--                                    </div>--}}
 
-                                    <div class="collpase-divider mt-2 mb-2"></div>
+                                    {{--                                    <div class="collpase-divider mt-2 mb-2"></div>--}}
 
                                 </div>
                             </div>

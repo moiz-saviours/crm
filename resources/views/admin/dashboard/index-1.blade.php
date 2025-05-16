@@ -77,6 +77,12 @@
                 cursor: text;
                 pointer-events: none;
             }
+            .cstm_bdge {
+                padding: 5px 10px;
+                font-weight: 400;
+                font-size: 0.7rem !important;
+                border-radius: 3px;
+            }
         </style>
     @endpush
     <section id="content" class="content">
@@ -331,7 +337,7 @@
                                     <td class="tabl_td align-middle text-center text-nowrap">{{ ucfirst(optional($payment->brand)->name) }}</td>
                                     <td class="tabl_td align-middle text-center text-nowrap">{{ ucfirst(optional($payment->team)->name) }}</td>
                                     <td class="tabl_td align-middle text-center text-nowrap">{{ $payment->amount }} {{optional($payment->invoice)->currency}}</td>
-                                    <td class="tabl_td align-middle text-center text-nowrap">Paid</td>
+                                    <td class="tabl_td align-middle text-center text-nowrap"><span class="badge bg-success cstm_bdge">Paid</span></td>
                                 </tr>
                             @endforeach
                             </tbody>
