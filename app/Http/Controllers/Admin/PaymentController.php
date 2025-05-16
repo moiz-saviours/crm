@@ -27,7 +27,7 @@ class PaymentController extends Controller
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $agents = User::where('status', 1)->orderBy('name')->get();
 //        $all_payments = Payment::where('status', 1)->get();
-        $payments = Payment::with(['brand', 'team', 'agent'])->get();
+        $payments = Payment::with(['brand', 'team', 'agent'])->orderBy('payment_date')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $client_contacts = ClientContact::select('id', 'special_key', 'name')
             ->with([
