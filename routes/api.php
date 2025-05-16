@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\ApiAuthorizePaymentController;
-use App\Http\Controllers\Api\ApiSecurePaymentController;
-use App\Http\Controllers\Api\ApiStripePaymentController;
+use App\Http\Controllers\Api\{
+    ApiAuthorizePaymentController,
+    ApiPaypalPaymentController,
+    ApiSecurePaymentController,
+    ApiStripePaymentController
+};
 use App\Http\Controllers\ApiInvoiceController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -36,6 +39,9 @@ Route::post('login', function (Request $request) {
 Route::post('process-payment', [ApiAuthorizePaymentController::class, 'processPayment'])->name('api.authorize.process-payment');
 Route::post('secure-process-payment', [ApiSecurePaymentController::class, 'processPayment'])->name('api.secure.process-payment');
 Route::post('stripe-process-payment', [ApiStripePaymentController::class, 'processPayment'])->name('api.stripe.process-payment');
+Route::post('paypal-create-order', [ApiPaypalPaymentController::class, 'createOrder'])->name('api.paypal.create-order');
+Route::post('paypal-capture-order', [ApiPaypalPaymentController::class, 'captureOrder'])->name('api.paypal.capture-order');
+Route::post('paypal-cancel-order', [ApiPaypalPaymentController::class, 'cancelOrder'])->name('api.paypal.cancel-order');
 //});
 Route::get('fetch-invoice/{invoice?}', [ApiInvoiceController::class, 'fetch_invoice'])->missing(function (Request $request) {
     return response()->json(['error' => 'Invalid url.'], 404);
