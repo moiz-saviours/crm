@@ -1043,7 +1043,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     aria-labelledby="v-pills-paypal-tab">
                                     <div class="sec-btn">
                                         <div id="paypal-button-container"></div>
-                                        <form id="paymentForm-stripe" class="paypalPaymentForm">
+                                        <form id="paymentForm-paypal" class="paypalPaymentForm">
                                         </form>
                                     </div>
                                 </div>
