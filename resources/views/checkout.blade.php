@@ -549,16 +549,15 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         aria-selected="false">{{$first_merchant == "edp" ? "Credit Card" : 'EDP'}}
                                     </button>
                                 @endif
-
-                                {{--                                @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']))--}}
-                                <button
-                                    class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
-                                    id="v-pills-paypal-tab" data-toggle="pill"
-                                    data-target="#v-pills-paypal" type="button" role="tab"
-                                    aria-controls="v-pills-paypal"
-                                    aria-selected="true">Paypal
-                                </button>
-                                {{--                                @endif--}}
+                                @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['paypal']) && !empty($invoiceDetails['invoice']['payment_method_keys']['paypal']))
+                                    <button
+                                        class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
+                                        id="v-pills-paypal-tab" data-toggle="pill"
+                                        data-target="#v-pills-paypal" type="button" role="tab"
+                                        aria-controls="v-pills-paypal"
+                                        aria-selected="true">Paypal
+                                    </button>
+                                @endif
                                 @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "stripe" ? 'active' : ""}}"
