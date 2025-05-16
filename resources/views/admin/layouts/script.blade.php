@@ -903,6 +903,16 @@
                 targetTable.DataTable().columns.adjust().draw();
             }
         });
+        $(".searchbox__btn").on('click', function () {
+            const searchTerm = $("#header-search-input").val().trim();
+            if (searchTerm) {
+                const currentUrl = window.location.origin + window.location.pathname;
+                window.location.href = `${currentUrl}?search=${searchTerm}`;
+                // window.location.href = `${currentUrl}?search=${encodeURIComponent(searchTerm)}`;
+            } else {
+                window.location.href = window.location.origin + window.location.pathname;
+            }
+        });
 
         const params = new URLSearchParams(window.location.search);
         function onAllDataTablesReady(callback) {
@@ -931,24 +941,29 @@
                 }
             });
         }
-        onAllDataTablesReady(function () {
-            const searchId = params.get('ref');
-            const searchTerm = params.get('search');
 
-            if (searchId) {
-                $('.editBtn').each(function () {
-                    if ($(this).data('id') == searchId) {
-                        $(this).click();
-                    }
-                });
-            }
-            if (searchTerm) {
-                $($.fn.dataTable.tables({visible: true})).each(function () {
-                    const dt = $(this).DataTable();
-                    dt.search(searchTerm).draw();
-                });
-            }
-        });
+        setTimeout(function () {
+            onAllDataTablesReady(function () {
+                const searchId = params.get('ref');
+                const searchTerm = params.get('search');
+
+                if (searchId) {
+                    $('.editBtn').each(function () {
+                        if ($(this).data('id') == searchId) {
+                            $(this).click();
+                        }
+                    });
+                }
+                if (searchTerm) {
+                    $($.fn.dataTable.tables({visible: true})).each(function () {
+                        const dt = $(this).DataTable();
+                        dt.search(searchTerm).draw();
+                    });
+                }
+            });
+        }, 100);
     });
-    !function(){document.currentScript?.remove()}();
+    !function () {
+        document.currentScript?.remove()
+    }();
 </script>
