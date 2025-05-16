@@ -307,19 +307,37 @@ class DashboardController extends Controller
                         ->where('team_key', $team->team_key)
                         ->sum('total_amount');
                     $total_target_achieved += $team_achieved;
-                    $team_target = TeamTarget::where('team_key', $team->team_key)
-                        ->where('month', $rangeval['month'])->where('year', $rangeval['year'])
-                        ->first();
-                    if ($team_target) {
-                        $total_target += $team_target->target_amount;
+//                    $team_target = TeamTarget::where('team_key', $team->team_key)
+//                        ->where('month', $rangeval['month'])->where('year', $rangeval['year'])
+//                        ->first();
+//                    if ($team_target) {
+//                        $total_target += $team_target->target_amount;
+//                    }
+
+
+//                    $team_targets[] = [
+//                        'team_key' => $team->team_key,
+//                        'team_name' => $team->name,
+//                        'target_amount' => (float)($team_target?->target_amount ?? 0),
+//                        'achieved' => (float)($team_achieved ?? 0),
+//                        'achieved_percentage' => ($team_target && $team_target->target_amount > 0)
+//                            ? round(($team_achieved / $team_target->target_amount) * 100, 2)
+//                            : 0,
+//                        'month' => $rangeval['month'],
+//                        'year' => $rangeval['year'],
+//                    ];
+                    $team_employee_targets = 0;
+                    foreach ($team->users as $employee) {
+                        $team_employee_targets += $employee->target;
                     }
+                    $total_target += $team_employee_targets;
                     $team_targets[] = [
                         'team_key' => $team->team_key,
                         'team_name' => $team->name,
-                        'target_amount' => (float)($team_target?->target_amount ?? 0),
-                        'achieved' => (float)($team_achieved ?? 0),
-                        'achieved_percentage' => ($team_target && $team_target->target_amount > 0)
-                            ? round(($team_achieved / $team_target->target_amount) * 100, 2)
+                        'target_amount' => (float) $team_employee_targets,
+                        'achieved' => (float) $team_achieved,
+                        'achieved_percentage' => ($team_employee_targets > 0)
+                            ? round(($team_achieved / $team_employee_targets) * 100, 2)
                             : 0,
                         'month' => $rangeval['month'],
                         'year' => $rangeval['year'],
