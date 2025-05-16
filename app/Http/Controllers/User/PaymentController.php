@@ -22,7 +22,7 @@ class PaymentController extends Controller
         } else {
             $query->whereNull('id');
         }
-        $all_payments = $query->get();
+        $all_payments = $query->orderBy('payment_date')->get();
         $my_payments = $all_payments->filter(function ($payment) {
             return $payment->agent_id === Auth::id();
         });
