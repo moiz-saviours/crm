@@ -1411,6 +1411,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                 function d() {
                     r.style.display = "none", n && clearInterval(n);
                 }
+                let paypalHandled = false;
 
                 paypal_sdk.Buttons({
                     style: {
@@ -1420,6 +1421,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                         label: 'paypal'
                     },
                     createOrder: function (data, actions) {
+                        paypalHandled = false;
                         r.style.display = "flex";
                         n = setInterval(i, 500);
 
@@ -1466,6 +1468,8 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                         });
                     },
                     onCancel: function (data) {
+                        if (paypalHandled) return;
+                        paypalHandled = true;
                         d();
                         $.post('{{ route("api.paypal.cancel-order") }}', {
                             _token: '{{ csrf_token() }}',
@@ -1476,6 +1480,8 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                         toastr.warning('Payment was cancelled', 'Payment Cancelled');
                     },
                     onError: function (err) {
+                        if (paypalHandled) return;
+                        paypalHandled = true;
                         d();
                         console.error("PayPal error:", err);
                         toastr.error('An error occurred with PayPal. Please try another payment method.', 'Payment Error');
