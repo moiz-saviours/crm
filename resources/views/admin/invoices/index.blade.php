@@ -102,23 +102,21 @@
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->brand))
-                                                        <a href="{{route('admin.brand.index')}}">{{ $invoice->brand->name }}</a>
-                                                        <br> {{ $invoice->brand->brand_key }}
+                                                        <a href="{{route('admin.brand.index')}}?search={{$invoice->brand->name}}">{{ $invoice->brand->name }}</a><br> {{ $invoice->brand->brand_key }}
                                                     @else
                                                         ---
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->team))
-                                                        <a href="{{route('admin.team.index')}}">{{ $invoice->team->name }}</a>
-                                                        <br> {{ $invoice->team->team_key }}
+                                                        <a href="{{route('admin.team.index')}}?search={{$invoice->team->name}}">{{ $invoice->team->name }}</a><br> {{ $invoice->team->team_key }}
                                                     @else
                                                         ---
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->customer_contact))
-                                                        <a href="{{route('admin.customer.contact.index')}}">{{ $invoice->customer_contact->name }}</a>
+                                                        <a href="{{route('admin.customer.contact.index')}}?search={{$invoice->customer_contact->name}}">{{ $invoice->customer_contact->name }}</a>
 {{--                                                        <a href="{{route('admin.customer.contact.edit',[$invoice->customer_contact->id])}}">{{ $invoice->customer_contact->name }}</a>--}}
                                                         {{--                                                        <br> {{ $invoice->customer_contact->special_key }}--}}
                                                     @else
@@ -127,7 +125,7 @@
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->agent_id , $invoice->agent_type ,$invoice->agent ))
-                                                        <a href="{{route('admin.employee.index')}}">{{ $invoice->agent->name }}</a>
+                                                        <a href="{{route('admin.employee.index')}}?search={{$invoice->agent->name}}">{{ $invoice->agent->name }}</a>
                                                     @else
                                                         ---
                                                     @endif
