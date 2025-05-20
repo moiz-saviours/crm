@@ -523,6 +523,21 @@
             //     icon: 'error',
             //     confirmButtonText: 'OK'
             // });
+            if (!document.querySelector('.toast')) {
+                Swal.fire({
+                    title: 'Unauthorized',
+                    text: 'Your session has expired or you are not authorized to perform this action. What would you like to do?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Reload',
+                    cancelButtonText: 'Cancel',
+                    allowOutsideClick: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            }
             console.log(jqXHR.responseJSON.error || jqXHR.responseJSON.message);
         } else if (jqXHR.status === 419) {
             Swal.fire({
