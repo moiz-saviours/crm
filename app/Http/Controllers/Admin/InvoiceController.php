@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\CustomerContact;
 use App\Models\Invoice;
 use App\Models\InvoiceMerchant;
+use App\Models\PaymentAttachment;
 use App\Models\PaymentMerchant;
 use App\Models\Team;
 use App\Models\User;
@@ -99,15 +100,12 @@ class InvoiceController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -146,7 +144,6 @@ class InvoiceController extends Controller
             'customer_contact_phone.required_if' => 'The customer contact phone number is required for fresh customers.',
             'customer_contact_phone.string' => 'The customer contact phone number must be a valid string.',
             'customer_contact_phone.max' => 'The customer contact phone number cannot exceed 15 characters.',
-
             'agent_id.required' => 'The agent field is required.',
             'agent_id.integer' => 'The agent must be a valid integer.',
 //            'agent_type.required' => 'The agent type field is required.',
@@ -240,11 +237,10 @@ class InvoiceController extends Controller
 //                $data['agent_type'] = get_class(auth()->user());
 //            }
             $invoice = Invoice::create($data);
-            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe' , 'paypal'])]);
+            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe', 'paypal', 'bank transfer'])]);
             $client_accounts = $brand->client_accounts;
             $validMerchantIds = $client_accounts->pluck('id')->toArray();
             $merchantExcluded = [];
-
             if ($request->has('merchants')) {
                 $merchants = $request->get('merchants', []);
                 if (array_diff($merchants, $validMerchantIds)) {
@@ -252,7 +248,7 @@ class InvoiceController extends Controller
                 }
                 foreach ($merchants as $type => $merchant_id) {
                     $client_account = $client_accounts->firstWhere('id', $merchant_id);
-                    if (!$client_account || !$client_account->hasSufficientLimitAndCapacity($client_account->id,$invoice->total_amount)->exists()) {
+                    if (!$client_account || !$client_account->hasSufficientLimitAndCapacity($client_account->id, $invoice->total_amount)->exists()) {
                         $merchantExcluded[] = $client_account ? $client_account->payment_method . " " . $client_account->name : "Unknown Merchant";
                     } else {
                         InvoiceMerchant::create([
@@ -328,15 +324,12 @@ class InvoiceController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -451,7 +444,7 @@ class InvoiceController extends Controller
                 'type' => $request->input('type'),
                 'due_date' => $request->input('due_date'),
             ]);
-            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe' , 'paypal'])]);
+            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe', 'paypal', 'bank transfer'])]);
             $client_accounts = $brand->client_accounts->unique('id');
             $validMerchantIds = $client_accounts->pluck('id')->toArray();
             $existingMerchants = InvoiceMerchant::where('invoice_key', $invoice->invoice_key)
@@ -464,7 +457,7 @@ class InvoiceController extends Controller
             }
             foreach ($merchants as $type => $merchant_id) {
                 $client_account = $client_accounts->firstWhere('id', $merchant_id);
-                if (!$client_account || !$client_account->hasSufficientLimitAndCapacity($client_account->id,$invoice->total_amount)->exists()) {
+                if (!$client_account || !$client_account->hasSufficientLimitAndCapacity($client_account->id, $invoice->total_amount)->exists()) {
                     $merchantExcluded[$type] = $client_account ? $client_account->payment_method . " " . $client_account->name : "Unknown Merchant";
                     unset($merchants[$type]);
                 }
