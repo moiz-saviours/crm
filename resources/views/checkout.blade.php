@@ -584,7 +584,7 @@ if (!empty($non_bank_methods)) {
                                 @endif
 
                                 <!-- Bank Transfer Tab -->
-                                @if (in_array('bank transfer', $invoiceDetails['invoice']['payment_methods']) )
+                                @if (in_array('bank transfer', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['bank_details']) && !empty($invoiceDetails['invoice']['bank_details']) )
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "bank transfer" ? 'active' : ""}}"
                                         id="v-pills-bank-transfer-tab" data-toggle="pill"
