@@ -20,6 +20,7 @@ return [
             'invoice.store',
             'invoice.edit',
             'invoice.update',
+            'invoice.payment_proofs',
             'user.client.account.by.brand',
             'payment.index',
             'payment-transaction-logs',
