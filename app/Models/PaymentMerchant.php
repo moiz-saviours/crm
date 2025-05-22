@@ -28,6 +28,7 @@ class PaymentMerchant extends Model
         'vendor_name',
         'email',
         'payment_method',
+        'bank_details',
         'login_id',
         'transaction_key',
         'test_login_id',
