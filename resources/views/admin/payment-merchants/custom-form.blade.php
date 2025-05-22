@@ -58,6 +58,27 @@
                 </div>
 
                 <div class="form-group mb-3">
+                    <label for="payment_method" class="form-label">Payment Method</label>
+                    <select class="form-control" id="payment_method" name="payment_method" required>
+                        <option value="" disabled>Select Payment Method</option>
+                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>
+                            Authorize
+                        </option>
+                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>EDP</option>
+                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
+                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>
+                            Bank Transfer
+                        </option>
+                        {{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>Credit Card</option>--}}
+                        {{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
+                        {{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
+                    </select>
+                    @error('payment_method')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
                     <label for="client_contact" class="form-label">Client Contact</label>
                     <select class="form-control" id="client_contact" name="c_contact_key" required>
                         <option value="" selected>Select Client Contact</option>
@@ -82,7 +103,7 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3">
-                    <label for="name" class="form-label">Name</label>
+                    <label for="name" class="form-label">Name / Account Title</label>
                     <input type="text" class="form-control" id="name" name="name"
                            value="{{ old('name') }}"
                            required>
@@ -116,41 +137,39 @@
                     @enderror
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="payment_method" class="form-label">Payment Method</label>
-                    <select class="form-control" id="payment_method" name="payment_method" required>
-                        <option value="" disabled>Select Payment Method</option>
-                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>Authorize</option>
-                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>EDP</option>
-                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>Stripe</option>
-                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
-                        {{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>Credit Card</option>--}}
-                        {{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>Bank Transfer</option>--}}
-                        {{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
-                        {{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
-                    </select>
-                    @error('payment_method')
-                    <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                </div>
 
-                <div class="form-group mb-3">
-                    <label for="login_id" class="form-label">Login ID / Publish Key</label>
-                    <input type="text" class="form-control" id="login_id" name="login_id"
-                           value="{{ old('login_id') }}" required>
-                    @error('login_id')
-                    <span class="text-danger">{{ $message }}</span>
-                    @enderror
+                <!-- Bank Fields (hidden by default) -->
+                <div id="bank_fields" class="second-fields">
+                    <div class="form-group mb-3">
+                        <label for="bank_details" class="form-label second-field-inputs">Bank Details</label>
+                        <textarea class="form-control" id="bank_details" name="bank_details"
+                                  rows="4">{{ old('bank_details') }}</textarea>
+                        @error('bank_details')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
+                <!-- Account Fields (shown by default) -->
+                <div id="account_fields" class="first-fields">
+                    <div class="form-group mb-3">
+                        <label for="login_id" class="form-label first-field-inputs">Login ID / Publish Key</label>
+                        <input type="text" class="form-control" id="login_id" name="login_id"
+                               value="{{ old('login_id') }}" required>
+                        @error('login_id')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-                <div class="form-group mb-3">
-                    <label for="transaction_key" class="form-label">Transaction Key / Secret Key</label>
-                    <input type="text" class="form-control" id="transaction_key"
-                           name="transaction_key"
-                           value="{{ old('transaction_key') }}" required>
-                    @error('transaction_key')
-                    <span class="text-danger">{{ $message }}</span>
-                    @enderror
+                    <div class="form-group mb-3">
+                        <label for="transaction_key" class="form-label first-field-inputs">Transaction Key / Secret
+                            Key</label>
+                        <input type="text" class="form-control" id="transaction_key"
+                               name="transaction_key"
+                               value="{{ old('transaction_key') }}" required>
+                        @error('transaction_key')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="form-group mb-3">
@@ -223,6 +242,23 @@
 @push('script')
     <script>
         $(document).ready(function () {
+
+            $('#payment_method').val('authorize').trigger('change');
+            $('#payment_method').on('change', function () {
+                if ($(this).val() === 'bank transfer') {
+                    $('#account_fields').fadeOut(() => {
+                        $('#bank_fields').fadeIn();
+                        $('#account_fields select, #account_fields input , #descriptor , #vendor_name').prop('required', false);
+                        $('#bank_fields input, #bank_fields textarea').prop('required', true);
+                    });
+                } else {
+                    $('#bank_fields').fadeOut(() => {
+                        $('#account_fields').fadeIn();
+                        $('#account_fields select, #account_fields input, #descriptor , #vendor_name').prop('required', true);
+                        $('#bank_fields input, #bank_fields textarea').prop('required', false);
+                    });
+                }
+            }).trigger('change');
 
             var storedCompanyKey;
             $('#select-all-brands').change(function () {
