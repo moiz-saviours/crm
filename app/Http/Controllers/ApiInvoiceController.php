@@ -29,6 +29,7 @@ class ApiInvoiceController extends Controller
             isset($invoice->invoice_merchants) ? $invoice->invoice_merchants->sortBy('merchant_type')->pluck('merchant_type')->toArray() : [];
             $payment_methods = [];
             $payment_method_keys = [];
+            $bank_details = "";
             if (isset($invoice->invoice_merchants)) {
                 foreach ($invoice->invoice_merchants->sortBy('merchant_type') as $invoice_merchant) {
                     $merchant = $invoice_merchant->merchant;
@@ -37,6 +38,8 @@ class ApiInvoiceController extends Controller
                             $payment_method_keys['stripe'] = $merchant->environment == 'sandbox' ? $merchant->test_login_id : $merchant->login_id;
                         } elseif ($invoice_merchant->merchant_type === 'paypal') {
                             $payment_method_keys['paypal'] = $merchant->environment == 'sandbox' ? $merchant->test_login_id : $merchant->login_id;
+                        } elseif ($invoice_merchant->merchant_type === 'bank transfer') {
+                            $bank_details = $merchant->bank_details;
                         }
                         $payment_methods[] = $invoice_merchant->merchant_type;
                     }
@@ -82,6 +85,9 @@ class ApiInvoiceController extends Controller
                 'payment_methods' => $payment_methods,
                 'payment_method_keys' => $payment_method_keys,
             ];
+            if($bank_details){
+                $data['bank_details'] = $bank_details;
+            }
             return response()->json(['success' => true, 'invoice' => $data, 'current_date' => Carbon::now()->format('jS F Y')]);
         } catch (ValidationException $exception) {
             return response()->json(['success' => false, 'error' => $exception->getMessage()], 422);
