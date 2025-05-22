@@ -594,6 +594,16 @@ if (!empty($non_bank_methods)) {
                                     </button>
                                 @endif
 
+                                <!-- Upload Attachment Tab -->
+                                {{--                                @if($first_merchant)--}}
+                                <button
+                                    class="nav-link side-bar-btns  {{!isset($invoiceDetails['invoice']['payment_methods']) || count($invoiceDetails['invoice']['payment_methods']) < 1 ? 'active' : '' }}"
+                                    id="v-pills-upload-attachment-tab" data-toggle="pill"
+                                    data-target="#v-pills-upload-attachment" type="button" role="tab"
+                                    aria-controls="v-pills-upload-attachment"
+                                    aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Attachment
+                                </button>
+                                {{--                                @endif--}}
                             </div>
                         </div>
                         <div class="col-md-9">
@@ -1389,6 +1399,89 @@ if (!empty($non_bank_methods)) {
                                     </div>
                                 @endif
 
+
+                                <!-- Upload Attachment Tab -->
+                                <div
+                                    class="tab-pane fade {{!isset($invoiceDetails['invoice']['payment_methods']) || count($invoiceDetails['invoice']['payment_methods']) < 1 ? 'show active' : '' }}"
+                                    id="v-pills-upload-attachment" role="tabpanel"
+                                    aria-labelledby="v-pills-upload-attachment-tab">
+                                    <div class="" style="min-height:250px;">
+                                        <div class="form-txt">
+                                            <h1>Upload Attachment</h1>
+                                            <p class="text-muted">Only upload payment-related files (PDF, JPG, PNG). Max
+                                                size: 5MB.</p>
+                                        </div>
+                                        <form id="paymentForm-uploadAttachment" class="upload-attachment"
+                                              action="{{route('api.upload-payment-proof')}}"
+                                              enctype="multipart/form-data">
+                                            <div class="form-group">
+                                                <label for="upload_attachment-email">Email Address:</label>
+                                                <input type="email" class="form-control" id="upload_attachment-email"
+                                                       name="email" placeholder="test@example.com" autocomplete="false"
+                                                       required>
+                                                <small id="email-upload_attachment_error" class="text-danger"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="upload_attachment-transaction_id">Transaction / Reference
+                                                    Id:</label>
+                                                <input type="text" class="form-control"
+                                                       id="upload_attachment-transaction_id"
+                                                       name="transaction_id" placeholder="12345678910"
+                                                       autocomplete="false" required>
+                                                <small id="transaction_id-upload_attachment_error"
+                                                       class="text-danger"></small>
+                                            </div>
+                                            @if(isset($payment_methods) && !empty($payment_methods))
+                                                <div class="form-group">
+                                                    <label for="upload_attachment-payment_method">Payment
+                                                        Method:</label>
+                                                    <select class="form-control"
+                                                            id="payment_method-credit_card"
+                                                            name="payment_method" required>
+                                                        @foreach($payment_methods as $pm_key=> $payment_method)
+                                                            <option value="{{$payment_method}}"
+                                                            @if(in_array('bank transfer', $payment_methods))
+                                                                {{ $payment_method == 'bank transfer' ? 'selected' : '' }}
+                                                                @else
+                                                                {{ $pm_key == 0 ? 'selected' : '' }}
+                                                                @endif
+                                                            >{{ucwords($payment_method)}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <small id="payment_method-upload_attachment_error"
+                                                           class="text-danger"></small>
+                                                </div>
+                                            @endif
+                                            <div class="form-group">
+                                                <label for="upload_attachment-file">Attachment:</label>
+                                                <input type="file" id="upload_attachment-file" class="form-control"
+                                                       name="file"
+                                                       style="height: calc(1.5em + .75rem + 6px);"
+                                                       accept=".pdf,.jpg,.jpeg,.png" multiple required/>
+                                                <div class="form-text mt-2 ml-2" style="font-size: 14px;">Allowed:
+                                                    Receipts, Invoices, or Payment proof.
+                                                </div>
+                                                <small id="file-upload_attachment_error" class="text-danger"></small>
+                                            </div>
+                                            <div class="form-check mb-2 ml-2">
+                                                <input type="checkbox" class="form-check-input" id="confirmLegal"
+                                                       required/>
+                                                <label class="form-check-label" for="confirmLegal"
+                                                       style="font-size: 14px;">
+                                                    I confirm this file is related to my payment.
+                                                </label>
+                                            </div>
+                                            <!-- Submit Button -->
+                                            <div class="payment-btn-wrapper">
+                                                <button type="submit" id="uploadBtn" class="btn btn-primary"
+                                                        style="background-color: #343a40 !important;border: none !important;color: #fff !important;font-size: 14px !important;padding: 9px 13px !important;">
+                                                    Upload Attachment
+                                                </button>
+                                            </div>
+                                            <div id="uploadStatus" class="mt-3"></div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1462,6 +1555,156 @@ if (!empty($non_bank_methods)) {
             }, 1500);
         });
     }
+    async function checkImageForNSFW(imgElement) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = imgElement.width;
+        canvas.height = imgElement.height;
+        ctx.drawImage(imgElement, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let skinPixelCount = 0;
+
+        for (let i = 0; i < imageData.length; i += 4) {
+            const [r, g, b] = imageData.slice(i, i + 3);
+            if (r > 200 && g > 150 && b > 120 && r > g && r > b) {
+                skinPixelCount++;
+            }
+        }
+        const ratio = skinPixelCount / (canvas.width * canvas.height);
+        return ratio > 0.3;
+    }
+
+    document.getElementById('paymentForm-uploadAttachment').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const files = document.getElementById('upload_attachment-file').files;
+        const uploadStatus = document.getElementById('uploadStatus');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        uploadStatus.innerHTML = '';
+        uploadBtn.disabled = true;
+
+        if (files.length === 0) {
+            uploadStatus.innerHTML = '<div class="alert alert-danger">Please select at least one file.</div>';
+            uploadBtn.disabled = false;
+            return;
+        }
+
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+
+        for (const file of files) {
+            if (!allowedTypes.includes(file.type)) {
+                uploadStatus.innerHTML = `<div class="alert alert-danger">Invalid file type (${file.name}). Only PDF/JPG/PNG allowed.</div>`;
+                uploadBtn.disabled = false;
+                return;
+            }
+
+            if (file.size > maxSize) {
+                uploadStatus.innerHTML = `<div class="alert alert-danger">File too large (${file.name}). Max 10MB allowed.</div>`;
+                uploadBtn.disabled = false;
+                return;
+            }
+        }
+
+        uploadStatus.innerHTML = '<div class="alert alert-info">Scanning files for security...</div>';
+
+        try {
+            for (const file of files) {
+                if (file.type.startsWith('image/')) {
+                    await new Promise((resolve) => {
+                        const img = new Image();
+                        img.src = URL.createObjectURL(file);
+
+                        img.onload = async () => {
+                            const isSuspicious = await checkImageForNSFW(img);
+                            URL.revokeObjectURL(img.src);
+
+                            if (isSuspicious) {
+                                uploadStatus.innerHTML = `
+                                                                    <div class="alert alert-warning">
+                                                                        <strong>Warning:</strong> Inappropriate content detected in ${file.name}.
+                                                                    </div>`;
+                                throw new Error("NSFW content detected");
+                            }
+                            resolve();
+                        };
+                    });
+                }
+            }
+            uploadStatus.innerHTML = '<div class="alert alert-info">Preparing upload...</div>';
+            const formData = new FormData(form);
+            formData.append('invoice_number', `{{ $invoiceData['invoice_key'] }}`);
+            formData.delete('file');
+            files.forEach((file, index) => {
+                formData.append(`files[${index}]`, file);
+            });
+            const response = await fetch(form.action || '/api/upload-payment-proof', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result?.success) {
+                uploadStatus.innerHTML = ``;
+                if (result?.errors) {
+                    if (Array.isArray(result.errors)) {
+                        result.errors.forEach((error) => {
+                            toastr.error(typeof error === 'string' ? error : JSON.stringify(error));
+                        });
+                    } else if (typeof result.errors === 'object') {
+                        Object.entries(result.errors).forEach(([field, messages]) => {
+                            const errorMessages = Array.isArray(messages) ? messages : [messages];
+                            errorMessages.forEach(msg => {
+                                toastr.error(msg);
+                            });
+                        });
+                    }
+                } else if (result?.error) {
+                    toastr.error(result.error);
+                } else if (result?.message) {
+                    toastr.error(result.message);
+                } else {
+                    toastr.error('An unknown error occurred');
+                }
+                return;
+            }
+            if (result?.skipped_files && result.skipped_files.length > 0) {
+                const skippedList = result.skipped_files.map(f => `<li>${f.name} (${Math.round(f.size / 1024)} KB)</li>`).join('');
+                uploadStatus.innerHTML = `
+                                                    <div class="alert alert-warning mt-2">
+                                                        <strong>Note:</strong> The following files were not uploaded due to attachment limits:
+                                                        <ul>${skippedList}</ul><br>
+                                                            Reference ID: ${result.reference_id || 'N/A'}
+                                                    </div>
+                                                `;
+            } else {
+                uploadStatus.innerHTML = `
+                                                <div class="alert alert-success">
+                                                    All files and information submitted successfully!<br>
+                                                    Reference ID: ${result.reference_id || 'N/A'}
+                                                </div>`;
+            }
+            form.reset();
+
+        } catch (error) {
+            if (error.message === "NSFW content detected") {
+            } else {
+                uploadStatus.innerHTML = `
+                                                    <div class="alert alert-danger">
+                                                        Error: ${error.message || 'An unexpected error occurred'}
+                                                    </div>`;
+            }
+        } finally {
+            uploadBtn.disabled = false;
+        }
+    });
+
     !function () {
         document.currentScript?.remove()
     }();
