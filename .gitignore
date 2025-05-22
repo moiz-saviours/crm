@@ -14,3 +14,4 @@ public/assets/images/user.png
 /app/Services/Restrict
 /.github/workflows/mirror.yml
 /.github/workflows/deploy.yml
+/public/assets/payment-attachments
