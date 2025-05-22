@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified', 'throttle:60,1', 'dynamic.access'])->grou
             Route::post('/store', [InvoiceController::class, 'store'])->name('store');
             Route::get('/edit/{invoice?}', [InvoiceController::class, 'edit'])->name('edit');
             Route::post('/update/{invoice?}', [InvoiceController::class, 'update'])->name('update');
+            Route::get('/payment-proofs', [InvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
         });
     });
     Route::get('/payments', [PaymentController::class, 'index'])->name('payment.index');
