@@ -119,6 +119,10 @@ class Invoice extends Model
     {
         return $this->hasOne(Payment::class, 'invoice_key', 'invoice_key');
     }
+    public function payment_attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PaymentAttachment::class, 'invoice_key', 'invoice_key');
+    }
     public function invoice_merchants(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(InvoiceMerchant::class, 'invoice_key', 'invoice_key');
