@@ -313,9 +313,17 @@ $dueDate = (new DateTime($invoiceData['due_date'] ?? 'now'))->format('Y-m-d');
 $currentDate = (new DateTime())->format('Y-m-d');
 $brandData = $invoiceData['brand'] ?? [];
 $countries = ['US' => 'United States', 'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AS' => 'American Samoa', 'AD' => 'Andorra', 'AO' => 'Angola', 'AI' => 'Anguilla', 'AG' => 'Antigua and Barbuda', 'AR' => 'Argentina', 'AM' => 'Armenia', 'AW' => 'Aruba', 'AU' => 'Australia', 'AT' => 'Austria', 'AZ' => 'Azerbaijan', 'BS' => 'Bahamas', 'BH' => 'Bahrain', 'BD' => 'Bangladesh', 'BB' => 'Barbados', 'BY' => 'Belarus', 'BE' => 'Belgium', 'BZ' => 'Belize', 'BJ' => 'Benin', 'BM' => 'Bermuda', 'BT' => 'Bhutan', 'BO' => 'Bolivia', 'BA' => 'Bosnia and Herzegovina', 'BW' => 'Botswana', 'BR' => 'Brazil', 'BN' => 'Brunei', 'BG' => 'Bulgaria', 'BF' => 'Burkina Faso', 'BI' => 'Burundi', 'CV' => 'Cabo Verde', 'KH' => 'Cambodia', 'CM' => 'Cameroon', 'CA' => 'Canada', 'KY' => 'Cayman Islands', 'CF' => 'Central African Republic', 'TD' => 'Chad', 'CL' => 'Chile', 'CN' => 'China', 'CO' => 'Colombia', 'KM' => 'Comoros', 'CG' => 'Congo', 'CD' => 'Congo (Democratic Republic)', 'CR' => 'Costa Rica', 'HR' => 'Croatia', 'CU' => 'Cuba', 'CY' => 'Cyprus', 'CZ' => 'Czech Republic', 'DK' => 'Denmark', 'DJ' => 'Djibouti', 'DM' => 'Dominica', 'DO' => 'Dominican Republic', 'EC' => 'Ecuador', 'EG' => 'Egypt', 'SV' => 'El Salvador', 'GQ' => 'Equatorial Guinea', 'ER' => 'Eritrea', 'EE' => 'Estonia', 'SZ' => 'Eswatini', 'ET' => 'Ethiopia', 'FJ' => 'Fiji', 'FI' => 'Finland', 'FR' => 'France', 'GA' => 'Gabon', 'GM' => 'Gambia', 'GE' => 'Georgia', 'DE' => 'Germany', 'GH' => 'Ghana', 'GR' => 'Greece', 'GD' => 'Grenada', 'GU' => 'Guam', 'GT' => 'Guatemala', 'GN' => 'Guinea', 'GW' => 'Guinea-Bissau', 'GY' => 'Guyana', 'HT' => 'Haiti', 'HN' => 'Honduras', 'HU' => 'Hungary', 'IS' => 'Iceland', 'IN' => 'India', 'ID' => 'Indonesia', 'IR' => 'Iran', 'IQ' => 'Iraq', 'IE' => 'Ireland', 'IL' => 'Israel', 'IT' => 'Italy', 'JM' => 'Jamaica', 'JP' => 'Japan', 'JO' => 'Jordan', 'KZ' => 'Kazakhstan', 'KE' => 'Kenya', 'KI' => 'Kiribati', 'KP' => 'North Korea', 'KR' => 'South Korea', 'KW' => 'Kuwait', 'KG' => 'Kyrgyzstan', 'LA' => 'Laos', 'LV' => 'Latvia', 'LB' => 'Lebanon', 'LS' => 'Lesotho', 'LR' => 'Liberia', 'LY' => 'Libya', 'LI' => 'Liechtenstein', 'LT' => 'Lithuania', 'LU' => 'Luxembourg', 'MG' => 'Madagascar', 'MW' => 'Malawi', 'MY' => 'Malaysia', 'MV' => 'Maldives', 'ML' => 'Mali', 'MT' => 'Malta', 'MH' => 'Marshall Islands', 'MR' => 'Mauritania', 'MU' => 'Mauritius', 'MX' => 'Mexico', 'FM' => 'Micronesia', 'MD' => 'Moldova', 'MC' => 'Monaco', 'MN' => 'Mongolia', 'ME' => 'Montenegro', 'MA' => 'Morocco', 'MZ' => 'Mozambique', 'MM' => 'Myanmar', 'NA' => 'Namibia', 'NR' => 'Nauru', 'NP' => 'Nepal', 'NL' => 'Netherlands', 'NZ' => 'New Zealand', 'NI' => 'Nicaragua', 'NE' => 'Niger', 'NG' => 'Nigeria', 'MK' => 'North Macedonia', 'NO' => 'Norway', 'OM' => 'Oman', 'PK' => 'Pakistan', 'PW' => 'Palau', 'PA' => 'Panama', 'PG' => 'Papua New Guinea', 'PY' => 'Paraguay', 'PE' => 'Peru', 'PH' => 'Philippines', 'PL' => 'Poland', 'PT' => 'Portugal', 'QA' => 'Qatar', 'RO' => 'Romania', 'RU' => 'Russia', 'RW' => 'Rwanda', 'WS' => 'Samoa', 'SM' => 'San Marino', 'SA' => 'Saudi Arabia', 'SN' => 'Senegal', 'RS' => 'Serbia', 'SC' => 'Seychelles', 'SL' => 'Sierra Leone', 'SG' => 'Singapore', 'SK' => 'Slovakia', 'SI' => 'Slovenia', 'SB' => 'Solomon Islands', 'SO' => 'Somalia', 'ZA' => 'South Africa', 'ES' => 'Spain', 'LK' => 'Sri Lanka', 'SD' => 'Sudan', 'SR' => 'Suriname', 'SE' => 'Sweden', 'CH' => 'Switzerland', 'SY' => 'Syria', 'TW' => 'Taiwan', 'TJ' => 'Tajikistan', 'TZ' => 'Tanzania', 'TH' => 'Thailand', 'TL' => 'Timor-Leste', 'TG' => 'Togo', 'TO' => 'Tonga', 'TT' => 'Trinidad and Tobago', 'TN' => 'Tunisia', 'TR' => 'Turkey', 'TM' => 'Turkmenistan', 'TV' => 'Tuvalu', 'UG' => 'Uganda', 'UA' => 'Ukraine', 'AE' => 'United Arab Emirates', 'GB' => 'United Kingdom', 'US' => 'United States', 'UY' => 'Uruguay', 'UZ' => 'Uzbekistan', 'VU' => 'Vanuatu', 'VA' => 'Vatican City', 'VE' => 'Venezuela', 'VN' => 'Vietnam', 'YE' => 'Yemen', 'ZM' => 'Zambia', 'ZW' => 'Zimbabwe'];
-$first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
-?>
-
+$payment_methods = $invoiceDetails['invoice']['payment_methods'] ?? [];
+$non_bank_methods = array_filter($payment_methods, function ($method) {
+    return $method !== "bank transfer";
+});
+if (!empty($non_bank_methods)) {
+    $first_merchant = reset($non_bank_methods); // Get first non-bank method
+} else if (in_array("bank transfer", $payment_methods)) {
+    $first_merchant = "bank transfer";
+} else {
+    $first_merchant = "";
+} ?>
 <section class="invoice-template py-2">
     <div class="container-fluid">
         <div class="row first-row">
@@ -522,12 +530,14 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                 </div>
             </div>
             <div
-                class="col-lg-6 col-12 <?= $invoiceDetails['invoice']['status'] == 1 ? 'd-none' : '' ?> <?= isset($invoiceDetails['invoice']['payment_methods']) && count($invoiceDetails['invoice']['payment_methods']) > 0 ? '' : 'd-none' ?>">
+                class="col-lg-6 col-12 <?= $invoiceDetails['invoice']['status'] == 1 ? 'd-none' : '' ?> <?= isset($invoiceDetails['invoice']['payment_methods']) && count($invoiceDetails['invoice']['payment_methods']) > 0 ? '' : '' ?>">
                 <div class="box-shade-2">
                     <div class="row">
                         <div class="col-md-3 side-bar-1">
                             <div class="nav justify-content-left nav-pills side-bar" id="v-pills-tab" role="tablist"
                                  aria-orientation="vertical">
+
+                                <!-- Credit Card Tab -->
                                 @if (in_array('authorize', $invoiceDetails['invoice']['payment_methods']))
                                     <button
                                         class="nav-link side-bar-btns  {{$first_merchant == "authorize" ? 'active' : ""}}"
@@ -539,6 +549,7 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     </button>
                                 @endif
 
+                                <!-- EDP Tab -->
                                 @if (in_array('edp', $invoiceDetails['invoice']['payment_methods']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "edp" ? 'active' : ""}}"
@@ -549,6 +560,8 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         aria-selected="false">{{$first_merchant == "edp" ? "Credit Card" : 'EDP'}}
                                     </button>
                                 @endif
+
+                                <!-- PayPal Tab -->
                                 @if (in_array('paypal', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['paypal']) && !empty($invoiceDetails['invoice']['payment_method_keys']['paypal']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "paypal" ? 'active' : ""}}"
@@ -558,6 +571,8 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         aria-selected="true">Paypal
                                     </button>
                                 @endif
+
+                                <!-- Stripe Tab -->
                                 @if (in_array('stripe', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['stripe']) && !empty($invoiceDetails['invoice']['payment_method_keys']['stripe']))
                                     <button
                                         class="nav-link side-bar-btns {{$first_merchant == "stripe" ? 'active' : ""}}"
@@ -567,10 +582,23 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                         aria-selected="false">Stripe
                                     </button>
                                 @endif
+
+                                <!-- Bank Transfer Tab -->
+                                @if (in_array('bank transfer', $invoiceDetails['invoice']['payment_methods']) )
+                                    <button
+                                        class="nav-link side-bar-btns {{$first_merchant == "bank transfer" ? 'active' : ""}}"
+                                        id="v-pills-bank-transfer-tab" data-toggle="pill"
+                                        data-target="#v-pills-bank-transfer" type="button" role="tab"
+                                        aria-controls="v-pills-bank-transfer"
+                                        aria-selected="true">Bank Transfer
+                                    </button>
+                                @endif
+
                             </div>
                         </div>
                         <div class="col-md-9">
                             <div class="tab-content" id="v-pills-tabContent">
+
                                 <!-- Credit Card Tab -->
                                 <div class="tab-pane fade {{$first_merchant == "authorize" ? 'show active' : ""}}"
                                      id="v-pills-credit-card" role="tabpanel"
@@ -1040,8 +1068,9 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     class="tab-pane fade {{in_array('paypal', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['payment_method_keys']['paypal']) && !empty($invoiceDetails['invoice']['payment_method_keys']['paypal']) && $first_merchant == "paypal" ? 'show active' : ""}}"
                                     id="v-pills-paypal" role="tabpanel"
                                     aria-labelledby="v-pills-paypal-tab">
-                                    <div class="sec-btn">
-                                        <div id="paypal-button-container"></div>
+                                    <div class="sec-btn"
+                                         style="display: flex;justify-content: center;min-height:215px;">
+                                        <div id="paypal-button-container" style="width: 80%;"></div>
                                         <form id="paymentForm-paypal" class="paypalPaymentForm">
                                         </form>
                                     </div>
@@ -1329,6 +1358,37 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
                                     {{--                                    </form>--}}
                                 </div>
 
+                                <!-- Bank Transfer Tab -->
+                                @if (in_array('bank transfer', $invoiceDetails['invoice']['payment_methods']) )
+                                    <div
+                                        class="tab-pane fade {{in_array('bank transfer', $invoiceDetails['invoice']['payment_methods']) && isset($invoiceDetails['invoice']['bank_details']) && !empty($invoiceDetails['invoice']['bank_details']) && $first_merchant == "bank transfer" ? 'show active' : ""}}"
+                                        id="v-pills-bank-transfer" role="tabpanel"
+                                        aria-labelledby="v-pills-bank-transfer-tab">
+                                        <div class="" style="min-height:250px;">
+                                            <div class="form-txt top-bar">
+                                                <h1>Bank Transfer</h1>
+                                                <i class="fa-regular fa-copy copy-all-btn"
+                                                   onclick="copyAllToClipboard(this)"><span> Copy All </span></i>
+                                            </div>
+                                            <div
+                                                style="font-size: 14px;margin: 5px;padding: 5px 0px 0px 5px;font-style: italic;font-weight: 400;color: #3C3D3A;">
+                                                <div class="bank-details-container">
+                                                    @php
+                                                        $lines = explode("\n", $invoiceDetails['invoice']['bank_details']);
+                                                    @endphp
+                                                    @foreach($lines as $line)
+                                                        <div class="copy-line">
+                                                            <span class="line-text">{{ $line }}</span>
+                                                            <i class="fa-regular fa-copy copy-btn"
+                                                               onclick="copyToClipboard(this)"></i>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
                             </div>
                         </div>
                     </div>
@@ -1379,6 +1439,28 @@ $first_merchant = $invoiceDetails['invoice']['payment_methods'][0] ?? "";
         document.body.innerHTML = printContents;
         window.print();
         document.body.innerHTML = originalContents;
+    }
+    function copyToClipboard(button) {
+        const text = button.closest('.copy-line').querySelector('.line-text').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            button.classList.add('success');
+            setTimeout(() => {
+                button.classList.remove('success');
+            }, 1500);
+        });
+    }
+
+    function copyAllToClipboard(button) {
+        let allText = '';
+        document.querySelectorAll('.line-text').forEach(el => {
+            allText += el.innerText + '\n';
+        });
+        navigator.clipboard.writeText(allText.trim()).then(() => {
+            button.classList.add('success');
+            setTimeout(() => {
+                button.classList.remove('success');
+            }, 1500);
+        });
     }
     !function () {
         document.currentScript?.remove()
