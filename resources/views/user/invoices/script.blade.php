@@ -424,8 +424,7 @@
                                 tax_amount, total_amount, currency,
                                 status,
                                 due_date,
-                                date,
-                                payment_attachments
+                                date
                             } = response.data;
                             const index = table.row($('#tr-' + id)).index();
                             const rowData = table.row(index).data();
@@ -518,13 +517,10 @@
                             if (brand) {
                                 actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
                             }
-                            if (payment_attachments && payment_attachments.length > 0) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${payment_attachments.length}  </button> `;
-                            }
                             if (status == 0 && (agent?.id == {{auth()->user()->id}} || creator?.id == {{auth()->user()->id}} || team && team.lead_id == {{auth()->user()->id}}) && creator_type != 'App\\Models\\Admin') {
-                                actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>`;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit"><i class="fas fa-edit"></i></button>`;
                             }
-                            if (normalizeHtml(decodeHtml(rowData[11])) !== normalizeHtml(actionsHtml)) {
+                            if (decodeHtml(rowData[11]) !== actionsHtml) {
                                 table.cell(index, 11).data(actionsHtml).draw();
                             }
                             $('#manage-form')[0].reset();
@@ -534,13 +530,6 @@
                     .catch(error => console.log(error));
             }
         });
-        function normalizeHtml(html) {
-            return html
-                .replace(/\s+/g, ' ')
-                .replace(/>\s+</g, '><')
-                .trim();
-        }
-
         $(document).on('click', '.view-transactions', function () {
             let invoice_key = $(this).data('invoice-key');
 

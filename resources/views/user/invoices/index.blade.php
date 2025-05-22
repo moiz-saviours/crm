@@ -211,7 +211,7 @@
                                                     @endif
                                                     @if($invoice->status != 1)
                                                         @can('edit',$invoice)
-                                                            <br><button type="button" class="btn btn-sm btn-primary editBtn mt-2"
+                                                            <button type="button" class="btn btn-sm btn-primary editBtn"
                                                                     data-id="{{ $invoice->id }}" title="Edit"><i
                                                                     class="fas fa-edit"></i></button>
                                                         @endcan
