@@ -277,11 +277,10 @@
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
                                                             title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
-                            ${status != 1 ? '<button type="button" class="btn btn-sm btn-primary editBtn" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" > </i></button>' +
-                                '<button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="' + id + '" title="Delete"><i class="fas fa-trash"></i></button>'
+                            ${status != 1 ? '<button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button>' +
+                                '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
                                 : ''}
                         </td>`;
-
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
 
                             $('#manage-form')[0].reset();
@@ -306,7 +305,8 @@
                                 tax_amount, total_amount, currency,
                                 status,
                                 due_date,
-                                date
+                                date,
+                                payment_attachments
                             } = response.data;
                             const index = table.row($('#tr-' + id)).index();
                             const rowData = table.row(index).data();
@@ -381,13 +381,16 @@
                             // Column 12: Actions
                             let actionsHtml = '';
                             if (brand) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button>`;
+                            }
+                            if (payment_attachments && payment_attachments.length > 0) {
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${payment_attachments.length}  </button> `;
                             }
                             if (status != 1) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit"><i class="fas fa-edit"></i></button>
-                                                <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete"><i class="fas fa-trash"></i></button>`;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
                             }
-                            if (decodeHtml(rowData[11]) !== actionsHtml) {
+                            if (normalizeHtml(decodeHtml(rowData[11])) !== normalizeHtml(actionsHtml)) {
                                 table.cell(index, 11).data(actionsHtml).draw();
                             }
                             $('#manage-form')[0].reset();
@@ -397,6 +400,12 @@
                     .catch(error => console.log(error));
             }
         });
+        function normalizeHtml(html) {
+            return html
+                .replace(/\s+/g, ' ')
+                .replace(/>\s+</g, '><')
+                .trim();
+        }
 
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
@@ -474,6 +483,136 @@
                 }
             });
         });
+
+        $(document).on('click', '.view-payment-proofs', function () {
+            const $this = $(this);
+            const invoice_key = $this.data('invoice-key');
+            const $modalInvoiceId = $('#modalInvoiceId');
+            const $tableBody = $('#paymentProofsTbody');
+
+            $modalInvoiceId.text(invoice_key);
+
+            $.ajax({
+                url: `{{ route('admin.invoice.payment_proofs') }}`,
+                type: 'GET',
+                data: {invoice_key: invoice_key},
+                beforeSend: function () {
+                    $tableBody.html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+                },
+                success: function (response) {
+                    $tableBody.empty();
+
+                    if (response.status === 'success' && response.payment_attachments.length > 0) {
+                        let hasValidAttachments = false;
+
+                        $.each(response.payment_attachments, function (parentIndex, payment_attachment) {
+                            try {
+                                const attachments = JSON.parse(payment_attachment.attachments);
+                                if (attachments && attachments.length > 0) {
+                                    hasValidAttachments = true;
+
+                                    $.each(attachments, function (index, attachment) {
+                                        const filePath = attachment.file_path.replace(/\\/g, '/');
+                                        const fileUrl = `/${filePath}`;
+                                        const fileType = attachment.extension || filePath.split('.').pop();
+                                        const fileName = attachment.original_name || attachment.file_name;
+                                        const createdAt = attachment.created_at || payment_attachment.created_at;
+                                        const $row = $('<tr>').html(`
+                                            <td class="align-middle text-center">${attachment.id}</td>
+                                            <td class="align-middle text-center">${fileName}</td>
+                                            <td class="align-middle text-center">${fileType}</td>
+                                            <td class="align-middle text-center">
+                                                <button class="btn btn-sm btn-outline-primary view-file-btn"
+                                                        data-url="${fileUrl}"
+                                                        data-name="${fileName}"
+                                                        data-type="${fileType}">
+                                                    <i class="fas fa-eye"></i> View
+                                                </button>
+                                            </td>
+                                            <td class="align-middle text-center">${new Date(createdAt).toLocaleString()}</td>
+                                            <td class="align-middle text-center">
+                                                <a href="${fileUrl}" download="${fileName}" class="btn btn-sm btn-outline-primary download-btn">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            </td>
+                                        `);
+                                        $tableBody.append($row);
+                                    });
+                                }
+                            } catch (e) {
+                                console.error('Error parsing attachments:', e);
+                                $tableBody.append(`
+                            <tr>
+                                <td colspan="6" class="text-center text-danger">
+                                    Error loading attachments for payment ${parentIndex + 1}
+                                </td>
+                            </tr>
+                        `);
+                            }
+                        });
+
+                        if (!hasValidAttachments) {
+                            $tableBody.html('<tr><td colspan="6" class="text-center">No valid attachments found.</td></tr>');
+                        }
+                    } else {
+                        $tableBody.html('<tr><td colspan="6" class="text-center">No payment attachments found.</td></tr>');
+                    }
+                    $('#paymentProofModal').modal('show');
+                },
+                error: function () {
+                    $tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error fetching data</td></tr>');
+                }
+            });
+        });
+
+        $(document).on('click', '.view-file-btn', function () {
+            const url = $(this).data('url');
+            const type = $(this).data('type');
+            const fileName = $(this).data('name');
+            previewFile(url, type, fileName);
+        });
+
+        function previewFile(url, type, fileName) {
+            const $pdfFrame = $('#pdfPreview');
+            const $imgPreview = $('#imagePreview');
+            const $previewFileName = $('#previewFileName');
+            // const fileName = url.split('/').pop();
+
+            $previewFileName.text(fileName);
+            if (type === 'pdf') {
+                $pdfFrame.attr('src', `${url}#toolbar=0`).show();
+                $imgPreview.hide();
+            } else {
+                $imgPreview.attr('src', url).show();
+                $pdfFrame.hide();
+            }
+            $('#filePreviewModal').modal('show');
+        }
+        
+        $(document).on('click', '.download-btn', function (e) {
+            if (this.hostname !== window.location.hostname) {
+                e.preventDefault();
+                const url = $(this).attr('href');
+                const fileName = $(this).attr('download');
+                fetch(url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(blobUrl);
+                    })
+                    .catch(error => {
+                        console.error('Download error:', error);
+                        alert('Download failed. Please try again.');
+                    });
+            }
+        });
+
         $(document).on('click', '.copyBtn', async function () {
             try {
                 let invoiceUrl = $(this).data('invoice-url');
@@ -601,7 +740,8 @@
                                 if ($(this).is(':checked')) {
                                     const dropdownHtml = `
                                     <div class="form-group mb-3">
-                                        <label for="merchant_select_${type}" class="form-label">Select Merchant</label>
+                                        <label for="merchant_select_${safeType}" class="form-label">Select Merchant</label>
+                                        <select class="form-control form-select" id="merchant_select_${safeType}" name="merchants[${type}]" title="Please select a ${type} merchant" required>
                                             <option value="" selected disabled>Please select a ${type} merchant</option>
                                             ${merchant_types[type].map(merchant => `
                                                 <option value="${merchant.id}">${merchant.name} ( Limit : ${merchant.limit} ) </option>
