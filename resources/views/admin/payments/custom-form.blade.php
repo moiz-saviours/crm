@@ -12,6 +12,31 @@
             <div class="form-body">
                 <div class="error-messages"></div>
                 <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label for="invoice_key" class="form-label mb-0">Invoice</label>
+                        <small class="fst-italic">(optional)</small>
+                    </div>
+                    <select class="form-control" id="invoice_key" name="invoice_key">
+                        <option value="">Create New Invoice</option>
+                        @foreach($unpaid_invoices as $unpaid_invoice)
+                            <option
+                                value="{{ $unpaid_invoice->invoice_key }}"
+                                data-brand="{{ $unpaid_invoice->brand_key }}"
+                                data-team="{{ $unpaid_invoice->team_key }}"
+                                data-agent="{{ $unpaid_invoice->agent_id }}"
+                                data-amount="{{ $unpaid_invoice->total_amount }}"
+                                data-customer="{{ optional($unpaid_invoice->customer_contact)->special_key }}"
+
+                                {{ old('invoice_key') == $unpaid_invoice->invoice_key ? 'selected' : '' }}>
+                                {{ $unpaid_invoice->invoice_number }} - {{ $unpaid_invoice->invoice_key }} - {{ optional($unpaid_invoice->customer_contact)->name }} - {{$unpaid_invoice->currency}} {{ $unpaid_invoice->total_amount }} - {{ $unpaid_invoice->created_at->format('jS F Y') }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('brand_key')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
                     <label for="brand_key" class="form-label">Brand</label>
                     <select class="form-control" id="brand_key" name="brand_key" required>
                         <option value="">Select Brand</option>
@@ -241,6 +266,17 @@
     <!------- CUSTOM FORM -------->
     <script>
         $(document).ready(function () {
+            $('#invoice_key').on('change', function () {
+                const selected = $(this).find('option:selected');
+
+                $('#brand_key').val(selected.data('brand') || '').trigger('change');
+                $('#team_key').val(selected.data('team') || '').trigger('change');
+                $('#agent_id').val(selected.data('agent') || '').trigger('change');
+                $('#type').val(selected.data('customer') ? 1 : 0).trigger('change');
+                $('#cus_contact_key').val(selected.data('customer') || '').trigger('change');
+                $('#amount').val(selected.data('amount') || '');
+            });
+
             $('#type').on('change', function () {
                 const type = $(this).val();
                 if (type == 0) {
