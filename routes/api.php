@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\{
     ApiStripePaymentController
 };
 use App\Http\Controllers\ApiInvoiceController;
+use App\Http\Controllers\ApiPaymentAttachmentController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +43,10 @@ Route::post('stripe-process-payment', [ApiStripePaymentController::class, 'proce
 Route::post('paypal-create-order', [ApiPaypalPaymentController::class, 'createOrder'])->name('api.paypal.create-order');
 Route::post('paypal-capture-order', [ApiPaypalPaymentController::class, 'captureOrder'])->name('api.paypal.capture-order');
 Route::post('paypal-cancel-order', [ApiPaypalPaymentController::class, 'cancelOrder'])->name('api.paypal.cancel-order');
+
+Route::post('upload-payment-proof',[ApiPaymentAttachmentController::class,'upload_attachment'])->name('api.upload-payment-proof');
+
+
 //});
 Route::get('fetch-invoice/{invoice?}', [ApiInvoiceController::class, 'fetch_invoice'])->missing(function (Request $request) {
     return response()->json(['error' => 'Invalid url.'], 404);
