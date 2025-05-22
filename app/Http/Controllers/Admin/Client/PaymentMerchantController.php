@@ -63,9 +63,10 @@ class PaymentMerchantController extends Controller
                 'email' => 'nullable|email|max:255',
                 'login_id' => 'nullable|string|max:255',
                 'transaction_key' => 'nullable|string|max:255',
+                'bank_details' => 'nullable|string',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal',
+                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal,bank transfer',
 //                'payment_method' => 'required|string|in:authorize,stripe,credit card,bank transfer,paypal,cash,other',
                 'environment' => [
                     'required',
@@ -91,6 +92,7 @@ class PaymentMerchantController extends Controller
                 'vendor_name' => $request->vendor_name,
                 'email' => $request->email,
                 'payment_method' => $request->payment_method,
+                'bank_details' => $request->bank_details,
                 'login_id' => $request->login_id,
                 'transaction_key' => $request->transaction_key,
                 'limit' => $request->limit,
@@ -107,15 +109,14 @@ class PaymentMerchantController extends Controller
             } elseif ($request->input('payment_method') == 'edp') {
                 $data['test_login_id'] = env('SECURE_TEST_KEY');
                 $data['test_transaction_key'] = env('SECURE_TEST_KEY');
-            }elseif ($request->input('payment_method') == 'stripe') {
+            } elseif ($request->input('payment_method') == 'stripe') {
                 $data['test_login_id'] = env('STRIPE_TEST_KEY');
                 $data['test_transaction_key'] = env('STRIPE_TEST_SECRET');
-            }elseif ($request->input('payment_method') == 'paypal') {
+            } elseif ($request->input('payment_method') == 'paypal') {
                 $data['test_login_id'] = env('PAYPAL_CLIENT_ID');
                 $data['test_transaction_key'] = env('PAYPAL_CLIENT_SECRET');
             }
             /** Note : For testing purpose only when environment is on sandbox (in testing) */
-
             $client_account = PaymentMerchant::create($data);
             if ($request->has('brands') && !empty($request->brands)) {
                 foreach ($request->brands as $brandKey) {
@@ -181,11 +182,12 @@ class PaymentMerchantController extends Controller
                 'descriptor' => 'nullable|string|max:255',
                 'vendor_name' => 'nullable|string|max:255',
                 'email' => 'nullable|email|max:255',
+                'bank_details' => 'nullable|string',
                 'login_id' => 'nullable|string|max:255',
                 'transaction_key' => 'nullable|string|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal',
+                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal,bank transfer',
 //                'payment_method' => 'required|string|in:authorize,stripe,credit card,bank transfer,paypal,cash,other',
                 'environment' => [
                     'required',
@@ -207,6 +209,7 @@ class PaymentMerchantController extends Controller
                 'vendor_name' => $request->vendor_name,
                 'email' => $request->email,
                 'payment_method' => $request->payment_method,
+                'bank_details' => $request->bank_details,
                 'login_id' => $request->login_id,
                 'transaction_key' => $request->transaction_key,
                 'limit' => $request->limit,
