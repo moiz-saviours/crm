@@ -498,6 +498,7 @@ class InvoiceController extends Controller
             if (!empty($merchantExcluded)) {
                 $message .= " However, the following merchants were excluded due to insufficient limits: " . implode(', ', $merchantExcluded);
             }
+            $invoice->load('payment_attachments');
             return response()->json(['data' => $invoice, 'success' => $message]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -518,6 +519,18 @@ class InvoiceController extends Controller
 
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
+        }
+    }
+
+    public function getPaymentProof(Request $request)
+    {
+        try {
+            $payment_attachments = PaymentAttachment::where('invoice_key', $request->input('invoice_key'))
+                ->orderBy('created_at', 'desc')
+                ->get();
+            return response()->json(['status' => 'success', 'payment_attachments' => $payment_attachments]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 }
