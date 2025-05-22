@@ -37,7 +37,8 @@ class PaymentController extends Controller
             ->orderBy('name')
             ->get()
             ->toArray();
-        return view('admin.payments.index', compact('payments', 'brands', 'teams', 'agents', 'customer_contacts', 'client_contacts'));
+        $unpaid_invoices = Invoice::where('status', 0)->orderBy('created_at', 'desc')->get();
+        return view('admin.payments.index', compact('unpaid_invoices', 'payments', 'brands', 'teams', 'agents', 'customer_contacts', 'client_contacts'));
     }
 
     /**
@@ -72,6 +73,7 @@ class PaymentController extends Controller
             'customer_contact_phone' => 'required_if:type,0|nullable|string|max:15',
 //            'payment_method' => 'required|string|in:authorize,edp,stripe,credit card,bank transfer,paypal,cash,other',
             'payment_date' => 'required|date',
+            'invoice_key' => 'nullable|string|max:255',
         ], [
             'client_account.required' => 'The client account field is required.',
             'client_account.integer' => 'The client account must be a valid integer.',
@@ -104,6 +106,22 @@ class PaymentController extends Controller
             'type.required' => 'The invoice type is required.',
             'type.in' => 'The type field must be fresh or upsale.',
         ]);
+        $validator->after(function ($validator) use ($request) {
+            if ($request->filled('invoice_key')) {
+                $invoice = Invoice::where('invoice_key', $request->invoice_key)->first();
+                if (!$invoice) {
+                    $validator->errors()->add('invoice_key', 'The selected invoice does not exist.');
+                } elseif ($invoice->status != 0) {
+                    $statusLabel = match ($invoice->status) {
+                        1 => 'Paid',
+                        2 => 'Refunded',
+                        3 => 'Chargeback',
+                        default => 'Unknown',
+                    };
+                    $validator->errors()->add('invoice_key', "This invoice is not unpaid. Status: {$statusLabel}");
+                }
+            }
+        });
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
@@ -130,21 +148,43 @@ class PaymentController extends Controller
             if (!$account->exists()) {
                 return response()->json(['error' => 'The selected client account does not exist. Please select a different or create a new one.'], 404);
             }
-            $invoiceData = [
-                'brand_key' => $request->input('brand_key'),
-                'team_key' => $request->input('team_key'),
-                'cus_contact_key' => $customer_contact->special_key,
-                'description' => $request->description,
-                'amount' => $request->amount,
-                'total_amount' => $request->input('amount'),
-                'type' => $request->input('type'),
-                'status' => 1,
-            ];
-            if ($request->has('agent_id')) {
-                $invoiceData['agent_id'] = $request->input('agent_id');
-                $invoiceData['agent_type'] = 'App\Models\User';
+            if ($request->filled('invoice_key')) {
+                $invoice = Invoice::where('invoice_key', $request->invoice_key)->where('status', 0)->first();
+                if (empty($invoice->brand_key)) {
+                    $invoice->brand_key = $request->input('brand_key');
+                }
+                if (empty($invoice->team_key)) {
+                    $invoice->team_key = $request->input('team_key');
+                }
+                if (empty($invoice->cus_contact_key)) {
+                    $invoice->cus_contact_key = $customer_contact->special_key;
+                }
+                if (empty($invoice->agent_id)) {
+                    $invoice->agent_id = $request->input('agent_id');
+                    $invoice->agent_type = 'App\Models\User';
+                }
+                $invoice->status = 1;
+                $invoice->save();
+                if (!$invoice) {
+                    return response()->json(['error' => 'The selected invoice does not exist.'], 404);
+                }
+            } else {
+                $invoiceData = [
+                    'brand_key' => $request->input('brand_key'),
+                    'team_key' => $request->input('team_key'),
+                    'cus_contact_key' => $customer_contact->special_key,
+                    'description' => $request->description,
+                    'amount' => $request->amount,
+                    'total_amount' => $request->input('amount'),
+                    'type' => $request->input('type'),
+                    'status' => 1,
+                ];
+                if ($request->has('agent_id')) {
+                    $invoiceData['agent_id'] = $request->input('agent_id');
+                    $invoiceData['agent_type'] = 'App\Models\User';
+                }
+                $invoice = Invoice::create($invoiceData);
             }
-            $invoice = Invoice::create($invoiceData);
             $paymentData = [
                 'brand_key' => $request->input('brand_key'),
                 'team_key' => $request->input('team_key'),
@@ -165,7 +205,7 @@ class PaymentController extends Controller
             $payment = Payment::create($paymentData);
             $payment->refresh();
             DB::commit();
-            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent','payment_gateway:id,c_contact_key,c_company_key,name,payment_method,name,descriptor');
+            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent', 'payment_gateway:id,c_contact_key,c_company_key,name,payment_method,name,descriptor');
             $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             return response()->json(['data' => $payment, 'success' => 'Record created successfully!']);
         } catch (\Exception $e) {
@@ -217,7 +257,7 @@ class PaymentController extends Controller
     public function update(Request $request, Payment $payment)
     {
         return response()->json(['error' => 'Harmful Behaviour Detected!.']);
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'client_account' => 'required|integer|exists:payment_merchants,id',
             'brand_key' => 'required|integer|exists:brands,brand_key',
             'team_key' => 'required|integer|exists:teams,team_key',
@@ -257,6 +297,9 @@ class PaymentController extends Controller
             'type.required' => 'The invoice type is required.',
             'type.in' => 'The type field must be fresh or upsale.',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
         DB::beginTransaction();
         try {
 
