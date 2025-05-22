@@ -577,6 +577,135 @@
             });
         });
 
+        $(document).on('click', '.view-payment-proofs', function () {
+            const $this = $(this);
+            const invoice_key = $this.data('invoice-key');
+            const $modalInvoiceId = $('#modalInvoiceId');
+            const $tableBody = $('#paymentProofsTbody');
+
+            $modalInvoiceId.text(invoice_key);
+
+            $.ajax({
+                url: `{{ route('invoice.payment_proofs') }}`,
+                type: 'GET',
+                data: {invoice_key: invoice_key},
+                beforeSend: function () {
+                    $tableBody.html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+                },
+                success: function (response) {
+                    $tableBody.empty();
+
+                    if (response.status === 'success' && response.payment_attachments.length > 0) {
+                        let hasValidAttachments = false;
+
+                        $.each(response.payment_attachments, function (parentIndex, payment_attachment) {
+                            try {
+                                const attachments = JSON.parse(payment_attachment.attachments);
+                                if (attachments && attachments.length > 0) {
+                                    hasValidAttachments = true;
+
+                                    $.each(attachments, function (index, attachment) {
+                                        const filePath = attachment.file_path.replace(/\\/g, '/');
+                                        const fileUrl = `/${filePath}`;
+                                        const fileType = attachment.extension || filePath.split('.').pop();
+                                        const fileName = attachment.original_name || attachment.file_name;
+                                        const createdAt = attachment.created_at || payment_attachment.created_at;
+                                        const $row = $('<tr>').html(`
+                                            <td class="align-middle text-center">${attachment.id}</td>
+                                            <td class="align-middle text-center">${fileName}</td>
+                                            <td class="align-middle text-center">${fileType}</td>
+                                            <td class="align-middle text-center">
+                                                <button class="btn btn-sm btn-outline-primary view-file-btn"
+                                                        data-url="${fileUrl}"
+                                                        data-name="${fileName}"
+                                                        data-type="${fileType}">
+                                                    <i class="fas fa-eye"></i> View
+                                                </button>
+                                            </td>
+                                            <td class="align-middle text-center">${new Date(createdAt).toLocaleString()}</td>
+                                            <td class="align-middle text-center">
+                                                <a href="${fileUrl}" download="${fileName}" class="btn btn-sm btn-outline-primary download-btn">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            </td>
+                                        `);
+                                        $tableBody.append($row);
+                                    });
+                                }
+                            } catch (e) {
+                                console.error('Error parsing attachments:', e);
+                                $tableBody.append(`
+                            <tr>
+                                <td colspan="6" class="text-center text-danger">
+                                    Error loading attachments for payment ${parentIndex + 1}
+                                </td>
+                            </tr>
+                        `);
+                            }
+                        });
+
+                        if (!hasValidAttachments) {
+                            $tableBody.html('<tr><td colspan="6" class="text-center">No valid attachments found.</td></tr>');
+                        }
+                    } else {
+                        $tableBody.html('<tr><td colspan="6" class="text-center">No payment attachments found.</td></tr>');
+                    }
+                    $('#paymentProofModal').modal('show');
+                },
+                error: function () {
+                    $tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error fetching data</td></tr>');
+                }
+            });
+        });
+
+        $(document).on('click', '.view-file-btn', function () {
+            const url = $(this).data('url');
+            const type = $(this).data('type');
+            const fileName = $(this).data('name');
+            previewFile(url, type, fileName);
+        });
+
+        function previewFile(url, type, fileName) {
+            const $pdfFrame = $('#pdfPreview');
+            const $imgPreview = $('#imagePreview');
+            const $previewFileName = $('#previewFileName');
+            // const fileName = url.split('/').pop();
+
+            $previewFileName.text(fileName);
+            if (type === 'pdf') {
+                $pdfFrame.attr('src', `${url}#toolbar=0`).show();
+                $imgPreview.hide();
+            } else {
+                $imgPreview.attr('src', url).show();
+                $pdfFrame.hide();
+            }
+            $('#filePreviewModal').modal('show');
+        }
+
+        $(document).on('click', '.download-btn', function (e) {
+            if (this.hostname !== window.location.hostname) {
+                e.preventDefault();
+                const url = $(this).attr('href');
+                const fileName = $(this).attr('download');
+                fetch(url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(blobUrl);
+                    })
+                    .catch(error => {
+                        console.error('Download error:', error);
+                        alert('Download failed. Please try again.');
+                    });
+            }
+        });
+
         $(document).on('click', '.copyBtn', async function () {
             try {
                 let invoiceUrl = $(this).data('invoice-url');
