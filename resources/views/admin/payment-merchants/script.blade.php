@@ -156,7 +156,8 @@
             $('#descriptor').val(client_account.descriptor);
             $('#vendor_name').val(client_account.vendor_name);
             $('#email').val(client_account.email);
-            $('#payment_method').val(client_account.payment_method);
+            $('#payment_method').val(client_account.payment_method).trigger('change');
+            $('#bank_details').val(client_account.bank_details);
             $('#login_id').val(client_account.login_id);
             $('#transaction_key').val(client_account.transaction_key);
             $('#limit').val(client_account.limit);
@@ -205,7 +206,7 @@
                                 <td class="align-middle text-center text-nowrap">${client_contact ? client_contact.name : '---'}</td>
                                 <td class="align-middle text-center text-nowrap">${client_company ? client_company.name : '---'}</td>
                                 <td class="align-middle text-center text-nowrap">${name}</td>
-                                <td class="align-middle text-center text-nowrap">${descriptor}</td>
+                                <td class="align-middle text-center text-nowrap">${descriptor??'---'}</td>
                                 <td class="align-middle text-center text-nowrap">${payment_method.toUpperCase()}</td>
                                 <td class="align-middle text-center text-nowrap">${email}</td>
                                 <td class="align-middle text-center text-nowrap">${login_id}</td>
