@@ -277,7 +277,7 @@
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
                                                             title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
-                            ${status != 1 ? '<button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button>' +
+                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button>' +
                                 '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
                                 : ''}
                         </td>`;
