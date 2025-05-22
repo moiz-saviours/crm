@@ -198,6 +198,17 @@
                                                                 title="Copy Invoice Url"><i
                                                                 class="fas fa-copy"></i></button>
                                                     @endif
+                                                    @if(isset($invoice->payment_attachments) && count($invoice->payment_attachments) > 0)
+                                                        @can('view_payment_proofs',$invoice)
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-primary view-payment-proofs"
+                                                                    data-invoice-key="{{ $invoice->invoice_key }}"
+                                                                    title="View Payment Proofs"><i
+                                                                    class="fas fa-paperclip"></i>
+                                                                {{ $invoice->payment_attachments->count() }}
+                                                            </button>
+                                                        @endcan
+                                                    @endif
                                                     @if($invoice->status != 1)
                                                         @can('edit',$invoice)
                                                             <button type="button" class="btn btn-sm btn-primary editBtn"
@@ -357,7 +368,56 @@
         </div>
     </div>
 
+    <div class="modal fade" id="paymentProofModal" tabindex="-1" aria-labelledby="paymentProofModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentProofModalLabel">Payment Proofs for Invoice: <span
+                            id="modalInvoiceId"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="overflow-y: auto;max-height: 350px">
+                    <table class="table table-striped" id="paymentProofTable">
+                        <thead>
+                        <tr>
+                            <th class="align-middle text-center">ID</th>
+                            <th class="align-middle text-center">FILE NAME</th>
+                            <th class="align-middle text-center">TYPE</th>
+                            <th class="align-middle text-center">PREVIEW</th>
+                            <th class="align-middle text-center">UPLOADED AT</th>
+                            <th class="align-middle text-center">ACTIONS</th>
+                        </tr>
+                        </thead>
+                        <tbody id="paymentProofsTbody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional: Add a separate modal for file previews (e.g., PDF/images) -->
+    <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewFileName">File Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <iframe id="pdfPreview" src="" style="width:100%; height:500px; border:none;"></iframe>
+                    <img id="imagePreview" src="" class="img-fluid" style="display:none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal -->
+
     @include('user.invoices.custom-form')
 
     @push('script')
