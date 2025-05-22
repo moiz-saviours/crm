@@ -671,16 +671,20 @@
                         if (response.data) {
                             const merchant_types = response.data;
                             Object.keys(merchant_types).forEach(type => {
-                                const checkboxId = `${type}_checkbox`;
+                                const safeType = type.replace(/\s+/g, '_');
+                                const checkboxId = `${safeType}_checkbox`;
+                                const displayName = type === "edp" ? "EasyPay Direct" :
+                                    type === "bank transfer" ? "Bank Transfer" :
+                                        type.charAt(0).toUpperCase() + type.slice(1);
                                 const checkboxHtml = `
                                 <div class="payment-gateway-card" data-type="${type}">
                                     <div class="form-check">
                                         <input class="form-check-input merchant-type-checkbox" type="checkbox" id="${checkboxId}" value="${type}">
                                         <label class="form-check-label" for="${checkboxId}">
-                                            <i class="${getIconForType(type)} me-2"></i> ${type === "edp" ? "EasyPay Direct" : type.charAt(0).toUpperCase() + type.slice(1)}
+                                            <i class="${getIconForType(type)} me-2"></i> ${displayName}
                                         </label>
                                     </div>
-                                    <div id="merchant_${type}" class="merchant-dropdown"></div>
+                                    <div id="merchant_${safeType}" class="merchant-dropdown"></div>
                                 </div>
                             `;
                                 merchantTypesContainer.append(checkboxHtml);
@@ -694,12 +698,13 @@
 
                             $('.payment-gateway-card .merchant-type-checkbox').on('change', function () {
                                 const type = $(this).val();
-                                const merchantDropdown = $(`#merchant_${type}`);
+                                const safeType = type.replace(/\s+/g, '_');
+                                const merchantDropdown = $(`#merchant_${safeType}`);
                                 if ($(this).is(':checked')) {
                                     const dropdownHtml = `
                                     <div class="form-group mb-3">
-                                        <label for="merchant_select_${type}" class="form-label">Select Merchant</label>
-                                        <select class="form-control form-select" id="merchant_select_${type}" name="merchants[${type}]" title="Please select a ${type} merchant" required>
+                                        <label for="merchant_select_${safeType}" class="form-label">Select Merchant</label>
+                                        <select class="form-control form-select" id="merchant_select_${safeType}" name="merchants[${type}]" title="Please select a ${type} merchant" required>
                                             <option value="" selected disabled>Please select a ${type} merchant</option>
                                             ${merchant_types[type].map(merchant => `
                                                 <option value="${merchant.id}">${merchant.name} ( Limit : ${merchant.limit} ) </option>
@@ -710,7 +715,7 @@
                                     merchantDropdown.html(dropdownHtml);
                                     if (invoice && invoice.merchant_types && invoice.merchant_types[type]) {
                                         setTimeout(() => {
-                                            $(`#merchant_select_${type}`).val(invoice.merchant_types[type]).trigger('change');
+                                            $(`#merchant_select_${safeType}`).val(invoice.merchant_types[type]).trigger('change');
                                         }, 100);
                                     }
                                 } else {
@@ -734,6 +739,8 @@
                     return 'fab fa-stripe';
                 case 'paypal':
                     return 'fab fa-paypal';
+                case 'bank transfer':
+                    return 'fas fa-university';
                 default:
                     return 'fas fa-question-circle';
             }
