@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\CustomerContact;
 use App\Models\Invoice;
 use App\Models\InvoiceMerchant;
+use App\Models\PaymentAttachment;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
@@ -490,10 +491,34 @@ class InvoiceController extends Controller
             if (!empty($merchantExcluded)) {
                 $message .= " However, the following merchants were excluded due to insufficient limits: " . implode(', ', $merchantExcluded);
             }
+            $invoice->load('payment_attachments');
             return response()->json(['data' => $invoice, 'success' => $message]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while updating the record', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getPaymentProof(Request $request)
+    {
+        try {
+            $invoice = Invoice::where('invoice_key', $request->input('invoice_key'))->first();
+            if (!$invoice) {
+                return response()->json(['status' => 'error', 'message' => 'Invoice not found'], 404);
+            }
+            $this->authorize('view_payment_proofs', $invoice);
+            $payment_attachments = PaymentAttachment::where('invoice_key', $request->input('invoice_key'))
+                ->orderBy('created_at', 'desc')
+                ->get();
+            return response()->json(['status' => 'success', 'payment_attachments' => $payment_attachments]);
+        } catch (AuthorizationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized action'
+            ], 403);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
 }
