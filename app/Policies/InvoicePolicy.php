@@ -45,4 +45,18 @@ class InvoicePolicy
     {
         return $this->edit($user, $invoice);
     }
+    /**
+     * Check if a user can view invoice payment proofs.
+     */
+    public function view_payment_proofs(User $user, Invoice $invoice)
+    {
+        if (!$invoice->id) return Response::denyWithStatus(404, 'Oops! Invoice not found.');
+        // Check if user is the agent (matching ID + type)
+        if ($invoice->agent && $invoice->agent->is($user)) return Response::allow();
+        // Check if user is the creator (matching ID + type)
+        if ($invoice->creator && $invoice->creator->is($user)) return Response::allow();
+        // Check if user is the team lead
+        if ($invoice->team_key && Team::where('team_key', $invoice->team_key)->where('lead_id', $user->id)->exists()) return Response::allow();
+        return Response::deny("You don't have permission to perform this action.");
+    }
 }
