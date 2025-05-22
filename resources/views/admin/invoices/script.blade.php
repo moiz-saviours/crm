@@ -387,7 +387,7 @@
                                 actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${payment_attachments.length}  </button> `;
                             }
                             if (status != 1) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
+                                actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
                                                 <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
                             }
                             if (normalizeHtml(decodeHtml(rowData[11])) !== normalizeHtml(actionsHtml)) {
@@ -588,7 +588,7 @@
             }
             $('#filePreviewModal').modal('show');
         }
-        
+
         $(document).on('click', '.download-btn', function (e) {
             if (this.hostname !== window.location.hostname) {
                 e.preventDefault();
