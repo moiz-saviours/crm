@@ -98,6 +98,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             Route::get('/edit/{invoice?}', [AdminInvoiceController::class, 'edit'])->name('edit');
             Route::post('/update/{invoice?}', [AdminInvoiceController::class, 'update'])->name('update');
             Route::delete('/delete/{invoice?}', [AdminInvoiceController::class, 'delete'])->name('delete');
+            Route::get('/payment-proofs', [AdminInvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
         });
     });
     /** Contacts Routes */
