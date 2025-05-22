@@ -36,7 +36,6 @@ class InvoiceController extends Controller
         $customer_contacts = CustomerContact::where(function ($query) use ($teamKeys) {
             $query->whereIn('team_key', $teamKeys)->orWhereMorphedTo('creator', auth()->user());
         })->active()->orderBy('name')->get();
-
         $all_invoices = Invoice::whereIn('brand_key', $brandKeys)
             ->whereIn('team_key', $teamKeys)
             ->orWhere(function ($query) use ($user) {
@@ -225,7 +224,7 @@ class InvoiceController extends Controller
 //                $data['agent_type'] = get_class(auth()->user());
 //            }
             $invoice = Invoice::create($data);
-            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe' , 'paypal'])]);
+            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe', 'paypal', 'bank transfer'])]);
             $client_accounts = $brand->client_accounts;
             $validMerchantIds = $client_accounts->pluck('id')->toArray();
             $merchantExcluded = [];
@@ -256,7 +255,7 @@ class InvoiceController extends Controller
             }, 'brand' => function ($query) {
                 $query->select('id', 'brand_key', 'name');
             }, 'team' => function ($query) {
-                $query->select('id', 'team_key', 'name','lead_id');
+                $query->select('id', 'team_key', 'name', 'lead_id');
             }, 'creator' => function ($query) {
                 $query->select('id', 'name', 'email');
             }]);
@@ -275,14 +274,11 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         $this->authorize('edit', $invoice);
-
         $invoice->load(['agent' => function ($query) {
             $query->select('id', 'name', 'email');
         }, 'customer_contact' => function ($query) {
             $query->select('id', 'name', 'email', 'phone', 'special_key');
         }, 'invoice_merchants']);
-
-
         $invoice->merchant_types = $invoice->invoice_merchants->mapWithKeys(fn($merchant) => [$merchant->merchant_type => $merchant->merchant_id]);
         return response()->json(['invoice' => $invoice]);
     }
@@ -429,7 +425,7 @@ class InvoiceController extends Controller
                 'type' => $request->input('type'),
                 'due_date' => $request->input('due_date'),
             ]);
-            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe' , 'paypal'])]);
+            $brand->load(['client_accounts' => fn($q) => $q->whereIn('payment_method', ['authorize', 'edp', 'stripe', 'paypal', 'bank transfer'])]);
             $client_accounts = $brand->client_accounts->unique('id');
             $validMerchantIds = $client_accounts->pluck('id')->toArray();
             $existingMerchants = InvoiceMerchant::where('invoice_key', $invoice->invoice_key)
@@ -480,7 +476,7 @@ class InvoiceController extends Controller
             }, 'brand' => function ($query) {
                 $query->select('id', 'brand_key', 'name');
             }, 'team' => function ($query) {
-                $query->select('id', 'team_key', 'name','lead_id');
+                $query->select('id', 'team_key', 'name', 'lead_id');
             }, 'creator' => function ($query) {
                 $query->select('id', 'name', 'email');
             }]);
