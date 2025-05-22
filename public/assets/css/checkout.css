@@ -999,9 +999,11 @@ input::placeholder {
     color: #999;
     font-style: italic;
 }
+
 input {
     font-style: italic;
 }
+
 select {
     color: #999;
     font-style: italic;
@@ -1009,4 +1011,71 @@ select {
 
 option {
     font-size: 14px !important;
+}
+
+.copy-line {
+    display: flex;
+    align-items: center;
+}
+
+.line-text {
+    display: inline;
+}
+
+.copy-btn {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #edf1f6;
+    padding: 4px;
+    font-size: 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    position: relative;
+}
+
+
+.copy-all-btn {
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    position: relative;
+    letter-spacing: 1px;
+}
+
+.copy-btn::after,
+.copy-all-btn::after {
+    content: 'Copy';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.copy-btn:hover::after,
+.copy-all-btn:hover::after {
+    opacity: 1;
+}
+
+.copy-btn.success::after,
+.copy-all-btn.success::after {
+    content: 'Copied!';
+    background: green;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
