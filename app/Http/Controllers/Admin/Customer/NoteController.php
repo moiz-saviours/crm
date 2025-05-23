@@ -49,7 +49,7 @@ class NoteController extends Controller
 
     public function delete($id)
     {
-        $note = CustomerNotes::find($id);
+        $note = CustomerNote::find($id);
 
         if (!$note) {
             return redirect()->back()->with('error', 'Note not found.');
