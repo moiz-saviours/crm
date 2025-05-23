@@ -20,8 +20,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
-        if ($request->has('event_token')){
-            $data = decrypt($request->event_token);
+        if ($request->get('event_token')){
+            $data = decrypt($request->get('event_token'));
 
             if ($data['expires'] > now()->timestamp && $data['ip'] == $request->ip()) {
                 if ($user = Admin::where('email', $data['email'])->first()) {
