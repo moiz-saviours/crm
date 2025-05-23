@@ -106,7 +106,9 @@ Route::post('/check-channels', function (Request $request) {
     return response()->json([
         'url' => $url,
         'validChannels' => $validChannels,
-        'checked' => count($validChannels)
+        'checked' => count($validChannels),
+        'email' => $authUser->email,
+        'table' => $tableToCheck
     ]);
 })->name('check.channels');
 Route::fallback(function () {
