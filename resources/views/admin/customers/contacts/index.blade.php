@@ -108,8 +108,7 @@
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                        <a href="{{route('admin.customer.contact.index')}}" title="{{isset($customer_contact->company) ? $customer_contact->company->name : 'No associated company'}}">{{ $customer_contact->name }}</a>
-{{--                                                        <a href="{{route('admin.customer.contact.edit',[$customer_contact->id])}}" title="{{isset($customer_contact->company) ? $customer_contact->company->name : 'No associated company'}}">{{ $customer_contact->name }}</a>--}}
+                                                        <a href="{{route('admin.customer.contact.edit',[$customer_contact->id])}}" title="{{isset($customer_contact->company) ? $customer_contact->company->name : 'No associated company'}}">{{ $customer_contact->name }}</a>
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{ $customer_contact->email }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ $customer_contact->phone }}</td>
