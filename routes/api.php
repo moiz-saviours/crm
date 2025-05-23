@@ -79,7 +79,7 @@ Route::post('/check-channels', function (Request $request) {
 
     $validChannels = [];
     $checkedChannels = 0;
-    $maxChannelsToCheck = 2;
+    $maxChannelsToCheck = 20;
 
     foreach ($channels as $domain => $channelName) {
         if ($domain === $request->current_domain) {
