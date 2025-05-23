@@ -523,7 +523,7 @@
 
                                     $.each(attachments, function (index, attachment) {
                                         const filePath = attachment.file_path.replace(/\\/g, '/');
-                                        const fileUrl = `/${filePath}`;
+                                        const fileUrl = `{{asset('/')}}${filePath}`;
                                         const fileType = attachment.extension || filePath.split('.').pop();
                                         const fileName = attachment.original_name || attachment.file_name;
                                         const createdAt = attachment.created_at || payment_attachment.created_at;
