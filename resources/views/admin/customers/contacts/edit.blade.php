@@ -3047,7 +3047,7 @@
                                                             @endif
                                                         </span>
                                                         <span>TXIDs : {{ $payment->transaction_id ?? "---" }}</span>
-                                                        <span>Brand : {{ $payment->brand->name }}</span>
+                                                        <span>Brand : {{ optional($payment->brand)->name }}</span>
                                                         <span>Method : {{ $payment->payment_method ?? "---" }}</span>
                                                         <span>Amount : {{ $payment->amount }}$
 
