@@ -95,7 +95,6 @@ Route::post('/check-channels', function (Request $request) {
 
             if ($response->ok() && $response->json('exists')) {
                 $validChannels[] = [
-                    'url' => $url,
                     'domain' => $domain,
                     'name' => $channelName,
                 ];
@@ -107,6 +106,7 @@ Route::post('/check-channels', function (Request $request) {
     }
 
     return response()->json([
+        'url' => $url,
         'validChannels' => $validChannels,
         'checked' => count($validChannels)
     ]);
