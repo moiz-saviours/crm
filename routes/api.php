@@ -51,6 +51,58 @@ Route::post('upload-payment-proof',[ApiPaymentAttachmentController::class,'uploa
 Route::get('fetch-invoice/{invoice?}', [ApiInvoiceController::class, 'fetch_invoice'])->missing(function (Request $request) {
     return response()->json(['error' => 'Invalid url.'], 404);
 });
+Route::post('/api/check-user', function(Request $request) {
+    $email = $request->input('email');
+    $table = $request->input('table');
+
+    if (!$email || !$table) {
+        return response()->json(['error' => 'Missing email or table'], 400);
+    }
+    $allowedTables = ['users', 'admins'];
+    if (!in_array($table, $allowedTables)) {
+        return response()->json(['error' => 'Invalid table'], 400);
+    }
+    $exists = DB::table($table)->where('email', $email)->exists();
+
+    return response()->json(['exists' => $exists]);
+});Route::post('/check-channels', function(){
+
+    $authUser = Auth::user();
+    $tableToCheck = ($authUser && $authUser->type === 'admin') ? 'admins' : 'users';
+
+    $channels = [
+        'payusinginvoice' => 'Channel 1',
+        'paymentbyinvoice' => 'Channel 2',
+        'paymentviainvoice' => 'Channel 3',
+        'paythroughinvoice' => 'Channel 4',
+        'payviainvoice' => 'Channel 5',
+    ];
+
+    $validChannels = [];
+
+    foreach ($channels as $domain  => $channelName) {
+        try {
+            $response = Http::timeout(3)->post("https://{$domain}.com/api/check-user", [
+                'email' => $authUser->email,
+                'table' => $tableToCheck
+            ]);
+
+            if ($response->ok() && $response->json('exists')) {
+                $validChannels[] = [
+                    'domain' => $domain,
+                    'name' => $channelName,
+                ];
+            }
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
+    }
+
+    return response()->json($validChannels);
+})->name('check.channels');
+
+
+
 Route::fallback(function () {
     return response()->json(['error' => 'Controller or function not found'], 404);
 });
