@@ -74,7 +74,7 @@ Route::post('/check-channels', function (Request $request) {
     $validChannels = [];
     foreach ($channels as $domain => $channelName) {
         try {
-            $response = Http::timeout(3)->post("https://{$domain}.com/api/check-user", [
+            $response = Http::timeout(3)->post("https://{$domain}.com/crm-development/api/check-user", [
                 'email' => $request->email,
                 'table' => $tableToCheck
             ]);
