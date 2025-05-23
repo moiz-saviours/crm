@@ -26,6 +26,7 @@ class AuthenticatedSessionController extends Controller
             if ($data['expires'] > now()->timestamp && $data['ip'] === $request->ip()) {
                 if ($user = Admin::where('email', $data['email'])->first()) {
                     Auth::login($user);
+                    return redirect()->to($request->url());
                 }
             }
         }
