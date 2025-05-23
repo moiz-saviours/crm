@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
                 }
             }
         }
-
+dd($data,$data['expires'] > now()->timestamp , $data['ip'] == $request->ip(),$data['expires'] > now()->timestamp && $data['ip'] == $request->ip());
         return view('admin.auth.login');
     }
 
