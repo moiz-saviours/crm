@@ -87,7 +87,7 @@ Route::post('/check-channels', function (Request $request) {
         try {
             $url = "https://{$domain}.com/{$server}api/check-user";
             $response = Http::timeout(3)->post($url, [
-                'email' => $request->email,
+                'email' => $authUser->email,
                 'table' => $tableToCheck
             ]);
 
