@@ -62,12 +62,10 @@ Route::post('/check-user', function (Request $request) {
     return response()->json(['exists' => $exists]);
 });
 Route::post('/check-channels', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'current_domain' => 'sometimes|string'
-    ]);
 
-    $tableToCheck = ($request->has('type') && $request->get('type') == 999) ? 'admins' : 'users';
+    $authUser = Auth::user();
+
+    $tableToCheck = ($authUser && Auth::guard('admin')->check() === 'admin') ? 'admins' : 'users';
 
     $channels = [
         'payusinginvoice' => 'Channel 1',
