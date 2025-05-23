@@ -78,16 +78,11 @@ Route::post('/check-channels', function (Request $request) {
     ];
 
     $validChannels = [];
-    $checkedChannels = 0;
-    $maxChannelsToCheck = 20;
+    $promises = [];
 
     foreach ($channels as $domain => $channelName) {
         if ($domain === $request->current_domain) {
             continue;
-        }
-
-        if ($checkedChannels >= $maxChannelsToCheck) {
-            break;
         }
 
         try {
@@ -102,10 +97,7 @@ Route::post('/check-channels', function (Request $request) {
                     'name' => $channelName,
                 ];
             }
-
-            $checkedChannels++;
         } catch (\Exception $e) {
-            // Log error if needed
             \Log::error("Channel check failed for {$domain}: " . $e->getMessage());
             continue;
         }
@@ -113,7 +105,7 @@ Route::post('/check-channels', function (Request $request) {
 
     return response()->json([
         'validChannels' => $validChannels,
-        'checked' => $checkedChannels
+        'checked' => count($validChannels)
     ]);
 })->name('check.channels');
 Route::fallback(function () {
