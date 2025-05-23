@@ -429,7 +429,17 @@
                             } = response.data;
                             const index = table.row($('#tr-' + id)).index();
                             const rowData = table.row(index).data();
-
+                            let totalAttachments = 0;
+                            if (payment_attachments && payment_attachments.length > 0) {
+                                totalAttachments = payment_attachments.reduce((count, payment) => {
+                                    try {
+                                        const attachments = JSON.parse(payment.attachments);
+                                        return count + (attachments ? attachments.length : 0);
+                                    } catch (e) {
+                                        return count;
+                                    }
+                                }, 0);
+                            }
                             // Update columns in the table dynamically
                             // Column 3: Invoice Number & Invoice Key
                             if (decodeHtml(rowData[2]) !== `${invoice_number}<br>${invoice_key}`) {
@@ -519,7 +529,7 @@
                                 actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
                             }
                             if (payment_attachments && payment_attachments.length > 0) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${payment_attachments.length}  </button> `;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> `;
                             }
                             if (status == 0 && (agent?.id == {{auth()->user()->id}} || creator?.id == {{auth()->user()->id}} || team && team.lead_id == {{auth()->user()->id}}) && creator_type != 'App\\Models\\Admin') {
                                 actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>`;
