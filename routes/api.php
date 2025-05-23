@@ -87,13 +87,15 @@ Route::post('/check-channels', function (Request $request) {
 
         $server = app()->environment('development')? 'crm-development/':null;
         try {
-            $response = Http::timeout(3)->post("https://{$domain}.com/{$server}api/check-user", [
+            $url = "https://{$domain}.com/{$server}api/check-user";
+            $response = Http::timeout(3)->post($url, [
                 'email' => $request->email,
                 'table' => $tableToCheck
             ]);
 
             if ($response->ok() && $response->json('exists')) {
                 $validChannels[] = [
+                    'url' => $url,
                     'domain' => $domain,
                     'name' => $channelName,
                 ];
