@@ -62,8 +62,13 @@ Route::post('/check-user', function (Request $request) {
     return response()->json(['exists' => $exists]);
 });
 Route::post('/check-channels', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'current_domain' => 'sometimes|string'
+    ]);
 
     $tableToCheck = ($request->has('type') && $request->get('type') == 999) ? 'admins' : 'users';
+
     $channels = [
         'payusinginvoice' => 'Channel 1',
         'paymentbyinvoice' => 'Channel 2',
@@ -71,40 +76,47 @@ Route::post('/check-channels', function (Request $request) {
         'paythroughinvoice' => 'Channel 4',
         'payviainvoice' => 'Channel 5',
     ];
+
     $validChannels = [];
+    $checkedChannels = 0;
+    $maxChannelsToCheck = 2; // Limit to 2 concurrent checks
+
     foreach ($channels as $domain => $channelName) {
+        // Skip current domain
+        if ($domain === $request->current_domain) {
+            continue;
+        }
+
+        // Limit to max channels to check
+        if ($checkedChannels >= $maxChannelsToCheck) {
+            break;
+        }
+
         try {
-            $url = "https://{$domain}.com/crm-development/api/check-user";
-            $response = Http::timeout(3)->post($url, [
+            $response = Http::timeout(3)->post("https://{$domain}.com/crm-development/api/check-user", [
                 'email' => $request->email,
                 'table' => $tableToCheck
             ]);
+
             if ($response->ok() && $response->json('exists')) {
                 $validChannels[] = [
                     'domain' => $domain,
                     'name' => $channelName,
                 ];
             }
-            $response_req[] = [
-                'url' => $url,
-                'response' => $response,
-                'response_json' => $response->json(),
-                'response_ok' => $response->ok(),
-                'exists' => $response->json('exists'),
-                'domain' => $domain,
-                'channels' => $validChannels,
-                'email' => $request->email,
-                'table' => $tableToCheck,
-                'name' => $channelName,
-                'hastype' => $request->has('type'),
-                'type' => $request->get('type'),
-                'typematch' => $request->get('type') == 999,
-            ];
+
+            $checkedChannels++;
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            // Log error if needed
+            \Log::error("Channel check failed for {$domain}: " . $e->getMessage());
+            continue;
         }
     }
-    return response()->json(['validChannels' => $validChannels, 'response_req' => $response_req]);
+
+    return response()->json([
+        'validChannels' => $validChannels,
+        'checked' => $checkedChannels
+    ]);
 })->name('check.channels');
 Route::fallback(function () {
     return response()->json(['error' => 'Controller or function not found'], 404);
