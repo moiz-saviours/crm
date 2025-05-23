@@ -20,6 +20,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
+        dd($request->get('event_token'));
         if ($request->get('event_token')){
             $data = decrypt($request->get('event_token'));
 
