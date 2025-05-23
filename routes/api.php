@@ -65,10 +65,10 @@ Route::post('/api/check-user', function(Request $request) {
     $exists = DB::table($table)->where('email', $email)->exists();
 
     return response()->json(['exists' => $exists]);
-});Route::post('/check-channels', function(){
+});
+Route::post('/check-channels', function(Request $request) {
 
-    $authUser = Auth::user();
-    $tableToCheck = ($authUser && $authUser->type === 'admin') ? 'admins' : 'users';
+    $tableToCheck = ($request->has('type') && $request->get('type') === 999) ? 'admins' : 'users';
 
     $channels = [
         'payusinginvoice' => 'Channel 1',
@@ -83,7 +83,7 @@ Route::post('/api/check-user', function(Request $request) {
     foreach ($channels as $domain  => $channelName) {
         try {
             $response = Http::timeout(3)->post("https://{$domain}.com/api/check-user", [
-                'email' => $authUser->email,
+                'email' => $request->email,
                 'table' => $tableToCheck
             ]);
 
