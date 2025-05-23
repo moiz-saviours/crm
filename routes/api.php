@@ -85,7 +85,7 @@ Route::post('/check-channels', function (Request $request) {
                     'name' => $channelName,
                 ];
             }
-            $response_req = [
+            $response_req[] = [
                 'url' => $url,
                 'response' => $response,
                 'response_json' => $response->json(),
