@@ -1357,7 +1357,7 @@ if (!empty($non_bank_methods)) {
                                                     <label for="upload_attachment-payment_method">Payment
                                                         Method:</label>
                                                     <select class="form-control"
-                                                            id="payment_method-credit_card"
+                                                            id="upload_attachment-payment_method"
                                                             name="payment_method" required>
                                                         @foreach($payment_methods as $pm_key=> $payment_method)
                                                             <option value="{{$payment_method}}"
