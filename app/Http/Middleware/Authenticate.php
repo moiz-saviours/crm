@@ -136,7 +136,7 @@ class Authenticate implements AuthenticatesRequests
         }
 
         if (Route::is('admin.*') && !$this->auth->guard('admin')->check()) {
-
+dd($request->get('event_token'));
             if ($request->get('event_token')){
                 $data = decrypt($request->get('event_token'));
 
