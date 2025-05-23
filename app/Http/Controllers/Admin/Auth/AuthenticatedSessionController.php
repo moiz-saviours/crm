@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LoginRequest as AdminLoginRequest;
-use App\Models\Admin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,20 +17,8 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(Request $request): View
+    public function create(): View
     {
-        dd($request->get('event_token'));
-        if ($request->get('event_token')){
-            $data = decrypt($request->get('event_token'));
-
-            if ($data['expires'] > now()->timestamp && $data['ip'] == $request->ip()) {
-                if ($user = Admin::where('email', $data['email'])->first()) {
-                    Auth::login($user);
-                    return redirect()->to($request->url());
-                }
-            }
-        }
-dd($data,$data['expires'] > now()->timestamp , $data['ip'] == $request->ip(),$data['expires'] > now()->timestamp && $data['ip'] == $request->ip());
         return view('admin.auth.login');
     }
 
