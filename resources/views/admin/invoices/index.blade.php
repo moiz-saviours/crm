@@ -197,11 +197,17 @@
                                                                 class="fas fa-copy"></i></button>
                                                     @endif
                                                     @if(isset($invoice->payment_attachments) && count($invoice->payment_attachments) > 0)
+                                                            @php
+                                                                $allAttachments = $invoice->payment_attachments->flatMap(function($payment) {
+                                                                    return json_decode($payment->attachments, true) ?? [];
+                                                                });
+                                                                $attachmentCount = $allAttachments->count();
+                                                            @endphp
                                                         <button type="button"
                                                                 class="btn btn-sm btn-primary view-payment-proofs"
                                                                 data-invoice-key="{{ $invoice->invoice_key }}" title="View Payment Proofs"><i
                                                                 class="fas fa-paperclip"></i>
-                                                             {{ $invoice->payment_attachments->count() }}
+                                                             {{ $attachmentCount }}
                                                         </button>
                                                     @endif
                                                     @if($invoice->status != 1)
