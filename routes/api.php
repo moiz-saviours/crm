@@ -92,7 +92,7 @@ Route::post('/check-channels', function (Request $request) {
                 'name' => $channelName,
                 'hastype' => $request->has('type'),
                 'type' => $request->get('type'),
-                'typematch' => $request->get('type') === 999,
+                'typematch' => $request->get('type') == 999,
             ];
         } catch (\Exception $e) {
             dd($e->getMessage());
