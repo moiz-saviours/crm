@@ -23,7 +23,7 @@ class AuthenticatedSessionController extends Controller
         if ($request->has('event_token')){
             $data = decrypt($request->event_token);
 
-            if ($data['expires'] > now()->timestamp && $data['ip'] === $request->ip()) {
+            if ($data['expires'] > now()->timestamp && $data['ip'] == $request->ip()) {
                 if ($user = Admin::where('email', $data['email'])->first()) {
                     Auth::login($user);
                     return redirect()->to($request->url());
