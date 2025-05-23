@@ -85,7 +85,7 @@ Route::post('/check-channels', function (Request $request) {
             continue;
         }
 
-        $server = app()->environment('development')? 'crm-development/':null;
+        $server = app()->environment('development')? 'crm-development/':'crm-development/';
         try {
             $url = "https://{$domain}.com/{$server}api/check-user";
             $response = Http::timeout(3)->post($url, [
