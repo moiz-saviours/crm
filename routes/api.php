@@ -63,7 +63,7 @@ Route::post('/api/check-user', function (Request $request) {
 });
 Route::post('/check-channels', function (Request $request) {
 
-    $tableToCheck = ($request->has('type') && $request->get('type') === 999) ? 'admins' : 'users';
+    $tableToCheck = ($request->has('type') && $request->get('type') == 999) ? 'admins' : 'users';
     $channels = [
         'payusinginvoice' => 'Channel 1',
         'paymentbyinvoice' => 'Channel 2',
