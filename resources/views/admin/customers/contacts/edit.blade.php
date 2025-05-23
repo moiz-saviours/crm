@@ -3107,7 +3107,7 @@
                                                                     class="badge bg-primary cstm_bdge">Charge Back</span>
                                                             @endif
                                                         </span>
-                                                        <span>Brand :{{$invoice->brand->name}} </span>
+                                                        <span>Brand :{{optional($invoice->brand)->name}} </span>
                                                         <span>
                                                             Amount : {{ $invoice->total_amount}}$
                                                             @if($invoice->taxable == 1)
