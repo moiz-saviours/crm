@@ -48,7 +48,7 @@ Route::post('upload-payment-proof', [ApiPaymentAttachmentController::class, 'upl
 Route::get('fetch-invoice/{invoice?}', [ApiInvoiceController::class, 'fetch_invoice'])->missing(function (Request $request) {
     return response()->json(['error' => 'Invalid url.'], 404);
 });
-Route::post('/api/check-user', function (Request $request) {
+Route::post('/check-user', function (Request $request) {
     $email = $request->input('email');
     $table = $request->input('table');
     if (!$email || !$table) {
