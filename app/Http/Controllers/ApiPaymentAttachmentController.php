@@ -23,7 +23,7 @@ class ApiPaymentAttachmentController extends Controller
                 return json_decode($attachment->attachments, true) ?: [];
             })
             ->count() : 0;
-        $maxLimit = 10;
+        $maxLimit = 5;
         if ($existingAttachmentCount >= $maxLimit) {
             return response()->json(['error' => 'Oop! Invoice maximum attachment limit reached.', 'current_count' => $existingAttachmentCount,], 404);
         }

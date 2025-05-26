@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Admin;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
@@ -135,6 +136,20 @@ class Authenticate implements AuthenticatesRequests
         }
 
         if (Route::is('admin.*') && !$this->auth->guard('admin')->check()) {
+
+            if ($request->get('event_token')){
+                $encryptedToken = urldecode($request->get('event_token'));
+
+                $data = decrypt($request->get('event_token'));
+
+                if ($data['expires'] > now()->timestamp && $data['ip'] == $request->ip()) {
+                    if ($user = Admin::where('email', $data['email'])->first()) {
+                        \Illuminate\Support\Facades\Auth::login($user);
+                        return redirect()->to($request->url());
+                    }
+                }
+            }
+
             return route('admin.login');
         }
 
