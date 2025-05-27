@@ -26,60 +26,83 @@ use Illuminate\Http\Request;
 
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
-
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
         $tableToCheck = 'admins';
         $allChannels = config('channels');
         $validChannels = [];
-        $host = request()->getHost();
-        $port = request()->getPort();
+
+        $host = $request->getHost();
+        $port = $request->getPort();
         $fullCurrentDomain = $port && $port != 80 && $port != 443 ? "$host:$port" : $host;
-        // Get current path for full redirection
-        $currentPath = $request->header('referer')
-            ? parse_url($request->header('referer'), PHP_URL_PATH)
-            : '/';
+
+        $referer = $request->header('referer');
+        $currentPath = $referer ? parse_url($referer, PHP_URL_PATH) : '/';
+
+        // For collecting debug data per domain
+        $debugDetails = [];
+
         foreach ($allChannels as $domain => $channelName) {
             if ($domain === $fullCurrentDomain) {
                 continue;
             }
+
+            $domainDebug = [
+                'domain' => $domain,
+                'channelName' => $channelName,
+                'attemptedUrl' => null,
+                'responseStatus' => null,
+                'responseData' => null,
+                'exception' => null,
+            ];
+
             try {
                 $isLocal = str_contains($domain, 'localhost');
                 $ssl = $isLocal ? 'http' : 'https';
                 $prefix = app()->environment('development') && !$isLocal ? '/crm-development' : '';
                 $url = "{$ssl}://{$domain}{$prefix}/api/check-user";
+                $domainDebug['attemptedUrl'] = $url;
+
                 $response = Http::timeout(3)->post($url, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
                 ]);
+
+                $domainDebug['responseStatus'] = $response->status();
+                $domainDebug['responseData'] = $response->json();
+
                 if ($response->ok() && $response->json('exists')) {
                     $validChannels[] = [
                         'domain' => $domain,
                         'name' => $channelName,
-                        'url' => "{$ssl}://{$domain}{$prefix}{$currentPath}", // full URL to be used in <a href>
+                        'url' => "{$ssl}://{$domain}{$prefix}{$currentPath}",
                     ];
                 }
 
             } catch (\Exception $e) {
-                Log::error("Channel check failed for {$domain}: " . $e->getMessage());
+                $errorMessage = "Channel check failed for {$domain}: " . $e->getMessage();
+                Log::error($errorMessage);
+                $domainDebug['exception'] = $e->getMessage();
             }
+
+            $debugDetails[] = $domainDebug;
         }
+
         return response()->json([
             'validChannels' => $validChannels,
-            'authUser' => $authUser,
-            'tableToCheck' => $tableToCheck,
-            'allChannels' => $allChannels,
-            'host' => $host,
-            'port' => $port,
-            'fullCurrentDomain' => $fullCurrentDomain,
-            'currentPath' => $currentPath,
-            'domain' => $domain,
-            'isLocal' => $isLocal,
-            'ssl' => $ssl,
-            'prefix' => $prefix,
-            'url' => $url,
+            'debug' => [
+                'authUser' => $authUser,
+                'tableToCheck' => $tableToCheck,
+                'allChannels' => $allChannels,
+                'host' => $host,
+                'port' => $port,
+                'fullCurrentDomain' => $fullCurrentDomain,
+                'currentPath' => $currentPath,
+                'perDomainDebug' => $debugDetails,
+            ]
         ]);
     })->name('check.channels');
+    
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
