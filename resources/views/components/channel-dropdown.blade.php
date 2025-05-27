@@ -91,7 +91,7 @@
                 data.data.forEach((channel, index) => {
                     const listItem = `
                         <div class="list-group-item py-1" style="display:none;">
-                            <a href="${channel.url}" target="_blank"
+                            <a href="${channel.url}" 
                                class="text-decoration-none text-primary fw-bold">
                                 ${channel.name}
                             </a>
