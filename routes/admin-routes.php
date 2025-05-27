@@ -43,7 +43,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
         $isProdOrDev = app()->environment(['production', 'development']);
 
         foreach ($allChannels as $baseDomain => $channelName) {
-            $isLocal = str_contains($baseDomain, 'localhost') || !str_contains($baseDomain, '.');
+            $isLocal = str_contains($baseDomain, 'localhost');
             $ssl = $isLocal ? 'http' : 'https';
 
             // Append .com for non-local domains
