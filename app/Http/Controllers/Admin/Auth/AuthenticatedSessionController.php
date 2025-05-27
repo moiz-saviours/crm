@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\LoginRequest as AdminLoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use function redirect;
 use function route;
@@ -30,7 +32,35 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $user = Auth::user();
+        $channels = [
+            'https://payusinginvoice.com',
+            'https://paymentbyinvoice.com',
+            'https://paymentviainvoice.com',
+            'https://paythroughinvoice.com',
+            'https://payviainvoice.com',
+        ];
 
+        $loginResults = [];
+        $prefix = app()->environment('development') ? '/crm-development' : '';
+        foreach ($channels as $url) {
+            try {
+                $response = Http::withHeaders([
+                    'Accept' => 'application/json',
+                ])->timeout(5)->post("$url/api{$prefix}/channel-login", [
+                    'email' => $user->email,
+                    'password' => $request->password, // Must send original password
+                ]);
+
+                $loginResults[$url] = $response->json();
+            } catch (\Exception $e) {
+                $loginResults[$url] = [
+                    'status' => 'failed',
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+        Log::info('Cross-channel login results', $loginResults);
         return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
