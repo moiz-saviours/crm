@@ -42,10 +42,14 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         /** It will destroy every user session */
-        $request->session()->invalidate();
+//        $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+    protected function guard()
+    {
+        return Auth::guard('web');
     }
 }
