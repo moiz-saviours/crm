@@ -209,8 +209,8 @@
                                 <td class="align-middle text-center text-nowrap">${descriptor??'---'}</td>
                                 <td class="align-middle text-center text-nowrap">${payment_method.toUpperCase()}</td>
                                 <td class="align-middle text-center text-nowrap">${email}</td>
-                                <td class="align-middle text-center text-nowrap">${login_id}</td>
-                                <td class="align-middle text-center text-nowrap">${transaction_key}</td>
+                                <td class="align-middle text-center text-nowrap">${login_id??""}</td>
+                                <td class="align-middle text-center text-nowrap">${transaction_key??""}</td>
                                 <td class="align-middle text-center text-nowrap">${limit}</td>
                                 <td class="align-middle text-center text-nowrap">${capacity}</td>
                                 <td class="align-middle text-center text-nowrap">${usage}</td>
