@@ -46,16 +46,26 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             $isLocal = str_contains($baseDomain, 'localhost') || !str_contains($baseDomain, '.');
             $ssl = $isLocal ? 'http' : 'https';
 
-            // In local, domain is used as is (e.g. payusinginvoice), otherwise append .com
+            // Append .com for non-local domains
             $resolvedDomain = $isLocal ? $baseDomain : "{$baseDomain}.com";
 
-            // In prod/dev, skip localhost-based channels
+            // Skip localhost in prod/dev
             if ($isProdOrDev && $isLocal) {
+                $debugDetails[] = [
+                    'domain' => $resolvedDomain,
+                    'channelName' => $channelName,
+                    'skipped' => 'Skipped because local domain in production/dev',
+                ];
                 continue;
             }
 
-            // Avoid checking current channel again
+            // Skip current domain (prevent pinging itself)
             if ($resolvedDomain === $fullCurrentDomain || $baseDomain === $fullCurrentDomain) {
+                $debugDetails[] = [
+                    'domain' => $resolvedDomain,
+                    'channelName' => $channelName,
+                    'skipped' => 'Skipped because same as current domain',
+                ];
                 continue;
             }
 
@@ -88,8 +98,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                     ];
                 }
             } catch (\Exception $e) {
-                $errorMessage = "Channel check failed for {$resolvedDomain}: " . $e->getMessage();
-                Log::error($errorMessage);
+                Log::error("Channel check failed for {$resolvedDomain}: " . $e->getMessage());
                 $domainDebug['exception'] = $e->getMessage();
             }
 
