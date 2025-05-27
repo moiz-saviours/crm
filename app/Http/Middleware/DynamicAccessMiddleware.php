@@ -59,7 +59,7 @@ class DynamicAccessMiddleware
         if ($previousUrl && str_contains($previousUrl, 'login')) {
             return $this->redirectToDashboard($request, $departmentRules, $roleRules);
         }
-        return $this->unauthorizedResponse($request, "You don't have permission to perform this action.");
+        return $this->unauthorizedResponse($request, "You don't have permission to perform this action..");
     }
 
     /**
@@ -75,7 +75,7 @@ class DynamicAccessMiddleware
             foreach ($departmentRules['routes'] as $route) {
                 if (str_contains($route, 'dashboard')) {
                     if (Route::has($route)) {
-                        return $this->redirectResponse($request, $route, "You don't have permission to perform this action.");
+                        return $this->redirectResponse($request, $route, "You don't have permission to perform this action .");
                     }
                 }
             }
@@ -84,7 +84,7 @@ class DynamicAccessMiddleware
             foreach ($roleRules['routes'] as $route) {
                 if (str_contains($route, 'dashboard')) {
                     if (Route::has($route)) {
-                        return $this->redirectResponse($request, $route, "You don't have permission to perform this action.");
+                        return $this->redirectResponse($request, $route, "You don't have permission to perform this action");
                     }
                 }
             }

@@ -413,7 +413,7 @@
                 } else if (jqXHR.status === 403) {
                     Swal.fire({
                         title: 'Forbidden',
-                        text: jqXHR.responseJSON.error ?? "You don\'t have permission to perform this action.",
+                        text: jqXHR.responseJSON.error ?? "You don\'t have permission to perform this action .",
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
@@ -501,7 +501,7 @@
                 confirmButtonText: 'OK'
             });
         } else if (jqXHR.status === 403) {
-            toastr['error']("You don\'t have permission to perform this action.");
+            toastr['error']("You don\'t have permission to perform this action");
 
             // Swal.fire({
             //     title: 'Forbidden',
@@ -776,7 +776,7 @@
                     /** Show generic error with toastr */
                     if (options.useToastr) {
                         if (jqXHR.status === 401) {
-                            toastr['error']("You don\'t have permission to perform this action.");
+                            toastr['error']("You don\'t have permission to perform this action..");
                         } else if (jqXHR.status !== 422 || !jqXHR.responseJSON.errors) {
                             toastr['error'](message);
                         }
