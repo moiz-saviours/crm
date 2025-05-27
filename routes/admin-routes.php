@@ -39,30 +39,39 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
         $referer = $request->header('referer');
         $currentPath = $referer ? parse_url($referer, PHP_URL_PATH) : '/';
 
-        // For collecting debug data per domain
         $debugDetails = [];
+        $isProdOrDev = app()->environment(['production', 'development']);
 
-        foreach ($allChannels as $domain => $channelName) {
-            if ($domain === $fullCurrentDomain) {
+        foreach ($allChannels as $baseDomain => $channelName) {
+            $isLocal = str_contains($baseDomain, 'localhost') || !str_contains($baseDomain, '.');
+            $ssl = $isLocal ? 'http' : 'https';
+
+            // In local, domain is used as is (e.g. payusinginvoice), otherwise append .com
+            $resolvedDomain = $isLocal ? $baseDomain : "{$baseDomain}.com";
+
+            // In prod/dev, skip localhost-based channels
+            if ($isProdOrDev && $isLocal) {
                 continue;
             }
 
+            // Avoid checking current channel again
+            if ($resolvedDomain === $fullCurrentDomain || $baseDomain === $fullCurrentDomain) {
+                continue;
+            }
+
+            $prefix = (!$isLocal && app()->environment('development')) ? '/crm-development' : '';
+            $url = "{$ssl}://{$resolvedDomain}{$prefix}/api/check-user";
+
             $domainDebug = [
-                'domain' => $domain,
+                'domain' => $resolvedDomain,
                 'channelName' => $channelName,
-                'attemptedUrl' => null,
+                'attemptedUrl' => $url,
                 'responseStatus' => null,
                 'responseData' => null,
                 'exception' => null,
             ];
 
             try {
-                $isLocal = str_contains($domain, 'localhost');
-                $ssl = $isLocal ? 'http' : 'https';
-                $prefix = app()->environment('development') && !$isLocal ? '/crm-development' : '';
-                $url = "{$ssl}://{$domain}{$prefix}/api/check-user";
-                $domainDebug['attemptedUrl'] = $url;
-
                 $response = Http::timeout(3)->post($url, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
@@ -73,14 +82,13 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
 
                 if ($response->ok() && $response->json('exists')) {
                     $validChannels[] = [
-                        'domain' => $domain,
+                        'domain' => $resolvedDomain,
                         'name' => $channelName,
-                        'url' => "{$ssl}://{$domain}{$prefix}{$currentPath}",
+                        'url' => "{$ssl}://{$resolvedDomain}{$prefix}{$currentPath}",
                     ];
                 }
-
             } catch (\Exception $e) {
-                $errorMessage = "Channel check failed for {$domain}: " . $e->getMessage();
+                $errorMessage = "Channel check failed for {$resolvedDomain}: " . $e->getMessage();
                 Log::error($errorMessage);
                 $domainDebug['exception'] = $e->getMessage();
             }
@@ -102,7 +110,6 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             ]
         ]);
     })->name('check.channels');
-    
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
