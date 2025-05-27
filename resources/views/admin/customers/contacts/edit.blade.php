@@ -1346,7 +1346,8 @@
             .company_sec span {
                 font-size: 0.8rem;
             }
-            .company_sec span a{
+
+            .company_sec span a {
                 text-decoration: none;
                 color: #0a89b4;
             }
@@ -1362,7 +1363,7 @@
                 border-radius: 3px;
             }
 
-            .showhide {
+            .showhide-invoice {
                 font-size: 10px;
                 font-weight: 500;
                 color: #0091ae;
@@ -1370,13 +1371,29 @@
                 background-color: #fff;
 
             }
-            .showhide:hover{
+
+            .showhide-payment {
+                font-size: 10px;
+                font-weight: 500;
+                color: #0091ae;
+                border: none;
+                background-color: #fff;
+
+            }
+
+            .showhide:hover {
             }
 
 
-             .show_btn:hover{
-                 text-decoration: none;
-             }
+            .show_btn:hover {
+                text-decoration: none;
+            }
+
+            .para_sec {
+                padding: 5px 0px;
+                margin: 10px 0px;
+                font-size: var(--nf-profile-para-size);
+            }
 
         </style>
 
@@ -1508,11 +1525,11 @@
                                         <div class="collapse-header-prent-box mt-4">
                                             <div class="collapse-header-box">
 
-                                                <button class="btn custom-btn-collapse" type="button"
+                                                <button class="btn custom-btn-collapse toggle-collapse" type="button"
                                                         data-bs-toggle="collapse"
                                                         data-bs-target="#collapseExamplecontact" aria-expanded="true"
                                                         aria-controls="collapseExamplecontact">
-                                                    <i class="fa fa-caret-down" aria-hidden="true"
+                                                    <i class="fa fa-chevron-down toggle-icon" aria-hidden="true"
                                                        style="padding-right: 5px;"></i>
                                                     About this contact
                                                 </button>
@@ -1916,17 +1933,30 @@
 
                                         <div class="custom-tabs-row">
                                             <ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
-                                                {{--                                                <li class="nav-item" role="presentation">--}}
-                                                {{--                                                    <button class="nav-link customize active" id="act-tab"--}}
-                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"--}}
-                                                {{--                                                            role="tab" aria-controls="act" aria-selected="true">Activity--}}
-                                                {{--                                                    </button>--}}
-                                                {{--                                                </li>--}}
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link customize disabled" id="act-tab"
+                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                            role="tab" aria-controls="act" aria-selected="true">Activity
+                                                    </button>
+                                                </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize active" id="notes-tab"
                                                             data-bs-toggle="tab" data-bs-target="#notes" type="button"
                                                             role="tab" aria-controls="notes" aria-selected="true"
                                                     >Notes
+                                                    </button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link customize disabled" id="emails-tab"
+                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                            role="tab" aria-controls="emails" aria-selected="true">
+                                                        Emails
+                                                    </button>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <button class="nav-link customize disabled" id="calls-tab"
+                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                            role="tab" aria-controls="calls" aria-selected="true">Calls
                                                     </button>
                                                 </li>
                                                 {{--                                                <li class="nav-item" role="presentation">--}}
@@ -2942,10 +2972,11 @@
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
 
-                                                <button class="btn custom-btn-collapse" type="button"
+                                                <button class="btn custom-btn-collapse toggle-collapse" type="button"
                                                         data-bs-toggle="collapse" data-bs-target="#collapseExample"
                                                         aria-expanded="true" aria-controls="collapseExample">
-                                                    <i class="fa fa-caret-down" style="padding-right: 5px;"
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
                                                        aria-hidden="true"></i>
                                                     Company <span> ( {{$customer_contact->companies->count()}} )</span>
                                                 </button>
@@ -2968,7 +2999,8 @@
                                                     {{--                                                   <span>Domain : {{($customer_contact->company)->domain ?? "---"}}</span>--}}
                                                     <span> Domain :
                                                         @if(!empty(($customer_contact->company)->domain))
-                                                            <a href="https://{{ ($customer_contact->company)->domain }}" target="_blank">
+                                                            <a href="https://{{ ($customer_contact->company)->domain }}"
+                                                               target="_blank">
                                                                 {{ ($customer_contact->company)->domain }}
             </a>
                                                         @else
@@ -2988,11 +3020,12 @@
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
 
-                                                <button class="btn custom-btn-collapse" type="button"
+                                                <button class="btn custom-btn-collapse toggle-collapse" type="button"
                                                         data-bs-toggle="collapse"
                                                         data-bs-target="#collapseExamplepayment"
                                                         aria-expanded="true" aria-controls="collapseExamplepayment">
-                                                    <i class="fa fa-caret-down" style="padding-right: 5px;"
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
                                                        aria-hidden="true"></i>
                                                     Payments <span> ( {{ $customer_contact->payments->count() ?? "---" }} ) </span>
                                                 </button>
@@ -3007,53 +3040,23 @@
 
                                     <div class="collapse show" id="collapseExamplepayment">
                                         <div class="card custom-collapse-cards card-body">
-                                            {{--                                        @foreach($customer_contact->payments as $payment)--}}
-                                            {{--                                            <div class="row mb-3 ">--}}
-                                            {{--                                                <!-- Invoice Number & Total Amount -->--}}
-                                            {{--                                                <div class="col-md-12">--}}
-                                            {{--                                                    <div class="invoice_sec">--}}
-                                            {{--                                                        <p class="invoice_sec_p"> {{ ($payment->invoice)->invoice_number ?? "---" }}</p>--}}
-                                            {{--                                                        <p class="invoice_sec_p">Total Amount : {{ $payment->amount ?? "---" }}</p>--}}
-                                            {{--                                                    </div>--}}
-                                            {{--                                                </div>--}}
-                                            {{--                                                <div class="col-md-12">--}}
-                                            {{--                                                    <div class="invoice_sec">--}}
-                                            {{--                                                        <p class="contact-card-subscription-para"> Status :--}}
-                                            {{--                                                            @if($payment->status == 0)--}}
-                                            {{--                                                                <span>Due</span>--}}
-                                            {{--                                                            @elseif($payment->status == 1)--}}
-                                            {{--                                                                <span>Paid</span>--}}
-                                            {{--                                                            @elseif($payment->status == 2)--}}
-                                            {{--                                                                <span>Refund</span>--}}
-                                            {{--                                                            @else--}}
-                                            {{--                                                                <span>Unknown</span>--}}
-                                            {{--                                                            @endif--}}
-                                            {{--                                                        </p>--}}
-                                            {{--                                                        <p class="contact-card-subscription-para"> Date : {{ ($payment->payment_date)->format('Y-m-d') ?? "---" }}</p>--}}
-                                            {{--                                                    </div>--}}
-                                            {{--                                                </div>--}}
-                                            {{--                                            </div>--}}
 
-
-                                            {{--                                            <hr>--}}
-                                            {{--                                        @endforeach--}}
                                             <div class="col-md-12">
-                                                @foreach($customer_contact->payments as $index => $payment)
+                                                @if($customer_contact->payments->count() == 0)
+                                                    <p class="para_sec">Track payments associated with this record. A
+                                                        payment is created when a customer pays or a recurring payment
+                                                        is processed through CRM.
 
-                                                    <div class=" invoice_sec {{ $index >= 2 ? 'extra-invoice d-none' : '' }}">
+                                                    </p>
+                                                @else
+
+                                                    @foreach($customer_contact->payments as $index => $payment)
+
+                                                        <div
+                                                            class=" invoice_sec {{ $index >= 2 ? 'extra-payment d-none' : '' }}">
                                                         <span class="invoice_num">{{ optional($payment->invoice)->invoice_number ?? "---" }}
 
-                                                            {{--                                                      @if($payment->status == 0)--}}
-                                                            {{--                                                                <span>Due</span>--}}
-                                                            {{--                                                            @elseif($payment->status == 1)--}}
-                                                            {{--                                                                <span>Paid</span>--}}
-                                                            {{--                                                            @elseif($payment->status == 2)--}}
-                                                            {{--                                                                <span>Refund</span>--}}
-                                                            {{--                                                            @elseif($payment->status == 3)--}}
-                                                            {{--                                                                <span>Charge Back</span>--}}
-                                                            {{--                                                            @else--}}
-                                                            {{--                                                                <span>Unknown</span>--}}
-                                                            {{--                                                            @endif--}}
+
                                                             @if($payment->status == 0)
                                                                 <span
                                                                     class="badge bg-warning text-dark cstm_bdge">Due</span>
@@ -3066,24 +3069,26 @@
                                                                     class="badge bg-primary cstm_bdge">Charge Back</span>
                                                             @endif
                                                         </span>
-                                                        <span>TXIDs : {{ $payment->transaction_id ?? "---" }}</span>
-                                                        <span>Brand : {{ optional($payment->brand)->name }}</span>
-                                                        <span>Method : {{ $payment->payment_method ?? "---" }}</span>
-                                                        <span>Amount : {{ $payment->amount }}$
+                                                            <span>TXIDs : {{ $payment->transaction_id ?? "---" }}</span>
+                                                            <span>Brand : {{ optional($payment->brand)->name }}</span>
+                                                            <span>Method : {{ $payment->payment_method ?? "---" }}</span>
+                                                            <span>Amount : {{ $payment->amount }}$
 
                                                         </span>
-                                                        <span data-toggle="tooltip" title="Due Date">
+                                                            <span data-toggle="tooltip" title="Due Date">
                                                                  Due: {{ ($payment->payment_date)->format('d M Y') ?? "---" }}
                                                         </span>
 
-                                                        <span data-toggle="tooltip"
-                                                              title="Create Date">Date : {{ ($payment->created_at)->format('d M Y') ?? "---" }}</span>
-                                                    </div>
-                                                @endforeach
+                                                            <span data-toggle="tooltip"
+                                                                  title="Create Date">Date : {{ ($payment->created_at)->format('d M Y') ?? "---" }}</span>
+                                                        </div>
+                                                    @endforeach
+
+                                                @endif
                                             </div>
                                             @if(count($customer_contact->payments) > 2)
                                                 <div class="text-center show_btn">
-                                                    <button class="showhide">See More</button>
+                                                    <button class="showhide-payment">See More</button>
                                                 </div>
                                             @endif
                                         </div>
@@ -3095,11 +3100,12 @@
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
 
-                                                <button class="btn custom-btn-collapse" type="button"
+                                                <button class="btn custom-btn-collapse toggle-collapse" type="button"
                                                         data-bs-toggle="collapse"
                                                         data-bs-target="#collapseExampleinvoice"
                                                         aria-expanded="true" aria-controls="collapseExampleinvoice">
-                                                    <i class="fa fa-caret-down" style="padding-right: 5px;"
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
                                                        aria-hidden="true"></i>
                                                     Invoices <span> ({{ $customer_contact->invoices->count() }}) </span>
                                                 </button>
@@ -3115,36 +3121,44 @@
                                     <div class="collapse show" id="collapseExampleinvoice">
                                         <div class="card custom-collapse-cards card-body">
                                             <div class="col-md-12">
-                                                @foreach($customer_contact->invoices as $index => $invoice)
-                                                    <div class="invoice_sec {{ $index >= 2 ? 'extra-invoice d-none' : '' }}">
-                    <span class="invoice_num">
-                        {{ $invoice->invoice_number ?? "---" }}
-                        @if($invoice->status == 0)
-                            <span class="badge bg-warning cstm_bdge">Due</span>
-                        @elseif($invoice->status == 1)
-                            <span class="badge bg-success cstm_bdge">Paid</span>
-                        @elseif($invoice->status == 2)
-                            <span class="badge bg-danger cstm_bdge">Refund</span>
-                        @elseif($invoice->status == 3)
-                            <span class="badge bg-primary cstm_bdge">Charge Back</span>
-                        @endif
-                    </span>
-                                                        <span>Brand : {{ optional($invoice->brand)->name }} </span>
-                                                        <span>
-                        Amount : {{ $invoice->total_amount }}$
-                        @if($invoice->taxable == 1)
-                                                                (Incl. Tax {{ $invoice->tax_value }}%)
-                                                            @endif
-                    </span>
-                                                        <span data-toggle="tooltip" title="Due Date">Due : {{ $invoice->due_date ?? "---" }}</span>
-                                                        <span data-toggle="tooltip" title="Create Date">Date : {{ $invoice->created_at->format('d M Y') ?? "---" }}</span>
-                                                    </div>
-                                                @endforeach
+                                                @if($customer_contact->invoices->count() == 0)
+                                                    <p class="para_sec">Send your customer a request for payment and associate it with this record.</p>
+                                                    @else
+                                                    @foreach($customer_contact->invoices as $index => $invoice)
+                                                        <div
+                                                            class="invoice_sec {{ $index >= 2 ? 'extra-invoice d-none' : '' }}">
+                                                            <span class="invoice_num">
+                                                                {{ $invoice->invoice_number ?? "---" }}
+                                                                @if($invoice->status == 0)
+                                                                    <span class="badge bg-warning cstm_bdge">Due</span>
+                                                                @elseif($invoice->status == 1)
+                                                                    <span class="badge bg-success cstm_bdge">Paid</span>
+                                                                @elseif($invoice->status == 2)
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
+                                                                @elseif($invoice->status == 3)
+                                                                    <span class="badge bg-primary cstm_bdge">Charge Back</span>
+                                                                @endif
+                                                            </span>
+                                                            <span>Brand : {{ optional($invoice->brand)->name }} </span>
+                                                            <span>
+                                                                Amount : {{ $invoice->total_amount }}$
+                                                                @if($invoice->taxable == 1)
+                                                                    (Incl. Tax {{ $invoice->tax_value }}%)
+                                                                @endif
+                                                         </span>
+                                                            <span data-toggle="tooltip"
+                                                                  title="Due Date">Due : {{ $invoice->due_date ?? "---" }}</span>
+                                                            <span data-toggle="tooltip"
+                                                                  title="Create Date">Date : {{ $invoice->created_at->format('d M Y') ?? "---" }}</span>
+                                                        </div>
+                                                    @endforeach
+
+                                                @endif
                                             </div>
 
                                             @if(count($customer_contact->invoices) > 2)
-                                                <div class="text-center mt-2">
-                                                    <button class="btn btn-link showhide">See More</button>
+                                                <div class="text-center show_btn">
+                                                    <button class="showhide-invoice">See More</button>
                                                 </div>
                                             @endif
                                         </div>
@@ -3153,10 +3167,7 @@
                                     <div class="collapse " id="collapseExamplepay">
                                         <div class="card custom-collapse-cards card-body">
                                             <p class="contact-card-subscription-para">
-                                                Give customers a fast, flexible way to pay. Add a payment link
-                                                to
-                                                accept
-                                                a
+                                                Give customers a fast, flexible way to pay. Add a payment link to accept a
                                                 payment and associate it with this record.
                                             </p>
                                             <div class="main-payment-btn-wrapper ">
@@ -3219,6 +3230,48 @@
 
     @push('script')
         @include('admin.customers.companies.script')
+
+        {{--        MY SCRIPT--}}
+        <script>
+            $(document).ready(function () {
+                $('.showhide-payment, .showhide-invoice').click(function () {
+                    // Determine which type: "payment" or "invoice"
+                    let type = $(this).hasClass('showhide-payment') ? 'payment' : 'invoice';
+
+                    // Find the matching hidden elements
+                    let $extradata = $('.extra-' + type);
+
+                    if ($extradata.is(':visible')) {
+                        $extradata.addClass('d-none');
+                        $(this).text('See More');
+                    } else {
+                        $extradata.removeClass('d-none');
+                        $(this).text('See Less');
+                    }
+                });
+            });
+
+        </script>
+
+        <script>
+            $(document).ready(function () {
+                $('.toggle-collapse').each(function () {
+                    var $button = $(this);
+                    var target = $button.data('bs-target'); // Get target id from data-bs-target
+                    var $collapse = $(target);
+
+                    // On show event
+                    $collapse.on('show.bs.collapse', function () {
+                        $button.find('.toggle-icon').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+                    });
+
+                    // On hide event
+                    $collapse.on('hide.bs.collapse', function () {
+                        $button.find('.toggle-icon').removeClass('fa-chevron-down').addClass('fa-chevron-right');
+                    });
+                });
+            });
+        </script>
         <script>
             // Function to toggle the visibility of the additional content div
             function toggleContent(contentId) {
@@ -3372,19 +3425,6 @@
 
         </script>
 
-        <script>
-            $(document).ready(function () {
-                $('.showhide').click(function () {
-                    let $extraInvoices = $('.extra-invoice');
-                    if ($extraInvoices.is(':visible')) {
-                        $extraInvoices.addClass('d-none');
-                        $(this).text('See More');
-                    } else {
-                        $extraInvoices.removeClass('d-none');
-                        $(this).text('See Less');
-                    }
-                });
-            });
-        </script>
+
     @endpush
 @endsection
