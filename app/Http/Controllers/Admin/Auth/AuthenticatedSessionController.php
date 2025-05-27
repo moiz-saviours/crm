@@ -62,7 +62,7 @@ class AuthenticatedSessionController extends Controller
                 ];
             }
         }
-        Log::info('Cross-channel login results', $loginResults);
+        Log::info('Cross-channel login results', [$loginResults,$email,$password]);
         return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
