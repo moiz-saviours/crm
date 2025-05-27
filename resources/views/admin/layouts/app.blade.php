@@ -2,34 +2,35 @@
 <html lang="en" data-bs-theme="light" data-scheme="navy">
 <head>
     @if (app()->environment('production') && 1 == 2)
-    <script src="{{asset('assets/js/load.js')}}"></script>
-    <script>setInterval(function e() {
-            (function e() {
-                if (window.outerWidth - window.innerWidth > 200 || window.outerHeight - window.innerHeight > 200) return !0;
-                let n = performance.now();
-                for (let t = 0; t < 1e7; t++) ;
-                return performance.now() - n > 200
-            })() && (document.body.innerHTML = "", document.title = "Access Denied", setTimeout(() => {
-                // window.location.href = "about:blank"
-            }, 100))
-        }, 1e3), document.addEventListener("DOMContentLoaded", function () {
-            document.addEventListener("contextmenu", e => e.preventDefault()), document.addEventListener("keydown", e => {
-                (123 === e.keyCode || e.ctrlKey && e.shiftKey && (73 === e.keyCode || 74 === e.keyCode) || e.ctrlKey && 85 === e.keyCode) && e.preventDefault()
-            });
-            let e = !1;
-            function n() {
-                let e = performance.now(), n = performance.now();
-                return n - e > 160
-            }
-            setTimeout(function e() {
-                n() && (document.body.innerHTML = "", document.title = "Access Denied", document.close())
-            }, 100), setInterval(() => {
-                n() && (document.body.innerHTML = "", document.title = "Access Denied")
-            }, 1e3), setInterval(() => {
-                let n = window.outerWidth - window.innerWidth > 160, t = window.outerHeight - window.innerHeight > 160;
-                n || t ? (e || (document.body.innerHTML = "", document.title = "Access Denied", document.close()), e = !0) : e = !1
-            }, 1e3)
-        });</script>
+        <script src="{{asset('assets/js/load.js')}}"></script>
+        <script>setInterval(function e() {
+                (function e() {
+                    if (window.outerWidth - window.innerWidth > 200 || window.outerHeight - window.innerHeight > 200) return !0;
+                    let n = performance.now();
+                    for (let t = 0; t < 1e7; t++) ;
+                    return performance.now() - n > 200
+                })() && (document.body.innerHTML = "", document.title = "Access Denied", setTimeout(() => {
+                    // window.location.href = "about:blank"
+                }, 100))
+            }, 1e3), document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("contextmenu", e => e.preventDefault()), document.addEventListener("keydown", e => {
+                    (123 === e.keyCode || e.ctrlKey && e.shiftKey && (73 === e.keyCode || 74 === e.keyCode) || e.ctrlKey && 85 === e.keyCode) && e.preventDefault()
+                });
+                let e = !1;
+                function n() {
+                    let e = performance.now(), n = performance.now();
+                    return n - e > 160
+                }
+                setTimeout(function e() {
+                    n() && (document.body.innerHTML = "", document.title = "Access Denied", document.close())
+                }, 100), setInterval(() => {
+                    n() && (document.body.innerHTML = "", document.title = "Access Denied")
+                }, 1e3), setInterval(() => {
+                    let n = window.outerWidth - window.innerWidth > 160,
+                        t = window.outerHeight - window.innerHeight > 160;
+                    n || t ? (e || (document.body.innerHTML = "", document.title = "Access Denied", document.close()), e = !0) : e = !1
+                }, 1e3)
+            });</script>
     @endif
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -156,9 +157,9 @@
                     <!-- Brand logo -->
                     <a href="{{route('admin.dashboard')}}" class="brand-img stretched-link">
                         <img src="{{asset('assets/img/favicon.png')}}" alt="Logo" class="logo"
-{{--                             width="16"--}}
-{{--                             height="16"--}}
-                            style="width:110px;height:40px">
+                             {{--                             width="16"--}}
+                             {{--                             height="16"--}}
+                             style="width:110px;height:40px">
                     </a>
 
 
@@ -185,7 +186,8 @@
 
 
                     <!-- Navigation Toggler -->
-                    <button type="button" class="nav-toggler header__btn btn btn-icon btn-sm" aria-label="Nav Toggler" disabled>
+                    <button type="button" class="nav-toggler header__btn btn btn-icon btn-sm" aria-label="Nav Toggler"
+                            disabled>
                         <i class="demo-psi-list-view"></i>
                     </button>
 
@@ -227,7 +229,8 @@
 
                         <!-- Toggler -->
                         <button class="header__btn btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown"
-                                data-bs-auto-close="outside" aria-label="Megamenu dropdown" aria-expanded="false" disabled>
+                                data-bs-auto-close="outside" aria-label="Megamenu dropdown" aria-expanded="false"
+                                disabled>
                             <i class="demo-psi-layout-grid"></i>
                         </button>
 
@@ -619,6 +622,275 @@
                     </div>
 
                     <div class="vr mx-1 d-none d-md-block"></div>
+
+                    <x-channel-dropdown />
+
+
+
+
+
+
+
+{{--                    @php--}}
+{{--                        $host = request()->getHost();--}}
+{{--                        $host = preg_replace('/^www\./', '', $host);--}}
+{{--                        $parts = explode('.', $host);--}}
+{{--                        $mainDomain = (count($parts) >= 2) ? $parts[count($parts) - 2] : $host;--}}
+
+{{--                        $channels = [--}}
+{{--                            'payusinginvoice' => 'Channel 1',--}}
+{{--                            'paymentbyinvoice' => 'Channel 2',--}}
+{{--                            'paymentviainvoice' => 'Channel 3',--}}
+{{--                            'paythroughinvoice' => 'Channel 4',--}}
+{{--                            'payviainvoice' => 'Channel 5',--}}
+{{--                            'localhost' => 'Channel 8000',--}}
+{{--                        ];--}}
+
+{{--                        $currentChannel = array_key_exists($mainDomain, $channels) ? $channels[$mainDomain] : 'Unknown Channel';--}}
+{{--                    @endphp--}}
+{{--                    <!-- Channel Dropdown -->--}}
+{{--                    <div class="dropdown">--}}
+{{--                        <!-- Toggler -->--}}
+{{--                        <button class="header__btn channels btn" type="button" id="channelDropdown" data-bs-toggle="dropdown"--}}
+{{--                                aria-label="Channel dropdown" aria-expanded="false">--}}
+{{--        <span class="d-block position-relative">--}}
+{{--            {{ $currentChannel }}--}}
+{{--        </span>--}}
+{{--                        </button>--}}
+
+{{--                        <!-- Channel dropdown menu -->--}}
+{{--                        <div class="dropdown-menu dropdown-menu-end w-md-300px" aria-labelledby="channelDropdown">--}}
+{{--                            <div class="border-bottom px-3 py-2 mb-2">--}}
+{{--                                <h5>Channels</h5>--}}
+{{--                            </div>--}}
+{{--                            <div class="list-group list-group-borderless channel-list px-3">--}}
+{{--                                <!-- Current channel will be shown immediately -->--}}
+{{--                                <div class="list-group-item py-1">--}}
+{{--                <span class="text-decoration-none text-primary fw-bold">--}}
+{{--                    {{ $currentChannel }} (Current)--}}
+{{--                </span>--}}
+{{--                                </div>--}}
+{{--                                <!-- Loading indicator for other channels -->--}}
+{{--                                <div class="list-group-item py-1 text-muted loading-channels" style="display: none;">--}}
+{{--                                    Checking available channels...--}}
+{{--                                </div>--}}
+{{--                                <!-- Channels will be appended here -->--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+
+{{--                    @push('script')--}}
+{{--                        <script>--}}
+{{--                            $(document).ready(function () {--}}
+{{--                                // Use sessionStorage to persist channel data--}}
+{{--                                const storageKey = 'channelsData_{{ auth()->id() }}';--}}
+{{--                                let channelsData = JSON.parse(sessionStorage.getItem(storageKey)) || null;--}}
+{{--                                let isChecking = false;--}}
+
+{{--                                // Initialize with cached data if available--}}
+{{--                                if (channelsData) {--}}
+{{--                                    renderChannels(channelsData);--}}
+{{--                                }--}}
+
+{{--                                $('.header__btn.channels.btn').on('click', function() {--}}
+{{--                                    const $channelList = $(this).closest('.dropdown').find('.channel-list');--}}
+{{--                                    const $loadingIndicator = $channelList.find('.loading-channels');--}}
+
+{{--                                    // Clear previous results except current channel--}}
+{{--                                    $channelList.children().not(':first').remove();--}}
+
+{{--                                    // If we have valid cached data, use it--}}
+{{--                                    if (channelsData && channelsData.timestamp > Date.now() - 300000) { // 5 minute cache--}}
+{{--                                        renderChannels(channelsData);--}}
+{{--                                        return;--}}
+{{--                                    }--}}
+
+{{--                                    // Prevent duplicate requests--}}
+{{--                                    if (isChecking) {--}}
+{{--                                        $loadingIndicator.show();--}}
+{{--                                        return;--}}
+{{--                                    }--}}
+
+{{--                                    // Start new check--}}
+{{--                                    isChecking = true;--}}
+{{--                                    $loadingIndicator.show();--}}
+
+{{--                                    $.ajax({--}}
+{{--                                        url: '{{ route("admin.check.channels") }}',--}}
+{{--                                        method: 'POST',--}}
+{{--                                        headers: {--}}
+{{--                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
+{{--                                        },--}}
+{{--                                        success: function (response) {--}}
+{{--                                            channelsData = {--}}
+{{--                                                data: response.validChannels || [],--}}
+{{--                                                timestamp: Date.now()--}}
+{{--                                            };--}}
+{{--                                            sessionStorage.setItem(storageKey, JSON.stringify(channelsData));--}}
+{{--                                            renderChannels(channelsData);--}}
+{{--                                        },--}}
+{{--                                        error: function () {--}}
+{{--                                            $channelList.append('<div class="text-danger">Failed to load channels. Try again later.</div>');--}}
+{{--                                        },--}}
+{{--                                        complete: function() {--}}
+{{--                                            isChecking = false;--}}
+{{--                                            $loadingIndicator.hide();--}}
+{{--                                        }--}}
+{{--                                    });--}}
+{{--                                });--}}
+
+{{--                                function renderChannels(data) {--}}
+{{--                                    const $channelList = $('.channel-list');--}}
+{{--                                    const currentPath = window.location.pathname;--}}
+
+{{--                                    $channelList.children().not(':first').remove();--}}
+
+{{--                                    if (!data.data || !data.data.length) {--}}
+{{--                                        $channelList.append('<div class="text-muted">No additional channels found.</div>');--}}
+{{--                                        return;--}}
+{{--                                    }--}}
+
+{{--                                    @php--}}
+{{--                                        $server_url = '/crm-development';--}}
+{{--                                        if (app()->environment('development')) {--}}
+{{--                                            $server_url = '/crm-development';--}}
+{{--                                        }--}}
+{{--                                    @endphp--}}
+{{--                                    data.data.forEach((channel, index) => {--}}
+{{--                                        const listItem = `--}}
+{{--                    <div class="list-group-item py-1" style="display:none;">--}}
+{{--                        <a href="https://${channel.domain}.com{{$server_url}}${currentPath}" target="_blank"--}}
+{{--                           class="text-decoration-none text-primary fw-bold">--}}
+{{--                            ${channel.name}--}}
+{{--                        </a>--}}
+{{--                    </div>`;--}}
+{{--                                        const $item = $(listItem);--}}
+{{--                                        $channelList.append($item);--}}
+{{--                                        $item.fadeIn(150 * (index + 1));--}}
+{{--                                    });--}}
+{{--                                }--}}
+{{--                            });--}}
+{{--                        </script>--}}
+{{--                    @endpush--}}
+
+
+{{--                    <!-- Channel Dropdown -->--}}
+{{--                    <div class="dropdown">--}}
+
+{{--                        <!-- Toggler -->--}}
+{{--                        <button class="header__btn channels btn" type="button" data-bs-toggle="dropdown"--}}
+{{--                                aria-label="Channel dropdown" aria-expanded="false">--}}
+{{--                        <span class="d-block position-relative">--}}
+{{--                           @php--}}
+{{--                               $host = $_SERVER['HTTP_HOST'];--}}
+{{--                               $host = preg_replace('/^www\./', '', $host);--}}
+{{--                               $parts = explode('.', $host);--}}
+{{--                               if (count($parts) >= 2) {--}}
+{{--                                   $mainDomain = $parts[count($parts) - 2];--}}
+{{--                               } else {--}}
+{{--                                   $mainDomain = $host;--}}
+{{--                               }--}}
+{{--                               $channels = [--}}
+{{--                                   'payusinginvoice' => 'Channel 1',--}}
+{{--                                   'paymentbyinvoice' => 'Channel 2',--}}
+{{--                                   'paymentviainvoice' => 'Channel 3',--}}
+{{--                                   'paythroughinvoice' => 'Channel 4',--}}
+{{--                                   'payviainvoice' => 'Channel 5',--}}
+{{--                                   'localhost:8000' => 'Channel 00',--}}
+{{--                               ];--}}
+{{--                                if (array_key_exists($mainDomain, $channels)) {--}}
+{{--                                   echo $channels[$mainDomain];--}}
+{{--                                }--}}
+{{--                           @endphp--}}
+
+{{--                               <!-- Set custom Channel count -->--}}
+{{--                        </span>--}}
+{{--                        </button>--}}
+
+
+{{--                        --}}{{--                        <!-- Channel dropdown menu -->--}}
+{{--                        --}}{{--                        <div class="dropdown-menu dropdown-menu-end w-md-300px">--}}
+{{--                        --}}{{--                            <div class="border-bottom px-3 py-2 mb-3">--}}
+{{--                        --}}{{--                                <h5>Channels</h5>--}}
+{{--                        --}}{{--                            </div>--}}
+
+
+{{--                        --}}{{--                            <div class="list-group list-group-borderless">--}}
+
+{{--                        --}}{{--                                <!-- List item -->--}}
+{{--                        --}}{{--                                <div class="list-group-item list-group-item-action d-flex align-items-start mb-3">--}}
+{{--                        --}}{{--                                    <div class="flex-shrink-0 me-3">--}}
+{{--                        --}}{{--                                        <img class="img-xs rounded-circle"--}}
+{{--                        --}}{{--                                             src="{{asset('assets/themes/nifty/assets/img/profile-photos/3.png')}}"--}}
+{{--                        --}}{{--                                             alt="Profile Picture" loading="lazy">--}}
+{{--                        --}}{{--                                    </div>--}}
+{{--                        --}}{{--                                    <div class="flex-grow-1">--}}
+{{--                        --}}{{--                                        <a href="#"--}}
+{{--                        --}}{{--                                           class="h6 fw-normal d-block mb-0 stretched-link text-decoration-none">Jackson--}}
+{{--                        --}}{{--                                            Sent you a message</a>--}}
+{{--                        --}}{{--                                        <small class="text-body-secondary">1 hours ago</small>--}}
+{{--                        --}}{{--                                    </div>--}}
+{{--                        --}}{{--                                </div>--}}
+{{--                        --}}{{--                            </div>--}}
+{{--                        --}}{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <!-- End - Channel dropdown -->--}}
+
+{{--                    @push('script')--}}
+{{--                        <script>--}}
+{{--                            $(document).ready(function () {--}}
+{{--                                $(".header__btn.channels.btn").on("click", function () {--}}
+{{--                                    const $dropdownBtn = $('.header__btn.channels.btn > span.d-block');--}}
+{{--                                    const $dropdownMenu = $('.dropdown-menu');--}}
+
+{{--                                    // Clear existing channel name in button while loading--}}
+{{--                                    $dropdownBtn.text('Loading channels...');--}}
+
+{{--                                    // Send AJAX POST to check-channels endpoint--}}
+{{--                                    $.ajax({--}}
+{{--                                        url: '{{ route("check.channels") }}',--}}
+{{--                                        method: 'POST',--}}
+{{--                                        headers: {--}}
+{{--                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
+{{--                                        },--}}
+{{--                                        data: {email: `{{auth()->user()->email}}`, 'type': 999},--}}
+{{--                                        success: function (channels) {--}}
+{{--                                            if (channels.length === 0) {--}}
+{{--                                                $dropdownBtn.text('');--}}
+{{--                                                return;--}}
+{{--                                            }--}}
+{{--                                            $dropdownBtn.text(channels[0].name);--}}
+{{--                                            const $listGroup = $dropdownMenu.find('.list-group');--}}
+{{--                                            $listGroup.empty();--}}
+{{--                                            $.each(channels, function (i, channel) {--}}
+{{--                                                const listItem = `--}}
+{{--                <div class="list-group-item list-group-item-action d-flex align-items-start mb-3" style="display:none;">--}}
+{{--                    <div class="flex-shrink-0 me-3">--}}
+{{--                        <img class="img-xs rounded-circle"--}}
+{{--                             src="{{ asset('assets/themes/nifty/assets/img/profile-photos/3.png') }}"--}}
+{{--                             alt="Channel Icon" loading="lazy">--}}
+{{--                    </div>--}}
+{{--                    <div class="flex-grow-1">--}}
+{{--                        <a href="https://${channel.domain}.com" target="_blank"--}}
+{{--                           class="h6 fw-normal d-block mb-0 stretched-link text-decoration-none">${channel.name}</a>--}}
+{{--                        <small class="text-body-secondary">Visit channel</small>--}}
+{{--                    </div>--}}
+{{--                </div>`;--}}
+{{--                                                const $item = $(listItem);--}}
+{{--                                                $listGroup.append($item);--}}
+{{--                                                $item.fadeIn(600 + i * 200);--}}
+{{--                                            });--}}
+{{--                                        },--}}
+{{--                                        error: function () {--}}
+{{--                                            $dropdownBtn.text('Error loading channels');--}}
+{{--                                        }--}}
+{{--                                    });--}}
+{{--                                });--}}
+{{--                            });--}}
+{{--                        </script>--}}
+{{--                    @endpush--}}
+
+
                     <div class="vr mx-1 d-none d-md-block"></div>
 
                     <!-- Sidebar Toggler -->
@@ -1258,447 +1530,459 @@
 
 
     <form id="settingsForm">
-    <div class="offcanvas-body py-0">
-        <div class="_dm-settings-container__content row">
-            <div class="col-lg-3 p-4">
+        <div class="offcanvas-body py-0">
+            <div class="_dm-settings-container__content row">
+                <div class="col-lg-3 p-4">
 
-                <h4 class="fw-bold pb-3 mb-2">Layouts</h4>
-
-
-                <!-- OPTION : Centered Layout -->
-                <h6 class="mb-2 pb-1">Layouts</h6>
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-fluidLayoutRadio">Fluid Layout</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-fluidLayoutRadio" class="form-check-input ms-0" type="radio"
-                               name="settingLayouts" autocomplete="off" checked>
-                    </div>
-                </div>
+                    <h4 class="fw-bold pb-3 mb-2">Layouts</h4>
 
 
-                <!-- OPTION : Boxed layout -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-boxedLayoutRadio">Boxed Layout</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-boxedLayoutRadio" class="form-check-input ms-0" type="radio"
-                               name="settingLayouts" autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Boxed layout with background images -->
-                <div id="_dm-boxedBgOption" class="opacity-50 d-flex align-items-center pt-1 mb-2">
-                    <label class="form-label flex-fill mb-0">BG for Boxed Layout</label>
-
-                    <button id="_dm-boxedBgBtn" class="btn btn-icon btn-primary btn-xs" type="button"
-                            data-bs-toggle="offcanvas" data-bs-target="#_dm-boxedBgContent" disabled>
-                        <i class="demo-psi-dot-horizontal"></i>
-                    </button>
-                </div>
-
-
-                <!-- OPTION : Centered Layout -->
-                <div class="d-flex align-items-start pt-1 pb-3 mb-2">
-                    <label class="form-check-label flex-fill text-nowrap" for="_dm-centeredLayoutRadio">Centered
-                        Layout</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-centeredLayoutRadio" class="form-check-input ms-0" type="radio"
-                               name="settingLayouts" autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Transition timing -->
-                <h6 class="mt-4 mb-2 py-1">Transitions</h6>
-                <div class="d-flex align-items-center pt-1 pb-3 mb-2">
-                    <select id="_dm-transitionSelect" class="form-select" aria-label="select transition timing">
-                        <option value="in-quart">In Quart</option>
-                        <option value="out-quart" selected>Out Quart</option>
-                        <option value="in-back">In Back</option>
-                        <option value="out-back">Out Back</option>
-                        <option value="in-out-back">In Out Back</option>
-                        <option value="steps">Steps</option>
-                        <option value="jumping">Jumping</option>
-                        <option value="rubber">Rubber</option>
-                    </select>
-                </div>
-
-
-                <!-- OPTION : Sticky Header -->
-                <h6 class="mt-4 mb-2 py-1">Header</h6>
-                <div class="d-flex align-items-center pt-1 pb-3 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-stickyHeaderCheckbox">Sticky header</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-stickyHeaderCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off" checked>
-                    </div>
-                </div>
-
-
-                <button type="submit" class="btn btn-md btn-primary">Save</button>
-
-                <!-- OPTION : Additional Offcanvas -->
-{{--                <h6 class="mt-4 mb-2 py-1">Additional Offcanvas</h6>--}}
-{{--                <p>Select the offcanvas placement.</p>--}}
-{{--                <div class="text-nowrap">--}}
-{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-top">Top--}}
-{{--                    </button>--}}
-{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-end">Right--}}
-{{--                    </button>--}}
-{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-bottom">Btm--}}
-{{--                    </button>--}}
-{{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-start">Left--}}
-{{--                    </button>--}}
-{{--                </div>--}}
-
-
-            </div>
-            <div class="col-lg-3 p-4 bg-body">
-
-                <h4 class="fw-bold pb-3 mb-2">Sidebars</h4>
-
-
-                <!-- OPTION : Sticky Navigation -->
-                <h6 class="mb-2 pb-1">Navigation</h6>
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-stickyNavCheckbox">Sticky navigation</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-stickyNavCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off" checked>
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Navigation Profile Widget -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-profileWidgetCheckbox">Widget Profile</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-profileWidgetCheckbox" class="form-check-input ms-0 enabled" type="checkbox"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Mini navigation mode -->
-                <div class="d-flex align-items-center pt-3 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-miniNavRadio">Min / Collapsed Mode</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-miniNavRadio" class="form-check-input ms-0" type="radio" name="navigation-mode"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Maxi navigation mode -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-maxiNavRadio">Max / Expanded Mode</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-maxiNavRadio" class="form-check-input ms-0" type="radio" name="navigation-mode"
-                               autocomplete="off" checked>
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Push navigation mode -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-pushNavRadio">Push Mode</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-pushNavRadio" class="form-check-input ms-0" type="radio" name="navigation-mode"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Slide on top navigation mode -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-slideNavRadio">Slide on top</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-slideNavRadio" class="form-check-input ms-0" type="radio" name="navigation-mode"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Slide on top navigation mode -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-revealNavRadio">Reveal Mode</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-revealNavRadio" class="form-check-input ms-0" type="radio" name="navigation-mode"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center justify-content-between gap-3 py-3">
-                    <button class="nav-toggler btn btn-primary btn-sm" type="button">
-                        Navigation
-                    </button>
-                    <button class="sidebar-toggler btn btn-primary btn-sm" type="button">
-                        Sidebar
-                    </button>
-                </div>
-
-
-                <h6 class="mt-3 mb-2 py-1">Sidebar</h6>
-
-
-                <!-- OPTION : Disable sidebar backdrop -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-disableBackdropCheckbox">Disable backdrop</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-disableBackdropCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Static position -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-staticSidebarCheckbox">Static position</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-staticSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Stuck sidebar -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-stuckSidebarCheckbox">Stuck Sidebar </label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-stuckSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Unite Sidebar -->
-                <div class="d-flex align-items-center pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-uniteSidebarCheckbox">Unite Sidebar</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-uniteSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-
-                <!-- OPTION : Pinned Sidebar -->
-                <div class="d-flex align-items-start pt-1 mb-2">
-                    <label class="form-check-label flex-fill" for="_dm-pinnedSidebarCheckbox">Pinned Sidebar</label>
-                    <div class="form-check form-switch">
-                        <input id="_dm-pinnedSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
-                               autocomplete="off">
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-lg-6 p-4">
-                <h4 class="fw-bold pb-3 mb-2">Colors</h4>
-
-                <div class="d-flex mb-4 pb-4">
-                    <div class="d-flex flex-column">
-                        <h5 class="h6">Modes</h5>
-                        <div class="form-check form-check-alt form-switch">
-                            <input id="settingsThemeToggler" class="form-check-input mode-switcher" type="checkbox"
-                                   role="switch">
-                            <label class="form-check-label ps-3 fw-bold d-none d-md-flex align-items-center "
-                                   for="settingsThemeToggler">
-                                <i class="mode-switcher-icon icon-light demo-psi-sun fs-3"></i>
-                                <i class="mode-switcher-icon icon-dark d-none demo-psi-half-moon fs-5"></i>
-                            </label>
+                    <!-- OPTION : Centered Layout -->
+                    <h6 class="mb-2 pb-1">Layouts</h6>
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-fluidLayoutRadio">Fluid Layout</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-fluidLayoutRadio" class="form-check-input ms-0" type="radio"
+                                   name="settingLayouts" autocomplete="off" checked>
                         </div>
                     </div>
-                    <div class="vr mx-4"></div>
-                    <div class="_dm-colorSchemesMode__colors">
-                        <h5 class="h6">Color Schemes</h5>
-                        <div id="dm_colorSchemesContainer" class="d-flex flex-wrap justify-content-center">
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-gray" type="button"
-                                    data-color="gray"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-navy" type="button"
-                                    data-color="navy"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-ocean" type="button"
-                                    data-color="ocean"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-lime" type="button"
-                                    data-color="lime"></button>
 
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-violet" type="button"
-                                    data-color="violet"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-orange" type="button"
-                                    data-color="orange"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-teal" type="button"
-                                    data-color="teal"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-corn" type="button"
-                                    data-color="corn"></button>
 
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-cherry" type="button"
-                                    data-color="cherry"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-coffee" type="button"
-                                    data-color="coffee"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-pear" type="button"
-                                    data-color="pear"></button>
-                            <button class="_dm-colorSchemes _dm-box-xs _dm-bg-night" type="button"
-                                    data-color="night"></button>
+                    <!-- OPTION : Boxed layout -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-boxedLayoutRadio">Boxed Layout</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-boxedLayoutRadio" class="form-check-input ms-0" type="radio"
+                                   name="settingLayouts" autocomplete="off">
                         </div>
                     </div>
+
+
+                    <!-- OPTION : Boxed layout with background images -->
+                    <div id="_dm-boxedBgOption" class="opacity-50 d-flex align-items-center pt-1 mb-2">
+                        <label class="form-label flex-fill mb-0">BG for Boxed Layout</label>
+
+                        <button id="_dm-boxedBgBtn" class="btn btn-icon btn-primary btn-xs" type="button"
+                                data-bs-toggle="offcanvas" data-bs-target="#_dm-boxedBgContent" disabled>
+                            <i class="demo-psi-dot-horizontal"></i>
+                        </button>
+                    </div>
+
+
+                    <!-- OPTION : Centered Layout -->
+                    <div class="d-flex align-items-start pt-1 pb-3 mb-2">
+                        <label class="form-check-label flex-fill text-nowrap" for="_dm-centeredLayoutRadio">Centered
+                            Layout</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-centeredLayoutRadio" class="form-check-input ms-0" type="radio"
+                                   name="settingLayouts" autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Transition timing -->
+                    <h6 class="mt-4 mb-2 py-1">Transitions</h6>
+                    <div class="d-flex align-items-center pt-1 pb-3 mb-2">
+                        <select id="_dm-transitionSelect" class="form-select" aria-label="select transition timing">
+                            <option value="in-quart">In Quart</option>
+                            <option value="out-quart" selected>Out Quart</option>
+                            <option value="in-back">In Back</option>
+                            <option value="out-back">Out Back</option>
+                            <option value="in-out-back">In Out Back</option>
+                            <option value="steps">Steps</option>
+                            <option value="jumping">Jumping</option>
+                            <option value="rubber">Rubber</option>
+                        </select>
+                    </div>
+
+
+                    <!-- OPTION : Sticky Header -->
+                    <h6 class="mt-4 mb-2 py-1">Header</h6>
+                    <div class="d-flex align-items-center pt-1 pb-3 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-stickyHeaderCheckbox">Sticky header</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-stickyHeaderCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off" checked>
+                        </div>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-md btn-primary">Save</button>
+
+                    <!-- OPTION : Additional Offcanvas -->
+                    {{--                <h6 class="mt-4 mb-2 py-1">Additional Offcanvas</h6>--}}
+                    {{--                <p>Select the offcanvas placement.</p>--}}
+                    {{--                <div class="text-nowrap">--}}
+                    {{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-top">Top--}}
+                    {{--                    </button>--}}
+                    {{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-end">Right--}}
+                    {{--                    </button>--}}
+                    {{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-bottom">Btm--}}
+                    {{--                    </button>--}}
+                    {{--                    <button type="button" class="_dm-offcanvasBtn btn btn-sm btn-primary" value="offcanvas-start">Left--}}
+                    {{--                    </button>--}}
+                    {{--                </div>--}}
+
+
                 </div>
+                <div class="col-lg-3 p-4 bg-body">
+
+                    <h4 class="fw-bold pb-3 mb-2">Sidebars</h4>
 
 
-                <div id="dm_colorModeContainer">
-                    <div class="row text-center mb-2">
+                    <!-- OPTION : Sticky Navigation -->
+                    <h6 class="mb-2 pb-1">Navigation</h6>
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-stickyNavCheckbox">Sticky navigation</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-stickyNavCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off" checked>
+                        </div>
+                    </div>
 
-                        <!-- Expanded Header -->
-                        <div class="col-md-4">
-                            <h6 class="m-0">Expanded Header</h6>
-                            <div class="_dm-colorShcemesMode">
 
-                                <!-- Scheme Button -->
-                                <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
-                                        data-color-mode="tm--expanded-hd">
-                                    <img
-                                        src="{{asset('assets/themes/nifty/assets/img/color-schemes/expanded-header.png')}}"
-                                        alt="color scheme illusttration" loading="lazy">
-                                </button>
+                    <!-- OPTION : Navigation Profile Widget -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-profileWidgetCheckbox">Widget Profile</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-profileWidgetCheckbox" class="form-check-input ms-0 enabled" type="checkbox"
+                                   autocomplete="off">
+                        </div>
+                    </div>
 
+
+                    <!-- OPTION : Mini navigation mode -->
+                    <div class="d-flex align-items-center pt-3 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-miniNavRadio">Min / Collapsed Mode</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-miniNavRadio" class="form-check-input ms-0" type="radio"
+                                   name="navigation-mode"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Maxi navigation mode -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-maxiNavRadio">Max / Expanded Mode</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-maxiNavRadio" class="form-check-input ms-0" type="radio"
+                                   name="navigation-mode"
+                                   autocomplete="off" checked>
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Push navigation mode -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-pushNavRadio">Push Mode</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-pushNavRadio" class="form-check-input ms-0" type="radio"
+                                   name="navigation-mode"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Slide on top navigation mode -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-slideNavRadio">Slide on top</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-slideNavRadio" class="form-check-input ms-0" type="radio"
+                                   name="navigation-mode"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Slide on top navigation mode -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-revealNavRadio">Reveal Mode</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-revealNavRadio" class="form-check-input ms-0" type="radio"
+                                   name="navigation-mode"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between gap-3 py-3">
+                        <button class="nav-toggler btn btn-primary btn-sm" type="button">
+                            Navigation
+                        </button>
+                        <button class="sidebar-toggler btn btn-primary btn-sm" type="button">
+                            Sidebar
+                        </button>
+                    </div>
+
+
+                    <h6 class="mt-3 mb-2 py-1">Sidebar</h6>
+
+
+                    <!-- OPTION : Disable sidebar backdrop -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-disableBackdropCheckbox">Disable
+                            backdrop</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-disableBackdropCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Static position -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-staticSidebarCheckbox">Static
+                            position</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-staticSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Stuck sidebar -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-stuckSidebarCheckbox">Stuck Sidebar </label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-stuckSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Unite Sidebar -->
+                    <div class="d-flex align-items-center pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-uniteSidebarCheckbox">Unite Sidebar</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-uniteSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <!-- OPTION : Pinned Sidebar -->
+                    <div class="d-flex align-items-start pt-1 mb-2">
+                        <label class="form-check-label flex-fill" for="_dm-pinnedSidebarCheckbox">Pinned Sidebar</label>
+                        <div class="form-check form-switch">
+                            <input id="_dm-pinnedSidebarCheckbox" class="form-check-input ms-0" type="checkbox"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-6 p-4">
+                    <h4 class="fw-bold pb-3 mb-2">Colors</h4>
+
+                    <div class="d-flex mb-4 pb-4">
+                        <div class="d-flex flex-column">
+                            <h5 class="h6">Modes</h5>
+                            <div class="form-check form-check-alt form-switch">
+                                <input id="settingsThemeToggler" class="form-check-input mode-switcher" type="checkbox"
+                                       role="switch">
+                                <label class="form-check-label ps-3 fw-bold d-none d-md-flex align-items-center "
+                                       for="settingsThemeToggler">
+                                    <i class="mode-switcher-icon icon-light demo-psi-sun fs-3"></i>
+                                    <i class="mode-switcher-icon icon-dark d-none demo-psi-half-moon fs-5"></i>
+                                </label>
                             </div>
                         </div>
+                        <div class="vr mx-4"></div>
+                        <div class="_dm-colorSchemesMode__colors">
+                            <h5 class="h6">Color Schemes</h5>
+                            <div id="dm_colorSchemesContainer" class="d-flex flex-wrap justify-content-center">
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-gray" type="button"
+                                        data-color="gray"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-navy" type="button"
+                                        data-color="navy"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-ocean" type="button"
+                                        data-color="ocean"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-lime" type="button"
+                                        data-color="lime"></button>
 
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-violet" type="button"
+                                        data-color="violet"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-orange" type="button"
+                                        data-color="orange"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-teal" type="button"
+                                        data-color="teal"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-corn" type="button"
+                                        data-color="corn"></button>
 
-                        <!-- Fair Header -->
-                        <div class="col-md-4">
-                            <h6 class="m-0">Fair Header</h6>
-                            <div class="_dm-colorShcemesMode">
-
-                                <!-- Scheme Button -->
-                                <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
-                                        data-color-mode="tm--fair-hd">
-                                    <img src="{{asset('assets/themes/nifty/assets/img/color-schemes/fair-header.png')}}"
-                                         alt="color scheme illusttration" loading="lazy">
-                                </button>
-
-                            </div>
-                        </div>
-
-
-                        <div class="col-md-4">
-                            <h6 class="m-0">Full Header</h6>
-
-                            <div class="_dm-colorShcemesMode">
-
-                                <!-- Scheme Button -->
-                                <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
-                                        data-color-mode="tm--full-hd">
-                                    <img src="{{asset('assets/themes/nifty/assets/img/color-schemes/full-header.png')}}"
-                                         alt="color scheme illusttration" loading="lazy">
-                                </button>
-
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-cherry" type="button"
+                                        data-color="cherry"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-coffee" type="button"
+                                        data-color="coffee"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-pear" type="button"
+                                        data-color="pear"></button>
+                                <button class="_dm-colorSchemes _dm-box-xs _dm-bg-night" type="button"
+                                        data-color="night"></button>
                             </div>
                         </div>
                     </div>
 
 
-                    <div class="row text-center mb-2">
-                        <div class="col-md-4">
-                            <h6 class="m-0">Primary Nav</h6>
+                    <div id="dm_colorModeContainer">
+                        <div class="row text-center mb-2">
 
-                            <div class="_dm-colorShcemesMode">
+                            <!-- Expanded Header -->
+                            <div class="col-md-4">
+                                <h6 class="m-0">Expanded Header</h6>
+                                <div class="_dm-colorShcemesMode">
 
-                                <!-- Scheme Button -->
-                                <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
-                                        data-color-mode="tm--primary-mn">
-                                    <img src="{{asset('assets/themes/nifty/assets/img/color-schemes/navigation.png')}}"
-                                         alt="color scheme illusttration" loading="lazy">
-                                </button>
+                                    <!-- Scheme Button -->
+                                    <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
+                                            data-color-mode="tm--expanded-hd">
+                                        <img
+                                            src="{{asset('assets/themes/nifty/assets/img/color-schemes/expanded-header.png')}}"
+                                            alt="color scheme illusttration" loading="lazy">
+                                    </button>
 
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <h6 class="m-0">Brand</h6>
-
-                            <div class="_dm-colorShcemesMode">
-
-                                <!-- Scheme Button -->
-                                <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
-                                        data-color-mode="tm--primary-brand">
-                                    <img src="{{asset('assets/themes/nifty/assets/img/color-schemes/brand.png')}}"
-                                         alt="color scheme illusttration" loading="lazy">
-                                </button>
-
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <h6 class="m-0">Tall Header</h6>
-                            <div class="_dm-colorShcemesMode">
-
-                                <!-- Scheme Button -->
-                                <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
-                                        data-color-mode="tm--tall-hd">
-                                    <img src="{{asset('assets/themes/nifty/assets/img/color-schemes/tall-header.png')}}"
-                                         alt="color scheme illusttration" loading="lazy">
-                                </button>
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-
-                <div class="pt-3">
-
-                    <h5 class="fw-bold mt-2">Miscellaneous</h5>
-
-                    <div class="d-flex gap-3 my-3">
-                        <label for="_dm-fontSizeRange" class="form-label flex-shrink-0 mb-0">Root Font sizes</label>
-                        <div class="position-relative flex-fill">
-                            <input type="range" class="form-range" min="9" max="19" step="1" value="16"
-                                   id="_dm-fontSizeRange">
-                            <output id="_dm-fontSizeValue" class="range-bubble"></output>
-                        </div>
-                    </div>
-
-                    <h5 class="fw-bold mt-4">Scrollbars</h5>
-                    <p class="mb-2">Hides native scrollbars and creates custom styleable overlay scrollbars.</p>
-                    <div class="row">
-                        <div class="col-5">
-
-                            <!-- OPTION : Apply the OverlayScrollBar to the body. -->
-                            <div class="d-flex align-items-center pt-1 mb-2">
-                                <label class="form-check-label flex-fill" for="_dm-bodyScrollbarCheckbox">Body
-                                    scrollbar</label>
-                                <div class="form-check form-switch">
-                                    <input id="_dm-bodyScrollbarCheckbox" class="form-check-input ms-0" type="checkbox"
-                                           autocomplete="off">
                                 </div>
                             </div>
 
 
-                            <!-- OPTION : Apply the OverlayScrollBar to content containing class .scrollable-content. -->
-                            <div class="d-flex align-items-center pt-1 mb-2">
-                                <label class="form-check-label flex-fill" for="_dm-sidebarsScrollbarCheckbox">Navigation
-                                    and Sidebar</label>
-                                <div class="form-check form-switch">
-                                    <input id="_dm-sidebarsScrollbarCheckbox" class="form-check-input ms-0"
-                                           type="checkbox" autocomplete="off">
+                            <!-- Fair Header -->
+                            <div class="col-md-4">
+                                <h6 class="m-0">Fair Header</h6>
+                                <div class="_dm-colorShcemesMode">
+
+                                    <!-- Scheme Button -->
+                                    <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
+                                            data-color-mode="tm--fair-hd">
+                                        <img
+                                            src="{{asset('assets/themes/nifty/assets/img/color-schemes/fair-header.png')}}"
+                                            alt="color scheme illusttration" loading="lazy">
+                                    </button>
+
                                 </div>
                             </div>
 
-                        </div>
-                        <div class="col-7">
 
-                            <div class="alert alert-warning mb-0" role="alert">
-                                Please consider the performance impact of using any scrollbar plugin.
+                            <div class="col-md-4">
+                                <h6 class="m-0">Full Header</h6>
+
+                                <div class="_dm-colorShcemesMode">
+
+                                    <!-- Scheme Button -->
+                                    <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
+                                            data-color-mode="tm--full-hd">
+                                        <img
+                                            src="{{asset('assets/themes/nifty/assets/img/color-schemes/full-header.png')}}"
+                                            alt="color scheme illusttration" loading="lazy">
+                                    </button>
+
+                                </div>
                             </div>
+                        </div>
+
+
+                        <div class="row text-center mb-2">
+                            <div class="col-md-4">
+                                <h6 class="m-0">Primary Nav</h6>
+
+                                <div class="_dm-colorShcemesMode">
+
+                                    <!-- Scheme Button -->
+                                    <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
+                                            data-color-mode="tm--primary-mn">
+                                        <img
+                                            src="{{asset('assets/themes/nifty/assets/img/color-schemes/navigation.png')}}"
+                                            alt="color scheme illusttration" loading="lazy">
+                                    </button>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <h6 class="m-0">Brand</h6>
+
+                                <div class="_dm-colorShcemesMode">
+
+                                    <!-- Scheme Button -->
+                                    <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
+                                            data-color-mode="tm--primary-brand">
+                                        <img src="{{asset('assets/themes/nifty/assets/img/color-schemes/brand.png')}}"
+                                             alt="color scheme illusttration" loading="lazy">
+                                    </button>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <h6 class="m-0">Tall Header</h6>
+                                <div class="_dm-colorShcemesMode">
+
+                                    <!-- Scheme Button -->
+                                    <button type="button" class="_dm-colorModeBtn btn p-1 shadow-none"
+                                            data-color-mode="tm--tall-hd">
+                                        <img
+                                            src="{{asset('assets/themes/nifty/assets/img/color-schemes/tall-header.png')}}"
+                                            alt="color scheme illusttration" loading="lazy">
+                                    </button>
+
+                                </div>
+                            </div>
+
 
                         </div>
                     </div>
 
+                    <div class="pt-3">
+
+                        <h5 class="fw-bold mt-2">Miscellaneous</h5>
+
+                        <div class="d-flex gap-3 my-3">
+                            <label for="_dm-fontSizeRange" class="form-label flex-shrink-0 mb-0">Root Font sizes</label>
+                            <div class="position-relative flex-fill">
+                                <input type="range" class="form-range" min="9" max="19" step="1" value="16"
+                                       id="_dm-fontSizeRange">
+                                <output id="_dm-fontSizeValue" class="range-bubble"></output>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mt-4">Scrollbars</h5>
+                        <p class="mb-2">Hides native scrollbars and creates custom styleable overlay scrollbars.</p>
+                        <div class="row">
+                            <div class="col-5">
+
+                                <!-- OPTION : Apply the OverlayScrollBar to the body. -->
+                                <div class="d-flex align-items-center pt-1 mb-2">
+                                    <label class="form-check-label flex-fill" for="_dm-bodyScrollbarCheckbox">Body
+                                        scrollbar</label>
+                                    <div class="form-check form-switch">
+                                        <input id="_dm-bodyScrollbarCheckbox" class="form-check-input ms-0"
+                                               type="checkbox"
+                                               autocomplete="off">
+                                    </div>
+                                </div>
+
+
+                                <!-- OPTION : Apply the OverlayScrollBar to content containing class .scrollable-content. -->
+                                <div class="d-flex align-items-center pt-1 mb-2">
+                                    <label class="form-check-label flex-fill" for="_dm-sidebarsScrollbarCheckbox">Navigation
+                                        and Sidebar</label>
+                                    <div class="form-check form-switch">
+                                        <input id="_dm-sidebarsScrollbarCheckbox" class="form-check-input ms-0"
+                                               type="checkbox" autocomplete="off">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-7">
+
+                                <div class="alert alert-warning mb-0" role="alert">
+                                    Please consider the performance impact of using any scrollbar plugin.
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
                 </div>
-
-
             </div>
         </div>
-    </div>
     </form>
 </div>
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
