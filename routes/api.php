@@ -58,7 +58,7 @@ Route::post('/check-user', function (Request $request) {
     if (!in_array($table, $allowedTables)) {
         return response()->json(['error' => 'Invalid table'], 400);
     }
-    $exists = DB::table($table)->where('email', $email)->exists();
+    $exists = DB::table($table)->where('email', $email)->where('status',1)->exists();
     return response()->json(['exists' => $exists]);
 });
 Route::post('/check-channels', function (Request $request) {
