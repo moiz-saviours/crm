@@ -29,6 +29,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(AdminLoginRequest $request): RedirectResponse
     {
+        $email = $request->input('email');
+        $password = $request->input('password');
+
         $request->authenticate();
 
         $request->session()->regenerate();
