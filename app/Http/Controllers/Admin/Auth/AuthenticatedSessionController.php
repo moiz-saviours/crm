@@ -35,7 +35,6 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        $user = Auth::user();
         $channels = [
             'https://payusinginvoice.com',
             'https://paymentbyinvoice.com',
@@ -51,8 +50,8 @@ class AuthenticatedSessionController extends Controller
                 $response = Http::withHeaders([
                     'Accept' => 'application/json',
                 ])->timeout(5)->post("$url/api{$prefix}/channel-login", [
-                    'email' => $user->email,
-                    'password' => $request->password, // Must send original password
+                    'email' => $email,
+                    'password' => $password, // Must send original password
                 ]);
 
                 $loginResults[$url] = $response->json();
