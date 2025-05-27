@@ -66,8 +66,11 @@ Route::post('/channel-login', function (Request $request) {
         'email' => ['required', 'email'],
         'password' => ['required'],
     ]);
-
-    if (Auth::attempt($request->only('email', 'password'))) {
+    $guard = "web";
+    if ($request->type && $request->type == 999 ){
+        $guard = "admin";
+    }
+    if (Auth::guard($guard)->attempt($request->only('email', 'password'))) {
         $request->session()->regenerate();
 
         return response()->json([

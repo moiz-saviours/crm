@@ -50,6 +50,7 @@ class AuthenticatedSessionController extends Controller
                 $response = Http::withHeaders([
                     'Accept' => 'application/json',
                 ])->timeout(5)->post("$url{$prefix}/api/channel-login", [
+                    'type' => 999,
                     'email' => $email,
                     'password' => $password, // Must send original password
                 ]);
@@ -62,7 +63,7 @@ class AuthenticatedSessionController extends Controller
                 ];
             }
         }
-        Log::info('Cross-channel login results', [$loginResults,$email,$password]);
+        Log::info('Cross-channel login results', $loginResults);
         return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
