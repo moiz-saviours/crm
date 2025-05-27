@@ -601,7 +601,7 @@ if (!empty($non_bank_methods)) {
                                     id="v-pills-upload-attachment-tab" data-toggle="pill"
                                     data-target="#v-pills-upload-attachment" type="button" role="tab"
                                     aria-controls="v-pills-upload-attachment"
-                                    aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Attachment
+                                    aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Add Receipt
                                 </button>
                                 {{--                                @endif--}}
                             </div>
