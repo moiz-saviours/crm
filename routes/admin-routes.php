@@ -49,7 +49,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             // Append .com for non-local domains
             $resolvedDomain = $isLocal ? $baseDomain : "{$baseDomain}.com";
 
-            // Skip localhost in prod/dev
+            // Skip local domains in production/development environments
             if ($isProdOrDev && $isLocal) {
                 $debugDetails[] = [
                     'domain' => $resolvedDomain,
@@ -59,7 +59,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 continue;
             }
 
-            // Skip current domain (prevent pinging itself)
+            // Skip current domain to avoid self-checking
             if ($resolvedDomain === $fullCurrentDomain || $baseDomain === $fullCurrentDomain) {
                 $debugDetails[] = [
                     'domain' => $resolvedDomain,
@@ -91,12 +91,16 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 $domainDebug['responseData'] = $response->json();
 
                 if ($response->ok() && $response->json('exists')) {
+                    // Prevent double prefix
+                    $finalPath = Str::startsWith($currentPath, $prefix) ? $currentPath : "{$prefix}{$currentPath}";
+
                     $validChannels[] = [
                         'domain' => $resolvedDomain,
                         'name' => $channelName,
-                        'url' => "{$ssl}://{$resolvedDomain}{$prefix}{$currentPath}",
+                        'url' => "{$ssl}://{$resolvedDomain}{$finalPath}",
                     ];
                 }
+
             } catch (\Exception $e) {
                 Log::error("Channel check failed for {$resolvedDomain}: " . $e->getMessage());
                 $domainDebug['exception'] = $e->getMessage();
@@ -119,6 +123,11 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             ]
         ]);
     })->name('check.channels');
+
+
+
+
+
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
