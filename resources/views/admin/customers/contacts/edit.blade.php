@@ -402,7 +402,7 @@
             .custom-contact-cards {
                 background: transparent;
                 box-shadow: none;
-                padding: 0px 12px 8px;
+                padding: 0px 0px 0px 30px;
             }
 
             .contact-card-details-head {
@@ -1346,6 +1346,10 @@
             .company_sec span {
                 font-size: 0.8rem;
             }
+            .company_sec span a{
+                text-decoration: none;
+                color: #0a89b4;
+            }
 
             .invoice_sec span {
                 font-size: 0.8rem;
@@ -1357,6 +1361,22 @@
                 font-size: 0.7rem !important;
                 border-radius: 3px;
             }
+
+            .showhide {
+                font-size: 10px;
+                font-weight: 500;
+                color: #0091ae;
+                border: none;
+                background-color: #fff;
+
+            }
+            .showhide:hover{
+            }
+
+
+             .show_btn:hover{
+                 text-decoration: none;
+             }
 
         </style>
 
@@ -2940,7 +2960,7 @@
                                         {{--                                        </div>--}}
 
                                     </div>
-                                    <div class="collapse" id="collapseExample">
+                                    <div class="collapse show" id="collapseExample">
                                         <div class="card custom-collapse-cards card-body">
                                             <div class="col-md-12">
                                                 <div class="company_sec">
@@ -2985,7 +3005,7 @@
                                         {{--                                        </div>--}}
                                     </div>
 
-                                    <div class="collapse " id="collapseExamplepayment">
+                                    <div class="collapse show" id="collapseExamplepayment">
                                         <div class="card custom-collapse-cards card-body">
                                             {{--                                        @foreach($customer_contact->payments as $payment)--}}
                                             {{--                                            <div class="row mb-3 ">--}}
@@ -3018,10 +3038,10 @@
                                             {{--                                            <hr>--}}
                                             {{--                                        @endforeach--}}
                                             <div class="col-md-12">
-                                                @foreach($customer_contact->payments as $payment)
+                                                @foreach($customer_contact->payments as $index => $payment)
 
-                                                    <div class=" invoice_sec">
-                                                        <span class="invoice_num">{{ ($payment->invoice)->invoice_number ?? "---" }}
+                                                    <div class=" invoice_sec {{ $index >= 2 ? 'extra-invoice d-none' : '' }}">
+                                                        <span class="invoice_num">{{ optional($payment->invoice)->invoice_number ?? "---" }}
 
                                                             {{--                                                      @if($payment->status == 0)--}}
                                                             {{--                                                                <span>Due</span>--}}
@@ -3061,6 +3081,11 @@
                                                     </div>
                                                 @endforeach
                                             </div>
+                                            @if(count($customer_contact->payments) > 2)
+                                                <div class="text-center show_btn">
+                                                    <button class="showhide">See More</button>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -3087,41 +3112,41 @@
                                         {{--                                        </div>--}}
                                     </div>
 
-                                    <div class="collapse" id="collapseExampleinvoice">
+                                    <div class="collapse show" id="collapseExampleinvoice">
                                         <div class="card custom-collapse-cards card-body">
                                             <div class="col-md-12">
-                                                @foreach($customer_contact->invoices as $invoice)
-
-                                                    <div class=" invoice_sec">
-                                                        <span class="invoice_num">{{ $invoice->invoice_number ?? "---" }}
-
-
-                                                            @if($invoice->status == 0)
-                                                                <span class="badge bg-warning cstm_bdge">Due</span>
-                                                            @elseif($invoice->status == 1)
-                                                                <span class="badge bg-success cstm_bdge">Paid</span>
-                                                            @elseif($invoice->status == 2)
-                                                                <span class="badge bg-danger cstm_bdge">Refund</span>
-                                                            @elseif($invoice->status == 3)
-                                                                <span
-                                                                    class="badge bg-primary cstm_bdge">Charge Back</span>
-                                                            @endif
-                                                        </span>
-                                                        <span>Brand :{{optional($invoice->brand)->name}} </span>
+                                                @foreach($customer_contact->invoices as $index => $invoice)
+                                                    <div class="invoice_sec {{ $index >= 2 ? 'extra-invoice d-none' : '' }}">
+                    <span class="invoice_num">
+                        {{ $invoice->invoice_number ?? "---" }}
+                        @if($invoice->status == 0)
+                            <span class="badge bg-warning cstm_bdge">Due</span>
+                        @elseif($invoice->status == 1)
+                            <span class="badge bg-success cstm_bdge">Paid</span>
+                        @elseif($invoice->status == 2)
+                            <span class="badge bg-danger cstm_bdge">Refund</span>
+                        @elseif($invoice->status == 3)
+                            <span class="badge bg-primary cstm_bdge">Charge Back</span>
+                        @endif
+                    </span>
+                                                        <span>Brand : {{ optional($invoice->brand)->name }} </span>
                                                         <span>
-                                                            Amount : {{ $invoice->total_amount}}$
-                                                            @if($invoice->taxable == 1)
-                                                                (Incl. Tax {{$invoice->tax_value}}%)
+                        Amount : {{ $invoice->total_amount }}$
+                        @if($invoice->taxable == 1)
+                                                                (Incl. Tax {{ $invoice->tax_value }}%)
                                                             @endif
-
-                                                            </span>
-                                                        <span data-toggle="tooltip"
-                                                              title="Due Date">Due : {{ ($invoice->due_date) ?? "---" }}</span>
-                                                        <span data-toggle="tooltip"
-                                                              title="Create Date">Date : {{ ($invoice->created_at)->format('d M Y') ?? "---" }}</span>
+                    </span>
+                                                        <span data-toggle="tooltip" title="Due Date">Due : {{ $invoice->due_date ?? "---" }}</span>
+                                                        <span data-toggle="tooltip" title="Create Date">Date : {{ $invoice->created_at->format('d M Y') ?? "---" }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
+
+                                            @if(count($customer_contact->invoices) > 2)
+                                                <div class="text-center mt-2">
+                                                    <button class="btn btn-link showhide">See More</button>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
@@ -3345,6 +3370,21 @@
             });
 
 
+        </script>
+
+        <script>
+            $(document).ready(function () {
+                $('.showhide').click(function () {
+                    let $extraInvoices = $('.extra-invoice');
+                    if ($extraInvoices.is(':visible')) {
+                        $extraInvoices.addClass('d-none');
+                        $(this).text('See More');
+                    } else {
+                        $extraInvoices.removeClass('d-none');
+                        $(this).text('See Less');
+                    }
+                });
+            });
         </script>
     @endpush
 @endsection
