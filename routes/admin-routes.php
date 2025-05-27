@@ -21,58 +21,58 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController};
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
 
+
     Route::post('/check-channels', function (Request $request) {
-
         $authUser = Auth::user();
-        $tableToCheck =  'admins';
-
-        $channels = [
-            'payusinginvoice' => 'Channel 1',
-            'paymentbyinvoice' => 'Channel 2',
-            'paymentviainvoice' => 'Channel 3',
-            'paythroughinvoice' => 'Channel 4',
-            'payviainvoice' => 'Channel 5',
-        ];
-
+        $tableToCheck = 'admins';
+        $allChannels = config('channels');
         $validChannels = [];
-        $promises = [];
+
         $host = request()->getHost();
-        $host = preg_replace('/^www\./', '', $host);
-        $parts = explode('.', $host);
-        $mainDomain = (count($parts) >= 2) ? $parts[count($parts) - 2] : $host;
-        foreach ($channels as $domain => $channelName) {
-            if ($domain === $mainDomain) {
+        $port = request()->getPort();
+        $fullCurrentDomain = $port && $port != 80 && $port != 443 ? "$host:$port" : $host;
+
+        // Get current path for full redirection
+        $currentPath = $request->header('referer')
+            ? parse_url($request->header('referer'), PHP_URL_PATH)
+            : '/';
+
+        foreach ($allChannels as $domain => $channelName) {
+            if ($domain === $fullCurrentDomain) {
                 continue;
             }
 
-            $server = app()->environment('development')? 'crm-development/':'crm-development/';
             try {
-                $url = "https://{$domain}.com/{$server}api/check-user";
+                $isLocal = str_contains($domain, 'localhost');
+                $ssl = $isLocal ? 'http' : 'https';
+                $prefix = app()->environment('development') && !$isLocal ? '/crm-development' : '';
+                $url = "{$ssl}://{$domain}{$prefix}/api/check-user";
+
                 $response = Http::timeout(3)->post($url, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
                 ]);
+
                 if ($response->ok() && $response->json('exists')) {
                     $validChannels[] = [
                         'domain' => $domain,
                         'name' => $channelName,
+                        'url' => "{$ssl}://{$domain}{$prefix}{$currentPath}", // full URL to be used in <a href>
                     ];
                 }
+
             } catch (\Exception $e) {
-                \Log::error("Channel check failed for {$domain}: " . $e->getMessage());
-                continue;
+                Log::error("Channel check failed for {$domain}: " . $e->getMessage());
             }
         }
 
         return response()->json([
-            'url' => $url,
             'validChannels' => $validChannels,
-            'checked' => count($validChannels),
-            'email' => $authUser->email,
-            'table' => $tableToCheck
         ]);
     })->name('check.channels');
 
