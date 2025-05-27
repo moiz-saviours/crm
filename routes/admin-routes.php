@@ -78,9 +78,9 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             'ssl' => $ssl,
             'prefix' => $prefix,
             'url' => $url,
-            'response' => $response,
-            'response_ok' => $response->ok(),
-            'response_json' => $response->json('exists'),
+            'response' => $response??"",
+            'response_ok' => $response?->ok(),
+            'response_json' => $response?->json('exists'),
         ]);
     })->name('check.channels');
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
