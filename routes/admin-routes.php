@@ -19,45 +19,39 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     ProfileController as AdminProfileController,
     SettingController as AdminSettingController,
     TeamController as AdminTeamController,
-    TeamTargetController as AdminTeamTargetController};
+    TeamTargetController as AdminTeamTargetController
+};
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
 
-
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
         $tableToCheck = 'admins';
         $allChannels = config('channels');
         $validChannels = [];
-
         $host = request()->getHost();
         $port = request()->getPort();
         $fullCurrentDomain = $port && $port != 80 && $port != 443 ? "$host:$port" : $host;
-
         // Get current path for full redirection
         $currentPath = $request->header('referer')
             ? parse_url($request->header('referer'), PHP_URL_PATH)
             : '/';
-
         foreach ($allChannels as $domain => $channelName) {
             if ($domain === $fullCurrentDomain) {
                 continue;
             }
-
             try {
                 $isLocal = str_contains($domain, 'localhost');
                 $ssl = $isLocal ? 'http' : 'https';
                 $prefix = app()->environment('development') && !$isLocal ? '/crm-development' : '';
                 $url = "{$ssl}://{$domain}{$prefix}/api/check-user";
-
                 $response = Http::timeout(3)->post($url, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
                 ]);
-
                 if ($response->ok() && $response->json('exists')) {
                     $validChannels[] = [
                         'domain' => $domain,
@@ -70,12 +64,25 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 Log::error("Channel check failed for {$domain}: " . $e->getMessage());
             }
         }
-
         return response()->json([
             'validChannels' => $validChannels,
+            'authUser' => $authUser,
+            'tableToCheck' => $tableToCheck,
+            'allChannels' => $allChannels,
+            'host' => $host,
+            'port' => $port,
+            'fullCurrentDomain' => $fullCurrentDomain,
+            'currentPath' => $currentPath,
+            'domain' => $domain,
+            'isLocal' => $isLocal,
+            'ssl' => $ssl,
+            'prefix' => $prefix,
+            'url' => $url,
+            'response' => $response,
+            'response_ok' => $response->ok(),
+            'response_json' => $response->json('exists'),
         ]);
     })->name('check.channels');
-
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
@@ -141,7 +148,6 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             Route::get('/logs/{team?}', [AdminTeamTargetController::class, 'log_index'])->name('log.index');
         });
     });
-
     /** Invoice Routes */
     Route::name('invoice.')->group(function () {
         Route::get('/invoices', [AdminInvoiceController::class, 'index'])->name('index');
@@ -222,7 +228,6 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
     });
     /** Payment Transaction Logs Route */
     Route::get('payment-transaction-logs', [AdminPaymentTransactionLogController::class, 'getLogs'])->name('payment-transaction-logs');
-
     /** CustomerContact Contacts Routes */
     Route::name('client.contact.')->group(function () {
         Route::get('/client/contacts', [AdminClientContactController::class, 'index'])->name('index');
@@ -261,10 +266,8 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             Route::delete('/delete/{client_account?}', [AdminPaymentMerchantController::class, 'delete'])->name('delete');
         });
     });
-
     Route::prefix('activity-logs')->name('activity-log.')->group(function () {
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
-
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
 });
