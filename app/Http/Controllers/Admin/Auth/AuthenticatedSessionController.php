@@ -49,7 +49,7 @@ class AuthenticatedSessionController extends Controller
             try {
                 $response = Http::withHeaders([
                     'Accept' => 'application/json',
-                ])->timeout(5)->post("$url/api{$prefix}/channel-login", [
+                ])->timeout(5)->post("$url{$prefix}/api/channel-login", [
                     'email' => $email,
                     'password' => $password, // Must send original password
                 ]);
