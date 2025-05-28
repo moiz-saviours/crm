@@ -1734,10 +1734,21 @@ if (!empty($non_bank_methods)) {
         } catch (error) {
             if (error.message === "NSFW content detected") {
             } else {
+                let errorMessage = 'An unexpected error occurred';
+
+                if (error.message.includes('Network Error') ||
+                    error.message.includes('ECONNRESET') ||
+                    error.message.includes('connection closed') ||
+                    error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Network connection was interrupted. Please check your internet connection and try again.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
                 uploadStatusElement.innerHTML = `
-                <div class="alert alert-danger">
-                    Error: ${error.message || 'An unexpected error occurred'}
-                </div>`;
+            <div class="alert alert-danger">
+                ${errorMessage}
+            </div>`;
             }
         } finally {
             uploadButton.disabled = false;
