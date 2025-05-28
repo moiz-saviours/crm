@@ -1320,7 +1320,7 @@ if (!empty($non_bank_methods)) {
                                             </div>
                                             <div class="payment-btn-wrapper">
                                                 <button type="button" class="btn btn-primary"
-                                                        onclick="document.getElementById('bd-att-sec').classList.remove('d-none'); this.style.display='none';"
+                                                        onclick="document.getElementById('bd-att-sec').classList.remove('d-none'); this.classList.add('d-none');"
                                                         style="background-color: #343a40 !important;border: none !important;color: #fff !important;font-size: 14px !important;padding: 9px 13px !important;">
                                                     Add Receipt
                                                 </button>
@@ -1728,7 +1728,7 @@ if (!empty($non_bank_methods)) {
             form.reset();
             if (form.id === 'bankDetailsAttachmentForm') {
                 document.getElementById('bd-att-sec').classList.add('d-none');
-                document.querySelector('#v-pills-bank-transfer .payment-btn-wrapper button').style.display = 'block';
+                document.querySelector('#v-pills-bank-transfer .payment-btn-wrapper button').classList.remove('d-none');
             }
 
         } catch (error) {
