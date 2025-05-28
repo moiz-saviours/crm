@@ -19,6 +19,27 @@
             <!-- Form Body -->
             <div class="form-body">
                 <div class="form-group mb-3">
+                    <label for="payment_method" class="form-label">Payment Method</label>
+                    <select class="form-control" id="payment_method" name="payment_method" required>
+                        <option value="" disabled>Select Payment Method</option>
+                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>
+                            Authorize
+                        </option>
+                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>EDP</option>
+                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
+                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>
+                            Bank Transfer
+                        </option>
+                        {{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>Credit Card</option>--}}
+                        {{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
+                        {{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
+                    </select>
+                    @error('payment_method')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
                     <label for="client_contact" class="form-label">Client Contact</label>
                     <select class="form-control" id="client_contact" name="c_contact_key" required>
                         <option value="" selected>Select Client Contact</option>
@@ -73,24 +94,6 @@
                     <input type="email" class="form-control" id="email" name="email"
                            value="{{ old('email') }}" required>
                     @error('email')
-                    <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="payment_method" class="form-label">Payment Method</label>
-                    <select class="form-control" id="payment_method" name="payment_method" required>
-                        <option value="" disabled>Select Payment Method</option>
-                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>Authorize</option>
-                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>EDP</option>
-                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>Stripe</option>
-                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>
-                        {{--                        <option value="credit card" {{ old('payment_method') == 'credit ca rd' ? 'selected' : '' }}>Credit Card</option>--}}
-                        {{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>Bank Transfer</option>--}}
-                        {{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
-                        {{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
-                    </select>
-                    @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
