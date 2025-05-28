@@ -200,7 +200,7 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
         document.body.style.transition = 'opacity 0.3s';
 
         const isLocalhost = ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
-        const blockedCountries = ['AF', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'KH', 'CN', 'CY', 'GE', 'IN', 'ID', 'IR', 'IQ', 'IL', 'JP', 'JO', 'KZ', 'KW', 'KG', 'LA', 'LB', 'MY', 'MV', 'MN', 'MM', 'NP', 'KP', 'OM', 'PK', 'PS', 'PH', 'QA', 'SA', 'SG', 'KR', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TL', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE'];
+        const blockedCountries = ['AF', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'KH', 'CN', 'CY', 'GE', 'IN', 'ID', 'IR', 'IQ', 'IL', 'JP', 'JO', 'KZ', 'KW', 'KG', 'LA', 'LB', 'MY', 'MV', 'MN', 'MM', 'NP', 'KP', 'OM', 'PK', 'PS', 'PH', 'QA', 'SA', 'SG', 'KR', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TL', 'TR', 'TM', 'UZ', 'VN', 'YE'];
         const accessDeniedMessage = 'Our services are not available in your region due to regulatory restrictions. We apologize for any inconvenience.';
 
         const shouldCheckGeolocation = <?php echo $shouldCheckGeolocation ? 'true' : 'false'; ?>;
@@ -601,7 +601,7 @@ if (!empty($non_bank_methods)) {
                                     id="v-pills-upload-attachment-tab" data-toggle="pill"
                                     data-target="#v-pills-upload-attachment" type="button" role="tab"
                                     aria-controls="v-pills-upload-attachment"
-                                    aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Attachment
+                                    aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Add Receipt
                                 </button>
                                 {{--                                @endif--}}
                             </div>

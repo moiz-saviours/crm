@@ -58,8 +58,29 @@ Route::post('/check-user', function (Request $request) {
     if (!in_array($table, $allowedTables)) {
         return response()->json(['error' => 'Invalid table'], 400);
     }
-    $exists = DB::table($table)->where('email', $email)->exists();
+    $exists = DB::table($table)->where('email', $email)->where('status',1)->exists();
     return response()->json(['exists' => $exists]);
+});
+Route::post('/channel-login', function (Request $request) {
+    $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+    $guard = "web";
+    if ($request->type && $request->type == 999 ){
+        $guard = "admin";
+    }
+    if (Auth::guard($guard)->attempt($request->only('email', 'password'))) {
+//        $request->session()->regenerate();
+
+        return response()->json([
+            'status' => 'ok',
+            'user' => Auth::user(),
+            'session_id' => session()->getId(),
+        ]);
+    }
+
+    return response()->json(['status' => 'error', 'message' => 'Invalid credentials'], 401);
 });
 Route::post('/check-channels', function (Request $request) {
 

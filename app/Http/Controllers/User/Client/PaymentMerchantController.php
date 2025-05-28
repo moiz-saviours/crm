@@ -50,7 +50,7 @@ class PaymentMerchantController extends Controller
                 'email' => 'nullable|email|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal',
+                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal,bank transfer',
                 'environment' => [
                     'required',
                     Rule::in([PaymentMerchantConstants::ENVIRONMENT_SANDBOX, PaymentMerchantConstants::ENVIRONMENT_PRODUCTION]),
@@ -73,11 +73,20 @@ class PaymentMerchantController extends Controller
                 'environment' => $request->environment ?? null,
                 'status' => $validatedData['status'],
             ];
+            /** Note : For testing purpose only when environment is on sandbox (in testing) */
             if ($request->input('payment_method') == 'authorize') {
-//              $this->getMerchantDetails($data);
-                /** Note : For testing purpose only when environment is on sandbox (in testing) */
-                $data['test_login_id'] = "4N9sW62gpb";
-                $data['test_transaction_key'] = "22H7H58sx8NZjM5C";
+//                $this->getMerchantDetails($data);
+                $data['test_login_id'] = env('AUTHORIZE_NET_API_TEST_LOGIN_ID');
+                $data['test_transaction_key'] = env('AUTHORIZE_NET_TEST_TRANSACTION_KEY');
+            } elseif ($request->input('payment_method') == 'edp') {
+                $data['test_login_id'] = env('SECURE_TEST_KEY');
+                $data['test_transaction_key'] = env('SECURE_TEST_KEY');
+            } elseif ($request->input('payment_method') == 'stripe') {
+                $data['test_login_id'] = env('STRIPE_TEST_KEY');
+                $data['test_transaction_key'] = env('STRIPE_TEST_SECRET');
+            } elseif ($request->input('payment_method') == 'paypal') {
+                $data['test_login_id'] = env('PAYPAL_CLIENT_ID');
+                $data['test_transaction_key'] = env('PAYPAL_CLIENT_SECRET');
             }
             $client_account = PaymentMerchant::create($data);
             DB::commit();
@@ -133,7 +142,7 @@ class PaymentMerchantController extends Controller
                 'email' => 'nullable|email|max:255',
                 'limit' => 'nullable|integer|min:1',
                 'capacity' => 'nullable|integer|min:1',
-                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal',
+                'payment_method' => 'required|string|in:authorize,edp,stripe,paypal,bank transfer',
                 'environment' => [
                     'required',
                     Rule::in([PaymentMerchantConstants::ENVIRONMENT_SANDBOX, PaymentMerchantConstants::ENVIRONMENT_PRODUCTION]),

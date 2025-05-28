@@ -209,8 +209,8 @@
                                 <td class="align-middle text-center text-nowrap">${descriptor??'---'}</td>
                                 <td class="align-middle text-center text-nowrap">${payment_method.toUpperCase()}</td>
                                 <td class="align-middle text-center text-nowrap">${email}</td>
-                                <td class="align-middle text-center text-nowrap">${login_id}</td>
-                                <td class="align-middle text-center text-nowrap">${transaction_key}</td>
+                                <td class="align-middle text-center text-nowrap">${login_id??""}</td>
+                                <td class="align-middle text-center text-nowrap">${transaction_key??""}</td>
                                 <td class="align-middle text-center text-nowrap">${limit}</td>
                                 <td class="align-middle text-center text-nowrap">${capacity}</td>
                                 <td class="align-middle text-center text-nowrap">${usage}</td>
@@ -275,7 +275,7 @@
                             }
                             // Column 6: Vendor name
                             if (decodeHtml(rowData[6]) !== payment_method.toUpperCase()) {
-                                table.cell(index, 6).data(payment_method).draw();
+                                table.cell(index, 6).data(payment_method.toUpperCase()).draw();
                             }
                             // Column 7: email
                             if (decodeHtml(rowData[7]) !== email) {

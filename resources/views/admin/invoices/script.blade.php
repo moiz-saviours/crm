@@ -239,7 +239,7 @@
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
-                                                          style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="color: var(--bs-primary);font-weight: 600;">${invoice_key}</b></span>
+                                                          style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
                         <td class="align-middle text-center text-nowrap">
                             ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}
@@ -328,7 +328,7 @@
                                     <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
-                                                          style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="color: var(--bs-primary);font-weight: 600;">${invoice_key}</b></span>
+                                                          style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                                 `).draw();
                             }
 

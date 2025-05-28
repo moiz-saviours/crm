@@ -103,7 +103,7 @@
                                                           title="Show transaction logs"
                                                           style="cursor: pointer;"
                                                           data-invoice-key="{{ $invoice->invoice_key }}"><b
-                                                            style="color: var(--bs-primary);font-weight: 600;">{{ $invoice->invoice_key }}</b></span>
+                                                            style="font-weight: 600;">{{ $invoice->invoice_key }}</b></span>
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->brand))

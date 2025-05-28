@@ -3,7 +3,8 @@
 
 <!-- Date Range Picker CSS -->
 <link rel="stylesheet" href="{{asset('assets/css/daterangepicker/daterangepicker.css')}}">
-<link id="_dm-cssOverlayScrollbars" rel="stylesheet" href="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.min.css')}}">
+<link id="_dm-cssOverlayScrollbars" rel="stylesheet"
+      href="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.min.css')}}">
 <!-- Fonts [ OPTIONAL ] -->
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
@@ -455,7 +456,8 @@ Detailed information and more samples can be found in the documentation.
     span.dt-column-title {
         color: var(--bs-primary);
     }
-    .custm-filtr{
+
+    .custm-filtr {
         padding: 0;
     }
 
@@ -470,6 +472,25 @@ Detailed information and more samples can be found in the documentation.
         box-shadow: inset 0 0 0 9999px var(--bs-primary);
         color: var(--bs-primary-color);
     }
+    .table.dataTable.table-striped > tbody > tr > td *:not(button):not(button *):not(.badge.bg-success) {
+        color: var(--bs-primary);
+    }
+
+    .table.dataTable.table-striped > tbody > tr.selected > td *:not(button):not(button *):not(.badge.bg-success) {
+        color: var(--bs-primary-color);
+    }
+
+    .table.dataTable.table-striped > tbody > tr.selected > td > button.btn-primary {
+        color: var(--bs-primary);
+        background-color: var(--bs-primary-color);
+        box-shadow: 0 .1rem .5rem rgba(var(--bs-primary-color-rgb), .5),
+    }
+
+    .table.dataTable.table-striped > tbody > tr.selected > td > button * {
+        color: inherit;
+    }
+
+
     .right-icon {
         display: flex;
         justify-content: end;
@@ -534,6 +555,7 @@ Detailed information and more samples can be found in the documentation.
         color: var(--bs-primary);
         font-weight: 600;
     }
+
     .table a:hover {
         text-decoration: underline;
     }
@@ -543,9 +565,10 @@ Detailed information and more samples can be found in the documentation.
         max-height: 50px;
     }
 
-    .root .mainnav__inner .nav-link.active ~ .nav .active,.root .mainnav__inner .nav-link.active ~ .nav .active:hover {
+    .root .mainnav__inner .nav-link.active ~ .nav .active, .root .mainnav__inner .nav-link.active ~ .nav .active:hover {
         color: var(--nf-mainnav-submenu-active-color);
     }
+
     .mn--min .mininav-content h3 {
         color: var(--nf-mainnav-link-color);
         font-size: var(--nf-brand-size);
@@ -578,7 +601,7 @@ Detailed information and more samples can be found in the documentation.
         /*padding: 0px;*/
     }
 
-    .profile-image{
+    .profile-image {
         object-fit: contain;
     }
 

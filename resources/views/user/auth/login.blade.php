@@ -53,7 +53,7 @@
                             <div class="forgot-password-div">
                                 <div class="save-password-div">
                                     <label class="switch">
-                                        <input type="checkbox">
+                                        <input type="checkbox" name="remember" checked>
                                         <span class="slider round"></span>
                                     </label>
 
