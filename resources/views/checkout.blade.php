@@ -1326,7 +1326,7 @@ if (!empty($non_bank_methods)) {
                                                 </button>
                                             </div>
 
-                                            <div id="bd-att-sec" class="d-none" style="min-height:250px;">
+                                            <div id="bd-att-sec" class="d-none" style="min-height:250px;padding: 0px 20px; line-height: 14px; font-size: 12px;">
                                                 <div class="form-txt">
                                                     <h1>Upload Receipt</h1>
                                                     <p class="text-muted">Only upload payment-related files (PDF, JPG,
