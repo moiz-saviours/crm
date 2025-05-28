@@ -71,7 +71,7 @@ Route::post('/channel-login', function (Request $request) {
         $guard = "admin";
     }
     if (Auth::guard($guard)->attempt($request->only('email', 'password'))) {
-        $request->session()->regenerate();
+//        $request->session()->regenerate();
 
         return response()->json([
             'status' => 'ok',
