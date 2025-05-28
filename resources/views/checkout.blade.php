@@ -593,17 +593,19 @@ if (!empty($non_bank_methods)) {
                                         aria-selected="true">Bank Transfer
                                     </button>
                                 @endif
-
-                                <!-- Upload Attachment Tab -->
-                                {{--                                @if($first_merchant)--}}
-                                <button
-                                    class="nav-link side-bar-btns  {{!isset($invoiceDetails['invoice']['payment_methods']) || count($invoiceDetails['invoice']['payment_methods']) < 1 ? 'active' : '' }}"
-                                    id="v-pills-upload-attachment-tab" data-toggle="pill"
-                                    data-target="#v-pills-upload-attachment" type="button" role="tab"
-                                    aria-controls="v-pills-upload-attachment"
-                                    aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Add Receipt
-                                </button>
-                                {{--                                @endif--}}
+                                @php
+                                    $hasOnlyBankTransfer = isset($payment_methods) && count($payment_methods) === 1 && in_array('bank transfer', $payment_methods);
+                                @endphp
+                                <!-- Upload Receipt Tab -->
+                                @if(!$hasOnlyBankTransfer)
+                                    <button
+                                        class="nav-link side-bar-btns  {{!isset($invoiceDetails['invoice']['payment_methods']) || count($invoiceDetails['invoice']['payment_methods']) < 1 ? 'active' : '' }}"
+                                        id="v-pills-upload-attachment-tab" data-toggle="pill"
+                                        data-target="#v-pills-upload-attachment" type="button" role="tab"
+                                        aria-controls="v-pills-upload-attachment"
+                                        aria-selected="true"><i class="fa-solid fa-upload mr-2"></i> Add Receipt
+                                    </button>
+                                @endif
                             </div>
                         </div>
                         <div class="col-md-9">
@@ -1316,19 +1318,113 @@ if (!empty($non_bank_methods)) {
                                                     @endforeach
                                                 </div>
                                             </div>
+                                            <div class="payment-btn-wrapper">
+                                                <button type="button" class="btn btn-primary"
+                                                        onclick="document.getElementById('bd-att-sec').classList.remove('d-none'); this.style.display='none';"
+                                                        style="background-color: #343a40 !important;border: none !important;color: #fff !important;font-size: 14px !important;padding: 9px 13px !important;">
+                                                    Add Receipt
+                                                </button>
+                                            </div>
+
+                                            <div id="bd-att-sec" class="d-none" style="min-height:250px;">
+                                                <div class="form-txt">
+                                                    <h1>Upload Receipt</h1>
+                                                    <p class="text-muted">Only upload payment-related files (PDF, JPG,
+                                                        PNG). Max
+                                                        size: 5MB.</p>
+                                                </div>
+                                                <form id="bankDetailsAttachmentForm" class="upload-attachment"
+                                                      action="{{route('api.upload-payment-proof')}}"
+                                                      enctype="multipart/form-data">
+                                                    <div class="form-group">
+                                                        <label for="upload_attachment-email">Email Address:</label>
+                                                        <input type="email" class="form-control"
+                                                               id="upload_attachment-email"
+                                                               name="email" placeholder="test@example.com"
+                                                               autocomplete="false"
+                                                               required>
+                                                        <small id="email-upload_attachment_error"
+                                                               class="text-danger"></small>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="upload_attachment-transaction_id">Transaction /
+                                                            Reference
+                                                            Id:</label>
+                                                        <input type="text" class="form-control"
+                                                               id="upload_attachment-transaction_id"
+                                                               name="transaction_id" placeholder="12345678910"
+                                                               autocomplete="false" required>
+                                                        <small id="transaction_id-upload_attachment_error"
+                                                               class="text-danger"></small>
+                                                    </div>
+                                                    @if(isset($payment_methods) && !empty($payment_methods))
+                                                        <div class="form-group">
+                                                            <label for="upload_attachment-payment_method">Payment
+                                                                Method:</label>
+                                                            <select class="form-control"
+                                                                    id="upload_attachment-payment_method"
+                                                                    name="payment_method" required>
+                                                                @foreach($payment_methods as $pm_key=> $payment_method)
+                                                                    <option value="{{$payment_method}}"
+                                                                    @if(in_array('bank transfer', $payment_methods))
+                                                                        {{ $payment_method == 'bank transfer' ? 'selected' : '' }}
+                                                                        @else
+                                                                        {{ $pm_key == 0 ? 'selected' : '' }}
+                                                                        @endif
+                                                                    >{{ucwords($payment_method)}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <small id="payment_method-upload_attachment_error"
+                                                                   class="text-danger"></small>
+                                                        </div>
+                                                    @endif
+                                                    <div class="form-group">
+                                                        <label for="upload_attachment-file">Attachment:</label>
+                                                        <input type="file" id="upload_attachment-file"
+                                                               class="form-control"
+                                                               name="file"
+                                                               style="height: calc(1.5em + .75rem + 6px);"
+                                                               accept=".pdf,.jpg,.jpeg,.png" multiple required/>
+                                                        <div class="form-text mt-2 ml-2" style="font-size: 14px;">
+                                                            Allowed:
+                                                            Receipts, Invoices, or Payment proof.
+                                                        </div>
+                                                        <small id="file-upload_attachment_error"
+                                                               class="text-danger"></small>
+                                                    </div>
+                                                    <div class="form-check mb-2 ml-2">
+                                                        <input type="checkbox" class="form-check-input"
+                                                               id="confirmLegal"
+                                                               required/>
+                                                        <label class="form-check-label" for="confirmLegal"
+                                                               style="font-size: 14px;">
+                                                            I confirm this file is related to my payment.
+                                                        </label>
+                                                    </div>
+                                                    <!-- Submit Button -->
+                                                    <div class="payment-btn-wrapper">
+                                                        <button type="submit" id="uploadBtnBdAtt"
+                                                                class="btn btn-primary"
+                                                                style="background-color: #343a40 !important;border: none !important;color: #fff !important;font-size: 14px !important;padding: 9px 13px !important;">
+                                                            Submit Receipt
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div id="bankDetailsUploadStatus" class="mt-3"></div>
                                         </div>
                                     </div>
                                 @endif
 
 
-                                <!-- Upload Attachment Tab -->
+                                <!-- Upload Receipt Tab -->
                                 <div
                                     class="tab-pane fade {{!isset($invoiceDetails['invoice']['payment_methods']) || count($invoiceDetails['invoice']['payment_methods']) < 1 ? 'show active' : '' }}"
                                     id="v-pills-upload-attachment" role="tabpanel"
                                     aria-labelledby="v-pills-upload-attachment-tab">
                                     <div class="" style="min-height:250px;">
                                         <div class="form-txt">
-                                            <h1>Upload Attachment</h1>
+                                            <h1>Upload Receipt</h1>
                                             <p class="text-muted">Only upload payment-related files (PDF, JPG, PNG). Max
                                                 size: 5MB.</p>
                                         </div>
@@ -1396,7 +1492,7 @@ if (!empty($non_bank_methods)) {
                                             <div class="payment-btn-wrapper">
                                                 <button type="submit" id="uploadBtn" class="btn btn-primary"
                                                         style="background-color: #343a40 !important;border: none !important;color: #fff !important;font-size: 14px !important;padding: 9px 13px !important;">
-                                                    Upload Attachment
+                                                    Submit Receipt
                                                 </button>
                                             </div>
                                             <div id="uploadStatus" class="mt-3"></div>
@@ -1494,20 +1590,35 @@ if (!empty($non_bank_methods)) {
         const ratio = skinPixelCount / (canvas.width * canvas.height);
         return ratio > 0.3;
     }
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainUploadForm = document.getElementById('paymentForm-uploadAttachment');
+        if (mainUploadForm) {
+            mainUploadForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const uploadStatus = document.getElementById('uploadStatus');
+                const uploadBtn = document.getElementById('uploadBtn');
+                handleAttachmentFormSubmit(mainUploadForm, uploadStatus, uploadBtn);
+            });
+        }
 
-    document.getElementById('paymentForm-uploadAttachment').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const files = document.getElementById('upload_attachment-file').files;
-        const uploadStatus = document.getElementById('uploadStatus');
-        const uploadBtn = document.getElementById('uploadBtn');
-
-        uploadStatus.innerHTML = '';
-        uploadBtn.disabled = true;
+        const bankDetailsForm = document.getElementById('bankDetailsAttachmentForm');
+        if (bankDetailsForm) {
+            bankDetailsForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const uploadStatus = document.getElementById('bankDetailsUploadStatus');
+                const uploadBtn = document.getElementById('uploadBtnBdAtt');
+                handleAttachmentFormSubmit(bankDetailsForm, uploadStatus, uploadBtn);
+            });
+        }
+    });
+    async function handleAttachmentFormSubmit(form, uploadStatusElement, uploadButton) {
+        const files = form.querySelector('input[type="file"]').files;
+        uploadStatusElement.innerHTML = '';
+        uploadButton.disabled = true;
 
         if (files.length === 0) {
-            uploadStatus.innerHTML = '<div class="alert alert-danger">Please select at least one file.</div>';
-            uploadBtn.disabled = false;
+            uploadStatusElement.innerHTML = '<div class="alert alert-danger">Please select at least one file.</div>';
+            uploadButton.disabled = false;
             return;
         }
 
@@ -1516,19 +1627,19 @@ if (!empty($non_bank_methods)) {
 
         for (const file of files) {
             if (!allowedTypes.includes(file.type)) {
-                uploadStatus.innerHTML = `<div class="alert alert-danger">Invalid file type (${file.name}). Only PDF/JPG/PNG allowed.</div>`;
-                uploadBtn.disabled = false;
+                uploadStatusElement.innerHTML = `<div class="alert alert-danger">Invalid file type (${file.name}). Only PDF/JPG/PNG allowed.</div>`;
+                uploadButton.disabled = false;
                 return;
             }
 
             if (file.size > maxSize) {
-                uploadStatus.innerHTML = `<div class="alert alert-danger">File too large (${file.name}). Max 10MB allowed.</div>`;
-                uploadBtn.disabled = false;
+                uploadStatusElement.innerHTML = `<div class="alert alert-danger">File too large (${file.name}). Max 10MB allowed.</div>`;
+                uploadButton.disabled = false;
                 return;
             }
         }
 
-        uploadStatus.innerHTML = '<div class="alert alert-info">Scanning files for security...</div>';
+        uploadStatusElement.innerHTML = '<div class="alert alert-info">Scanning files for security...</div>';
 
         try {
             for (const file of files) {
@@ -1542,10 +1653,10 @@ if (!empty($non_bank_methods)) {
                             URL.revokeObjectURL(img.src);
 
                             if (isSuspicious) {
-                                uploadStatus.innerHTML = `
-                                                                    <div class="alert alert-warning">
-                                                                        <strong>Warning:</strong> Inappropriate content detected in ${file.name}.
-                                                                    </div>`;
+                                uploadStatusElement.innerHTML = `
+                                <div class="alert alert-warning">
+                                    <strong>Warning:</strong> Inappropriate content detected in ${file.name}.
+                                </div>`;
                                 throw new Error("NSFW content detected");
                             }
                             resolve();
@@ -1553,13 +1664,15 @@ if (!empty($non_bank_methods)) {
                     });
                 }
             }
-            uploadStatus.innerHTML = '<div class="alert alert-info">Preparing upload...</div>';
+
+            uploadStatusElement.innerHTML = '<div class="alert alert-info">Preparing upload...</div>';
             const formData = new FormData(form);
             formData.append('invoice_number', `{{ $invoiceData['invoice_key'] }}`);
             formData.delete('file');
             files.forEach((file, index) => {
                 formData.append(`files[${index}]`, file);
             });
+
             const response = await fetch(form.action || '/api/upload-payment-proof', {
                 method: 'POST',
                 body: formData,
@@ -1572,7 +1685,7 @@ if (!empty($non_bank_methods)) {
             const result = await response.json();
 
             if (!response.ok || !result?.success) {
-                uploadStatus.innerHTML = ``;
+                uploadStatusElement.innerHTML = ``;
                 if (result?.errors) {
                     if (Array.isArray(result.errors)) {
                         result.errors.forEach((error) => {
@@ -1595,37 +1708,41 @@ if (!empty($non_bank_methods)) {
                 }
                 return;
             }
+
             if (result?.skipped_files && result.skipped_files.length > 0) {
                 const skippedList = result.skipped_files.map(f => `<li>${f.name} (${Math.round(f.size / 1024)} KB)</li>`).join('');
-                uploadStatus.innerHTML = `
-                                                    <div class="alert alert-warning mt-2">
-                                                        <strong>Note:</strong> The following files were not uploaded due to attachment limits:
-                                                        <ul>${skippedList}</ul><br>
-                                                            Reference ID: ${result.reference_id || 'N/A'}
-                                                    </div>
-                                                `;
+                uploadStatusElement.innerHTML = `
+                <div class="alert alert-warning mt-2">
+                    <strong>Note:</strong> The following files were not uploaded due to attachment limits:
+                    <ul>${skippedList}</ul><br>
+                    Reference ID: ${result.reference_id || 'N/A'}
+                </div>`;
             } else {
-                uploadStatus.innerHTML = `
-                                                <div class="alert alert-success">
-                                                    All files and information submitted successfully!<br>
-                                                    Reference ID: ${result.reference_id || 'N/A'}
-                                                </div>`;
+                uploadStatusElement.innerHTML = `
+                <div class="alert alert-success">
+                    All files and information submitted successfully!<br>
+                    Reference ID: ${result.reference_id || 'N/A'}
+                </div>`;
             }
+
             form.reset();
+            if (form.id === 'bankDetailsAttachmentForm') {
+                document.getElementById('bd-att-sec').classList.add('d-none');
+                document.querySelector('#v-pills-bank-transfer .payment-btn-wrapper button').style.display = 'block';
+            }
 
         } catch (error) {
             if (error.message === "NSFW content detected") {
             } else {
-                uploadStatus.innerHTML = `
-                                                    <div class="alert alert-danger">
-                                                        Error: ${error.message || 'An unexpected error occurred'}
-                                                    </div>`;
+                uploadStatusElement.innerHTML = `
+                <div class="alert alert-danger">
+                    Error: ${error.message || 'An unexpected error occurred'}
+                </div>`;
             }
         } finally {
-            uploadBtn.disabled = false;
+            uploadButton.disabled = false;
         }
-    });
-
+    }
     !function () {
         document.currentScript?.remove()
     }();
