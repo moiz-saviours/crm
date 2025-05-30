@@ -1319,14 +1319,14 @@ if (!empty($non_bank_methods)) {
                                                 </div>
                                             </div>
                                             <div class="payment-btn-wrapper">
-                                                <button type="button" class="btn btn-primary"
-                                                        onclick="document.getElementById('bd-att-sec').classList.remove('d-none'); this.classList.add('d-none');"
+                                                <button type="button" class="btn btn-primary d-none"
+{{--                                                        onclick="document.getElementById('bd-att-sec').classList.remove('d-none'); this.classList.add('d-none');"--}}
                                                         style="background-color: #343a40 !important;border: none !important;color: #fff !important;font-size: 14px !important;padding: 9px 13px !important;">
                                                     Add Receipt
                                                 </button>
                                             </div>
 
-                                            <div id="bd-att-sec" class="d-none" style="min-height:250px;padding: 0px 20px; line-height: 14px; font-size: 12px;">
+                                            <div id="bd-att-sec" class="" style="min-height:250px;padding: 0px 20px; line-height: 14px; font-size: 12px;">
                                                 <div class="form-txt">
                                                     <h1>Upload Receipt</h1>
                                                     <p class="text-muted">Only upload payment-related files (PDF, JPG,
@@ -1336,34 +1336,13 @@ if (!empty($non_bank_methods)) {
                                                 <form id="bankDetailsAttachmentForm" class="upload-attachment"
                                                       action="{{route('api.upload-payment-proof')}}"
                                                       enctype="multipart/form-data">
-                                                    <div class="form-group">
-                                                        <label for="bd-att-upload_attachment-email">Email Address:</label>
-                                                        <input type="email" class="form-control"
-                                                               id="bd-att-upload_attachment-email"
-                                                               name="email" placeholder="test@example.com"
-                                                               autocomplete="false"
-                                                               required>
-                                                        <small id="email-upload_attachment_error"
-                                                               class="text-danger"></small>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="bd-att-upload_attachment-transaction_id">Transaction /
-                                                            Reference
-                                                            Id:</label>
-                                                        <input type="text" class="form-control"
-                                                               id="bd-att-upload_attachment-transaction_id"
-                                                               name="transaction_id" placeholder="12345678910"
-                                                               autocomplete="false" required>
-                                                        <small id="transaction_id-upload_attachment_error"
-                                                               class="text-danger"></small>
-                                                    </div>
                                                     @if(isset($payment_methods) && !empty($payment_methods))
-                                                        <div class="form-group">
+                                                        <div class="form-group" hidden>
                                                             <label for="bd-att-upload_attachment-payment_method">Payment
                                                                 Method:</label>
                                                             <select class="form-control"
                                                                     id="bd-att-upload_attachment-payment_method"
-                                                                    name="payment_method" required>
+                                                                    name="payment_method" required hidden>
                                                                 @foreach($payment_methods as $pm_key=> $payment_method)
                                                                     <option value="{{$payment_method}}"
                                                                     @if(in_array('bank transfer', $payment_methods))
@@ -1385,21 +1364,8 @@ if (!empty($non_bank_methods)) {
                                                                name="file"
                                                                style="height: calc(1.5em + .75rem + 6px);"
                                                                accept=".pdf,.jpg,.jpeg,.png" multiple required/>
-                                                        <div class="form-text mt-2 ml-2" style="font-size: 14px;">
-                                                            Allowed:
-                                                            Receipts, Invoices, or Payment proof.
-                                                        </div>
                                                         <small id="bd-att-file-upload_attachment_error"
                                                                class="text-danger"></small>
-                                                    </div>
-                                                    <div class="form-check mb-2 ml-2">
-                                                        <input type="checkbox" class="form-check-input"
-                                                               id="bd-att-confirmLegal"
-                                                               required/>
-                                                        <label class="form-check-label" for="bd-att-confirmLegal"
-                                                               style="font-size: 14px;">
-                                                            I confirm this file is related to my payment.
-                                                        </label>
                                                     </div>
                                                     <!-- Submit Button -->
                                                     <div class="payment-btn-wrapper">
@@ -1727,9 +1693,12 @@ if (!empty($non_bank_methods)) {
 
             form.reset();
             if (form.id === 'bankDetailsAttachmentForm') {
-                document.getElementById('bd-att-sec').classList.add('d-none');
-                document.querySelector('#v-pills-bank-transfer .payment-btn-wrapper button').classList.remove('d-none');
+                // document.getElementById('bd-att-sec').classList.add('d-none');
+                // document.querySelector('#v-pills-bank-transfer .payment-btn-wrapper button').classList.remove('d-none');
             }
+            setTimeout(function (){
+                uploadStatusElement.innerHTML = "";
+            },5000)
 
         } catch (error) {
             if (error.message === "NSFW content detected") {
