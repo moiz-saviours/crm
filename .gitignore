@@ -15,3 +15,4 @@ public/assets/images/user.png
 /.github/workflows/mirror.yml
 /.github/workflows/deploy.yml
 /public/assets/payment-attachments
+/.github/workflows
