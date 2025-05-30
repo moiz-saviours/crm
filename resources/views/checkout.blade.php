@@ -1400,8 +1400,7 @@ if (!empty($non_bank_methods)) {
                                             <div class="form-group">
                                                 <label for="upload_attachment-email">Email Address:</label>
                                                 <input type="email" class="form-control" id="upload_attachment-email"
-                                                       name="email" placeholder="test@example.com" autocomplete="false"
-                                                       required>
+                                                       name="email" placeholder="test@example.com" autocomplete="false">
                                                 <small id="email-upload_attachment_error" class="text-danger"></small>
                                             </div>
                                             <div class="form-group">
@@ -1410,7 +1409,7 @@ if (!empty($non_bank_methods)) {
                                                 <input type="text" class="form-control"
                                                        id="upload_attachment-transaction_id"
                                                        name="transaction_id" placeholder="12345678910"
-                                                       autocomplete="false" required>
+                                                       autocomplete="false">
                                                 <small id="transaction_id-upload_attachment_error"
                                                        class="text-danger"></small>
                                             </div>
