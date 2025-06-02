@@ -29,8 +29,8 @@ class ApiPaymentAttachmentController extends Controller
         }
         $validator = Validator::make($request->all(), [
             'invoice_number' => 'required|numeric|exists:invoices,invoice_key',
-            'email' => 'required|email',
-            'transaction_id' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'transaction_id' => 'nullable|string|max:255',
             'payment_method' => [
                 'nullable',
                 'string',
