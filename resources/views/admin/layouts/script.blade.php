@@ -962,6 +962,12 @@
                 }
             });
         }, 100);
+
+        function strLimit(string, limit = 100, end = '...') {
+            if (!string) return '---';
+            return string.length > limit ? string.substring(0, limit) + end : string;
+        }
+
     });
     !function () {
         document.currentScript?.remove()
