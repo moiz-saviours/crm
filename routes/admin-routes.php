@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
+    ChannelController as AdminChannelController,
     AccountController as AdminAccountController,
     ActivityLogController as AdminActivityLogController,
     BrandController as AdminBrandController,
@@ -31,24 +32,18 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
         $tableToCheck = 'admins';
         $allChannels = config('channels');
         $validChannels = [];
-
         $host = $request->getHost();
         $port = $request->getPort();
         $fullCurrentDomain = $port && $port != 80 && $port != 443 ? "$host:$port" : $host;
-
         $referer = $request->header('referer');
         $currentPath = $referer ? parse_url($referer, PHP_URL_PATH) : '/';
-
         $debugDetails = [];
         $isProdOrDev = app()->environment(['production', 'development']);
-
         foreach ($allChannels as $baseDomain => $channelName) {
             $isLocal = str_contains($baseDomain, 'localhost');
             $ssl = $isLocal ? 'http' : 'https';
-
             // Append .com for non-local domains
             $resolvedDomain = $isLocal ? $baseDomain : "{$baseDomain}.com";
-
             // Skip local domains in production/development environments
             if ($isProdOrDev && $isLocal) {
                 $debugDetails[] = [
@@ -58,7 +53,6 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 ];
                 continue;
             }
-
             // Skip current domain to avoid self-checking
             if ($resolvedDomain === $fullCurrentDomain || $baseDomain === $fullCurrentDomain) {
                 $debugDetails[] = [
@@ -68,10 +62,8 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 ];
                 continue;
             }
-
             $prefix = (!$isLocal && app()->environment('development')) ? '/crm-development' : '';
             $url = "{$ssl}://{$resolvedDomain}{$prefix}/api/check-user";
-
             $domainDebug = [
                 'domain' => $resolvedDomain,
                 'channelName' => $channelName,
@@ -80,20 +72,16 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 'responseData' => null,
                 'exception' => null,
             ];
-
             try {
                 $response = Http::timeout(3)->post($url, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
                 ]);
-
                 $domainDebug['responseStatus'] = $response->status();
                 $domainDebug['responseData'] = $response->json();
-
                 if ($response->ok() && $response->json('exists')) {
                     // Prevent double prefix
                     $finalPath = Str::startsWith($currentPath, $prefix) ? $currentPath : "{$prefix}{$currentPath}";
-
                     $validChannels[] = [
                         'domain' => $resolvedDomain,
                         'name' => $channelName,
@@ -105,10 +93,8 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 Log::error("Channel check failed for {$resolvedDomain}: " . $e->getMessage());
                 $domainDebug['exception'] = $e->getMessage();
             }
-
             $debugDetails[] = $domainDebug;
         }
-
         return response()->json([
             'validChannels' => $validChannels,
             'debug' => [
@@ -123,14 +109,14 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
             ]
         ]);
     })->name('check.channels');
-
-
-
-
-
     Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
+    /** Channel Routes */
+    Route::resource('channels', AdminChannelController::class);
+    Route::prefix('channels')->name('channels.')->group(function () {
+        Route::get('/change-status/{channel?}', [AdminAccountController::class, 'change_status'])->name('change.status');
+    });
     /** Profile Routes */
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [AdminProfileController::class, 'edit'])->name('edit');
