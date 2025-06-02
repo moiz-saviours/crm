@@ -350,7 +350,7 @@
         {{--                $('#formContainer').removeClass('open')--}}
         {{--            }--}}
         {{--        })--}}
-        {{--        .catch(error => console.log('An error occurred while updating the record.'));--}}
+        {{--        .catch(error => console.error('An error occurred while updating the record.',error));--}}
         {{--});--}}
 
 

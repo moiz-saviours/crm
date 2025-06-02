@@ -220,7 +220,7 @@
         //                 $('#formContainer').removeClass('open')
         //             }
         //         })
-        //         .catch(error => console.log('An error occurred while updating the record.'));
+        //         .catch(error => console.error('An error occurred while updating the record.',error));
         // });
 
         /** Edit */
@@ -307,7 +307,7 @@
         {{--                    $('#formContainer').removeClass('open')--}}
         {{--                }--}}
         {{--            })--}}
-        {{--            .catch(error => console.log('An error occurred while updating the record.'));--}}
+        {{--            .catch(error => console.error('An error occurred while updating the record.',error));--}}
         {{--    } else {--}}
         {{--        const url = $(this).attr('action');--}}
         {{--        AjaxRequestPromise(url, formData, 'POST', {useToastr: true})--}}
@@ -379,7 +379,7 @@
                             $('#formContainer').removeClass('open');
                         }
                     })
-                    .catch(error => console.log('An error occurred while updating the record.'));
+                    .catch(error => console.error('An error occurred while updating the record.',error));
             } else {
                 const url = $(this).attr('action');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})

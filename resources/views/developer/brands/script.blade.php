@@ -217,7 +217,7 @@
                         table.row($('#tr-' + id)).data(columns).draw();
                     }
                 })
-                .catch(error => console.log('An error occurred while updating the record.'));
+                .catch(error => console.error('An error occurred while updating the record.',error));
         });
 
         /** Change Status*/

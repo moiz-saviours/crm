@@ -311,7 +311,7 @@
             .then(response => {
                 console.log('Settings updated successfully:', response);
             })
-            .catch(error => console.log('An error occurred while updating the record.'));
+            .catch(error => console.error('An error occurred while updating the record.',error));
 
     });
     function flattenObject(obj, parentKey = '', formData = new FormData()) {
