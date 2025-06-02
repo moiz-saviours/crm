@@ -16,3 +16,4 @@ public/assets/images/user.png
 /.github/workflows/deploy.yml
 /public/assets/payment-attachments
 /.github/workflows
+/public/assets/images/channel-logos
