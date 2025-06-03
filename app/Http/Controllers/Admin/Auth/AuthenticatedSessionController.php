@@ -29,41 +29,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(AdminLoginRequest $request): RedirectResponse
     {
-//        $email = $request->input('email');
-//        $password = $request->input('password');
-
         $request->authenticate();
-
         $request->session()->regenerate();
-//        $channels = [
-//            'https://payusinginvoice.com',
-//            'https://paymentbyinvoice.com',
-//            'https://paymentviainvoice.com',
-//            'https://paythroughinvoice.com',
-//            'https://payviainvoice.com',
-//        ];
-//
-//        $loginResults = [];
-//        $prefix = app()->environment('development') ? '/crm-development' : '';
-//        foreach ($channels as $url) {
-//            try {
-//                $response = Http::withHeaders([
-//                    'Accept' => 'application/json',
-//                ])->timeout(5)->post("$url{$prefix}/api/channel-login", [
-//                    'type' => 999,
-//                    'email' => $email,
-//                    'password' => $password, // Must send original password
-//                ]);
-//
-//                $loginResults[$url] = $response->json();
-//            } catch (\Exception $e) {
-//                $loginResults[$url] = [
-//                    'status' => 'failed',
-//                    'error' => $e->getMessage()
-//                ];
-//            }
-//        }
-//        Log::info('Cross-channel login results', $loginResults);
         return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
