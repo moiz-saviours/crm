@@ -115,7 +115,7 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
     /** Channel Routes */
     Route::resource('channels', AdminChannelController::class);
     Route::prefix('channels')->name('channels.')->group(function () {
-        Route::get('/change-status/{channel?}', [AdminAccountController::class, 'change_status'])->name('change.status');
+        Route::get('/change-status/{channel?}', [AdminChannelController::class, 'change_status'])->name('change.status');
     });
     /** Profile Routes */
     Route::prefix('profile')->name('profile.')->group(function () {
