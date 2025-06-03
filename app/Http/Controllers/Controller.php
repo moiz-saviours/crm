@@ -28,13 +28,13 @@ abstract class Controller
         return 'Unknown';
     }
 
-    protected function smartResponse($request, $data = [], $routeName = null, $successMessage = 'Operation successful.')
+    protected function smartResponse($request, $data = [], $routeName = null, $successMessage = 'Operation successful.',$key='data')
     {
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => $successMessage,
-                'data' => $data
+                $key => $data
             ]);
         }
         return redirect()->route($routeName)->with('success', $successMessage);
