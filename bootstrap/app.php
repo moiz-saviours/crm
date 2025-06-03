@@ -37,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [LastSeen::class, Cooldown::class]);
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
+            'verify.cross.domain' => \App\Http\Middleware\VerifyCrossDomainToken::class,
             'auth' => Authenticate::class,
             'restrict.dev' => RestrictDevAccess::class,
             'abilities' => CheckAbilities::class,
