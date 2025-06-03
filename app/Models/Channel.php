@@ -97,7 +97,7 @@ class Channel extends Model
      */
     public function creator()
     {
-        return $this->morphTo();
+        return $this->morphTo('creator');
     }
 
     /**
@@ -105,7 +105,7 @@ class Channel extends Model
      */
     public function owner()
     {
-        return $this->morphTo();
+        return $this->morphTo('owner');
     }
 
     /**
