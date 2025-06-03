@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 require __DIR__ . '/admin-auth.php';
-Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['verify.cross.domain','auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
         $tableToCheck = 'admins';
