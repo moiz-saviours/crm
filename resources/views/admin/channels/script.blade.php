@@ -79,7 +79,7 @@
                 order: [[1, 'desc']],
                 responsive: false,
                 scrollX: true,
-                scrollY:  ($(window).height() - 200),
+                scrollY: ($(window).height() - 200),
                 scrollCollapse: true,
                 paging: true,
                 columnDefs: [
@@ -95,7 +95,7 @@
                 },
                 fixedColumns: {
                     start: 0,
-                    end: 3
+                    end: 2
                 },
             });
             table.buttons().container().appendTo(`#right-icon-${index}`);
@@ -133,7 +133,7 @@
         function setDataAndShowEdit(data) {
             const channel = data?.channel;
             if (!channel) {
-                toastr.error('Client account data is missing.')
+                toastr.error('Data is missing.')
                 return false;
             }
 
@@ -183,9 +183,10 @@
                                 meta_title,
                                 meta_description,
                                 meta_keywords,
-                                last_activity_at
+                                // last_activity_at
                             } = response.data;
                             const index = table.rows().count() + 1;
+                            // let last_activity_at_formatted = formatDate2(last_activity_at);
                             const columns = `
                                 <td class="align-middle text-center text-nowrap"></td>
                                 <td class="align-middle text-center text-nowrap">${index}</td>
@@ -196,7 +197,7 @@
                                     ${response.data.logo ? `<img src="{{asset('assets/images/channel-logos/')}}/${response.data.logo}" style="max-height: 30px;">` : ''}
                                 </td>
                                 <td class="align-middle text-center text-nowrap">
-                                    ${response.data.favicon ? `<img src="{{asset('assets/images/channel-favicon/')}}/${response.data.favicon}" style="max-height: 30px;">` : ''}
+                                    ${response.data.favicon ? `<img src="{{asset('assets/images/channel-favicons/')}}/${response.data.favicon}" style="max-height: 30px;">` : ''}
                                 </td>
                                 <td class="align-middle text-center text-nowrap">${description ? strLimit(description, 50) : '---'}</td>
                                 <td class="align-middle text-center text-nowrap">${language}</td>
@@ -204,7 +205,7 @@
                                 <td class="align-middle text-center text-nowrap">${meta_title ? strLimit(meta_title, 20) : '---'}</td>
                                 <td class="align-middle text-center text-nowrap">${meta_description ? strLimit(meta_description, 30) : '---'}</td>
                                 <td class="align-middle text-center text-nowrap">${meta_keywords ? strLimit(meta_keywords, 30) : '---'}</td>
-                                <td class="align-middle text-center text-nowrap">${last_activity_at}</td>
+                                // <td class="align-middle text-center text-nowrap">${last_activity_at_formatted}</td>
                                 <td class="align-middle text-center text-nowrap">
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
@@ -222,9 +223,10 @@
                             $('#formContainer').removeClass('open')
                         }
                     })
-                    .catch(error => console.error('An error occurred while updating the record.',error));
+                    .catch(error => console.error('An error occurred while updating the record.', error));
             } else {
                 const url = $(this).attr('action');
+                formData.append('_method', 'PUT');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response?.data) {
@@ -243,9 +245,12 @@
                                 meta_description,
                                 meta_keywords,
                                 logo,
-                                favicon
+                                favicon,
+                                // last_activity_at
                             } = response.data;
                             const index = table.row($('#tr-' + id)).index();
+                            // let last_activity_at_formatted = formatDate2(last_activity_at);
+
                             const rowData = table.row(index).data();
 
                             // Column 2: Name
@@ -261,14 +266,14 @@
                                 table.cell(index, 4).data(url).draw();
                             }
                             // Column 5: logo
-                            const logoHtml = logo ? `<img src="${logo}" style="max-height: 30px;">` : '';
+                            const logoHtml = logo ? `<img src="{{asset('assets/images/channel-logos/')}}/${logo}" style="max-height: 30px;">` : '';
                             if (decodeHtml(rowData[5]) !== logoHtml) {
-                                table.cell(index, 5).data(logo ? `<img src="${logo}" style="max-height: 30px;">` : '').draw();
+                                table.cell(index, 5).data(logoHtml).draw();
                             }
                             // Column 6: logo
-                            const favHtml = favicon ? `<img src="${favicon}" style="max-height: 30px;">` : '';
+                            const favHtml = favicon ? `<img src="{{asset('assets/images/channel-favicons/')}}/${favicon}" style="max-height: 30px;">` : '';
                             if (decodeHtml(rowData[6]) !== favHtml) {
-                                table.cell(index, 6).data(favicon ? `<img src="${favicon}" style="max-height: 30px;">` : '').draw();
+                                table.cell(index, 6).data(favHtml).draw();
                             }
                             // Column 7: description
                             if (decodeHtml(rowData[7]) !== description) {
@@ -294,10 +299,10 @@
                             if (decodeHtml(rowData[12]) !== meta_keywords) {
                                 table.cell(index, 12).data(meta_keywords).draw();
                             }
-                            // Column 14: Status
-                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == "active" ? "checked" : ""} data-bs-toggle="toggle">`;
-                            if (decodeHtml(rowData[14]) !== statusHtml) {
-                                table.cell(index, 14).data(statusHtml).draw();
+                            // Column 13: Status
+                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
+                            if (decodeHtml(rowData[13]) !== statusHtml) {
+                                table.cell(index, 13).data(statusHtml).draw();
                             }
 
                             $('#manage-form')[0].reset();
@@ -314,16 +319,15 @@
         /** Change Status*/
         $('tbody').on('change', '.change-status', function () {
             const statusCheckbox = $(this);
-            const status = statusCheckbox.is(':checked') ? 'active' : 'inactive';
+            const status = +statusCheckbox.is(':checked');
             const rowId = statusCheckbox.data('id');
             AjaxRequestPromise(`{{ route('admin.channels.change.status') }}/${rowId}?status=${status}`, null, 'GET', {useToastr: true})
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
-                    const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status == 'active' ? "checked" : ""} data-bs-toggle="toggle">`;
-                    table.cell(rowIndex, 14).data(statusHtml).draw();
+                    const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status ? "checked" : ""} data-bs-toggle="toggle">`;
+                    table.cell(rowIndex, table.column($('th:contains("STATUS")')).index()).data(statusHtml).draw();
                 })
-                .catch((error) => {
-                    console.log(error);
+                .catch(() => {
                     statusCheckbox.prop('checked', !status);
                 });
         });
@@ -358,5 +362,10 @@
                     }
                 });
         });
+
+        function formatDate2(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+        }
     });
 </script>
