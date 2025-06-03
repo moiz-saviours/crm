@@ -82,7 +82,7 @@
                                             <th class="align-middle text-center text-nowrap">META TITLE</th>
                                             <th class="align-middle text-center text-nowrap">META DESCRIPTION</th>
                                             <th class="align-middle text-center text-nowrap">META KEYWORDS</th>
-                                            <th class="align-middle text-center text-nowrap">LAST ACTIVITY</th>
+{{--                                            <th class="align-middle text-center text-nowrap">LAST ACTIVITY</th>--}}
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
                                             <th class="align-middle text-center text-nowrap">ACTION</th>
                                         </tr>
@@ -111,9 +111,9 @@
                                                 <td class="align-middle text-center text-nowrap">{{ Str::limit($channel->meta_title, 20) }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ Str::limit($channel->meta_description, 30) }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ Str::limit($channel->meta_keywords, 30) }}</td>
-                                                <td class="align-middle text-center text-nowrap">
-                                                    {{ $channel->last_activity_at ? $channel->last_activity_at->format('Y-m-d H:i') : '' }}
-                                                </td>
+{{--                                                <td class="align-middle text-center text-nowrap">--}}
+{{--                                                    {{ $channel->last_activity_at ? $channel->last_activity_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5": '' }}--}}
+{{--                                                </td>--}}
                                                 <td class="align-middle text-center text-nowrap">
                                                     <input type="checkbox" class="status-toggle change-status"
                                                            data-id="{{ $channel->id }}"
