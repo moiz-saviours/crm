@@ -35,7 +35,12 @@ class VerifyCrossDomainToken
             if (!$user) {
                 abort(403, 'User not found or inactive');
             }
-            Auth::loginUsingId($user->id);
+            $guard = $request->route()?->middleware()
+                ? collect($request->route()->middleware())->first(fn($m) => str_starts_with($m, 'auth:'))
+                : null;
+            $guard = $guard ? explode(':', $guard)[1] : 'web';
+
+            Auth::guard($guard)->loginUsingId($user->id);
             return Redirect::to($request->url());
 
         } catch (\Exception $e) {
