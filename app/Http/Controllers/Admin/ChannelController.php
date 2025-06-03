@@ -43,7 +43,7 @@ class ChannelController extends Controller
             $channel = Channel::create($data);
             $this->handleFileUploads($request, $channel);
             DB::commit();
-            return $this->smartResponse($request, $channel, 'admin.channels.index', 'Channel created successfully.', 'channel');
+            return $this->smartResponse($request, $channel, 'admin.channels.index', 'Channel created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->smartError($request, $e);
