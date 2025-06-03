@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,9 @@ class VerifyCrossDomainToken
             return $next($request);
         }
         try {
-            $decrypted = decrypt($request->access_token);
+            $key = base64_decode('AxS9/+trvgrFBcvBwuYl0kjVocGf8t+eiol6LtErpck=');
+            $encrypter = new Encrypter($key, 'AES-256-CBC');
+            $decrypted = $encrypter->decrypt($request->access_token);
             if (now()->gt($decrypted['expires_at'])) {
                 abort(403, 'Token expired');
             }
