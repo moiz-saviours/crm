@@ -22,11 +22,12 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController
 };
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 require __DIR__ . '/admin-auth.php';
-Route::middleware(['verify.cross.domain','auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
         $tableToCheck = 'admins';
@@ -75,20 +76,20 @@ Route::middleware(['verify.cross.domain','auth:admin', 'verified:admin', 'thrott
             $finalUrl = "{$ssl}://{$baseDomain}{$portPart}{$currentPath}";
 
             // Generate access token
-            $accessToken = encrypt([
-                'domain' => $fullCurrentDomain,
+            $payload = [
                 'table' => $tableToCheck,
-                'user_id' => $authUser->id,
                 'email' => $authUser->email,
                 'ip_address' => $request->ip(),
-                'session_id' => session()->getId(),
                 'expires_at' => now()->addSeconds(config('session.lifetime') * 60),
-            ]);
+            ];
 
+            $key = base64_decode("AxS9/+trvgrFBcvBwuYl0kjVocGf8t+eiol6LtErpck=");
+            $encrypter = new Encrypter($key, 'AES-256-CBC');
+            $accessToken = $encrypter->encrypt($payload);
             $validChannels[] = [
-                'domain' => $displayDomain, // This now includes port if exists
+                'domain' => $displayDomain,
                 'name' => $channelName,
-                'access_token' => $accessToken,
+                'access_token' =>  urlencode($accessToken),
                 'url' => $finalUrl,
                 'logo' => $channel->logo ? asset($channel->logo) : null,
                 'favicon' => $channel->favicon ? asset($channel->favicon) : null,
