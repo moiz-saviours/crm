@@ -76,10 +76,10 @@
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
                 buttons: exportButtons,
-                order: [[1, 'asc']],
+                order: [[1, 'desc']],
                 responsive: false,
                 scrollX: true,
-                scrollY: ($(window).height() - 350),
+                scrollY: ($(window).height() - 200),
                 scrollCollapse: true,
                 paging: true,
                 columnDefs: [
@@ -94,8 +94,8 @@
                     selector: 'td:first-child'
                 },
                 fixedColumns: {
-                    start: 2,
-                    end: 1
+                    start: 0,
+                    end: 2
                 },
             });
             table.buttons().container().appendTo(`#right-icon-${index}`);
@@ -120,7 +120,7 @@
             }
             $('#manage-form')[0].reset();
             $.ajax({
-                url: `{{route('admin.account.edit')}}/` + id,
+                url: `{{ route('admin.channels.edit', ':id') }}`.replace(':id', id),
                 type: 'GET',
                 success: function (data) {
                     setDataAndShowEdit(data);
@@ -130,79 +130,35 @@
                 }
             });
         });
-        /** Change Password Btn */
-        $(document).on('click', '.changePwdBtn', function () {
-            const id = $(this).data('id');
-            if (!id) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Record not found. Do you want to reload the page?',
-                    icon: 'error',
-                    showCancelButton: true,
-                    confirmButtonText: 'Reload',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    }
-                });
-            }
-            $('.manage-form').trigger('reset');
-
-            $('#manage-form-2').data('id', id);
-            $('#manage-form-2').attr('action', `{{route('admin.account.update.password')}}/` + id);
-            $('#formContainerChangePassword').addClass('open');
-        });
-
-        var $defaultImage;
-        const $imageInput = $('#image'), $imageUrl = $('#image_url'), $imageDisplay = $('#image-display'),
-            $imageDiv = $('#image-div');
-
-        const updateImage = (src) => {
-            $imageDisplay.attr('src', src || $defaultImage);
-            $imageDiv.toggle(!!src)
-        };
-        $imageInput.on('change', function () {
-            const file = this.files[0];
-            if (file) {
-                updateImage(URL.createObjectURL(file));
-                $imageUrl.val(null);
-            } else {
-                updateImage($imageUrl.val());
-            }
-        });
-        $imageUrl.on('input', function () {
-            if (!$imageInput.val()) updateImage($(this).val());
-        });
-        updateImage();
-
         function setDataAndShowEdit(data) {
-            $('#manage-form').data('id', data.id);
-
-            $('#name').val(data.name);
-            $('#email').val(data.email);
-            $('#designation').val(data.designation);
-            $('#gender').val(data.gender);
-            $('#phone_number').val(data.phone_number);
-            $('#address').val(data.address);
-            $('#status').val(data.status);
-            if (data.image) {
-                var isValidUrl = data.image.match(/^(https?:\/\/|\/|\.\/)/);
-                if (isValidUrl) {
-                    $imageUrl.val(data.image);
-                    $defaultImage = data.image;
-                    updateImage(data.image)
-                } else {
-                    $imageUrl.val(`{{asset('assets/images/admins/')}}/` + data.image);
-                    $defaultImage = `{{asset('assets/images/admins/')}}/` + data.image;
-                    updateImage(`{{asset('assets/images/admins/')}}/` + data.image)
-                }
-                $imageDisplay.attr('alt', data.name);
-                $imageDiv.show();
+            const channel = data?.channel;
+            if (!channel) {
+                toastr.error('Data is missing.')
+                return false;
             }
-            $('#manage-form').attr('action', `{{route('admin.account.update')}}/` + data.id);
+
+            $('#manage-form').data('id', channel.id);
+
+            $('#name').val(channel.name);
+            $('#slug').val(channel.slug);
+            $('#url').val(channel.url);
+            $('#description').val(channel.description);
+            $('#meta_title').val(channel.meta_title);
+            $('#meta_description').val(channel.meta_description);
+            $('#meta_keywords').val(channel.meta_keywords);
+
+            $('#language').val(channel.language).trigger('change');
+            $('#timezone').val(channel.timezone).trigger('change');
+            $('#status').val(channel.status ? '1' : '0').trigger('change');
+
+            $('#manage-form').attr('action', `{{ route('admin.channels.update', ':id') }}`.replace(':id', channel.id));
             $('#formContainer').addClass('open')
         }
+        const decodeHtml = (html) => {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        };
 
         /** Manage Record */
         $('#manage-form').on('submit', function (e) {
@@ -210,31 +166,50 @@
             var dataId = $('#manage-form').data('id');
             var formData = new FormData(this);
             if (!dataId) {
-                AjaxRequestPromise(`{{ route("admin.account.store") }}`, formData, 'POST', {useToastr: true})
+                AjaxRequestPromise(`{{ route("admin.channels.store") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response?.data) {
-                            const {id, image, name, email, designation, status} = response.data;
-                            const imageUrl = isValidUrl(image) ? image : (image ? `{{ asset('assets/images/admins/') }}/${image}` : '{{ asset("assets/images/no-image-available.png") }}');
+                            const {
+                                id,
+                                name,
+                                slug,
+                                url,
+                                description,
+                                language,
+                                timezone,
+                                status,
+                                creator,
+                                owner,
+                                meta_title,
+                                meta_description,
+                                meta_keywords,
+                                // last_activity_at
+                            } = response.data;
                             const index = table.rows().count() + 1;
+                            // let last_activity_at_formatted = formatDate2(last_activity_at);
                             const columns = `
                                 <td class="align-middle text-center text-nowrap"></td>
                                 <td class="align-middle text-center text-nowrap">${index}</td>
-                                <td class="align-middle text-center text-nowrap">
-                                    ${imageUrl ? `<object data="${imageUrl}" class="avatar avatar-sm me-3" title="${name}">
-                                        <img src="${imageUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">
-                                    </object>`
-                                : null}
-                                </td>
                                 <td class="align-middle text-center text-nowrap">${name}</td>
-                                <td class="align-middle text-center text-nowrap">${email}</td>
-                                <td class="align-middle text-center text-nowrap">${designation}</td>
+                                <td class="align-middle text-center text-nowrap">${slug}</td>
+                                <td class="align-middle text-center text-nowrap">${url}</td>
                                 <td class="align-middle text-center text-nowrap">
-                                    <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
+                                    ${response.data.logo ? `<img src="{{asset('assets/images/channel-logos/')}}/${response.data.logo}" style="max-height: 30px;">` : ''}
+                                </td>
+                                <td class="align-middle text-center text-nowrap">
+                                    ${response.data.favicon ? `<img src="{{asset('assets/images/channel-favicons/')}}/${response.data.favicon}" style="max-height: 30px;">` : ''}
+                                </td>
+                                <td class="align-middle text-center text-nowrap">${description ? strLimit(description, 50) : '---'}</td>
+                                <td class="align-middle text-center text-nowrap">${language}</td>
+                                <td class="align-middle text-center text-nowrap">${timezone}</td>
+                                <td class="align-middle text-center text-nowrap">${meta_title ? strLimit(meta_title, 20) : '---'}</td>
+                                <td class="align-middle text-center text-nowrap">${meta_description ? strLimit(meta_description, 30) : '---'}</td>
+                                <td class="align-middle text-center text-nowrap">${meta_keywords ? strLimit(meta_keywords, 30) : '---'}</td>
+                                // <td class="align-middle text-center text-nowrap">${last_activity_at_formatted}</td>
+                                <td class="align-middle text-center text-nowrap">
+                                    <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
                                 <td class="align-middle text-center table-actions">
-                                    <button type="button" class="btn btn-sm btn-primary changePwdBtn"
-                                            data-id="${id}" title="Change Password"><i
-                                            class="fas fa-key"></i></button>
                                     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -242,111 +217,125 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
-                        `;
+                            `;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
                             $('#manage-form')[0].reset();
-                            $('#image-display').attr('src', null);
-                            // $('#formContainer').removeClass('open')
+                            $('#formContainer').removeClass('open')
                         }
                     })
-                    .catch(error => console.error('An error occurred while updating the record.',error));
+                    .catch(error => console.error('An error occurred while updating the record.', error));
             } else {
                 const url = $(this).attr('action');
+                formData.append('_method', 'PUT');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response?.data) {
-                            const {id, image, name, email, designation, status} = response.data;
-                            const imageUrl = isValidUrl(image) ? image : (image ? `{{ asset('assets/images/admins/') }}/${image}` : `{{ asset("assets/images/no-image-available.png") }}`);
+                            const {
+                                id,
+                                name,
+                                slug,
+                                url,
+                                description,
+                                language,
+                                timezone,
+                                status,
+                                creator,
+                                owner,
+                                meta_title,
+                                meta_description,
+                                meta_keywords,
+                                logo,
+                                favicon,
+                                // last_activity_at
+                            } = response.data;
                             const index = table.row($('#tr-' + id)).index();
-                            const rowData = table.row(index).data();
-                            // Column 2: Image
-                            if (rowData[2] !== (imageUrl ? `<object data="${imageUrl}" class="avatar avatar-sm me-3" title="${name}">
-                                                <img src="${imageUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">
-                                            </object>` : '')) {
-                                table.cell(index, 2).data(imageUrl ? `<object data="${imageUrl}" class="avatar avatar-sm me-3" title="${name}">
-                                                            <img src="${imageUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">
-                                                        </object>` : '').draw();
-                            }
-                            // Column 3: Name
-                            if (rowData[3] !== name) {
-                                table.cell(index, 3).data(name).draw();
-                            }
-                            // Column 4: Email
-                            if (rowData[4] !== email) {
-                                table.cell(index, 4).data(email).draw();
-                            }
-                            // Column 5: Designation
-                            if (rowData[5] !== designation) {
-                                table.cell(index, 5).data(designation).draw();
-                            }
-                            // Column 6: Status
-                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
-                            if (rowData[6] !== statusHtml) {
-                                table.cell(index, 6).data(statusHtml).draw();
-                            }
-                            //
-                            // const columns = [
-                            //     null,
-                            //     index,
-                            //     imageUrl ? `<object data="${imageUrl}" class="avatar avatar-sm me-3" title="${name}">
-                            //                 <img src="${imageUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">
-                            //             </object>` : '',
-                            //     name,
-                            //     email,
-                            //     designation,
-                            //     `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`,
-                            //     ` <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
-                            //                 <i class="fas fa-edit"></i>
-                            //             </button>
-                            //             <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
-                            //                 <i class="fas fa-trash"></i>
-                            //             </button>`
-                            // ];
-                            // table.row($('#tr-' + id)).data(columns).draw();
-                            $('#manage-form')[0].reset();
-                            $('#image-display').attr('src', null);
-                            // $('#formContainer').removeClass('open')
-                        }
-                    })
-                    .catch(error => console.log(error));
-            }
-        });
-        /** Manage Passowrd */
-        $('#manage-form-2').on('submit', function (e) {
-            e.preventDefault();
-            var dataId = $(this).data('id');
-            var formData = new FormData(this);
-            if (dataId) {
-                const url = $(this).attr('action');
-                AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
-                    .then(response => {
-                        if (response?.data) {
-                            $(this)[0].reset();
-                        }
-                    })
-                    .catch(error => console.log(error));
-            }
-        });
+                            // let last_activity_at_formatted = formatDate2(last_activity_at);
 
+                            const rowData = table.row(index).data();
+
+                            // Column 2: Name
+                            if (decodeHtml(rowData[2]) !== name) {
+                                table.cell(index, 2).data(name).draw();
+                            }
+                            // Column 3: slug
+                            if (decodeHtml(rowData[3]) !== slug) {
+                                table.cell(index, 3).data(slug).draw();
+                            }
+                            // Column 4: url
+                            if (decodeHtml(rowData[4]) !== url) {
+                                table.cell(index, 4).data(url).draw();
+                            }
+                            // Column 5: logo
+                            const logoHtml = logo ? `<img src="{{asset('assets/images/channel-logos/')}}/${logo}" style="max-height: 30px;">` : '';
+                            if (decodeHtml(rowData[5]) !== logoHtml) {
+                                table.cell(index, 5).data(logoHtml).draw();
+                            }
+                            // Column 6: logo
+                            const favHtml = favicon ? `<img src="{{asset('assets/images/channel-favicons/')}}/${favicon}" style="max-height: 30px;">` : '';
+                            if (decodeHtml(rowData[6]) !== favHtml) {
+                                table.cell(index, 6).data(favHtml).draw();
+                            }
+                            // Column 7: description
+                            if (decodeHtml(rowData[7]) !== description) {
+                                table.cell(index, 7).data(description).draw();
+                            }
+                            // Column 8: language
+                            if (decodeHtml(rowData[8]) !== language) {
+                                table.cell(index, 8).data(language).draw();
+                            }
+                            // Column 9: timezone
+                            if (decodeHtml(rowData[9]) !== timezone) {
+                                table.cell(index, 9).data(timezone).draw();
+                            }
+                            // Column 10: meta title
+                            if (decodeHtml(rowData[10]) !== meta_title) {
+                                table.cell(index, 10).data(meta_title).draw();
+                            }
+                            // Column 11: meta description
+                            if (decodeHtml(rowData[11]) !== meta_description) {
+                                table.cell(index, 11).data(meta_description).draw();
+                            }
+                            // Column 12: meta keywords
+                            if (decodeHtml(rowData[12]) !== meta_keywords) {
+                                table.cell(index, 12).data(meta_keywords).draw();
+                            }
+                            // Column 13: Status
+                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
+                            if (decodeHtml(rowData[13]) !== statusHtml) {
+                                table.cell(index, 13).data(statusHtml).draw();
+                            }
+
+                            $('#manage-form')[0].reset();
+                            $('#formContainer').removeClass('open')
+                        }
+                    })
+                    .catch(error => console.log(error));
+            }
+        });
+        function strLimit(string, limit = 100, end = '...') {
+            if (!string) return '---';
+            return string.length > limit ? string.substring(0, limit) + end : string;
+        }
         /** Change Status*/
         $('tbody').on('change', '.change-status', function () {
             const statusCheckbox = $(this);
             const status = +statusCheckbox.is(':checked');
             const rowId = statusCheckbox.data('id');
-            AjaxRequestPromise(`{{ route('admin.account.change.status') }}/${rowId}?status=${status}`, null, 'GET', {useToastr: true})
+            AjaxRequestPromise(`{{ route('admin.channels.change.status') }}/${rowId}?status=${status}`, null, 'GET', {useToastr: true})
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
                     const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status ? "checked" : ""} data-bs-toggle="toggle">`;
-                    table.cell(rowIndex, 6).data(statusHtml).draw();
+                    table.cell(rowIndex, table.column($('th:contains("STATUS")')).index()).data(statusHtml).draw();
                 })
                 .catch(() => {
                     statusCheckbox.prop('checked', !status);
                 });
         });
+
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');
-            AjaxDeleteRequestPromise(`{{ route("admin.account.delete", "") }}/${id}`, null, 'DELETE', {
+            AjaxDeleteRequestPromise(`{{ route("admin.channels.destroy", "") }}/${id}`, null, 'DELETE', {
                 useDeleteSwal: true,
                 useToastr: true,
             })
@@ -373,19 +362,10 @@
                     }
                 });
         });
-    });
-</script>
 
-<script>
-    $(document).ready(function () {
-        $('.generatePassword').click(function () {
-            const form = $(this).closest('form');
-            const passwordInput = form.find('input[name="password"]').length ? form.find('input[name="password"]') : form.find('input[name="change_password"]');
-            if (passwordInput.length) {
-                passwordInput.val(generateRandomPassword(12)).trigger('change');
-            } else {
-                console.error('No password input field found');
-            }
-        });
+        function formatDate2(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+        }
     });
 </script>

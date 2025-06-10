@@ -166,6 +166,16 @@
                 <ul class="mainnav__menu nav flex-column">
                     <!-- Link with submenu -->
                     <li class="nav-item">
+                        <a href="{{route('admin.channels.index')}}"
+                           class="nav-link mininav-toggle {{ request()->is('admin/channel*') ? 'active' : '' }}">
+                            <i class="demo-pli-data-cloud fs-5 me-2"></i>
+                            <span class="nav-label mininav-content ms-1 collapse show" style="">
+                              <span data-popper-arrow="" class="arrow"></span>
+                              Channels
+                           </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{route('admin.account.index')}}"
                            class="nav-link mininav-toggle {{ request()->is('admin/account*') ? 'active' : '' }}">
                             <i class="demo-pli-lock-user fs-5 me-2"></i>

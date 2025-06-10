@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
+    ChannelController as AdminChannelController,
     AccountController as AdminAccountController,
     ActivityLogController as AdminActivityLogController,
     BrandController as AdminBrandController,
@@ -21,6 +22,7 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController
 };
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -29,60 +31,96 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
         $tableToCheck = 'admins';
-        $allChannels = config('channels');
+        $allChannels = \App\Models\Channel::where('status', 1)->get();
         $validChannels = [];
-
         $host = $request->getHost();
         $port = $request->getPort();
         $fullCurrentDomain = $port && $port != 80 && $port != 443 ? "$host:$port" : $host;
-
         $referer = $request->header('referer');
         $currentPath = $referer ? parse_url($referer, PHP_URL_PATH) : '/';
-
         $debugDetails = [];
-        $isProdOrDev = app()->environment(['production', 'development']);
+        $isLocalEnvironment = app()->environment('local');
 
-        foreach ($allChannels as $baseDomain => $channelName) {
+        foreach ($allChannels as $channel) {
+            $channelUrl = $channel->url;
+            $parsedUrl = parse_url($channelUrl);
+            $baseDomain = $parsedUrl['host'] ?? '';
+            $port = $parsedUrl['port'] ?? null;
+            $displayDomain = $port ? "{$baseDomain}:{$port}" : $baseDomain;
+            $channelName = $channel->name;
             $isLocal = str_contains($baseDomain, 'localhost');
             $ssl = $isLocal ? 'http' : 'https';
 
-            // Append .com for non-local domains
-            $resolvedDomain = $isLocal ? $baseDomain : "{$baseDomain}.com";
-
-            // Skip local domains in production/development environments
-            if ($isProdOrDev && $isLocal) {
-                $debugDetails[] = [
-                    'domain' => $resolvedDomain,
-                    'channelName' => $channelName,
-                    'skipped' => 'Skipped because local domain in production/dev',
-                ];
-                continue;
-            }
-
             // Skip current domain to avoid self-checking
-            if ($resolvedDomain === $fullCurrentDomain || $baseDomain === $fullCurrentDomain) {
+            if ($baseDomain === $request->getHost() && $port == $request->getPort()) {
                 $debugDetails[] = [
-                    'domain' => $resolvedDomain,
+                    'domain' => $displayDomain,
                     'channelName' => $channelName,
                     'skipped' => 'Skipped because same as current domain',
                 ];
                 continue;
             }
 
-            $prefix = (!$isLocal && app()->environment('development')) ? '/crm-development' : '';
-            $url = "{$ssl}://{$resolvedDomain}{$prefix}/api/check-user";
+            // Only allow local-to-local redirects in local environment
+            if (!$isLocalEnvironment && $isLocal) {
+                $debugDetails[] = [
+                    'domain' => $displayDomain,
+                    'channelName' => $channelName,
+                    'skipped' => 'Skipped because local domain in non-local environment',
+                ];
+                continue;
+            }
 
+            // Build the proper URL with port if exists
+            $portPart = $port ? ":{$port}" : '';
+            $finalUrl = "{$ssl}://{$baseDomain}{$portPart}{$currentPath}";
+
+            // Generate access token
+            $payload = [
+                'table' => $tableToCheck,
+                'email' => $authUser->email,
+                'ip_address' => $request->ip(),
+                'expires_at' => now()->addSeconds(config('session.lifetime') * 60),
+            ];
+
+            $key = base64_decode("AxS9/+trvgrFBcvBwuYl0kjVocGf8t+eiol6LtErpck=");
+            $encrypter = new Encrypter($key, 'AES-256-CBC');
+            $accessToken = $encrypter->encrypt($payload);
+            $validChannels[] = [
+                'domain' => $displayDomain,
+                'name' => $channelName,
+                'access_token' =>  urlencode($accessToken),
+                'url' => $finalUrl,
+                'logo' => $channel->logo ? asset($channel->logo) : null,
+                'favicon' => $channel->favicon ? asset($channel->favicon) : null,
+                'is_local' => $isLocal,
+            ];
+
+            // For local environments, skip the API check
+            if ($isLocalEnvironment) {
+                $debugDetails[] = [
+                    'domain' => $displayDomain,
+                    'channelName' => $channelName,
+                    'skipped' => 'Skipped API check in local environment',
+                    'auto_approved' => true
+                ];
+                continue;
+            }
+
+            // For non-local environments, perform API check
+            $prefix = app()->environment('development') ? '/crm-development' : '';
+            $checkUrl = "{$ssl}://{$baseDomain}{$prefix}/api/check-user";
             $domainDebug = [
-                'domain' => $resolvedDomain,
+                'domain' => $displayDomain,
                 'channelName' => $channelName,
-                'attemptedUrl' => $url,
+                'attemptedUrl' => $checkUrl,
                 'responseStatus' => null,
                 'responseData' => null,
                 'exception' => null,
             ];
 
             try {
-                $response = Http::timeout(3)->post($url, [
+                $response = Http::timeout(3)->post($checkUrl, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
                 ]);
@@ -90,47 +128,37 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
                 $domainDebug['responseStatus'] = $response->status();
                 $domainDebug['responseData'] = $response->json();
 
-                if ($response->ok() && $response->json('exists')) {
-                    // Prevent double prefix
-                    $finalPath = Str::startsWith($currentPath, $prefix) ? $currentPath : "{$prefix}{$currentPath}";
-
-                    $validChannels[] = [
-                        'domain' => $resolvedDomain,
-                        'name' => $channelName,
-                        'url' => "{$ssl}://{$resolvedDomain}{$finalPath}",
-                    ];
+                if (!$response->ok() || !$response->json('exists')) {
+                    array_pop($validChannels); // Remove the channel if check fails
                 }
-
             } catch (\Exception $e) {
-                Log::error("Channel check failed for {$resolvedDomain}: " . $e->getMessage());
+                Log::error("Channel check failed for {$displayDomain}: " . $e->getMessage());
                 $domainDebug['exception'] = $e->getMessage();
+                array_pop($validChannels); // Remove the channel if check fails
             }
 
             $debugDetails[] = $domainDebug;
         }
 
         return response()->json([
+            'success' => true,
             'validChannels' => $validChannels,
-            'debug' => [
-                'authUser' => $authUser,
-                'tableToCheck' => $tableToCheck,
-                'allChannels' => $allChannels,
-                'host' => $host,
-                'port' => $port,
-                'fullCurrentDomain' => $fullCurrentDomain,
-                'currentPath' => $currentPath,
-                'perDomainDebug' => $debugDetails,
-            ]
+            'currentChannel' => [
+                'name' => config('app.name'),
+                'url' => url('/'),
+                'logo' => asset('images/logo.png'),
+                'favicon' => asset('favicon.ico'),
+            ],
+            'debug' => $debugDetails
         ]);
-    })->name('check.channels');
-
-
-
-
-
-    Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
+    })->name('check.channels');    Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
+    /** Channel Routes */
+    Route::resource('channels', AdminChannelController::class);
+    Route::prefix('channels')->name('channels.')->group(function () {
+        Route::get('/change-status/{channel?}', [AdminChannelController::class, 'change_status'])->name('change.status');
+    });
     /** Profile Routes */
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [AdminProfileController::class, 'edit'])->name('edit');

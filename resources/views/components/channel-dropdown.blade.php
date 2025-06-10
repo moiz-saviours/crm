@@ -91,8 +91,10 @@
                 data.data.forEach((channel, index) => {
                     const listItem = `
                         <div class="list-group-item py-1" style="display:none;">
-                            <a href="${channel.url}" 
-                               class="text-decoration-none text-primary fw-bold">
+                            <a href="${channel.url}"
+                               class="text-decoration-none text-primary fw-bold redirect-channel"
+                                data-url="${channel.url}"
+                                data-token="${channel.access_token}">
                                 ${channel.name}
                             </a>
                         </div>`;
@@ -101,6 +103,29 @@
                     $item.fadeIn(150 * (index + 1));
                 });
             }
+            $(document).on('mouseenter', '.redirect-channel', function() {
+                const cleanUrl = $(this).attr('href');
+                window.status = cleanUrl;
+            }).on('mouseleave', '.redirect-channel', function() {
+                window.status = '';
+            });
+            $(document).on("click", '.redirect-channel', function (e) {
+                e.preventDefault();
+                const url = $(this).data('url');
+                const token = $(this).data('token');
+                // Verify session before redirecting
+                // $.get('/api/check-session', function(response) {
+                //     if (response.valid) {
+                // Append token to URL and redirect
+                window.location.href = `${url}?access_token=${encodeURIComponent(token)}`;
+                // } else {
+                //     toastr.error('Your session has expired - please login again');
+                //     window.location.href = '/login';
+                // }
+                // }).fail(function() {
+                //     toastr.error('Could not verify session status');
+                // });
+            });
         });
     </script>
 @endpush

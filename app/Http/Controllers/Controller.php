@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
 abstract class Controller
 {
     use AuthorizesRequests, ValidatesRequests;
+
     function getCardType($cardNumber)
     {
         $cardNumber = preg_replace('/\D/', '', $cardNumber);
@@ -24,6 +26,31 @@ abstract class Controller
             }
         }
         return 'Unknown';
+    }
+
+    protected function smartResponse($request, $data = [], $routeName = null, $successMessage = 'Operation successful.',$key='data')
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMessage,
+                $key => $data
+            ]);
+        }
+        return redirect()->route($routeName)->with('success', $successMessage);
+    }
+
+    protected function smartError($request, \Throwable $exception, $status = 500)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Something went wrong',
+                'message' => $exception->getMessage(),
+                'line' => $exception->getLine()
+            ], $status);
+        }
+        return redirect()->back()->withErrors(['error' => $exception->getMessage()]);
     }
 
     public function newGlobalFunction(string $functionName, array $values = []): mixed

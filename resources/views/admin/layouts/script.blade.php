@@ -311,7 +311,7 @@
             .then(response => {
                 console.log('Settings updated successfully:', response);
             })
-            .catch(error => console.log('An error occurred while updating the record.'));
+            .catch(error => console.error('An error occurred while updating the record.',error));
 
     });
     function flattenObject(obj, parentKey = '', formData = new FormData()) {
@@ -962,6 +962,12 @@
                 }
             });
         }, 100);
+
+        function strLimit(string, limit = 100, end = '...') {
+            if (!string) return '---';
+            return string.length > limit ? string.substring(0, limit) + end : string;
+        }
+
     });
     !function () {
         document.currentScript?.remove()
