@@ -20,7 +20,8 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     ProfileController as AdminProfileController,
     SettingController as AdminSettingController,
     TeamController as AdminTeamController,
-    TeamTargetController as AdminTeamTargetController
+    TeamTargetController as AdminTeamTargetController,
+SalesKpiController as AdminSalesKpiController,
 };
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
@@ -343,4 +344,5 @@ Route::middleware(['auth:admin', 'verified:admin', 'throttle:60,1'])->prefix('ad
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
+    Route::get('/sales/sales-kpi', [AdminSalesKpiController::class, 'index'])->name('sales.kpi');
 });
