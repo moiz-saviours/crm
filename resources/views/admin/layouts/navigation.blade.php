@@ -175,6 +175,28 @@
                            </span>
                         </a>
                     </li>
+                    <li class="nav-item has-sub">
+                        <a href="javascript:void(0)"
+                           class="mininav-toggle nav-link collapsed {{ request()->is('admin/sales*') ? 'active' : '' }}"><i
+                                class="demo-pli-building fs-5 me-2"></i>
+                            <span class="nav-label ms-1">Sales</span>
+                        </a>
+                        <!-- Ui Elements submenu list -->
+                        <ul class="mininav-content nav collapse">
+                            <li data-popper-arrow class="arrow"></li>
+                            <div class="navigate-heading">
+                                <i class="demo-pli-address-book"></i>
+                                <h3>Slaes Kpi</h3>
+                            </div>
+                            <li class="nav-item">
+                                <a href="{{route('admin.sales.kpi')}}"
+                                   class="nav-link {{ request()->is('admin/sales/sales-kpi*') ? 'active' : '' }}">Sales Kpi</a>
+                            </li>
+
+
+                        </ul>
+                        <!-- END : Ui Elements submenu list -->
+                    </li>
                     <li class="nav-item">
                         <a href="{{route('admin.account.index')}}"
                            class="nav-link mininav-toggle {{ request()->is('admin/account*') ? 'active' : '' }}">
