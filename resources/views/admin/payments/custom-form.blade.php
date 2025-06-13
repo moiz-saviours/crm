@@ -28,7 +28,10 @@
                                 data-customer="{{ optional($unpaid_invoice->customer_contact)->special_key }}"
 
                                 {{ old('invoice_key') == $unpaid_invoice->invoice_key ? 'selected' : '' }}>
-                                {{ $unpaid_invoice->invoice_number }} - {{ $unpaid_invoice->invoice_key }} - {{ optional($unpaid_invoice->customer_contact)->name }} - {{$unpaid_invoice->currency}} {{ $unpaid_invoice->total_amount }} - {{ $unpaid_invoice->created_at->format('jS F Y') }}
+                                {{ $unpaid_invoice->invoice_number }} - {{ $unpaid_invoice->invoice_key }}
+                                - {{ optional($unpaid_invoice->customer_contact)->name }}
+                                - {{$unpaid_invoice->currency}} {{ $unpaid_invoice->total_amount }}
+                                - {{ $unpaid_invoice->created_at->format('jS F Y') }}
                             </option>
                         @endforeach
                     </select>
@@ -193,14 +196,15 @@
                                             $accountName = $account['name'] ?? $account->name;
                                             $accountPaymentMethod = $account['payment_method'] ?? $account->payment_method;
                                         @endphp
-                                        <option value="{{ $accountKey }}" {{ old('client_account') == $accountKey ? 'selected' : '' }}>
+                                        <option
+                                            value="{{ $accountKey }}" {{ old('client_account') == $accountKey ? 'selected' : '' }}>
                                             💳 {{ $accountName }} - {{$accountPaymentMethod}}
                                         </option>
                                     @endforeach
                                 </optgroup>
+                                @endforeach
+                                </optgroup>
                             @endforeach
-                            </optgroup>
-                        @endforeach
                     </select>
                     @error('client_account')
                     <span class="text-danger">{{ $message }}</span>
@@ -208,33 +212,33 @@
                 </div>
 
 
-{{--                <div class="form-group mb-3">--}}
-{{--                    <label for="payment_method" class="form-label">Payment Method</label>--}}
-{{--                    <select class="form-control" id="payment_method" name="payment_method" required>--}}
-{{--                        <option value="">Select Payment Method</option>--}}
-{{--                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>--}}
-{{--                            Authorize--}}
-{{--                        </option>--}}
-{{--                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>--}}
-{{--                            Edp--}}
-{{--                        </option>--}}
-{{--                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>--}}
-{{--                            Stripe--}}
-{{--                        </option>--}}
-{{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>--}}
-{{--                            Credit Card--}}
-{{--                        </option>--}}
-{{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>--}}
-{{--                            Bank Transfer--}}
-{{--                        </option>--}}
-{{--                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>--}}
-{{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
-{{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
-{{--                    </select>--}}
-{{--                    @error('payment_method')--}}
-{{--                    <span class="text-danger">{{ $message }}</span>--}}
-{{--                    @enderror--}}
-{{--                </div>--}}
+                {{--                <div class="form-group mb-3">--}}
+                {{--                    <label for="payment_method" class="form-label">Payment Method</label>--}}
+                {{--                    <select class="form-control" id="payment_method" name="payment_method" required>--}}
+                {{--                        <option value="">Select Payment Method</option>--}}
+                {{--                        <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>--}}
+                {{--                            Authorize--}}
+                {{--                        </option>--}}
+                {{--                        <option value="edp" {{ old('payment_method') == 'edp' ? 'selected' : '' }}>--}}
+                {{--                            Edp--}}
+                {{--                        </option>--}}
+                {{--                        <option value="stripe" {{ old('payment_method') == 'stripe' ? 'selected' : '' }}>--}}
+                {{--                            Stripe--}}
+                {{--                        </option>--}}
+                {{--                        <option value="credit card" {{ old('payment_method') == 'credit card' ? 'selected' : '' }}>--}}
+                {{--                            Credit Card--}}
+                {{--                        </option>--}}
+                {{--                        <option value="bank transfer" {{ old('payment_method') == 'bank transfer' ? 'selected' : '' }}>--}}
+                {{--                            Bank Transfer--}}
+                {{--                        </option>--}}
+                {{--                        <option value="paypal" {{ old('payment_method') == 'paypal' ? 'selected' : '' }}>PayPal</option>--}}
+                {{--                        <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>--}}
+                {{--                        <option value="other" {{ old('payment_method') == 'other' ? 'selected' : '' }}>Other</option>--}}
+                {{--                    </select>--}}
+                {{--                    @error('payment_method')--}}
+                {{--                    <span class="text-danger">{{ $message }}</span>--}}
+                {{--                    @enderror--}}
+                {{--                </div>--}}
                 <div class="form-group mb-3">
                     <label for="payment_date" class="form-label">Payment Date</label>
                     <input type="date" class="form-control" id="payment_date" name="payment_date"
@@ -266,7 +270,9 @@
     <!------- CUSTOM FORM -------->
     <script>
         $(document).ready(function () {
-            $('#invoice_key').on('change', function () {
+            let t = false;
+            $('#invoice_key').on('change', function (e) {
+                if (e.isTrigger) return;
                 const selected = $(this).find('option:selected');
 
                 $('#brand_key').val(selected.data('brand') || '').trigger('change');
@@ -275,6 +281,36 @@
                 $('#type').val(selected.data('customer') ? 1 : 0).trigger('change');
                 $('#cus_contact_key').val(selected.data('customer') || '').trigger('change');
                 $('#amount').val(selected.data('amount') || '');
+
+                if ($(this).val()) {
+                    t = false;
+                }
+            });
+            $('#brand_key,#team_key,#agent_id,#type,#cus_contact_key,#amount').on('change', function (e) {
+                if (!e.isTrigger) {
+                    if (!t) {
+                        t = true;
+                        document.getElementById("invoice_key").scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        toastr.info('Modifying fields will generate a new invoice.');
+                    }
+                    const currentField = $(this);
+                    const fieldsToReset = ['#invoice_key'
+                        // , '#brand_key', '#team_key', '#agent_id', '#type', '#cus_contact_key', '#amount'
+                    ];
+
+                    fieldsToReset.forEach(field => {
+                        if (!currentField.is(field)) {
+                            if (field === '#type' && currentField.is('#cus_contact_key')) {
+                                $(field).val(1).trigger('change');
+                            } else {
+                                $(field).val(field === '#amount' ? '' : (field === '#type' ? 0 : '')).trigger('change');
+                            }
+                        }
+                    });
+                }
             });
 
             $('#type').on('change', function () {
