@@ -29,9 +29,32 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(AdminLoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
-        $request->session()->regenerate();
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        if ($reauthUserId = session('admin_reauth_user_id')) {
+            $user = Auth::guard('admin')->getProvider()->retrieveById($reauthUserId);
+            if ($user) {
+                session()->put('admin_login_credentials', [
+                    'email' => $user->email,
+                    'password' => 'placeholder', // Actual password not needed here
+                    'remember' => false
+                ]);
+                session()->forget('admin_reauth_user_id');
+                return redirect()->route('admin.2fa.show');
+            }
+        }
+        if (!Auth::guard('admin')->validate($request->only('email', 'password'))) {
+            return back()->withErrors(['email' => __('auth.failed'),]);
+        }
+        $request->session()->put('admin_login_credentials', [
+            'email' => $request->email,
+            'password' => $request->password,
+            'remember' => $request->filled('remember')
+        ]);
+
+        return redirect()->route('admin.2fa.show');
+//
+//        $request->authenticate();
+//        $request->session()->regenerate();
+//        return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
     /**
@@ -44,6 +67,7 @@ class AuthenticatedSessionController extends Controller
         /** It will destroy every user session */
 //        $request->session()->invalidate();
         $request->session()->regenerateToken();
+        session()->forget('admin_2fa_verified');
 
         return redirect(route('admin.login'));
     }
