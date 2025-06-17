@@ -12,7 +12,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "paypal/paypal-checkout-sdk": "^1.0",
-        "stripe/stripe-php": "^16.4"
+        "stripe/stripe-php": "^16.4",
+        "twilio/sdk": "^8.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
