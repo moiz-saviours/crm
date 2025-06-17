@@ -29,7 +29,7 @@ return [
         ],
     ],
     'twilio' => [
-        'sid' => env('TWILLO_SID'),
+        'sid' => env('TWILIO_SID'),
         'token' => env('TWILIO_TOKEN'),
         'from' => env('TWILIO_FROM'),
     ],
