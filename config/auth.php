@@ -39,14 +39,17 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'session' => 'user_session',
         ],
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
+            'session' => 'admin_session',
         ],
         'developer' => [
             'driver' => 'session',
             'provider' => 'developers',
+            'session' => 'developer_session',
         ],
     ],
 
