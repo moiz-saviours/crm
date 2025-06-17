@@ -91,7 +91,8 @@ class TwoFactorService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => 'Failed to send SMS: ' . $e->getMessage()
+                'error' => 'Failed to send SMS',
+                'log' => $e->getMessage(),
             ];
         }
     }
