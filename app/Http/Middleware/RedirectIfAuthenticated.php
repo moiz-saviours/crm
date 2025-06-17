@@ -27,7 +27,7 @@ class RedirectIfAuthenticated
         $guards = empty($guards) ? [null] : $guards;
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                if (!$this->isPathForGuard($request->path(), $guard) || $this->isLoginPath($request, $guard)) {
+                if (!$this->isPathForGuard($request->path(), $guard) || $this->isGuestRoute($request, $guard)) {
                     return redirect($this->redirectTo($request));
                 }
             }
@@ -83,6 +83,24 @@ class RedirectIfAuthenticated
         return $request->is("{$loginPrefix}/login");
     }
 
+    protected function isGuestRoute(Request $request, string $guard): bool
+    {
+        $guardPrefixes = [
+            'admin' => 'admin',
+            'developer' => 'developer',
+            'web' => '', // No prefix for normal users
+        ];
+        $prefix = $guardPrefixes[$guard] ?? '';
+        $prefix = $prefix ? "$prefix/" : '';
+        $guestRoutes = ['login', 'register', 'forgot-password', 'reset-password', '2fa/show', '2fa/verify', '2fa/send'];
+        foreach ($guestRoutes as $route) {
+            if ($request->is("{$prefix}{$route}*")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Get the default URI the user should be redirected to when they are authenticated.
      */
@@ -93,15 +111,12 @@ class RedirectIfAuthenticated
                 return route($uri);
             }
         }
-
         $routes = Route::getRoutes()->get('GET');
-
         foreach (['dashboard', 'home'] as $uri) {
             if (isset($routes[$uri])) {
                 return '/' . $uri;
             }
         }
-
         return '/';
     }
 
