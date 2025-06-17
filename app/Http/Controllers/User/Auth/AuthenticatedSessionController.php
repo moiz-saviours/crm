@@ -27,11 +27,35 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        if ($reauthUserId = session('web_reauth_user_id')) {
+            $user = Auth::guard('web')->getProvider()->retrieveById($reauthUserId);
+            if ($user) {
+                session()->put('web_login_credentials', [
+                    'email' => $user->email,
+                    'password' => 'placeholder', // Actual password not needed here
+                    'remember' => false
+                ]);
+                session()->forget('web_reauth_user_id');
+                return redirect()->route('2fa.show');
+            }
+        }
+        if (!Auth::guard('web')->validate($request->only('email', 'password'))) {
+            return back()->withErrors([
+                'email' => __('auth.failed'),
+            ]);
+        }
+        $request->session()->put('web_login_credentials', [
+            'email' => $request->email,
+            'password' => $request->password,
+            'remember' => $request->filled('remember')
+        ]);
 
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('user.dashboard', absolute: false));
+        return redirect()->route('2fa.show');
+//        $request->authenticate();
+//
+//        $request->session()->regenerate();
+//
+//        return redirect()->intended(route('user.dashboard', absolute: false));
     }
 
     /**
@@ -45,6 +69,7 @@ class AuthenticatedSessionController extends Controller
 //        $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+        session()->forget('web_2fa_verified');
 
         return redirect('/login');
     }
