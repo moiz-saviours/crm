@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\User\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\User\Auth\TwoFactorController as UserTwoFactorController;
 use App\Http\Controllers\User\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\User\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\User\Auth\EmailVerificationPromptController;
@@ -11,11 +12,11 @@ use App\Http\Controllers\User\Auth\RegisteredUserController;
 use App\Http\Controllers\User\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest:web')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
+Route::middleware(['guest:web', '2fa'])->group(function () {
+//    Route::get('register', [RegisteredUserController::class, 'create'])
+//        ->name('register');
+//
+//    Route::post('register', [RegisteredUserController::class, 'store']);
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -33,9 +34,16 @@ Route::middleware('guest:web')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('/two-factor-auth', [UserTwoFactorController::class, 'show'])->name('2fa.show');
+    Route::post('/two-factor-auth/send', [UserTwoFactorController::class, 'send'])->name('2fa.send');
+    Route::get('/two-factor-auth/verify', [UserTwoFactorController::class, 'verifyShow'])->name('2fa.verify.show');
+    Route::post('/two-factor-auth/verify', [UserTwoFactorController::class, 'verify'])->name('2fa.verify');
+
 });
 
 Route::middleware('auth:web')->group(function () {
+
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
