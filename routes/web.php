@@ -32,7 +32,7 @@ Route::get('/', function () {
 //    return view('welcome');
 });
 require __DIR__ . '/auth.php';
-Route::middleware(['auth', 'verified', 'throttle:60,1', 'dynamic.access'])->group(function () {
+Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1', 'dynamic.access'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard')//->middleware('can:dashboard_view')
     ;
     Route::get('/profile', [ProfileController::class, 'edit'])->name('user.profile');
