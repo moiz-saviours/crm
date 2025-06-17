@@ -1,5 +1,5 @@
 <!-- Toastr CSS -->
-<link rel="stylesheet" href="{{asset('build/toaster/css/toastr.min.css')}}">
+<link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
 
 <!-- Date Range Picker CSS -->
 <link rel="stylesheet" href="{{asset('assets/css/daterangepicker/daterangepicker.css')}}">
@@ -355,7 +355,7 @@ Detailed information and more samples can be found in the documentation.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <!-- Toastr CSS -->
-<link rel="stylesheet" href="{{asset('build/toaster/css/toastr.min.css')}}">
+<link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
 
 <style>
 

@@ -15,7 +15,7 @@
 <link href="{{asset('assets/css/choices.min.css')}}" rel="stylesheet"/>
 
 <!-- Toastr CSS -->
-<link rel="stylesheet" href="{{asset('build/toaster/css/toastr.min.css')}}">
+<link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
 
 <!-- Scripts -->
 {{--@vite(['resources/css/app.css', 'resources/js/app.js'])--}}

@@ -127,7 +127,7 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invo
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="{{asset('build/toaster/css/toastr.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
 
 
     <!-- pdf download links -->
@@ -137,7 +137,7 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invo
 
 
     <!-- Toaster -->
-    <script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+    <script src="{{asset('assets/toaster/js/toastr.min.js')}}"></script>
 
     <script>
         // Toastr options

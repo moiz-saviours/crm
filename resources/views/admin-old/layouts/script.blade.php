@@ -195,7 +195,7 @@
 </script>
 
 <!-- Toaster -->
-<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+<script src="{{asset('assets/toaster/js/toastr.min.js')}}"></script>
 
 <script>
     // Toastr options

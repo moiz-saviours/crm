@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Login | Two-Factor Verification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('build/toaster/css/toastr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/toaster/css/toastr.min.css') }}">
     <link rel="icon" type="image/png" href="{{asset('assets/img/favicon2.png')}}">
 
 
@@ -246,7 +246,7 @@
 </div>
 
 <script src="{{asset('assets/js/jquery.min.js')}}"></script>
-<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+<script src="{{asset('assets/toaster/js/toastr.min.js')}}"></script>
 <script>
     // Toastr options
     toastr.options = {

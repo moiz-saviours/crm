@@ -28,7 +28,7 @@
     <script src="{{asset('assets/fonts/fontawsome.js')}}" crossorigin="anonymous"></script>
     <!-- CSS Files -->
     <link id="pagestyle" href="{{asset('assets/css/dashboard.css')}}?v=2.1.0" rel="stylesheet"/>
-    <link rel="stylesheet" href="{{asset('build/toaster/css/toastr.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
 </head>
 <body class="font-sans text-gray-900 antialiased">
 @yield('content')
@@ -53,7 +53,7 @@
 <script src="{{asset('assets/js/jquery.min.js')}}"></script>
 
 <!-- Toaster1 -->
-<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+<script src="{{asset('assets/toaster/js/toastr.min.js')}}"></script>
 <script>
     // Toastr options
     toastr.options = {

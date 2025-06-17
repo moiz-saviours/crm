@@ -11,7 +11,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
     {{--    <link rel="stylesheet" href="./style.css/">--}}
     <link rel="stylesheet" href="{{asset ('assets/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('build/toaster/css/toastr.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
     <link rel="apple-touch-icon" sizes="76x76" href="{{asset('assets/img/apple-icon.png')}}">
     <link rel="icon" type="image/png" href="{{asset('assets/img/favicon2.png')}}">
 
@@ -89,7 +89,7 @@
 <script src="{{asset('assets/js/jquery.min.js')}}"></script>
 <script src="{{asset('assets/js/core/bootstrap.min.js')}}"></script>
 <!-- Toaster1 -->
-<script src="{{asset('build/toaster/js/toastr.min.js')}}"></script>
+<script src="{{asset('assets/toaster/js/toastr.min.js')}}"></script>
 <script>
     // Toastr options
     toastr.options = {
