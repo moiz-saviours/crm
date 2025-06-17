@@ -41,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
             'auth' => Authenticate::class,
+            '2fa' => \App\Http\Middleware\TwoFactorMiddleware::class,
             'restrict.dev' => RestrictDevAccess::class,
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
