@@ -59,7 +59,7 @@ class TwoFactorService
         }
     }
 
-    public function sendSmsCode($user, string $code)
+    public function sendSmsCode($user, string $code): array
     {
         try {
 
