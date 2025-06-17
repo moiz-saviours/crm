@@ -18,9 +18,9 @@ return new class extends Migration {
                 $table->string('method')->nullable()->default(null);
                 $table->timestamp('expires_at')->nullable()->default(null);
                 $table->timestamp('verified_at')->nullable()->default(null);
-                $table->json('response')->nullable();
-                $table->string('status')->nullable();
-                $table->string('response_id')->nullable();
+                $table->json('response')->nullable()->default(null);
+                $table->string('response_id')->nullable()->default(null);
+                $table->string('status')->nullable()->default(null);
                 $table->timestamps();
                 $table->softDeletes();
                 $table->index(['morph_id', 'morph_type']);
