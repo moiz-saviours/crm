@@ -1,3 +1,78 @@
+/* Custom fonts and overrides */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0a0f1d 100%);
+}
+
+.card {
+    @apply rounded-2xl shadow-xl transition-all;
+}
+
+.card:hover {
+    @apply -translate-y-1 shadow-2xl;
+}
+
+.method-option {
+    @apply border-2 border-slate-200 transition-all;
+}
+.method-option:hover {
+    @apply border-primary-300 -translate-y-0.5;
+}
+.method-option.selected {
+    @apply border-primary-500 bg-primary-50;
+}
+.dark .method-option.selected {
+    background-color: rgba(14, 165, 233, 0.1);
+    border-color: #0ea5e9;
+}
+.dark .method-option:hover {
+    border-color: #0ea5e9;
+}
+
+.security-badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.7;
+    }
+}
+
+.toggle-checkbox:checked {
+    right: 0;
+    background-color: #0ea5e9;
+}
+.toggle-checkbox:checked + .toggle-label {
+    background-color: #0ea5e9;
+}
+
+.btn-primary {
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    box-shadow: 0 4px 6px rgba(2, 132, 199, 0.2);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(2, 132, 199, 0.3);
+}

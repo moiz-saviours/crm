@@ -9,68 +9,6 @@
     <link rel="icon" type="image/png" href="{{asset('assets/img/favicon2.png')}}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        body.dark {
-            background: linear-gradient(135deg, #0c4a6e 0%, #0a0f1d 100%);
-        }
-
-        .card {
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            border-radius: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-
-        .security-badge {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 0.7;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0.7;
-            }
-        }
-
-        .toggle-checkbox:checked {
-            right: 0;
-            background-color: #0ea5e9;
-        }
-
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #0ea5e9;
-        }
-
-        .btn-primary {
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-            box-shadow: 0 4px 6px rgba(2, 132, 199, 0.2);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(2, 132, 199, 0.3);
-        }
-
         .code-input {
             width: 3rem;
             height: 3.5rem;
