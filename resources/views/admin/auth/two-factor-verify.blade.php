@@ -172,46 +172,29 @@
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
-
+    const toastManager = {
+        maxToasts: 3,
+        show: function (type, message, title = '') {
+            let isVisible = false;
+            $('.toast').each(function () {
+                if ($(this).text().includes(message)) {
+                    isVisible = true;
+                    return false;
+                }
+            });
+            if (isVisible) return;
+            const toasts = $('.toast');
+            if (toasts.length >= this.maxToasts) {
+                $(toasts[0]).remove();
+            }
+            toastr.clear();
+            toastr.previousToast = null;
+            toastr[type](message, title);
+        }
+    };
     @error('code')
     toastr.error(`{{ $message }}`);
     @enderror
-    @if ($method === 'sms' && !empty($response_id))
-    document.addEventListener('DOMContentLoaded', function () {
-        const response_id = `{{ $response_id }}`;
-        setTimeout(() => {
-            fetch(`{{route('twilio.sms.status')}}/` + response_id)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status) {
-                        let status = data.status;
-                        switch (status) {
-                            case 'queued':
-                                toastr.info('Your message has been queued for delivery.');
-                                break;
-                            case 'sent':
-                                toastr.success('Your message was sent successfully.');
-                                break;
-                            case 'delivered':
-                                toastr.success('Your message was delivered successfully.');
-                                break;
-                            case 'failed':
-                            case 'undelivered':
-                                toastr.error('Message delivery failed. Please try again or contact support.');
-                                break;
-                            default:
-                                toastr.warning('Message status: ' + status);
-                        }
-                    }
-                })
-                .catch(() => {
-                    console.log('Failed to retrieve message status.');
-                });
-        }, 1000);
-    });
-    @endif
-
-
 
     function toggleDarkMode() {
         document.body.classList.toggle('dark');
@@ -257,6 +240,7 @@
         }
     }
     let timerInterval = null;
+    let hasCheckedStatus = false;
     function resendCode() {
         const resendButton = document.getElementById('resend-button');
         const resendTimer = document.getElementById('resend-timer');
@@ -286,18 +270,71 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    toastr.success('New code sent successfully');
+                    if (data.message) toastManager.show('success', data.message);
                     startCountdown(resendButton, resendTimer);
+                    if ('{{ $method }}' === 'sms') hasCheckedStatus = false;
+                    if (data.response_id) {
+                        setTimeout(() => {
+                            checkSMSStatus(data.response_id);
+                            localStorage.setItem(`sms_status_checked_${data.response_id}`, 'true');
+                            hasCheckedStatus = true;
+                        }, 2000);
+                    }
                 } else {
-                    toastr.error(data.error || data.message || 'Failed to resend code');
+                    toastManager.show('error', data.error || data.message || 'Failed to resend verification code.');
                     resetResendButton(resendButton, resendTimer);
                 }
             })
             .catch(error => {
-                toastr.error('An error occurred while resending the code');
+                console.log(error)
+                toastManager.show('error', 'An error occurred while resending the code');
                 resetResendButton(resendButton, resendTimer);
             });
     }
+    @if ($method === 'sms' && !empty($response_id))
+    document.addEventListener('DOMContentLoaded', function () {
+        const statusCheckKey = 'sms_status_checked_{{ $response_id }}';
+        const hasCheckedBefore = localStorage.getItem(statusCheckKey);
+
+        if (!hasCheckedBefore && !hasCheckedStatus) {
+            checkSMSStatus(`{{ $response_id }}`);
+            localStorage.setItem(statusCheckKey, 'true');
+            hasCheckedStatus = true;
+        }
+    });
+    function checkSMSStatus(response_id) {
+        fetch(`{{ route('twilio.sms.status') }}/${response_id}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                if (data.status) {
+                    let status = data.status.toLowerCase();
+                    switch (status) {
+                        case 'queued':
+                            toastManager.show('info', 'Your message has been queued for delivery.');
+                            break;
+                        case 'sent':
+                            toastManager.show('success', 'Your message was sent successfully.');
+                            break;
+                        case 'delivered':
+                            toastManager.show('success', 'Your message was delivered successfully.');
+                            break;
+                        case 'failed':
+                        case 'undelivered':
+                            toastManager.show('error', 'Message delivery failed. Please try again or contact support.');
+                            break;
+                        default:
+                            toastManager.show('warning', `Message status: ${status}`);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Status check error:', error);
+            });
+    }
+    @endif
     function startCountdown(button, timerElement) {
         let seconds = 30;
         updateTimerDisplay();
@@ -348,7 +385,7 @@
                 // Focus the last input
                 inputs[5].focus();
             } else {
-                toastr.error('Please paste a 6-digit code');
+                toastManager.show('error', 'Please paste a 6-digit code');
             }
         });
         document.getElementById('pasteInput').addEventListener('paste', function (e) {
@@ -362,7 +399,7 @@
                 });
                 inputs[5].focus();
             } else {
-                toastr.error('Please paste a 6-digit code');
+                toastManager.show('error', 'Please paste a 6-digit code');
             }
         });
     });
