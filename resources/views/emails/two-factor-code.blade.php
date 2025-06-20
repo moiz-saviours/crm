@@ -57,7 +57,7 @@
     <p style="font-size: 11px; color: #9ca3af; margin: 0; line-height: 1.5;">
         This message contains confidential information intended only for the recipient.<br>
         © {{ date('Y') }} {{ config('app.name') }}. All Rights Reserved.<br>
-        <span style="font-family: monospace; font-size: 10px;">ID: {{ Str::random(16) }}</span>
+        <span style="font-family: monospace; font-size: 10px;">ID: {{ $message_id }}</span>
     </p>
 @endcomponent
 @endcomponent
