@@ -98,6 +98,7 @@ class TwoFactorController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $response['message'],
+                    'response_id' => $response['sid']??"",
                     'method' => $method,
                 ]);
             }
