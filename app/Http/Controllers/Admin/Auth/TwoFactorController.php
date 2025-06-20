@@ -95,12 +95,15 @@ class TwoFactorController extends Controller
                         'method' => $method
                     ], 500);
                 }
-                return response()->json([
+                $response_data = [
                     'success' => true,
                     'message' => $response['message'],
-                    'response_id' => $response['sid']??"",
                     'method' => $method,
-                ]);
+                ];
+                if ($method === 'sms' && isset($response['response_id'])) {
+                    $response_data['response_id'] = $response['response_id'];
+                }
+                return response()->json($response_data);
             }
             return response()->json([
                 'success' => false,
