@@ -291,7 +291,10 @@
                 if (data.success) {
                     startCountdown(button, textButton, 'Code Sent!', resendTimer, textMessage, `We've sent a 6-digit code to your ${selectedMethod === 'email' ? 'email' : 'phone'}`);
                     toastManager.show('success', data.message ?? "Verification code sent successfully.");
-                    window.location.href = '{{ route("admin.2fa.verify.show") }}?method=' + selectedMethod;
+                    let delay = selectedMethod === 'sms' ? 3500 : 1000;
+                    setTimeout(() => {
+                        window.location.href = '{{ route("admin.2fa.verify.show") }}?method=' + selectedMethod;
+                    }, delay);
                 } else {
                     startCountdown(button, textButton, 'Try Again', resendTimer, textMessage, `Failed to send. Please try again in few seconds.`);
                     const errorMessage = data.error || data.message || 'Failed to send verification code.';
