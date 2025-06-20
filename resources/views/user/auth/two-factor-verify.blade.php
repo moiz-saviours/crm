@@ -175,6 +175,40 @@
     @error('code')
     toastr.error(`{{ $message }}`);
     @enderror
+    @if ($method === 'sms' && !empty($response_id))
+    document.addEventListener('DOMContentLoaded', function () {
+        const response_id = `{{ $response_id }}`;
+        setTimeout(() => {
+            fetch(`{{route('twilio.sms.status')}}/` + response_id)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status) {
+                        let status = data.status;
+                        switch (status) {
+                            case 'queued':
+                                toastr.info('Your message has been queued for delivery.');
+                                break;
+                            case 'sent':
+                                toastr.success('Your message was sent successfully.');
+                                break;
+                            case 'delivered':
+                                toastr.success('Your message was delivered successfully.');
+                                break;
+                            case 'failed':
+                            case 'undelivered':
+                                toastr.error('Message delivery failed. Please try again or contact support.');
+                                break;
+                            default:
+                                toastr.warning('Message status: ' + status);
+                        }
+                    }
+                })
+                .catch(() => {
+                    console.log('Failed to retrieve message status.');
+                });
+        }, 1000);
+    });
+    @endif
     // Dark mode toggle
     function toggleDarkMode() {
         document.body.classList.toggle('dark');
