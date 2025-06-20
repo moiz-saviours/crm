@@ -7,6 +7,7 @@ use App\Services\GlobalService;
 use App\Services\Restrict\PaymentGatewayService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -34,6 +35,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (
+            app()->environment('production') ||
+            request()->header('x-forwarded-proto') === 'https'
+        ) {
+            URL::forceScheme('https');
+        }
+
         Gate::policy(Invoice::class, InvoicePolicy::class);
         Channel::observe(ChannelObserver::class);
 
