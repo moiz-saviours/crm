@@ -77,7 +77,10 @@ class TwoFactorService
                 'body' => "Your verification code is: $code"
             ];
             if (!app()->environment('local')) {
-                $messageParams['statusCallback'] = route('twilio.status.callback');
+                $messageParams['statusCallback'] = route('api.twilio.status.callback');
+            }else{
+                $baseUrl = rtrim(env('DEV_BASE_URL'), '/');
+                $messageParams['statusCallback'] = $baseUrl . route('api.twilio.status.callback', [], false);
             }
             $message = $twilio->messages->create($user->phone_number, $messageParams);
             if (app()->environment('local')) {
