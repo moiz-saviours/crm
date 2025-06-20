@@ -14,14 +14,17 @@ class TwoFactorCodeMail extends Mailable
     use Queueable, SerializesModels;
 
     public string $code;
+    public string $message_id;
     public $user;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $code)
+    public function __construct($user, $code,$message_id)
     {
         $this->user = $user;
         $this->code = $code;
+        $this->message_id = $message_id;
     }
     /**
      * Get the message envelope.
@@ -43,6 +46,7 @@ class TwoFactorCodeMail extends Mailable
             with: [
                 'user' => $this->user,
                 'code' => $this->code,
+                'message_id' => $this->message_id,
                 'ipAddress' => request()->ip(),
                 'time' => now()->format('Y-m-d H:i:s T'),
             ],
