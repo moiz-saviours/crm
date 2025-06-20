@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\StripePaymentController;
+use App\Http\Controllers\SmsServiceContoller;
 use App\Http\Controllers\User\SettingController;
 use App\Models\ClientContact;
 use App\Http\Controllers\User\{BrandController,
@@ -203,3 +204,6 @@ Route::fallback(function (Request $request) {
 });
 Route::get('invoice', [CheckoutController::class, 'index'])->name('invoice');
 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('twilio/status-callback', [SmsServiceContoller::class, 'statusCallback'])->name('twilio.status.callback');
+Route::get('twilio-sms/status/{sid?}', [SmsServiceContoller::class, 'smsStatus'])->name('twilio.sms.status');
+
