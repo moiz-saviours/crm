@@ -7,6 +7,7 @@ use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TwoFactorCodeMail;
+use Illuminate\Support\Str;
 use Twilio\Rest\Client;
 
 class TwoFactorService
@@ -30,7 +31,8 @@ class TwoFactorService
     public function sendEmailCode($user, string $code): array
     {
         try {
-            Mail::to($user->email)->send(new TwoFactorCodeMail($user, $code));
+            $message_id = Str::random(16);
+            Mail::to($user->email)->send(new TwoFactorCodeMail($user, $code, $message_id));
             $verificationCode = VerificationCode::where('morph_id', $user->id)
                 ->where('morph_type', get_class($user))
                 ->where('code', $code)
@@ -39,8 +41,9 @@ class TwoFactorService
             if ($verificationCode) {
                 $verificationCode->update([
                     'status' => 'sent',
+                    'response_id' => $message_id,
                     'response' => json_encode([
-                        'provider' => 'laravel',
+                        'provider' => config('mail.default'),
                         'sent_to' => $user->email,
                         'timestamp' => now()->toDateTimeString(),
                     ]),
@@ -48,13 +51,15 @@ class TwoFactorService
             }
             return [
                 'success' => true,
-                'message' => 'Verification email sent successfully',
+                'message' => 'Verification email sent successfully.',
             ];
 
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Failed to send email: ' . $e->getMessage(),
+                'error' => 'Email sending failed. Please try again later.',
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
             ];
         }
     }
@@ -67,32 +72,77 @@ class TwoFactorService
                 config('services.twilio.sid'),
                 config('services.twilio.token')
             );
-            $message = $twilio->messages->create(
-                $user->phone_number,
-                [
-                    'from' => config('services.twilio.from'),
-                    'body' => "Your verification code is: $code"
-                ]
-            );
+            $messageParams = [
+                'from' => config('services.twilio.from'),
+                'body' => "Your verification code is: $code"
+            ];
+            if (!app()->environment('local')) {
+                $messageParams['statusCallback'] = route('twilio.status.callback');
+            }
+            $message = $twilio->messages->create($user->phone_number, $messageParams);
+            if (app()->environment('local')) {
+                Log::info('[LOCAL] SMS sending skipped', [
+                    'user_id' => $user->id,
+                    'phone' => $user->phone_number,
+                    'code' => $code,
+                    'would_send' => true
+                ]);
+            }
+            $status = $message->status ?? 'unknown';
+            $statusMessage = match ($status) {
+                'queued' => 'Your message has been queued for delivery.',
+                'sending' => 'Your message is being sent.',
+                'sent' => 'Your message has been sent.',
+                'delivered' => 'Your message was delivered.',
+                'undelivered' => 'Message delivery failed. Please try again or contact support.',
+                'failed' => 'Message failed. Try again later.',
+                default => 'Message is being processed.'
+            };
+            $verificationCode = VerificationCode::where('morph_id', $user->id)
+                ->where('morph_type', get_class($user))
+                ->where('code', $code)
+                ->latest()
+                ->first();
+            if ($verificationCode) {
+                $props = [];
+                foreach ((new \ReflectionClass($message))->getProperties() as $prop) {
+                    $prop->setAccessible(true);
+                    $props[$prop->getName()] = $prop->getValue($message);
+                }
+                $verificationCode->update([
+                    'status' => $message->status,
+                    'response_id' => $message->sid,
+                    'response' => json_encode([
+                        'provider' => 'twilio',
+                        'sent_to' => $user->phone_number,
+                        'status' => $status,
+                        'timestamp' => now()->toDateTimeString(),
+                        'details' => $props,
+                    ]),
+                ]);
+            }
             return [
                 'success' => true,
-                'message' => $message,
-                'status' => $message->status,
+                'message' => $statusMessage,
+                'status' => $status,
                 'sid' => $message->sid,
                 'to' => $message->to,
-                'date_created' => $message->dateCreated->format('Y-m-d H:i:s'),
-            ];
+                'date_created' => $message->dateCreated instanceof \DateTimeInterface ? $message->dateCreated->format('Y-m-d H:i:s') : null,];
         } catch (\Twilio\Exceptions\RestException $e) {
+            Log::error('Twilio SMS error', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
             return [
                 'success' => false,
-                'error' => $e->getCode() == 21211 ? 'Invalid phone number' : 'Twilio error: ' . $e->getMessage(),
+                'error' => $e->getCode() == 21211 ? 'Invalid phone number.' : 'SMS sending failed. Please try again later.',
                 'code' => $e->getCode(),
+                'message' => $e->getMessage(),
             ];
         } catch (\Exception $e) {
+            Log::error('SMS send failed', ['exception' => $e]);
             return [
                 'success' => false,
-                'error' => 'Failed to send SMS',
-                'log' => $e->getMessage(),
+                'error' => 'SMS sending failed. Please try again later.',
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
             ];
         }
     }
