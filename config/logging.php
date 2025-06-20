@@ -56,6 +56,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
+        'twilio' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/twilio.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
         'merchant' => [
             'driver' => 'daily',
             'path' => storage_path('logs/merchant.log'),
