@@ -204,6 +204,5 @@ Route::fallback(function (Request $request) {
 });
 Route::get('invoice', [CheckoutController::class, 'index'])->name('invoice');
 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout');
-Route::post('twilio/status-callback', [SmsServiceContoller::class, 'statusCallback'])->name('twilio.status.callback');
 Route::get('twilio-sms/status/{sid?}', [SmsServiceContoller::class, 'smsStatus'])->name('twilio.sms.status');
 
