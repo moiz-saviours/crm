@@ -80,28 +80,32 @@ class TwoFactorController extends Controller
         }
         try {
             $verificationCode = $this->twoFactorService->generateCode($user, $method);
+            $response = null;
             if ($method === 'email' || $method === 'sms') {
                 if ($method === 'email') {
-                    $this->twoFactorService->sendEmailCode($user, $verificationCode->code);
+                    $response = $this->twoFactorService->sendEmailCode($user, $verificationCode->code);
                 } elseif ($method === 'sms') {
-                   $response = $this->twoFactorService->sendSmsCode($user, $verificationCode->code);
+                    $response = $this->twoFactorService->sendSmsCode($user, $verificationCode->code);
+                }
+                if ($response['success'] === false) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => $response['error'],
+                        'method' => $method
+                    ], 500);
                 }
                 return response()->json([
                     'success' => true,
-                    'message' => 'Verification code sent successfully.',
+                    'message' => $response['message'],
                     'method' => $method,
-                    'response' => $response??""
                 ]);
             }
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send verification code'
+                'error' => 'Failed to send verification code. Please try again later.'
             ], 400);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send verification code: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'error' => 'Failed to send verification code. Please try again later.', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
 
@@ -125,6 +129,7 @@ class TwoFactorController extends Controller
         $lastCode = VerificationCode::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
             ->latest()
+            ->valid()
             ->first();
         if (!$lastCode) {
             return redirect()->route('2fa.show');
@@ -132,6 +137,8 @@ class TwoFactorController extends Controller
         return view('user.auth.two-factor-verify', [
             'method' => $lastCode->method,
             'email' => $user->email,
+            'status' => $lastCode->status,
+            'response_id' => $lastCode->response_id,
         ]);
     }
 
@@ -161,6 +168,7 @@ class TwoFactorController extends Controller
         $lastCode = VerificationCode::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
             ->latest()
+            ->valid()
             ->first();
         if (!$lastCode) {
             return back()->withErrors(['code' => 'No verification code found. Please request a new one.']);
