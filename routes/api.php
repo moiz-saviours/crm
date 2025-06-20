@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\{
 };
 use App\Http\Controllers\ApiInvoiceController;
 use App\Http\Controllers\ApiPaymentAttachmentController;
+use App\Http\Controllers\SmsServiceContoller;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -135,3 +136,4 @@ Route::post('/check-channels', function (Request $request) {
 Route::fallback(function () {
     return response()->json(['error' => 'Controller or function not found'], 404);
 });
+Route::post('twilio/status-callback', [SmsServiceContoller::class, 'statusCallback'])->name('api.twilio.status.callback');
