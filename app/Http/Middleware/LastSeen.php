@@ -12,20 +12,22 @@ class LastSeen
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::guard('web')->check()) {
             $user = Auth::guard('web')->user();
+        }
+        if (Auth::guard('admin')->check()) {
+            $user = Auth::guard('admin')->user();
+        }
+        if (isset($user)) {
+            if (!$user->last_seen) {
+                session()->put('show_tour', true);
+            }
             $user->last_seen = now();
             $user->saveQuietly();
-        }
-
-        if (Auth::guard('admin')->check()) {
-            $admin = Auth::guard('admin')->user();
-            $admin->last_seen = now();
-            $admin->saveQuietly();
         }
         return $next($request);
     }
