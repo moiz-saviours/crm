@@ -68,6 +68,8 @@
                 <!-- Page title and information -->
                 <h1 class="page-title mb-2">Dashboard</h1>
                 <h2 class="h5">Welcome to the CRM Dashboard.</h2>
+
+                <button class="start-tour-btn my-btn tour-userdashboard-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="user_dashboard"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                 <!-- END : Page title and information -->
             </div>
         </div>
@@ -77,7 +79,7 @@
                     <div class="row">
 
                         <!-- Total Sales -->
-                        <div class="col-md-3">
+                        <div class="col-md-3 tour-userdashboardsales">
                             <div class="card text-white" style="background-color: var(--bs-primary);">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
@@ -100,7 +102,7 @@
                         </div>
 
                         <!-- Target -->
-                        <div class="col-md-3">
+                        <div class="col-md-3 tour-userdashboardtarget">
                             <div class="card text-white" style="background-color: var(--bs-primary);">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
@@ -123,7 +125,7 @@
                         </div>
 
                         <!-- Fresh Invoices -->
-                        <div class="col-md-3">
+                        <div class="col-md-3 tour-userdashboardfreshinvoice">
                             <div class="card text-white" style="background-color: var(--bs-primary);">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
@@ -146,7 +148,7 @@
                         </div>
 
                         <!-- Upsale Invoices -->
-                        <div class="col-md-3">
+                        <div class="col-md-3 tour-userdashboardupdsaleinvoice">
                             <div class="card text-white" style="background-color: var(--bs-primary);">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2">
@@ -173,7 +175,7 @@
             </div>
             <div class="content__boxed">
                 <div class="content__wrap">
-                    <div class="row">
+                    <div class="row tour-userdashboardinvoicedata">
                         <h1 class="page-title mb-2">Invoices</h1>
                         @php
                             $invoiceData = [
@@ -213,7 +215,7 @@
             <div class="content__boxed">
                 <div class="content__wrap">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6 tour-userdashboardmonthlydata">
                             <div class="card">
                                 <div class="card-header toolbar">
                                     <div class="toolbar-start">
@@ -237,7 +239,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 tour-userdashboardyearlydata">
                             <div class="card">
                                 <div class="card-header toolbar">
                                     <div class="toolbar-start">
@@ -267,7 +269,7 @@
             <div class="content__boxed">
                 <div class="content__wrap">
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-8 tour-userdashboardrecenpayment">
                             <h2>Recent Payments</h2>
 
                             <table class="table table-striped dashbord_tbl initTable">
@@ -304,7 +306,7 @@
                             </table>
                         </div>
                         <div class="col-md-4 right_col">
-                            <div class="card">
+                            <div class="card tour-userdashboardleadprogress">
                                 <div class="card-header toolbar">
                                     <div class="toolbar-start">
                                         <h5 class="m-0">Lead Progress</h5>
@@ -326,7 +328,7 @@
                                     <div class="leadpieChart collapse show" id="leadPieChart"></div>
                                 </div>
                             </div>
-                            <div class="card">
+                            <div class="card tour-userdashboardaymentprogress">
                                 <div class="card-header toolbar">
                                     <div class="toolbar-start">
                                         <h5 class="m-0">Payment Progress</h5>
@@ -348,7 +350,7 @@
                                     <div class="donutchart" id="_dm-DonutChart"></div>
                                 </div>
                             </div>
-                            <div class="card">
+                            <div class="card tour-userdashboardoverallprogress">
                                 <div class="card-header toolbar">
                                     <div class="toolbar-start">
                                         <h5 class="m-0">OverAll CRM</h5>

@@ -91,8 +91,9 @@
             <div class="content__wrap">
                 <header class="custm_header">
                     <div class="new_head">
-                        <h1 class="page-title mb-2">Companies <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
+                        <h1 class="page-title mb-2 ">Companies <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
                         {{--                        <h2 id="record-count" class="h6">{{count($client_companies) }} records</h2>--}}
+
                     </div>
                     <div class="filters">
                         <div class="actions">
@@ -102,20 +103,22 @@
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
-                            <button class="create-contact open-form-btn">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="client_company_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-createclientcompany">Create New</button>
 
                         </div>
                     </div>
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed  tour-clientcompanyalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Companies
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientcompanytitle" data-toggle="tooltip" title="Take a Tour" data-tour="client_company"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -145,7 +148,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body ">
                                     <table id="allClientCompaniesTable" class="table table-striped datatable-exportable
                             stripe row-border order-column nowrap
                             initTable ">
@@ -160,7 +163,7 @@
                                             <th class="align-middle text-center text-nowrap">URL</th>
                                             <th class="align-middle text-center text-nowrap">DESCRIPTION</th>
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
-                                            <th class="align-middle text-center text-nowrap">ACTION</th>
+                                            <th class="align-middle text-center text-nowrap tour-clientcompanyaction">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -192,7 +195,7 @@
                                                            data-id="{{ $client_company->id }}"
                                                            {{ $client_company->status == 1 ? 'checked' : '' }} data-bs-toggle="toggle">
                                                 </td>
-                                                <td class="align-middle text-center table-actions">
+                                                <td class="align-middle text-center table-actions ">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
                                                             data-id="{{ $client_company->id }}" title="Edit"><i
                                                             class="fas fa-edit"></i></button>

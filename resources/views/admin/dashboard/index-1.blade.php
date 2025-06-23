@@ -89,8 +89,11 @@
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                <h1 class="page-title mb-2">Dashboard</h1>
+                <h1 class="page-title mb-2  ">Dashboard</h1>
                 <h2 class="h5">Welcome to the CRM Dashboard.</h2>
+
+
+                <button class="start-tour-btn my-btn tour-dashboard1-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard1"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                 <!-- END : Page title and information -->
             </div>
         </div>
@@ -98,7 +101,7 @@
             <div class="content__wrap">
                 <div class="row">
                     <!-- Active Admins -->
-                    <div class="col-md-3" data-bs-toggle="modal" data-bs-target="#activeAdminModal">
+                    <div class="col-md-3 tour-dashboard1-admin" data-bs-toggle="modal" data-bs-target="#activeAdminModal">
                         <div class="card text-white" style="background-color: var(--bs-primary);">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-2">
@@ -120,7 +123,7 @@
                     </div>
 
                     <!-- Active Users -->
-                    <div class="col-md-3" data-bs-toggle="modal" data-bs-target="#activeUserModal">
+                    <div class="col-md-3 tour-dashboard1-user" data-bs-toggle="modal" data-bs-target="#activeUserModal">
                         <div class="card text-white" style="background-color: var(--bs-primary);">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-2">
@@ -141,7 +144,7 @@
                         </div>
                     </div>
                     <!-- Fresh Invoices -->
-                    <div class="col-md-3" data-bs-toggle="modal" data-bs-target="#freshInvoicesModal">
+                    <div class="col-md-3 tour-dashboard1-freshinvoice" data-bs-toggle="modal" data-bs-target="#freshInvoicesModal">
                         <div class="card text-white" style="background-color: var(--bs-primary);">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-2">
@@ -166,7 +169,7 @@
                     </div>
 
                     <!-- Upsale Invoices -->
-                    <div class="col-md-3" data-bs-toggle="modal" data-bs-target="#upsaleInvoicesModal">
+                    <div class="col-md-3 tour-dashboard1-upsaleinvoice" data-bs-toggle="modal" data-bs-target="#upsaleInvoicesModal">
                         <div class="card text-white" style="background-color: var(--bs-primary);">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-2">
@@ -194,7 +197,7 @@
         </div>
         <div class="content__boxed">
             <div class="content__wrap" style="padding-top: 0px">
-                <div class="row">
+                <div class="row tour-dashboard1-invoicedata">
                     <h1 class="page-title mb-2">Invoices</h1>
                     @php
                         $invoiceData = [
@@ -260,7 +263,7 @@
         <div class="content__boxed">
             <div class="content__wrap">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6 tour-dashboard1-monthlydata">
                         <div class="card">
                             <div class="card-header toolbar">
                                 <div class="toolbar-start">
@@ -284,7 +287,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 tour-dashboard1-annualdata">
                         <div class="card">
                             <div class="card-header toolbar">
                                 <div class="toolbar-start">
@@ -314,7 +317,7 @@
         <div class="content__boxed">
             <div class="content__wrap">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-8 tour-dashboard1-recenpayment">
                         <h2>Recent Payments</h2>
                         <table class="table table-striped dashbord_tbl initTable">
                             <thead>
@@ -344,7 +347,7 @@
                         </table>
                     </div>
                     <div class="col-md-4 right_col">
-                        <div class="card">
+                        <div class="card tour-dashboard1-leadprogress">
                             <div class="card-header toolbar">
                                 <div class="toolbar-start">
                                     <h5 class="m-0">Lead Progress</h5>
@@ -366,7 +369,7 @@
                                 <div class="leadpieChart collapse show" id="leadPieChart"></div>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card tour-dashboard1-paymentprogress">
                             <div class="card-header toolbar">
                                 <div class="toolbar-start">
                                     <h5 class="m-0">Payment Progress</h5>
@@ -388,7 +391,7 @@
                                 <div class="donutchart" id="_dm-DonutChart"></div>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card tour-dashboard1-overallprogress">
                             <div class="card-header toolbar">
                                 <div class="toolbar-start">
                                     <h5 class="m-0">OverAll CRM</h5>

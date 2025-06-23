@@ -272,14 +272,16 @@
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-userleadalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Leads
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-{{--                            <li class="tab-item " data-tab="allleads">All Leads--}}
+                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-userleadtitle" data-toggle="tooltip" title="Take a Tour" data-tour="user_leads"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
+                            {{--                            <li class="tab-item " data-tab="allleads">All Leads--}}
 {{--                                <i class="fa fa-times close-icon" aria-hidden="true"></i></li>--}}
                         </ul>
                     </div>

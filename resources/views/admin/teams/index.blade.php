@@ -19,19 +19,22 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="create-contact open-form-btn">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="team_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-createteam">Create New</button>
                         </div>
                     </div>
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-teamalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Teams
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-teamtitle" data-toggle="tooltip" title="Take a Tour" data-tour="teams"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -77,8 +80,8 @@
                                             <th class="align-middle text-center text-nowrap">Description</th>
                                             <th class="align-middle text-center text-nowrap">Assigned Brands</th>
                                             <th class="align-middle text-center text-nowrap">Lead</th>
-                                            <th class="align-middle text-center text-nowrap">Status</th>
-                                            <th class="align-middle text-center text-nowrap">Action</th>
+                                            <th class="align-middle text-center text-nowrap tour-teamstatus">Status</th>
+                                            <th class="align-middle text-center text-nowrap tour-teamaction">Action</th>
                                         </tr>
                                         </thead>
                                         <tbody>

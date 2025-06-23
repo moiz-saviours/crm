@@ -258,14 +258,18 @@
             /* DATATABLE */
         </style>
     @endpush
-    <section id="content" class="content">
+    <section id="content" class="content ">
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                <h1 class="page-title mb-2">Stats Dashboard</h1>
+                <h1 class="page-title mb-2 all-data">Stats Dashboard</h1>
                 {{--                <h2 class="h5">Welcome to the Stats Dashboard.</h2>--}}
                 <p>Welcome to the Stats Dashboard.</p>
                 {{--                <!-- END : Page title and information -->--}}
+
+
+                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard2"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+
             </div>
         </div>
         <div class="content__boxed">
@@ -280,7 +284,7 @@
                         <div class="col-lg-12">
                             <div class="main-dashboard-header">
                                 <h2 class="main-dashboard-heading"></h2>
-                                <div class="form-group">
+                                <div class="form-group tour-team-select">
                                     <label for="teamSelect">Select Team:</label>
                                     <select id="teamSelect" name="teamSelect" class="form-control">
                                         <option value="all">All Teams</option>
@@ -289,7 +293,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group tour-brand-select">
                                     <label for="brandSelect">Select Brand:</label>
                                     <select id="brandSelect" name="brandSelect" class="form-control">
                                         <option value="all">All Brands</option>
@@ -298,7 +302,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group tour-date-select">
                                     <label for="dateRangePicker">Select Date Range:</label>
                                     <input type="text" id="dateRangePicker" name="dateRangePicker"
                                            class="form-control dateRangePicker"/>
@@ -312,37 +316,37 @@
 
                         <div class="tabular-main-box">
                             <div class="row">
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-2 col-md-2 tour-totalsales-select">
                                     <div class="sales-number-div text-center">
                                         <h2 class="sales-total-heading">Total Sales</h2>
                                         <p id="total-sales-count" class="total-sales-count"> $0 </p>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-2 col-md-2 tour-totalcash-select">
                                     <div class="sales-number-div text-center">
                                         <h2 class="sales-total-heading">Total Cash</h2>
                                         <p id="total-cash-count" class="total-sales-count"> $0 </p>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-2 col-md-2 tour-refund-select">
                                     <div class="sales-number-div text-center">
                                         <h2 class="sales-total-heading">Refunds / Chargeback</h2>
                                         <p id="refund-charge-back" class="total-sales-count"> $0 / $0 </p>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-2 col-md-2 tour-charge-select">
                                     <div class="sales-number-div text-center">
                                         <h2 class="sales-total-heading">Chargeback Ratio</h2>
                                         <p id="charge-back-ratio" class="total-sales-count"> 0 % </p>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-2 col-md-2 tour-reversals-select">
                                     <div class="sales-number-div text-center">
                                         <h2 class="sales-total-heading">Reversals</h2>
                                         <p id="reversal-sales-count" class="total-sales-count"> $0 </p>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-2 col-md-2 tour-netcash-select">
                                     <div class="sales-number-div text-center">
                                         <h2 class="sales-total-heading">Net Cash</h2>
                                         <p id="net-cash-count" class="total-sales-count"> $0 </p>
@@ -354,7 +358,7 @@
                                 <div class="col-lg-5">
                                     <div class="row ">
                                         <div class="col-lg-6">
-                                            <div class="sales-number-div">
+                                            <div class="sales-number-div tour-targetvsachieved-select">
                                                 <h2 class="sales-total-heading">Targeted Vs Achieved</h2>
                                                 <!-- Total Target -->
                                                 <p id="total-target-vs-total-achieved" class="total-sales-count">$0 /
@@ -377,7 +381,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-6 tour-mtd-select">
                                             <div class="sales-number-div">
                                                 <h2 class="mtd-hedaing">MTD/LA</h2>
                                                 <p class="total-sales-count">
@@ -390,7 +394,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-6  mt-3">
+                                        <div class="col-lg-6  mt-3 tour-upsell-select">
                                             <div class="sales-number-div">
                                                 <h2 class="mtd-hedaing">UPSELL</h2>
                                                 <p class="total-sales-count" id="total-upsell"> $0
@@ -398,7 +402,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-6  mt-3">
+                                        <div class="col-lg-6  mt-3 tour-account-select">
                                             <div class="sales-number-div">
                                                 <h2 class="mtd-hedaing">Accounts</h2>
                                                 <p class="total-sales-count"> 0
@@ -406,7 +410,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-12 mt-3">
+                                        <div class="col-lg-12 mt-3 tour-teamrecord-select">
                                             <table class="table table-striped initTable" id="teamRecordsTable">
                                                 <thead>
                                                 <tr class="monthly-sales-record-table-row ">
@@ -417,6 +421,15 @@
                                                     <th scope="col">Acheived %</th>
                                                 </tr>
                                                 </thead>
+                                                <tfoot>
+                                                <tr>
+                                                    <th>Total Teams</th>
+                                                    <th>Total Months</th>
+                                                    <th>Sum of Targets</th>
+                                                    <th>Sum of Achieved</th>
+                                                    <th>Average %</th>
+                                                </tr>
+                                                </tfoot>
                                                 <tbody></tbody>
                                             </table>
                                         </div>
@@ -424,7 +437,7 @@
                                     </div>
 
                                 </div>
-                                <div class="col-lg-7 col-md-12">
+                                <div class="col-lg-7 col-md-12 tour-userecord-select">
                                     {{--                                    <div class="sales-record-table-container">--}}
                                     {{--                                    <div class="sales-record-table-container monthly-sales-record-table">--}}
                                     <table class="table table-striped dashbord_tbl initTable"
@@ -437,6 +450,14 @@
                                             <th class="table-headings">Sales</th>
                                         </tr>
                                         </thead>
+                                        <tfoot>
+                                        <tr>
+                                            <th>Total Employees</th>
+                                            <th>Total Teams</th>
+                                            <th>Sum of Targets</th>
+                                            <th>Sum of Sales</th>
+                                        </tr>
+                                        </tfoot>
                                         <tbody></tbody>
                                     </table>
                                     {{--                                    </div>--}}
@@ -676,6 +697,7 @@
                 function initializeDatatable(table_div, index) {
                     let parentHeight = table_div.parent().height();
                     let tableId = table_div.attr('id');
+
                     let datatable = table_div.DataTable({
                         dom:
                             "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
@@ -687,11 +709,11 @@
                         scrollY: tableId === "employeeRecordsTable" ? "500px" : parentHeight ? parentHeight - 145 + "px" : "500px",
                         scrollCollapse: true,
                         paging: true,
-
                         pageLength: tableId === "teamRecordsTable" ? 5 : 10,
                         lengthMenu: [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+
                     });
-                    datatable.columns.adjust().draw();
+
                     return datatable;
                 }
                 $('#dateRangePicker').daterangepicker({

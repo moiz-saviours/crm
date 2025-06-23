@@ -10,8 +10,9 @@
             <div class="content__wrap">
                 <header class="custm_header">
                     <div class="new_head">
-                        <h1 class="page-title mb-2">Contacts <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
+                        <h1 class="page-title mb-2 ">Contacts <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
 {{--                        <h2 id="record-count" class="h6">{{count($client_contacts)}} records</h2>--}}
+
                     </div>
                     <div class="filters">
                         <div class="actions">
@@ -20,19 +21,21 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="create-contact open-form-btn">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="client_contact_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-createclientcontact">Create New</button>
                         </div>
                     </div>
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-clientcontactalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Contacts
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientcontacttitle" data-toggle="tooltip" title="Take a Tour" data-tour="client_contact"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -63,7 +66,7 @@
 {{--                                        </div>--}}
 {{--                                    </div>--}}
 {{--                                </div>--}}
-                                <div class="card-body">
+                                <div class="card-body ">
                                     <table id="allContactsTable" class="table table-striped datatable-exportable
                             stripe row-border order-column nowrap
                             initTable
@@ -79,8 +82,8 @@
                                             <th class="align-middle text-center text-nowrap">ADDRESS</th>
                                             <th class="align-middle text-center text-nowrap">CITY</th>
                                             <th class="align-middle text-center text-nowrap">STATE</th>
-                                            <th class="align-middle text-center text-nowrap">STATUS</th>
-                                            <th class="align-middle text-center text-nowrap">ACTION</th>
+                                            <th class="align-middle text-center text-nowrap tour-clientcontactstatus">STATUS</th>
+                                            <th class="align-middle text-center text-nowrap tour-clientcontactaction">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -94,12 +97,12 @@
                                                 <td class="align-middle text-center text-nowrap">{{ $client_contact->address }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ $client_contact->city }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ $client_contact->state }}</td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-center text-nowrap ">
                                                     <input type="checkbox" class="status-toggle change-status"
                                                            data-id="{{ $client_contact->id }}"
                                                            {{ $client_contact->status == 1 ? 'checked' : '' }} data-bs-toggle="toggle">
                                                 </td>
-                                                <td class="align-middle text-center table-actions">
+                                                <td class="align-middle text-center table-actions ">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
                                                             data-id="{{ $client_contact->id }}" title="Edit"><i
                                                                 class="fas fa-edit"></i></button>

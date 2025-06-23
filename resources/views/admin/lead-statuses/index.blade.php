@@ -95,20 +95,23 @@
 {{--                            </button>--}}
 {{--                            <button class="header_btn">Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
-                            <button class="create-contact open-form-btn">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="lead_status_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-createleadstatus">Create New</button>
 
                         </div>
                     </div>
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-leadstatusalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Lead Statuses
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-leadstatustitle" data-toggle="tooltip" title="Take a Tour" data-tour="lead_status"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -150,8 +153,8 @@
                                             <th class="align-middle text-center text-nowrap">NAME</th>
                                             <th class="align-middle text-center text-nowrap">COLOR</th>
                                             <th class="align-middle text-center text-nowrap">DESCRIPTION</th>
-                                            <th class="align-middle text-center text-nowrap">STATUS</th>
-                                            <th class="align-middle text-center text-nowrap">ACTION</th>
+                                            <th class="align-middle text-center text-nowrap tour-leadstatus">STATUS</th>
+                                            <th class="align-middle text-center text-nowrap tour-leadstatusaction">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>

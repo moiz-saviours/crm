@@ -20,19 +20,22 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="create-contact open-form-btn">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="lead_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-createlead">Create New</button>
                         </div>
                     </div>
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-leadalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Leads
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-leadtitle" data-toggle="tooltip" title="Take a Tour" data-tour="lead"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -86,7 +89,7 @@
                                             <th class="align-middle text-center text-nowrap">NOTE</th>
                                             <th class="align-middle text-center text-nowrap">CREATED DATE</th>
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
-                                            <th class="align-middle text-center text-nowrap">ACTION</th>
+                                            <th class="align-middle text-center text-nowrap tour-leadaction">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>
