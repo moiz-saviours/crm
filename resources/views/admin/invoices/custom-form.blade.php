@@ -32,15 +32,15 @@
             <label for="crsf_token" class="form-label d-none">Crsf Token</label>
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
             <!-- Form Header -->
-            <div class="form-header fh-1">
-                <span id="custom-form-heading">Manage Invoice</span>
+            <div class="form-header fh-1 ">
+                <span id="custom-form-heading" class="tour-invoicecreation">Manage Invoice</span>
                 <button type="button" class="close-btn">×</button>
             </div>
             <!-- Form Body -->
             <div class="form-body">
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 ">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control searchable" id="brand_key" name="brand_key"
+                    <select class="form-control select2 searchable tour-invoicecreatebrand" id="brand_key" name="brand_key"
                             title="Please select a brand" required autocomplete="off">
                         <option value="" selected disabled>Please select brand</option>
                         @foreach($brands as $brand)
@@ -53,9 +53,9 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Team</label>
-                    <select class="form-control searchable" id="team_key" name="team_key"
+                    <select class="form-control searchable tour-invoicecreateteam" id="team_key" name="team_key"
                             title="Please select a team">
-                        <option value="" disabled>Please select team</option>
+                        <option value="" selected disabled>Please select team</option>
                         @foreach($teams as $team)
                             <option
                                 value="{{ $team->team_key }}" {{ old('team_key') == $team->team_key ? 'selected' : '' }}>
@@ -70,7 +70,7 @@
 
                 <div class="form-group mb-3">
                     <label for="type" class="form-label">Type</label>
-                    <select class="form-control" id="type" name="type" title="Please select customer type" required>
+                    <select class="form-control tour-invoiceusertype" id="type" name="type" title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
                         <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
                     </select>
@@ -110,7 +110,7 @@
                 </div>
                 <div id="upsale-customer-contact-fields" class="form-group mb-3 first-fields">
                     <label for="cus_contact_key" class="form-label">Select Customer Contact</label>
-                    <select class="form-control first-field-inputs" id="cus_contact_key" name="cus_contact_key">
+                    <select class="form-control first-field-inputs tour-invoicecusselect" id="cus_contact_key" name="cus_contact_key">
                         <option value="">Select Customer Contact</option>
                         @foreach($customer_contacts as $customer_contact)
                             <option
@@ -126,7 +126,7 @@
 
                 <div class="form-group mb-3">
                     <label for="agent_id" class="form-label">Agent</label>
-                    <select class="form-control searchable" id="agent_id" name="agent_id" title="Please select agent">
+                    <select class="form-control searchable tour-invoiceagentselect" id="agent_id" name="agent_id" title="Please select agent">
                         <option value="" disabled>Select Agent</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ old('agent_id') == $user->id ? 'selected' : '' }}>
@@ -141,7 +141,7 @@
 
                 <div class="form-group mb-3">
                     <label for="due_date" class="form-label">Due Date</label>
-                    <input type="date" class="form-control" id="due_date" name="due_date"
+                    <input type="date" class="form-control tour-invoicedateselect" id="due_date" name="due_date"
                            value="{{ old('due_date', now('Pacific/Honolulu')->addDays(5)->format('Y-m-d')) }}"
                            min="{{ now('Pacific/Honolulu')->format('Y-m-d') }}"
                            max="{{ now('Pacific/Honolulu')->addYear()->format('Y-m-d') }}">
@@ -153,7 +153,7 @@
 
                 <div class="form-group mb-3">
                     <label for="currency" class="form-label">Currency</label>
-                    <select class="form-control" id="currency" name="currency">
+                    <select class="form-control tour-invoicecurselect" id="currency" name="currency">
                         <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
                         <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }} disabled>GBP</option>
                         <option value="AUD" {{ old('currency') == 'AUD' ? 'selected' : '' }} disabled>AUD</option>
@@ -163,16 +163,16 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 tour-invoicemerchant">
                     <div id="merchant-types-container">
                     </div>
                     @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 ">
                     <label for="amount" class="form-label">Amount</label>
-                    <input type="number" class="form-control" id="amount" name="amount" step="1"
+                    <input type="number" class="form-control tour-invoiceamount" id="amount" name="amount" step="1"
                            min="1"
                            max="{{config('invoice.max_amount')}}" value="{{ old('amount') }}">
                     @error('amount')
@@ -181,7 +181,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="taxable" class="form-label d-flex align-items-center">
-                        <input type="checkbox" class="form-check-input me-2" id="taxable" name="taxable"
+                        <input type="checkbox" class="form-check-input me-2 tour-invoicetax" id="taxable" name="taxable"
                                value="1" {{ old('taxable') ? 'checked' : '' }}>
                         Is this invoice taxable?
                     </label>
@@ -227,7 +227,7 @@
                     </div>
                 </div>
 
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 tour-invoicetotal">
                     <label for="total_amount" class="form-label">Total Amount</label>
                     <input type="number" class="form-control" id="total_amount" name="total_amount" step="0.01"
                            min="1"
@@ -237,7 +237,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 tour-invoicedesc">
                     <label for="description" class="form-label">Service Description</label>
                     <textarea class="form-control" id="description" name="description"
                               rows="3" required>{{ old('description') }}</textarea>
@@ -247,7 +247,7 @@
                 </div>
             </div>
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-invoicecomplete"><i class="fas fa-save me-2"></i> Save</button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
         </div>

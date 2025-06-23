@@ -100,21 +100,21 @@
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
             <!-- Form Header -->
             <div class="form-header fh-1">
-                <span id="custom-form-heading">Manage Team</span>
+                <span id="custom-form-heading" class="tour-teamcreation"> Manage Team</span>
                 <button type="button" class="close-btn">×</button>
             </div>
             <!-- Form Body -->
             <div class="form-body">
                 <div class="form-group mb-3">
                     <label for="name" class="form-label">Team Name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" required>
+                    <input type="text" class="form-control tour-teamname" id="name" name="name" placeholder="Enter name" required>
                     @error('name')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="form-group mb-3">
                     <label for="email" class="form-label">Team Lead</label>
-                    <select class="form-control select2" id="lead_id" name="lead_id">
+                    <select class="form-control select2 tour-teamlead" id="lead_id" name="lead_id">
                         <option value="" selected>Select Team Lead</option>
                         @foreach($users as $user)
                             <option
@@ -130,7 +130,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="designation" class="form-label">Description</label>
-                    <input type="text" class="form-control" id="description" name="description">
+                    <input type="text" class="form-control tour-teamdesc" id="description" name="description">
 
                     @error('description')
                     <span class="text-danger">{{ $message }}</span>
@@ -154,7 +154,7 @@
                 </style>
 
                 <div class="form-group mb-3">
-                    <label for="user" class="form-label">Team Members</label>
+                    <label for="user" class="form-label tour-teammember">Team Members</label>
 
                     <div class="main-images-wrapper">
 
@@ -217,7 +217,7 @@
                                 <h5 class="font-weight-bold mb-0 text-center">Brands</h5>
                                 <div class="form-check form-check-update d-flex align-items-center form-check-inline">
                                     <input type="checkbox" id="select-all-brands"
-                                           class="form-check-input">
+                                           class="form-check-input ">
                                     <label class="form-check-label" for="select-all-brands">
                                         <small id="select-all-label">Select All</small>
                                     </label>
@@ -226,7 +226,7 @@
 
                             <!-- Brands Select Dropdown -->
                             <div class="form-group">
-                                <select name="brands[]" id="brands" class="form-control" multiple>
+                                <select name="brands[]" id="brands" class="form-control tour-teambrand" multiple>
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->brand_key }}"
                                             {{ in_array($brand->brand_key, old('brands', [])) ? 'selected' : '' }}>
@@ -243,8 +243,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group mb-3">
-                    <label for="status" class="form-label">Status</label>
+                <div class="form-group mb-3 ">
+                    <label for="status" class="form-label ">Status</label>
                     <select class="form-control" id="status" name="status">
                         <option value="1">Active</option>
                         <option value="0">Inactive</option>
@@ -256,7 +256,7 @@
             </div>
 
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-teamsubmit"><i class="fas fa-save me-2"></i> Save</button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
         </div>

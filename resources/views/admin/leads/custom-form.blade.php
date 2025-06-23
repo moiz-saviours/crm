@@ -5,14 +5,14 @@
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
             <!-- Form Header -->
             <div class="form-header fh-1">
-                <span id="custom-form-heading">Manage Lead</span>
+                <span id="custom-form-heading" class="tour-leadcreation">Manage Lead</span>
                 <button type="button" class="close-btn">×</button>
             </div>
             <!-- Form Body -->
             <div class="form-body">
                 <div class="form-group mb-3">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control searchable" id="brand_key" name="brand_key"
+                    <select class="form-control searchable tour-leadbrand" id="brand_key" name="brand_key"
                             title="Please select a brand" required>
                         <option value="" selected>Please select brand</option>
                         @foreach($brands as $brand)
@@ -27,7 +27,7 @@
 
                 <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Team</label>
-                    <select class="form-control searchable" id="team_key" name="team_key"
+                    <select class="form-control searchable tour-leadteam" id="team_key" name="team_key"
                             title="Please select a Team" required>
                         <option value="" selected>Please select Team</option>
                         @foreach($teams as $team)
@@ -43,7 +43,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name"
+                    <input type="text" class="form-control tour-leadname" id="name" name="name"
                            value="{{ old('name') }}">
                     @error('name')
                     <span class="text-danger">{{ $message }}</span>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email"
+                    <input type="email" class="form-control tour-leademail" id="email"
                            name="email" value="{{ old('email') }}">
                     @error('email')
                     <span class="text-danger">{{ $message }}</span>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="phone" class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="phone"
+                    <input type="text" class="form-control tour-leadphone" id="phone"
                            name="phone" value="{{ old('phone') }}">
                     @error('phone')
                     <span class="text-danger">{{ $message }}</span>
@@ -67,8 +67,8 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="lead_status_id" class="form-label">Lead Type</label>
-                    <select class="form-control searchable" id="lead_status_id" name="lead_status_id"
+                    <label for="lead_status_id" class="form-label ">Lead Type</label>
+                    <select class="form-control searchable tour-leadtype" id="lead_status_id" name="lead_status_id"
                             required>
                         <option value="" selected>Please select lead status</option>
                         @foreach($leadStatuses as $lead_status)
@@ -86,14 +86,14 @@
 
                 <div class="form-group mb-3">
                     <label for="note" class="form-label">Note</label>
-                    <textarea class="form-control" rows="6" id="note" name="note">{{ old('note') }}</textarea>
+                    <textarea class="form-control tour-leadnote" rows="6" id="note" name="note">{{ old('note') }}</textarea>
                     @error('note')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="form-group mb-3">
                     <label for="status" class="form-label">Status</label>
-                    <select class="form-control" id="status" name="status">
+                    <select class="form-control tour-leadsstatus" id="status" name="status">
                         <option value="1">Active</option>
                         <option value="0">Inactive</option>
                     </select>
@@ -102,7 +102,7 @@
             </div>
 
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-leadsubmit"><i class="fas fa-save me-2"></i> Save</button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
         </div>

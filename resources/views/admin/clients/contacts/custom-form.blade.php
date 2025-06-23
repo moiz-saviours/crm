@@ -12,7 +12,7 @@
             <label for="crsf_token" class="form-label d-none">Crsf Token</label>
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
             <!-- Form Header -->
-            <div class="form-header fh-1">
+            <div class="form-header fh-1 tour-clientcontactcreation">
                 <span id="custom-form-heading">Manage Client Contact</span>
                 <button type="button" class="close-btn">×</button>
             </div>
@@ -29,7 +29,7 @@
                             @endphp
 
                                 <!-- Select All Toggle Section -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3 ">
                                 <h5 class="font-weight-bold mb-0 text-center">Brands</h5>
                                 <div
                                     class="form-check form-check-update d-flex align-items-center form-check-inline">
@@ -43,7 +43,7 @@
 
                             <!-- Brands Select Dropdown -->
                             <div class="form-group">
-                                <select name="brands[]" id="brands" class="form-control" multiple>
+                                <select name="brands[]" id="brands" class="form-control tour-clientcontactbrand" multiple>
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->brand_key }}"
                                             {{ in_array($brand->brand_key, old('brands', [])) ? 'selected' : '' }}>
@@ -63,7 +63,7 @@
 
                 <div class="form-group mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name"
+                    <input type="text" class="form-control tour-clientcontactname" id="name" name="name"
                            value="{{ old('name') }}" required>
                     @error('name')
                     <span class="text-danger">{{ $message }}</span>
@@ -71,7 +71,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email"
+                    <input type="email" class="form-control tour-clientcontactemail" id="email" name="email"
                            value="{{ old('email') }}" required>
                     @error('email')
                     <span class="text-danger">{{ $message }}</span>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="phone" class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="phone" name="phone"
+                    <input type="text" class="form-control tour-clientcontactphone" id="phone" name="phone"
                            value="{{ old('phone') }}">
                     @error('phone')
                     <span class="text-danger">{{ $message }}</span>
@@ -88,7 +88,7 @@
 
                 <div class="form-group mb-3">
                     <label for="address" class="form-label">Address</label>
-                    <textarea class="form-control" id="address" name="address"
+                    <textarea class="form-control tour-clientcontactaddress" id="address" name="address"
                               rows="5">{{ old('address') }}</textarea>
                     @error('address')
                     <span class="text-danger">{{ $message }}</span>
@@ -99,7 +99,7 @@
                 <div class="form-group mb-3">
                     <div class="col-md-12 mb-3">
                         <label for="city" class="form-label">City</label>
-                        <input type="text" class="form-control" id="city" name="city"
+                        <input type="text" class="form-control tour-clientcontactcity" id="city" name="city"
                                value="{{ old('city') }}">
                         @error('city')
                         <span class="text-danger">{{ $message }}</span>
@@ -113,7 +113,7 @@
                     <div class="form-group mb-3">
                         <div class="col-md-12 mb-3">
                             <label for="state" class="form-label">State</label>
-                            <input type="text" class="form-control" id="state" name="state"
+                            <input type="text" class="form-control tour-clientcontactstate" id="state" name="state"
                                    value="{{ old('state') }}">
                             @error('state')
                             <span class="text-danger">{{ $message }}</span>
@@ -124,7 +124,7 @@
 
                     <div class="col-md-12 mb-3">
                         <label for="country" class="form-label">Country</label>
-                        <select class="form-control searchable" id="country" name="country"
+                        <select class="form-control searchable tour-clientcontactcountry" id="country" name="country"
                                 title="Please select country" required>
                             @foreach(config('countries') as $code => $country)
                                 <option
@@ -141,7 +141,7 @@
                     <div class="form-group mb-3">
                         <div class="col-md-12 mb-3">
                             <label for="zipcode" class="form-label">Zip Code</label>
-                            <input type="text" class="form-control" id="zipcode" name="zipcode"
+                            <input type="text" class="form-control tour-clientcontactzip" id="zipcode" name="zipcode"
                                    value="{{ old('zipcode') }}">
                             @error('zipcode')
                             <span class="text-danger">{{ $message }}</span>
@@ -152,7 +152,7 @@
 
                     <div class="form-group mb-3">
                         <label for="status" class="form-label">Status</label>
-                        <select class="form-control" id="status" name="status">
+                        <select class="form-control tour-clientcontactstatus1" id="status" name="status">
                             <option value="1">Active</option>
                             <option value="0">Inactive</option>
                         </select>
@@ -161,12 +161,12 @@
                         @enderror
                     </div>
                 </div>
-
+            </div>
                 <div class="form-button">
-                <button type="submit" class="btn-primary save-btn"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-clientcontactsubmit"><i class="fas fa-save me-2"></i> Save</button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
-            </div>
+
         </div>
 
     </form>

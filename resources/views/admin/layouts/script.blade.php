@@ -31,6 +31,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+{{--INTRO JS LIBRARY--}}
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/4.3.0/intro.min.js"></script>--}}
+
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js/dist/js/shepherd.min.js"></script>
+
+<script src="{{asset ('assets/js/intro-tour.js')}}"></script>
+<script src="{{asset ('assets/js/tour.js')}}"></script>
+
 
 <!-- Jquery UI -->
 {{--<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>--}}
@@ -838,7 +846,7 @@
 
         if (formContainer.length > 0) {
             openCustomForm(formContainer, manageForm);
-            closeCustomForm(formContainer, manageForm);
+            //closeCustomForm(formContainer, manageForm);
         } else {
             // console.warn('#formContainer does not exist.');
         }
@@ -863,12 +871,12 @@
         }
         $(document).on('click', function (event) {
             if (
-                (!$(event.target).closest('.form-container').length &&
-                    !$(event.target).is('.form-container') &&
-                    !$(event.target).closest('.open-form-btn').length &&
-                    !$(event.target).is('.editBtn') &&
-                    !$(event.target).is('.changePwdBtn')
-                ) ||
+                // (!$(event.target).closest('.form-container').length &&
+                //     !$(event.target).is('.form-container') &&
+                //     !$(event.target).closest('.open-form-btn').length &&
+                //     !$(event.target).is('.editBtn') &&
+                //     !$(event.target).is('.changePwdBtn')
+                // ) ||
                 $(event.target).is('.form-container .close-btn')
             ) {
                 closeCustomForm(formContainer, manageForm);

@@ -4,19 +4,19 @@
             <label for="crsf_token" class="form-label d-none">Crsf Token</label>
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
             <!-- Form Header -->
-            <div class="form-header fh-1">
-                <span id="custom-form-heading">Manage Payment</span>
+            <div class="form-header fh-1 ">
+                <span id="custom-form-heading" class="tour-paymentcreation">Manage Payment</span>
                 <button type="button" class="close-btn">×</button>
             </div>
             <!-- Form Body -->
             <div class="form-body">
                 <div class="error-messages"></div>
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 tour-paymentwithinvoice">
                     <div class="d-flex justify-content-between align-items-center">
                         <label for="invoice_key" class="form-label mb-0">Invoice</label>
                         <small class="fst-italic">(optional)</small>
                     </div>
-                    <select class="form-control" id="invoice_key" name="invoice_key">
+                    <select class="form-control " id="invoice_key" name="invoice_key">
                         <option value="">Create New Invoice</option>
                         @foreach($unpaid_invoices as $unpaid_invoice)
                             <option
@@ -39,9 +39,9 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="form-group mb-3">
+                <div class="form-group mb-3 ">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control" id="brand_key" name="brand_key" required>
+                    <select class="form-control tour-paymentbrand" id="brand_key" name="brand_key" required>
                         <option value="">Select Brand</option>
                         @foreach($brands as $brand)
                             <option
@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Team</label>
-                    <select class="form-control" id="team_key" name="team_key" required>
+                    <select class="form-control tour-paymentteam" id="team_key" name="team_key" required>
                         <option value="">Select Team</option>
                         @foreach($teams as $team)
                             <option
@@ -71,7 +71,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="agent_id" class="form-label ">Agent</label>
-                    <select class="form-control" id="agent_id" name="agent_id" required>
+                    <select class="form-control tour-paymentagent" id="agent_id" name="agent_id" required>
                         <option value="">Select Agent</option>
                         @foreach($agents as $agent)
                             <option value="{{ $agent->id }}" {{ old('agent_id') == $agent->id ? 'selected' : '' }}>
@@ -87,7 +87,7 @@
 
                 <div class="form-group mb-3">
                     <label for="type" class="form-label">Customer Type</label>
-                    <select class="form-control" id="type" name="type" title="Please select customer type" required>
+                    <select class="form-control tour-paymentcustype" id="type" name="type" title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
                         @if($customer_contacts->count() > 0)
                             <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
@@ -129,7 +129,7 @@
                 </div>
                 <div id="upsale-customer-contact-fields" class="form-group mb-3 first-fields">
                     <label for="cus_contact_key" class="form-label">Select Customer Contact</label>
-                    <select class="form-control first-field-inputs" id="cus_contact_key" name="cus_contact_key">
+                    <select class="form-control first-field-inputs tour-paymentcuscontact" id="cus_contact_key" name="cus_contact_key">
                         <option value="">Select Customer Contact</option>
                         @foreach($customer_contacts as $customer_contact)
                             <option
@@ -153,7 +153,7 @@
 
                 <div class="form-group mb-3">
                     <label for="amount" class="form-label">Amount</label>
-                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="1"
+                    <input type="number" class="form-control tour-paymentamount" id="amount" name="amount" step="0.01" min="1"
                            value="{{ old('amount') }}" required>
                     @error('amount')
                     <span class="text-danger">{{ $message }}</span>
@@ -171,7 +171,7 @@
 
                 <div class="form-group mb-3">
                     <label for="client_account" class="form-label">Client Account</label>
-                    <select class="form-control" id="client_account" name="client_account" required>
+                    <select class="form-control tour-paymentaccount" id="client_account" name="client_account" required>
                         <option value="">Select Client Account</option>
 
                         @foreach($client_contacts as $client_contact)
@@ -241,7 +241,7 @@
                 {{--                </div>--}}
                 <div class="form-group mb-3">
                     <label for="payment_date" class="form-label">Payment Date</label>
-                    <input type="date" class="form-control" id="payment_date" name="payment_date"
+                    <input type="date" class="form-control tour-paymentdate" id="payment_date" name="payment_date"
                            value="{{ old('payment_date') }}" max="{{now('GMT+5')->toDateString()}}" required>
                     @error('payment_date')
                     <span class="text-danger">{{ $message }}</span>
@@ -250,18 +250,20 @@
 
                 <div class="form-group mb-3">
                     <label for="transaction_id" class="form-label">Transaction ID</label>
-                    <input type="text" class="form-control" id="transaction_id" name="transaction_id"
+                    <input type="text" class="form-control tour-paymenttrid" id="transaction_id" name="transaction_id"
                            value="{{ old('transaction_id') }}" required>
                     @error('transaction_id')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-            </div>
 
+            </div>
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-paymentsubmit"><i class="fas fa-save me-2"></i> Save</button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
+
+
         </div>
     </form>
 </div>

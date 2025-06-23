@@ -6,6 +6,16 @@
 <link id="_dm-cssOverlayScrollbars" rel="stylesheet"
       href="{{asset('assets/themes/nifty/assets/vendors/overlayscrollbars/overlayscrollbars.min.css')}}">
 <!-- Fonts [ OPTIONAL ] -->
+{{--INTRO CSS--}}
+
+<link rel="stylesheet" href="{{asset ('assets/css/tour.css')}}">
+
+{{--INTRO CSS--}}
+{{--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/4.3.0/introjs.min.css">--}}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js/dist/css/shepherd.css" />
+
+
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
 <style type="text/css">
