@@ -22,7 +22,8 @@
                             {{--                            <button class="header_btn">Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn">Import</button>--}}
-                            <button class="create-contact open-form-btn">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="user_invoicecreate"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-usercreateinvoice">Create New</button>
                         </div>
                     </div>
                 </header>
@@ -33,11 +34,13 @@
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
-                            <li class="tab-item active all-tab" data-tab="home">All Invoices <i
+                            <li class="tab-item active all-tab tour-userallinvoice" data-tab="home">All Invoices <i
                                     class="fa fa-times close-icon"
                                     aria-hidden="true"></i></li>
-                            <li class="tab-item my-tab" data-tab="home">My Invoices <i class="fa fa-times close-icon"
+                            <li class="tab-item my-tab tour-useronlyinvoice" data-tab="home">My Invoices <i class="fa fa-times close-icon"
                                                                                        aria-hidden="true"></i></li>
+                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-userinvoicetitle" data-toggle="tooltip" title="Take a Tour" data-tour="user_invoice"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -86,7 +89,7 @@
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
                                             <th class="align-middle text-center text-nowrap">DUE DATE</th>
                                             <th class="align-middle text-center text-nowrap">CREATE DATE</th>
-                                            <th class="align-middle text-center text-nowrap">ACTION</th>
+                                            <th class="align-middle text-center text-nowrap tour-userinvoiceaction">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>

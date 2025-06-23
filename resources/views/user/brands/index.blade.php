@@ -29,7 +29,7 @@
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-userbrandalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
@@ -40,12 +40,15 @@
                                         data-tab="tab-pane-{{$team->team_key}}">{{$team->name}}<i
                                             class="fa fa-times close-icon"
                                             aria-hidden="true"></i></li>
+                                    <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-userbrandtitle" data-toggle="tooltip" title="Take a Tour" data-tour="user_brands"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
                                 @endforeach
                             @else
                                 <li class="tab-item active"
                                     data-tab="tab-pane-brands">Brands<i
                                         class="fa fa-times close-icon"
                                         aria-hidden="true"></i></li>
+
                             @endif
                             {{--                                <li class="tab-item"--}}
                             {{--                                    data-tab="tab-pane-"><i--}}

@@ -271,12 +271,13 @@
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
-                            <li class="tab-item active all-tab" data-tab="home">All Payments
+                            <li class="tab-item active all-tab tour-userallpayment" data-tab="home">All Payments
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
                             @if(Auth::user()->department->name === 'Sales')
-                                <li class="tab-item  my-tab" data-tab="home">My Payments <i
+                                <li class="tab-item  my-tab tour-useronlypayment" data-tab="home">My Payments <i
                                         class="fa fa-times close-icon"
                                         aria-hidden="true"></i></li>
+                                <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-userpaymenttitle" data-toggle="tooltip" title="Take a Tour" data-tour="user_payment"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                             @endif
                         </ul>
                     </div>

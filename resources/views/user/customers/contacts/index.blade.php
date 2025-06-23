@@ -22,20 +22,23 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="create-contact open-form-btn ">Create New</button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="user_customer_contact_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="create-contact open-form-btn tour-usercreatecustomer">Create New</button>
                         </div>
                     </div>
                 </header>
             </div>
         </div>
-        <div class="content__boxed">
+        <div class="content__boxed tour-usercontactalldata">
             <div class="content__wrap">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Contacts
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-{{--                            <li class="tab-item " data-tab="menu1">My Contacts <i class="fa fa-times close-icon"--}}
+                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-usercontacttitle" data-toggle="tooltip" title="Take a Tour" data-tour="user_customer_contact"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+
+                            {{--                            <li class="tab-item " data-tab="menu1">My Contacts <i class="fa fa-times close-icon"--}}
 {{--                                                                                  aria-hidden="true"></i></li>--}}
                         </ul>
                         {{--                        <div class="tab-buttons" >--}}
@@ -214,30 +217,30 @@
 @include('user.customers.contacts.custom-form')
     @push('script')
         @include('user.customers.contacts.script')
-        <script>
+{{--        <script>--}}
 
-            $(document).ready(function () {
-                const formContainer = $('#formContainer');
-                $('.open-form-btn').click(function () {
-                    $(this).hasClass('void') ? $(this).attr('title', "You don't have access to create a record.").tooltip({placement: 'bottom'}).tooltip('show') : (formContainer.addClass('open'));
-                });
-                $(document).click(function (event) {
-                    if (!$(event.target).closest('#formContainer').length && !$(event.target).is('#formContainer') && !$(event.target).closest('.open-form-btn').length) {
-                        formContainer.removeClass('open')
-                    }
-                });
-                $(".tab-item").on("click", function () {
-                    // Remove 'active' class from all tabs and panes
-                    $(".tab-item").removeClass("active");
-                    $(".tab-pane").removeClass("active");
+{{--            $(document).ready(function () {--}}
+{{--                const formContainer = $('#formContainer');--}}
+{{--                $('.open-form-btn').click(function () {--}}
+{{--                    $(this).hasClass('void') ? $(this).attr('title', "You don't have access to create a record.").tooltip({placement: 'bottom'}).tooltip('show') : (formContainer.addClass('open'));--}}
+{{--                });--}}
+{{--                $(document).click(function (event) {--}}
+{{--                    if (!$(event.target).closest('#formContainer').length && !$(event.target).is('#formContainer') && !$(event.target).closest('.open-form-btn').length) {--}}
+{{--                        formContainer.removeClass('open')--}}
+{{--                    }--}}
+{{--                });--}}
+{{--                $(".tab-item").on("click", function () {--}}
+{{--                    // Remove 'active' class from all tabs and panes--}}
+{{--                    $(".tab-item").removeClass("active");--}}
+{{--                    $(".tab-pane").removeClass("active");--}}
 
-                    $(this).addClass("active");
+{{--                    $(this).addClass("active");--}}
 
-                    const targetPane = $(this).data("tab");
-                    $("#" + targetPane).addClass("active");
-                });
-            });
+{{--                    const targetPane = $(this).data("tab");--}}
+{{--                    $("#" + targetPane).addClass("active");--}}
+{{--                });--}}
+{{--            });--}}
 
-        </script>
+{{--        </script>--}}
     @endpush
 @endsection
