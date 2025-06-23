@@ -254,6 +254,9 @@
             div.dt-container div.dt-paging {
                 padding: 0px 10px 0 0;
             }
+            .dsh_btn {
+                display: flex;
+            }
 
             /* DATATABLE */
         </style>
@@ -262,13 +265,16 @@
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                <h1 class="page-title mb-2 all-data">Stats Dashboard</h1>
+                 <div class="dsh_btn">
+                     <h1 class="page-title mb-2 all-data">Stats Dashboard</h1>
+                     <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard2"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+
+                 </div>
                 {{--                <h2 class="h5">Welcome to the Stats Dashboard.</h2>--}}
                 <p>Welcome to the Stats Dashboard.</p>
                 {{--                <!-- END : Page title and information -->--}}
 
 
-                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard2"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
 
             </div>
         </div>

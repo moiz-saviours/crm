@@ -60,17 +60,23 @@
                 background-color: #fff;
                 color: #000 !important;
             }
+            .dsh_btn {
+                display: flex;
+            }
         </style>
     @endif
     <section id="content" class="content">
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                <h1 class="page-title mb-2">Dashboard</h1>
+               <div class="dsh_btn">
+                   <h1 class="page-title mb-2">Dashboard</h1>
+                   <button class="start-tour-btn my-btn tour-userdashboard-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="user_dashboard"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+
+               </div>
                 <h2 class="h5">Welcome to the CRM Dashboard.</h2>
 
-                <button class="start-tour-btn my-btn tour-userdashboard-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="user_dashboard"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
-                <!-- END : Page title and information -->
+                 <!-- END : Page title and information -->
             </div>
         </div>
         @if(strtolower(optional(auth()->user()->department)->name) == "sales")
