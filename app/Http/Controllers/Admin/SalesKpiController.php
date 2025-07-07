@@ -172,7 +172,7 @@ class SalesKpiController extends Controller
         array  $timePeriods
     ): array
     {
-        $target = $user->target;
+        $target = $user->target??0;
         // Main invoice calculations
         $invoices = $this->getUserInvoices($user->id, $startDate, $endDate, $teamKey, $brandKey);
         $achieved = $invoices->sum('total_amount');
