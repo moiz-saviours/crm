@@ -100,4 +100,17 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Position::class, 'position_id');
     }
+
+    /**
+     * Get the user's preferred locale.
+     */
+    public function preferredLocale(): string
+    {
+        return $this->locale;
+    }
+
+    public function scopeDepartment($query,$department)
+    {
+        return $query->whereHas('department', fn($q) => $q->where('name', $department));
+    }
 }
