@@ -23,6 +23,12 @@
 <script src="{{asset('assets/js/plugins/datatable/new/datatables.min.js')}}"></script>
 {{--<script type="text/javascript" charset="utf-8"--}}
 {{--        src="https://cdn.datatables.net/1.10.25/extensions/Editor/js/dataTables.editor.min.js"></script>--}}
+
+{{-- Select Checkbox--}}
+<script src="{{asset('assets/js/plugins/datatable/new/dataTables.select.js')}}"></script>
+<script src="{{asset('assets/js/plugins/datatable/new/select.dataTables.js')}}"></script>
+
+
 <!-- New -->
 
 <!-- SweetAlert2 -->
@@ -369,7 +375,6 @@
     /** Loader End */
 
     $(document).ajaxStart(function () {
-        randomLoader = randomLoaderFunction();
         $(`#loader`).show();
         $(`#loader`).addClass('loader-light');
         $(`.${randomLoader}`).removeClass('load-spinner');
