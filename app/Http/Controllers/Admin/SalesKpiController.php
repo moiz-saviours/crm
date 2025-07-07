@@ -105,7 +105,7 @@ class SalesKpiController extends Controller
             $teamsCommissionData = $this->calculateTeamsCommission($user, $startDate, $endDate, $teamKey, $brandKey);
             $timePeriods = $this->prepareTimePeriods($startDate, $endDate);
             // Wire commission
-            $wirePayments = $this->calculateWirePayments($user, $startDate, $endDate, $timePeriods, $teamKey, $brandKey, $target);
+            $wirePayments = $this->calculateWirePayments($user, $startDate, $endDate, $timePeriods, $teamKey, $brandKey, $target??0.00);
             $bonusTiers = $this->calculateTieredBonus($achieved, $target, $percentage);
             $data[] = [
                 'id' => $user->id,
