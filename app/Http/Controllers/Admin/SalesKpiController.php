@@ -246,7 +246,7 @@ class SalesKpiController extends Controller
         array  $timePeriods,
         string $teamKey,
         string $brandKey,
-        float  $target
+        float  $target = 0
     ): array
     {
         return [
