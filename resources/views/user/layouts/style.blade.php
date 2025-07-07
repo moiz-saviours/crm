@@ -448,7 +448,7 @@ Detailed information and more samples can be found in the documentation.
     }
 
     .dt-buttons .btn.btn-secondary {
-        /*padding: 6px 9px;*/
+        padding: 6px 9px;
         background-color: #fff;
     }
 
@@ -462,7 +462,7 @@ Detailed information and more samples can be found in the documentation.
     }
 
     .dt-buttons .btn.btn-secondary span:hover {
-        color: #fff;
+        color: var(--bs-primary);
     }
 
     span.dt-column-title {
@@ -567,8 +567,36 @@ Detailed information and more samples can be found in the documentation.
     .table a:hover {
         text-decoration: underline;
     }
-</style>
-<style>
+    .table th.move-col {
+        position: relative;
+        padding-left: 5px!important;
+        transition: background-color 0.2s ease;
+    }
+
+    .table th.move-col::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        background-image: url('{{asset('assets/images/dott-to-move-col.png')}}');
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0;
+        transition: all 0.2s ease;
+    }
+
+    .table th.move-col:hover::before {
+        opacity: 0.7;
+        left: 3px;
+    }
+
+    .table th.move-col:active::before {
+        opacity: 1;
+        transform: translateY(-50%) scale(1.1);
+    }
     table object.avatar.avatar-sm.me-3 {
         max-width: 50px;
         max-height: 50px;
@@ -632,5 +660,63 @@ Detailed information and more samples can be found in the documentation.
 
     .form-check-input[type=checkbox]:checked::after {
         display: block;
+    }
+    .dropdown-menu.dt-button-collection {
+        display: block !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+        visibility: visible !important;
+        position: absolute !important;
+        animation: none !important;
+        transition: none !important;
+        border: none;
+        z-index: 12;
+    }
+
+    .mainnav .dropdown-menu:not(.dt-button-collection) {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+        transform: scale(0);
+    }
+
+    .dropdown-item:focus, .dropdown-item:hover {
+        color: var(--bs-primary-color);
+        background-color: var(--bs-primary);
+    }
+
+    div.dt-button-background {
+        position: absolute !important;
+        z-index: 11 !important;;
+    }
+
+    div.dt-button-background {
+        background: radial-gradient(ellipse farthest-corner at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.15) 100%) !important;
+        border-radius: inherit;
+    }
+    table.dataTable input.dt-select-checkbox {
+        border: none !important;
+    }
+    th.select-checkbox.dt-select.dt-orderable-none .dt-select-checkbox {
+        border: 1px solid !important;
+    }
+    table.dataTable>tbody>tr.selected>td.select-checkbox:before, table.dataTable>tbody>tr.selected>th.select-checkbox:before {
+        content: ""!important;
+    }
+
+    .dt-scroll-head table.dataTable.table-bordered th {
+        border-top-width: 1px;
+        border-top-color: var(--bs-secondary);
+        border-bottom-width: 1px !important;
+        border-bottom-color: var(--bs-secondary);
+    }
+    .dt-scroll-head table.dataTable.table-bordered tr:not(:first-child) th {
+        border-top-width: 0 !important;
+    }
+
+    .dt-scroll-body table.dataTable.table-bordered td {
+        border-top-width: 1px !important;
+        border-top-color: var(--bs-secondary);
     }
 </style>
