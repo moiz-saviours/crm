@@ -93,7 +93,7 @@ class SalesKpiController extends Controller
                 })
                 ->get();
             $achieved = $invoices->sum('total_amount');
-            $target = $user->target;
+            $target = $user->target??0.00;
             $percentage = $target > 0 ? round(($achieved / $target) * 100, 2) : 0;
             $upToTarget = min($achieved, $target);
             $aboveTarget = max(0, $achieved - $target);
@@ -246,7 +246,7 @@ class SalesKpiController extends Controller
         array  $timePeriods,
         string $teamKey,
         string $brandKey,
-        float  $target = 0.00
+        float  $target
     ): array
     {
         return [
