@@ -21,7 +21,7 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     SettingController as AdminSettingController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController,
-SalesKpiController as AdminSalesKpiController,
+    SalesKpiController as AdminSalesKpiController,
 };
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
@@ -234,6 +234,13 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::delete('/delete/{invoice?}', [AdminInvoiceController::class, 'delete'])->name('delete');
             Route::get('/payment-proofs', [AdminInvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
         });
+    });
+    /** Sales Routes */
+    Route::name('sales.')->prefix('sales')->group(function () {
+        Route::get('/sales-kpi', [AdminSalesKpiController::class, 'index'])->name('kpi');
+        Route::get('/sales-kpi-2', [AdminSalesKpiController::class, 'index_2'])->name('kpi.2');
+        Route::get('/sales-kpi-update', [AdminSalesKpiController::class, 'index_update'])->name('kpi.update');
+        Route::get('/sales-kpi-update-2', [AdminSalesKpiController::class, 'index_update_2'])->name('kpi.update.2');
     });
     /** Contacts Routes */
     Route::name('customer.')->group(function () {

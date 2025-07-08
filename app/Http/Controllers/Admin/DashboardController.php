@@ -36,10 +36,10 @@ class DashboardController extends Controller
         $activeUsers = User::where('last_seen', '>=', $activeTime)->get();
         $freshInvoices = Invoice::whereMonth('created_at', $this->currentMonth)
             ->whereYear('created_at', $this->currentYear)
-            ->where('type', 0)->where('status',1)->get();
+            ->where('type', 0)->where('status', 1)->get();
         $upsaleInvoices = Invoice::whereMonth('created_at', $this->currentMonth)
             ->whereYear('created_at', $this->currentYear)
-            ->where('type', 1)->where('status',1)->get();
+            ->where('type', 1)->where('status', 1)->get();
         $adminProgress = $totalAdmins > 0 && count($activeAdmins) > 0 ? (count($activeAdmins) / $totalAdmins) * 100 : 0;
         $userProgress = $totalUsers > 0 && count($activeUsers) > 0 ? (count($activeUsers) / $totalUsers) * 100 : 0;
         $freshInvoiceProgress = (count($freshInvoices) + count($upsaleInvoices)) > 0 ? (count($freshInvoices) / (count($freshInvoices) + count($upsaleInvoices))) * 100 : 0;
@@ -151,8 +151,8 @@ class DashboardController extends Controller
     public function index_2_update_stats(Request $request)
     {
         try {
-            $startDate = $request->input('start_date');
-            $endDate = $request->input('end_date');
+            $startDate = \Carbon\Carbon::parse($request->input('start_date'));
+            $endDate = Carbon::parse($request->input('end_date'));
             $teamKey = $request->input('team_key', 'all');
             $brandKey = $request->input('brand_key', 'all');
             if ($startDate > $endDate) {
@@ -196,7 +196,7 @@ class DashboardController extends Controller
                 $previousMtdEndDate = date('Y-m-d', strtotime($mtdEndDate . ' -1 month'));
                 $previousMtdSales = Invoice::where('status', Invoice::STATUS_PAID)
 //                    ->whereBetween('created_at', [$previousMtdStartDate, $previousMtdEndDate])
-                    ->whereHas('payment', function($query) use ($previousMtdStartDate, $previousMtdEndDate) {
+                    ->whereHas('payment', function ($query) use ($previousMtdStartDate, $previousMtdEndDate) {
                         $query->whereBetween('payment_date', [$previousMtdStartDate, $previousMtdEndDate]);
                     })
                     ->when($teamKey != 'all', function ($query) use ($teamKey) {
@@ -226,7 +226,7 @@ class DashboardController extends Controller
                 ->get()->map(function ($employee) use ($startDate, $endDate, $teamKey, $brandKey) {
                     $employee->sales = Invoice::where('status', Invoice::STATUS_PAID)->where('agent_id', $employee->id)
 //                        ->whereBetween('created_at', [$startDate, $endDate])
-                        ->whereHas('payment', function($query) use ($startDate, $endDate) {
+                        ->whereHas('payment', function ($query) use ($startDate, $endDate) {
                             $query->whereBetween('payment_date', [$startDate, $endDate]);
                         })
                         ->when($teamKey != 'all', function ($query) use ($teamKey) {
@@ -240,7 +240,7 @@ class DashboardController extends Controller
                 });
             $totalSales = Invoice::where('status', Invoice::STATUS_PAID)
 //                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function($query) use ($startDate, $endDate) {
+                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('payment_date', [$startDate, $endDate]);
                 })
                 ->when($teamKey != 'all', function ($query) use ($teamKey) {
@@ -253,7 +253,7 @@ class DashboardController extends Controller
             $totalUpSales = Invoice::where('status', Invoice::STATUS_PAID)
                 ->where('type', 1)
 //                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function($query) use ($startDate, $endDate) {
+                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('payment_date', [$startDate, $endDate]);
                 })
                 ->when($teamKey != 'all', function ($query) use ($teamKey) {
@@ -265,7 +265,7 @@ class DashboardController extends Controller
                 ->sum('total_amount');
             $refunded = Invoice::where('status', Invoice::STATUS_REFUNDED)
 //                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function($query) use ($startDate, $endDate) {
+                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('payment_date', [$startDate, $endDate]);
                 })
                 ->when($teamKey != 'all', function ($query) use ($teamKey) {
@@ -277,7 +277,7 @@ class DashboardController extends Controller
                 ->sum('total_amount');
             $chargeBack = Invoice::where('status', Invoice::STATUS_CHARGEBACK)
 //                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function($query) use ($startDate, $endDate) {
+                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('payment_date', [$startDate, $endDate]);
                 })
                 ->when($teamKey != 'all', function ($query) use ($teamKey) {
@@ -301,7 +301,7 @@ class DashboardController extends Controller
                 foreach ($teams as $team) {
                     $team_achieved = Invoice::where('status', Invoice::STATUS_PAID)
 //                        ->whereBetween('created_at', [$startDate, $endDate])
-                        ->whereHas('payment', function($query) use ($startDate, $endDate) {
+                        ->whereHas('payment', function ($query) use ($startDate, $endDate) {
                             $query->whereBetween('payment_date', [$startDate, $endDate]);
                         })
                         ->where('team_key', $team->team_key)
@@ -313,8 +313,6 @@ class DashboardController extends Controller
 //                    if ($team_target) {
 //                        $total_target += $team_target->target_amount;
 //                    }
-
-
 //                    $team_targets[] = [
 //                        'team_key' => $team->team_key,
 //                        'team_name' => $team->name,
@@ -334,8 +332,8 @@ class DashboardController extends Controller
                     $team_targets[] = [
                         'team_key' => $team->team_key,
                         'team_name' => $team->name,
-                        'target_amount' => (float) $team_employee_targets,
-                        'achieved' => (float) $team_achieved,
+                        'target_amount' => (float)$team_employee_targets,
+                        'achieved' => (float)$team_achieved,
                         'achieved_percentage' => ($team_employee_targets > 0)
                             ? round(($team_achieved / $team_employee_targets) * 100, 2)
                             : 0,
@@ -365,7 +363,7 @@ class DashboardController extends Controller
         } catch
         (\Exception $e) {
             Log::error("Error fetching total sales: " . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'An error occurred while fetching data', 'error' => $e->getMessage(),'line' => $e->getLine()], 500);
+            return response()->json(['success' => false, 'message' => 'An error occurred while fetching data', 'error' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
 

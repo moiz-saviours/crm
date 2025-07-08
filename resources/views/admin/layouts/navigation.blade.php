@@ -71,7 +71,7 @@
                 <ul class="mainnav__menu nav flex-column">
                     <!-- Link with submenu -->
                     <li class="nav-item has-sub">
-                        <a class="mininav-toggle nav-link collapsed "><i
+                        <a class="mininav-toggle nav-link collapsed {{ request()->is('admin/dashboard*') ? 'active' : '' }}"><i
                                 class="demo-pli-home fs-5 me-2"></i>
                             <span class="nav-label ms-1">Dashboard</span>
                         </a>
@@ -80,12 +80,12 @@
                             <li data-popper-arrow class="arrow"></li>
                             <li class="nav-item">
                                 <a href="{{route('admin.dashboard')}}"
-                                   class="nav-link {{ request()->is('admin/dashboard*') ? 'active' : '' }}">Dashboard
+                                   class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">Dashboard
                                     1</a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{route('admin.dashboard.2')}}"
-                                   class="nav-link {{ request()->is('admin/dashboard-2*') ? 'active' : '' }}">Dashboard
+                                   class="nav-link {{ request()->is('admin/dashboard-2') ? 'active' : '' }}">Dashboard
                                     2</a>
                             </li>
                         </ul>
@@ -186,11 +186,15 @@
                             <li data-popper-arrow class="arrow"></li>
                             <div class="navigate-heading">
                                 <i class="demo-pli-address-book"></i>
-                                <h3>Slaes Kpi</h3>
+                                <h3>Sales Kpi</h3>
                             </div>
                             <li class="nav-item">
                                 <a href="{{route('admin.sales.kpi')}}"
-                                   class="nav-link {{ request()->is('admin/sales/sales-kpi*') ? 'active' : '' }}">Sales Kpi</a>
+                                   class="nav-link {{ request()->is('admin/sales/sales-kpi') ? 'active' : '' }}">Sales Kpi</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{route('admin.sales.kpi.2')}}"
+                                   class="nav-link {{ request()->is('admin/sales/sales-kpi-2') ? 'active' : '' }}">Sales Kpi 2</a>
                             </li>
 
 

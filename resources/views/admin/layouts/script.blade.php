@@ -14,6 +14,8 @@
 <!-- New -->
 {{--https://cdn.datatables.net/v/bs4/jszip-3.10.1/dt-2.1.8/b-3.2.0/b-colvis-3.2.0/b-html5-3.2.0/b-print-3.2.0/cr-2.0.4/date-1.5.4/fc-5.0.4/fh-4.0.1/sc-2.4.3/sp-2.3.3/sl-2.1.0/datatables.min.css--}}
 <link href="{{asset('assets/css/datatable/new/datatables.min.css')}}" rel="stylesheet">
+{{--<link href="https://cdn.datatables.net/buttons/3.2.3/css/buttons.dataTables.css" rel="stylesheet">--}}
+
 {{--https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js--}}
 <script src="{{asset('assets/js/plugins/datatable/new/pdfmake.min.js')}}"></script>
 {{--https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js--}}
@@ -22,6 +24,11 @@
 <script src="{{asset('assets/js/plugins/datatable/new/datatables.min.js')}}"></script>
 {{--<script type="text/javascript" charset="utf-8"--}}
 {{--        src="https://cdn.datatables.net/1.10.25/extensions/Editor/js/dataTables.editor.min.js"></script>--}}
+
+{{-- Select Checkbox--}}
+<script src="{{asset('assets/js/plugins/datatable/new/dataTables.select.js')}}"></script>
+<script src="{{asset('assets/js/plugins/datatable/new/select.dataTables.js')}}"></script>
+
 <!-- New -->
 
 <!-- SweetAlert2 -->
@@ -319,7 +326,7 @@
             .then(response => {
                 console.log('Settings updated successfully:', response);
             })
-            .catch(error => console.error('An error occurred while updating the record.',error));
+            .catch(error => console.error('An error occurred while updating the record.', error));
 
     });
     function flattenObject(obj, parentKey = '', formData = new FormData()) {
@@ -369,7 +376,6 @@
     /** Loader End */
 
     $(document).ajaxStart(function () {
-        randomLoader = randomLoaderFunction();
         $(`#loader`).show();
         $(`#loader`).addClass('loader-light');
         $(`.${randomLoader}`).removeClass('load-spinner');
