@@ -476,8 +476,8 @@
 
                             html += '<div class="team-member mb-4">' +
                                 '<h6>' + team.name + ' (' +
-                                formatCurrency(team.target, '$') + ' / ' +
-                                formatCurrency(team.achieved, '$') + ' = ' +
+                                'A ' + formatCurrency(team.achieved, '$') + ' / ' +
+                                'T ' + formatCurrency(team.target, '$') + ' = ' +
                                 team.percentage.toFixed(2) + '%)</h6>' + '<table class="table table-sm table-bordered mb-2">' +
                                 '<thead class="thead-light">' +
                                 '<tr>' +
