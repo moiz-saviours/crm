@@ -13,7 +13,7 @@ use App\Http\Requests\Admin\LoginRequest as AdminLoginRequest;
 
 class TwoFactorController extends Controller
 {
-    protected $twoFactorService;
+    protected TwoFactorService $twoFactorService;
 
     public function __construct(TwoFactorService $twoFactorService)
     {
