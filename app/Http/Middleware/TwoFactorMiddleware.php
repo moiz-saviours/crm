@@ -59,7 +59,7 @@ class TwoFactorMiddleware
     protected function handleTwoFactorRoute(Request $request, string $guard, Closure $next): Response
     {
         if (session($guard . '_2fa_verified')) {
-            $dashboardRoute = $guard === 'web' ? 'dashboard' : $guard . '.dashboard';
+            $dashboardRoute = $guard === 'web' ? 'user.dashboard' : $guard . '.dashboard';
             return redirect()->route($dashboardRoute);
         }
         return $next($request);
