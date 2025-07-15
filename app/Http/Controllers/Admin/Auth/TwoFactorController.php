@@ -22,19 +22,10 @@ class TwoFactorController extends Controller
 
     public function show(Request $request)
     {
-        $credentials = $request->session()->get('admin_login_credentials');
-        if (!$credentials) {
-            return redirect()->route('admin.login')->withErrors([
-                'email' => __('auth.session_expired')
-            ]);
-        }
-        $user = Auth::guard('admin')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('admin')->user();
         if (!$user) {
             return redirect()->route('admin.login')->withErrors([
-                'email' => __('auth.failed')
+                'email' => __('auth.session_expired')
             ]);
         }
         return view('admin.auth.two-factor', compact('user'));
@@ -48,28 +39,11 @@ class TwoFactorController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $credentials = $request->session()->get('admin_login_credentials');
-        if (!$request->has('email') || !Admin::where('email', $request->get('email'))->whereStatus(1)->exists() || $credentials['email'] != $request->get('email')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials.'
-            ], 401);
-        }
-        if (!$credentials) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired'
-            ], 401);
-        }
-        $user = Auth::guard('admin')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('admin')->user();
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
+            return redirect()->route('admin.login')->withErrors([
+                'email' => __('auth.session_expired')
+            ]);
         }
         $method = $request->get('method');
         if ($method === 'sms' && !$user->phone_number) {
@@ -116,19 +90,10 @@ class TwoFactorController extends Controller
 
     public function verifyShow(Request $request)
     {
-        $credentials = $request->session()->get('admin_login_credentials');
-        if (!$credentials) {
-            return redirect()->route('admin.login')->withErrors([
-                'email' => __('auth.session_expired')
-            ]);
-        }
-        $user = Auth::guard('admin')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('admin')->user();
         if (!$user) {
             return redirect()->route('admin.login')->withErrors([
-                'email' => __('auth.failed')
+                'email' => __('auth.session_expired')
             ]);
         }
         $lastCode = VerificationCode::where('morph_id', $user->id)
@@ -154,19 +119,10 @@ class TwoFactorController extends Controller
         $request->validate([
             'code' => 'required|size:6'
         ]);
-        $credentials = $request->session()->get('admin_login_credentials');
-        if (!$credentials) {
-            return redirect()->route('admin.login')->withErrors([
-                'email' => __('auth.session_expired')
-            ]);
-        }
-        $user = Auth::guard('admin')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('admin')->user();
         if (!$user) {
             return redirect()->route('admin.login')->withErrors([
-                'email' => __('auth.failed')
+                'email' => __('auth.session_expired')
             ]);
         }
         $code = $request->get('code');
@@ -180,15 +136,11 @@ class TwoFactorController extends Controller
         }
         if ($this->twoFactorService->verifyCode($user, $code, $lastCode->method)) {
             $request->session()->put('admin_2fa_verified', true);
-            $request->session()->forget('admin_login_credentials');
-            $loginRequest = AdminLoginRequest::createFrom($request);
-            $loginRequest->merge([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'remember' => $credentials['remember']
-            ]);
-            $loginRequest->authenticate();
-            $loginRequest->session()->regenerate();
+            if (!session()->has('session_removing')) {
+                $request->session()->put('session_removing', 1);
+            } else {
+                $request->session()->put('session_removing', session()->get('session_removing') + 1);
+            }
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
         return back()->withErrors(['code' => 'Invalid verification code']);
