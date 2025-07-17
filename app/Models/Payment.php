@@ -11,6 +11,10 @@ class Payment extends Model
 {
     use Notifiable, SoftDeletes, ActivityLoggable;
 
+    const STATUS_DUE = 0;
+    const STATUS_PAID = 1;
+    const STATUS_REFUNDED = 2;
+    const STATUS_CHARGEBACK = 3;
     protected $table = 'payments';
     protected $primaryKey = 'id';
     /**
@@ -43,7 +47,6 @@ class Payment extends Model
         'status',
         'payment_environment',
     ];
-
     protected $casts = [
         'payment_date' => 'date:Y-m-d',
     ];
