@@ -265,17 +265,12 @@
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                 <div class="dsh_btn">
-                     <h1 class="page-title mb-2 all-data">Stats Dashboard</h1>
-                     <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard2"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
-
-                 </div>
+                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour"
+                        data-tour="dashboard2"><i class="fas fa-exclamation-circle custom-dot"></i></button>
+                <h1 class="page-title mb-2 all-data">Stats Dashboard</h1>
                 {{--                <h2 class="h5">Welcome to the Stats Dashboard.</h2>--}}
                 <p>Welcome to the Stats Dashboard.</p>
                 {{--                <!-- END : Page title and information -->--}}
-
-
-
             </div>
         </div>
         <div class="content__boxed">
@@ -306,6 +301,46 @@
                                         @foreach($brands as $brand)
                                             <option value="{{ $brand->brand_key }}">{{ $brand->name }}</option>
                                         @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group tour-timezone-select">
+                                    <label for="timeZoneSelect">Select TimeZone:</label>
+                                    <select id="timeZoneSelect" name="timeZoneSelect" class="form-control">
+                                        <!-- UTC/GMT -->
+                                        <option value="UTC" selected>UTC (Coordinated Universal Time)</option>
+                                        <option value="GMT">GMT (Greenwich Mean Time)</option>
+
+                                        <!-- United States Timezones -->
+                                        <optgroup label="United States">
+                                            <!-- Eastern Time -->
+                                            <option value="America/New_York">Eastern Time (ET) - New York</option>
+                                            <option value="America/Detroit">Eastern Time (ET) - Detroit</option>
+
+                                            <!-- Central Time -->
+                                            <option value="America/Chicago">Central Time (CT) - Chicago</option>
+                                            <option value="America/Mexico_City">Central Time (CT) - Mexico City</option>
+
+                                            <!-- Mountain Time -->
+                                            <option value="America/Denver">Mountain Time (MT) - Denver</option>
+                                            <option value="America/Phoenix">Mountain Time (MT - No DST) - Phoenix</option>
+
+                                            <!-- Pacific Time -->
+                                            <option value="America/Los_Angeles">Pacific Time (PT) - Los Angeles</option>
+                                            <option value="America/Tijuana">Pacific Time (PT) - Tijuana</option>
+
+                                            <!-- Other US Zones -->
+                                            <option value="America/Anchorage">Alaska Time (AKT) - Anchorage</option>
+                                            <option value="Pacific/Honolulu">Hawaii Time (HST) - Honolulu</option>
+                                        </optgroup>
+
+                                        <!-- United Kingdom Timezones -->
+                                        <optgroup label="United Kingdom">
+                                            <option value="Europe/London">London (GMT/BST)</option>
+                                            <option value="Europe/Belfast">Belfast (GMT/BST)</option>
+                                            <option value="Europe/Guernsey">Guernsey (GMT/BST)</option>
+                                            <option value="Europe/Isle_of_Man">Isle of Man (GMT/BST)</option>
+                                            <option value="Europe/Jersey">Jersey (GMT/BST)</option>
+                                        </optgroup>
                                     </select>
                                 </div>
                                 <div class="form-group tour-date-select">
@@ -723,60 +758,97 @@
                     return datatable;
                 }
                 $('#dateRangePicker').daterangepicker({
+                    timePicker: true,
+                    timePicker24Hour: false,
+                    timePickerIncrement: 1,
                     locale: {
-                        format: 'YYYY-MM-DD'
+                        format: 'YYYY-MM-DD h:mm:ss A',
                     },
-                    startDate: moment().startOf('month'), // Default start date (beginning of current month)
-                    endDate: moment().endOf('month'), // Default end date (end of current month)
+                    startDate: moment().startOf('month').startOf('day'),    // First moment of first day of month
+                    endDate: moment().endOf('month').endOf('day'),         // Last moment of last day of month
                     ranges: {
-                        'Today': [moment(), moment()],
-                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                        'This Month': [moment().startOf('month'), moment().endOf('month')],
-                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                        'Current Quarter': [moment().startOf('quarter'), moment().endOf('quarter')],
-                        'Last Quarter': [moment().subtract(1, 'quarter').startOf('quarter'), moment().subtract(1, 'quarter').endOf('quarter')],
-                        'This Year': [moment().startOf('year'), moment()],
-                        'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
+                        'Today': [
+                            moment().startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})  // 11:59:59 PM
+                        ],
+                        'Yesterday': [
+                            moment().subtract(1, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().subtract(1, 'days').endOf('day').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                        ],
+                        'Last 7 Days': [
+                            moment().subtract(6, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})                       // 11:59:59 PM
+                        ],
+                        'Last 30 Days': [
+                            moment().subtract(29, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})                        // 11:59:59 PM
+                        ],
+                        'This Month': [
+                            moment().startOf('month').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().endOf('month').set({hour: 23, minute: 59, second: 59})  // 11:59:59 PM
+                        ],
+                        'Last Month': [
+                            moment().subtract(1, 'month').startOf('month').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().subtract(1, 'month').endOf('month').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                        ],
+                        'Current Quarter': [
+                            moment().startOf('quarter').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().endOf('quarter').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                        ],
+                        'Last Quarter': [
+                            moment().subtract(1, 'quarter').startOf('quarter').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().subtract(1, 'quarter').endOf('quarter').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                        ],
+                        'This Year': [
+                            moment().startOf('year').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})    // 11:59:59 PM
+                        ],
+                        'Last Year': [
+                            moment().subtract(1, 'year').startOf('year').set({hour: 0, minute: 0}), // 12:00 AM
+                            moment().subtract(1, 'year').endOf('year').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                        ],
                     }
                 });
 
-                const startDate = moment().startOf('month').format('YYYY-MM-DD');
-                const endDate = moment().endOf('month').format('YYYY-MM-DD');
+                const startDate = moment().startOf('month').format('YYYY-MM-DD h:mm:ss A');
+                const endDate = moment().endOf('month').format('YYYY-MM-DD h:mm:ss A');
+                const timeZoneSelect = $('#timeZoneSelect').val();
                 const teamKey = 'all';
                 const brandKey = 'all';
 
-                fetchData(startDate, endDate, teamKey, brandKey);
+                fetchData(startDate, endDate, timeZoneSelect, teamKey, brandKey);
 
                 // Listen to 'apply' event and send the selected date range
                 // $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
                 //     var startDate = picker.startDate.format('YYYY-MM-DD');
                 //     var endDate = picker.endDate.format('YYYY-MM-DD');
-                //     fetchData(startDate, endDate, teamKey, brandKey);
+                //     const timeZoneSelect = $('#timeZoneSelect').val();
+                //     fetchData(startDate, endDate,timeZoneSelect, teamKey, brandKey);
                 // });
 
                 // Listen to 'cancel' event and clear the date range
                 $('#dateRangePicker').on('cancel.daterangepicker', function () {
-                    fetchData('', '', '', '');
+                    fetchData('', '', '', '', '');
                 });
 
-                $('#dateRangePicker, #teamSelect, #brandSelect').on('change', function () {
-                    const startDate = $('#dateRangePicker').data('daterangepicker').startDate.format('YYYY-MM-DD');
-                    const endDate = $('#dateRangePicker').data('daterangepicker').endDate.format('YYYY-MM-DD');
+                $('#dateRangePicker,#timeZoneSelect, #teamSelect, #brandSelect').on('change', function () {
+                    const startDate = $('#dateRangePicker').data('daterangepicker').startDate.format('YYYY-MM-DD h:mm:ss A');
+                    const endDate = $('#dateRangePicker').data('daterangepicker').endDate.format('YYYY-MM-DD h:mm:ss A');
                     const teamKey = $('#teamSelect').val();
                     const brandKey = $('#brandSelect').val();
-                    fetchData(startDate, endDate, teamKey, brandKey);
+                    const timeZoneSelect = $('#timeZoneSelect').val();
+                    fetchData(startDate, endDate, timeZoneSelect, teamKey, brandKey);
                 });
 
                 // Function to send AJAX request with date range
-                function fetchData(startDate, endDate, teamKey, brandKey) {
+                function fetchData(startDate, endDate, timeZoneSelect = "UTC", teamKey = 'all', brandKey = 'all') {
                     let url = `{{ route("admin.dashboard.2.update.stats") }}`;
                     if (startDate && endDate && teamKey) {
                         let table = dataTables[0];
                         AjaxRequestPromise(url, {
                             start_date: startDate,
                             end_date: endDate,
+                            timeZoneSelect: timeZoneSelect,
                             team_key: teamKey,
                             brand_key: brandKey
                         }, 'GET')
@@ -826,12 +898,30 @@
                                         "July", "August", "September", "October", "November", "December"
                                     ];
 
-                                    response.team_targets.forEach(target => {
+                                    const allTargets = [];
+
+                                    for (const teamKey in response.team_targets) {
+                                        const yearData = response.team_targets[teamKey];
+                                        for (const year in yearData) {
+                                            const monthData = yearData[year];
+                                            for (const month in monthData) {
+                                                allTargets.push(monthData[month]);
+                                            }
+                                        }
+                                    }
+
+                                    allTargets.sort((a, b) => {
+                                        const dateA = new Date(a.year, a.month - 1); // JS months are 0-based
+                                        const dateB = new Date(b.year, b.month - 1);
+                                        return dateB.getTime() - dateA.getTime();
+                                    });
+
+                                    allTargets.forEach(target => {
                                         teams_table.row.add($(`
                                             <tr>
                                                 <td>${target.team_name}</td>
-                                                <td>${monthNames[target.month - 1] || ""} ${target.year ?? "N/A"}</td>
-                                                <td>$${target.target_amount.toLocaleString()}</td>
+                                                <td>${monthNames[target.month - 1] || ""} ${target.year ?? "---"}</td>
+                                                <td>$${target.target_amount.toFixed(2).toLocaleString()}</td>
                                                 <td>$${target.achieved.toLocaleString()}</td>
                                                 <td>${target.achieved_percentage}%</td>
                                             </tr>

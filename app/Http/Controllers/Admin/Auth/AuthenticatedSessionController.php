@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LoginRequest as AdminLoginRequest;
+use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -29,32 +31,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(AdminLoginRequest $request): RedirectResponse
     {
-        if ($reauthUserId = session('admin_reauth_user_id')) {
-            $user = Auth::guard('admin')->getProvider()->retrieveById($reauthUserId);
-            if ($user) {
-                session()->put('admin_login_credentials', [
-                    'email' => $user->email,
-                    'password' => 'placeholder', // Actual password not needed here
-                    'remember' => false
-                ]);
-                session()->forget('admin_reauth_user_id');
-                return redirect()->route('admin.2fa.show');
-            }
-        }
-        if (!Auth::guard('admin')->validate($request->only('email', 'password'))) {
-            return back()->withErrors(['email' => __('auth.failed'),]);
-        }
-        $request->session()->put('admin_login_credentials', [
-            'email' => $request->email,
-            'password' => $request->password,
-            'remember' => $request->filled('remember')
-        ]);
-
-        return redirect()->route('admin.2fa.show');
-//
-//        $request->authenticate();
-//        $request->session()->regenerate();
-//        return redirect()->intended(route('admin.dashboard', absolute: false));
+        $request->authenticate();
+        $request->session()->regenerate();
+        return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 
     /**
@@ -62,15 +41,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $userId = Auth::guard('admin')->id();
         Auth::guard('admin')->logout();
-
         /** It will destroy every user session */
 //        $request->session()->invalidate();
         $request->session()->regenerateToken();
-        session()->forget('admin_2fa_verified');
-
+        session()->put('admin_2fa_verified', false);
+        if ($userId) {
+            Cache::forget("admin_2fa_verified:{$userId}");
+        }
         return redirect(route('admin.login'));
     }
+
     protected function guard()
     {
         return Auth::guard('admin');

@@ -93,7 +93,7 @@ class SalesKpiController extends Controller
                 })
                 ->get();
             $achieved = $invoices->sum('total_amount');
-            $target = $user->target??0;
+            $target = $user->target ?? 0;
             $percentage = $target > 0 ? round(($achieved / $target) * 100, 2) : 0;
             $upToTarget = min($achieved, $target);
             $aboveTarget = max(0, $achieved - $target);
@@ -172,7 +172,7 @@ class SalesKpiController extends Controller
         array  $timePeriods
     ): array
     {
-        $target = $user->target??0;
+        $target = $user->target ?? 0;
         // Main invoice calculations
         $invoices = $this->getUserInvoices($user->id, $startDate, $endDate, $teamKey, $brandKey);
         $achieved = $invoices->sum('total_amount');
@@ -379,6 +379,9 @@ class SalesKpiController extends Controller
                         'amount' => $teamCommission,
                     ]
                 ];
+                /**
+                 * Above Team Target Spiff above CommissionRates::LEAD_BONUS % will be 3x
+                 */
                 if ($isLead && $teamPercentage > CommissionRates::LEAD_BONUS) {
                     $leadBonus = $teamAboveTarget * 3;
                     $teams[$team->team_key]['lead_bonus'] = $leadBonus;
@@ -465,12 +468,12 @@ class SalesKpiController extends Controller
     {
         $tier1 = $tier2 = $tier3 = 0;
         $percentage -= 100;
-        if ($percentage >= CommissionRates::BONUS_TIERS['3x']) {
-            $tier3 = max(0, $achieved - ($target * 3.5)) * 3;
-        } else if ($percentage >= CommissionRates::BONUS_TIERS['2_5x']) {
-            $tier2 = max(0, $achieved - ($target * 3)) * 2.5;
-        } else if ($percentage >= CommissionRates::BONUS_TIERS['2x']) {
-            $tier1 = max(0, $achieved - ($target * 2.5)) * 2;
+        if ($percentage > CommissionRates::BONUS_TIERS['3x']) {
+            $tier3 = max(0, $achieved - ($target * (CommissionRates::BONUS_TIERS['3x'] + 100) / 100)) * 3;
+        } else if ($percentage > CommissionRates::BONUS_TIERS['2_5x']) {
+            $tier2 = max(0, $achieved - ($target * (CommissionRates::BONUS_TIERS['2_5x'] + 100) / 100)) * 2.5;
+        } else if ($percentage > CommissionRates::BONUS_TIERS['2x']) {
+            $tier1 = max(0, $achieved - ($target * (CommissionRates::BONUS_TIERS['2x'] + 100) / 100)) * 2;
         }
         return [
             'tier1' => $tier1,

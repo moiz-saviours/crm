@@ -143,69 +143,55 @@ class DashboardController extends Controller
 
     public function index_2()
     {
-        $teams = Team::where('status', 1)->orderBy('name')->get();
-        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $teams = Team::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
         return view('admin.dashboard.index-2', ['teams' => $teams, 'brands' => $brands]);
     }
 
     public function index_2_update_stats(Request $request)
     {
         try {
-            $startDate = \Carbon\Carbon::parse($request->input('start_date'));
+            $timezone = $request->input('timeZoneSelect', 'UTC');
+            $startDate = Carbon::parse($request->input('start_date'));
             $endDate = Carbon::parse($request->input('end_date'));
+            $startDateTz = Carbon::parse($request->input('start_date'), $timezone)->setTimezone('UTC');
+            $endDateTz = Carbon::parse($request->input('end_date'), $timezone)->setTimezone('UTC');
             $teamKey = $request->input('team_key', 'all');
             $brandKey = $request->input('brand_key', 'all');
-            if ($startDate > $endDate) {
+            if ($startDateTz > $endDateTz) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid date range: start date cannot be greater than end date.'
                 ], 400);
             }
             $dateRanges = [];
-            $currentStart = $startDate;
-            while ($currentStart <= $endDate) {
-                $monthStart = date('Y-m-01', strtotime($currentStart));
-                $monthEnd = date('Y-m-t', strtotime($currentStart));
-                $rangeStart = max($currentStart, $monthStart);
-                $rangeEnd = min($endDate, $monthEnd);
+            $currentStart = $startDateTz->copy();
+            while ($currentStart <= $endDateTz) {
+//                $monthStart = date('Y-m-01', strtotime($currentStart));
+//                $monthEnd = date('Y-m-t', strtotime($currentStart));
+                $monthStart = $currentStart->copy()->startOfMonth();
+                $monthEnd = $currentStart->copy()->endOfMonth();
+                $rangeStart = $currentStart->greaterThan($monthStart) ? $currentStart : $monthStart;
+                $rangeEnd = $endDateTz->greaterThan($monthEnd) ? $endDateTz : $monthEnd;
+//                if ($rangeEnd->isSameDay($monthEnd) || $rangeEnd->isSameDay($endDateTz)) {
+//                    $rangeEnd = $rangeEnd->endOfDay();
+//                }
                 $dateRanges[] = [
                     'start' => $rangeStart,
                     'end' => $rangeEnd,
                 ];
-                $currentStart = date('Y-m-01', strtotime($currentStart . ' +1 month'));
+                $currentStart = $monthStart->copy()->addMonth();
             }
             $mtdTotalSales = 0;
             $previousMtdTotalSales = 0;
             foreach ($dateRanges as $range) {
                 $mtdStartDate = $range['start'];
                 $mtdEndDate = $range['end'];
-                $mtdSales = Invoice::where('status', Invoice::STATUS_PAID)
-//                    ->whereBetween('created_at', [$mtdStartDate, $mtdEndDate])
-                    ->whereHas('payment', function ($query) use ($mtdStartDate, $mtdEndDate) {
-                        $query->whereBetween('payment_date', [$mtdStartDate, $mtdEndDate]);
-                    })
-                    ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                        return $query->where('team_key', $teamKey);
-                    })
-                    ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                        return $query->where('brand_key', $brandKey);
-                    })
-                    ->sum('total_amount');
+                $mtdSales = $this->calculateSum(Payment::STATUS_PAID, $mtdStartDate, $mtdEndDate, $teamKey, $brandKey);
                 $mtdTotalSales += $mtdSales;
-                $previousMtdStartDate = date('Y-m-d', strtotime($mtdStartDate . ' -1 month'));
-                $previousMtdEndDate = date('Y-m-d', strtotime($mtdEndDate . ' -1 month'));
-                $previousMtdSales = Invoice::where('status', Invoice::STATUS_PAID)
-//                    ->whereBetween('created_at', [$previousMtdStartDate, $previousMtdEndDate])
-                    ->whereHas('payment', function ($query) use ($previousMtdStartDate, $previousMtdEndDate) {
-                        $query->whereBetween('payment_date', [$previousMtdStartDate, $previousMtdEndDate]);
-                    })
-                    ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                        return $query->where('team_key', $teamKey);
-                    })
-                    ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                        return $query->where('brand_key', $brandKey);
-                    })
-                    ->sum('total_amount');
+                $previousMtdStartDate = $mtdStartDate->copy()->subMonth();
+                $previousMtdEndDate = $mtdEndDate->copy()->subMonth();
+                $previousMtdSales = $this->calculateSum(Payment::STATUS_PAID, $previousMtdStartDate, $previousMtdEndDate, $teamKey, $brandKey);
                 $previousMtdTotalSales += $previousMtdSales;
             }
             $lapsePercentage = 0;
@@ -217,96 +203,46 @@ class DashboardController extends Controller
                 }
             }
             $employees = User::with('teams')
-                ->where('status', 1)
                 ->when($teamKey !== 'all', function ($query) use ($teamKey) {
                     $query->whereHas('teams', function ($teamQuery) use ($teamKey) {
                         $teamQuery->where('teams.team_key', $teamKey);
                     });
                 })
-                ->get()->map(function ($employee) use ($startDate, $endDate, $teamKey, $brandKey) {
-                    $employee->sales = Invoice::where('status', Invoice::STATUS_PAID)->where('agent_id', $employee->id)
-//                        ->whereBetween('created_at', [$startDate, $endDate])
-                        ->whereHas('payment', function ($query) use ($startDate, $endDate) {
-                            $query->whereBetween('payment_date', [$startDate, $endDate]);
-                        })
-                        ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                            return $query->where('team_key', $teamKey);
-                        })
-                        ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                            return $query->where('brand_key', $brandKey);
-                        })
-                        ->sum('total_amount');
+                ->get()->map(function ($employee) use ($startDateTz, $endDateTz, $teamKey, $brandKey) {
+                    $employee->sales = $this->calculateSum(Payment::STATUS_PAID, $startDateTz, $endDateTz, $teamKey, $brandKey, 1, $employee);
                     return $employee;
                 });
-            $totalSales = Invoice::where('status', Invoice::STATUS_PAID)
-//                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('payment_date', [$startDate, $endDate]);
-                })
-                ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                    return $query->where('team_key', $teamKey);
-                })
-                ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                    return $query->where('brand_key', $brandKey);
-                })
-                ->sum('total_amount');
-            $totalUpSales = Invoice::where('status', Invoice::STATUS_PAID)
-                ->where('type', 1)
-//                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('payment_date', [$startDate, $endDate]);
-                })
-                ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                    return $query->where('team_key', $teamKey);
-                })
-                ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                    return $query->where('brand_key', $brandKey);
-                })
-                ->sum('total_amount');
-            $refunded = Invoice::where('status', Invoice::STATUS_REFUNDED)
-//                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('payment_date', [$startDate, $endDate]);
-                })
-                ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                    return $query->where('team_key', $teamKey);
-                })
-                ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                    return $query->where('brand_key', $brandKey);
-                })
-                ->sum('total_amount');
-            $chargeBack = Invoice::where('status', Invoice::STATUS_CHARGEBACK)
-//                ->whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('payment', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('payment_date', [$startDate, $endDate]);
-                })
-                ->when($teamKey != 'all', function ($query) use ($teamKey) {
-                    return $query->where('team_key', $teamKey);
-                })
-                ->when($brandKey != 'all', function ($query) use ($brandKey) {
-                    return $query->where('brand_key', $brandKey);
-                })
-                ->sum('total_amount');
+            $totalSales = $this->calculateSum(Payment::STATUS_PAID, $startDateTz, $endDateTz, $teamKey, $brandKey);
+            $totalUpSales = $this->calculateSum(Payment::STATUS_PAID, $startDateTz, $endDateTz, $teamKey, $brandKey, 1);
+            $refunded = $this->calculateSum(Payment::STATUS_REFUNDED, $startDateTz, $endDateTz, $teamKey, $brandKey);
+            $chargeBack = $this->calculateSum(Payment::STATUS_CHARGEBACK, $startDateTz, $endDateTz, $teamKey, $brandKey);
             $chargeBackRatio = $totalSales > 0 ? (($chargeBack / $totalSales) * 100) . ' ' : '0 ';
             $netSales = $totalSales - ($refunded + $chargeBack);
             $range = $this->getMonthsBetweenDates($startDate, $endDate);
-            $teams = Team::with('targets')->where('status', 1)
+            $teams = Team::with('targets')
                 ->when($teamKey != 'all', function ($query) use ($teamKey) {
                     return $query->where('team_key', $teamKey);
                 })->get();
             $team_targets = [];
-            $total_target = 0;
-            $total_target_achieved = 0;
-            foreach ($range as $rangeval) {
-                foreach ($teams as $team) {
-                    $team_achieved = Invoice::where('status', Invoice::STATUS_PAID)
-//                        ->whereBetween('created_at', [$startDate, $endDate])
-                        ->whereHas('payment', function ($query) use ($startDate, $endDate) {
-                            $query->whereBetween('payment_date', [$startDate, $endDate]);
-                        })
-                        ->where('team_key', $team->team_key)
-                        ->sum('total_amount');
-                    $total_target_achieved += $team_achieved;
+            $total_target = $total_target_achieved = 0;
+            foreach ($teams as $team) {
+                foreach ($range as $rangeYearKey => $rangeYearval) {
+                    foreach ($rangeYearval as $rangeMonthVal) {
+                        $team_achieved = Invoice::where('status', Invoice::STATUS_PAID)
+                            ->whereHas('payment', function ($q) use ($startDateTz, $endDateTz, $team, $teamKey, $brandKey, $rangeYearKey, $rangeMonthVal) {
+                                $q->whereBetween('payment_date', [$startDateTz, $endDateTz])
+                                    ->whereMonth('payment_date', $rangeMonthVal)
+                                    ->whereYear('payment_date', $rangeYearKey)
+                                    ->where('team_key', $team->team_key)
+                                    ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+                                    ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey));
+                            })
+                            ->with('payment')
+                            ->get()
+                            ->sum(function ($invoice) {
+                                return optional($invoice->payment)->amount ?? 0;
+                            });
+                        $total_target_achieved += $team_achieved;
 //                    $team_target = TeamTarget::where('team_key', $team->team_key)
 //                        ->where('month', $rangeval['month'])->where('year', $rangeval['year'])
 //                        ->first();
@@ -324,22 +260,19 @@ class DashboardController extends Controller
 //                        'month' => $rangeval['month'],
 //                        'year' => $rangeval['year'],
 //                    ];
-                    $team_employee_targets = 0;
-                    foreach ($team->users as $employee) {
-                        $team_employee_targets += $employee->target;
+                        $total_target += $team->users->sum('target');
+                        $team_targets[$team->team_key][$rangeYearKey][$rangeMonthVal] = [
+                            'team_key' => $team->team_key,
+                            'team_name' => $team->name,
+                            'target_amount' => (float)$team->users->sum('target'),
+                            'achieved' => (float)$team_achieved,
+                            'achieved_percentage' => ($team->users->sum('target') > 0)
+                                ? round(($team_achieved / $team->users->sum('target')) * 100, 2)
+                                : 0,
+                            'month' => $rangeMonthVal,
+                            'year' => $rangeYearKey,
+                        ];
                     }
-                    $total_target += $team_employee_targets;
-                    $team_targets[] = [
-                        'team_key' => $team->team_key,
-                        'team_name' => $team->name,
-                        'target_amount' => (float)$team_employee_targets,
-                        'achieved' => (float)$team_achieved,
-                        'achieved_percentage' => ($team_employee_targets > 0)
-                            ? round(($team_achieved / $team_employee_targets) * 100, 2)
-                            : 0,
-                        'month' => $rangeval['month'],
-                        'year' => $rangeval['year'],
-                    ];
                 }
             }
             $total_achieved_percentage = ($total_target > 0) ? round(($total_target_achieved / $total_target) * 100, 2) : 0;
@@ -359,12 +292,38 @@ class DashboardController extends Controller
                 'total_target_achieved' => $total_target_achieved,
                 'total_achieved_percentage' => $total_achieved_percentage,
                 'totalUpSales' => $totalUpSales,
+                'startDate' => $startDateTz,
+                'endDate' => $endDateTz,
             ]);
         } catch
         (\Exception $e) {
             Log::error("Error fetching total sales: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'An error occurred while fetching data', 'error' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
+    }
+
+    /**
+     * Calculate the total sum of invoices by status and optional filters.
+     *
+     * @param string $status
+     * @param string|Carbon $startDate
+     * @param string|Carbon $endDate
+     * @param string|null $teamKey
+     * @param string|null $brandKey
+     * @param int|null $type
+     * @return float|int
+     */
+    function calculateSum(string $status, Carbon|string $startDate, Carbon|string $endDate, ?string $teamKey = "all", ?string $brandKey = "all", ?int $type = null, $agent = null)
+    {
+        return Payment::whereHas('invoice', function ($q) use ($status, $type) {
+            $q->where('status', $status)
+                ->when(!is_null($type), fn($q) => $q->where('type', $type));
+        })
+            ->whereBetween('payment_date', [$startDate, $endDate])
+            ->when($agent !== null, fn($q) => $q->where('agent_id', $agent->id))
+            ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+            ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
+            ->sum('amount');
     }
 
     /**
@@ -379,17 +338,23 @@ class DashboardController extends Controller
         if (!strtotime($startDate) || !strtotime($endDate)) {
             throw new \InvalidArgumentException('Invalid date format. Expected Y-m-d.');
         }
-        $start = Carbon::parse($startDate)->startOfMonth();
-        $end = Carbon::parse($endDate)->startOfMonth();
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
         if ($start->gt($end)) {
             throw new \InvalidArgumentException('Start date must be before or equal to end date.');
         }
-        $period = CarbonPeriod::create($start, '1 month', $end);
-        return collect($period)->map(function (Carbon $date) {
-            return [
-                'month' => $date->format('m'),
-                'year' => $date->format('Y'),
-            ];
-        });
+        $period = CarbonPeriod::create($start, $end);
+        $grouped = [];
+        foreach ($period as $date) {
+            $year = (int)$date->format('Y');
+            $month = (int)$date->format('m');
+            if (!isset($grouped[$year])) {
+                $grouped[$year] = [];
+            }
+            if (!in_array($month, $grouped[$year])) {
+                $grouped[$year][] = $month;
+            }
+        }
+        return collect($grouped);
     }
 }

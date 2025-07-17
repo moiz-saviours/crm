@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TwoFactorController extends Controller
 {
-    protected $twoFactorService;
+    protected TwoFactorService $twoFactorService;
 
     public function __construct(TwoFactorService $twoFactorService)
     {
@@ -22,19 +22,10 @@ class TwoFactorController extends Controller
 
     public function show(Request $request)
     {
-        $credentials = $request->session()->get('web_login_credentials');
-        if (!$credentials) {
-            return redirect()->route('login')->withErrors([
-                'email' => __('auth.session_expired')
-            ]);
-        }
-        $user = Auth::guard('web')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('web')->user();
         if (!$user) {
             return redirect()->route('login')->withErrors([
-                'email' => __('auth.failed')
+                'email' => __('auth.session_expired')
             ]);
         }
         return view('user.auth.two-factor', compact('user'));
@@ -48,23 +39,7 @@ class TwoFactorController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $credentials = $request->session()->get('web_login_credentials');
-        if (!$request->has('email') || !User::where('email', $request->get('email'))->whereStatus(1)->exists() || $credentials['email'] != $request->get('email')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials.'
-            ], 401);
-        }
-        if (!$credentials) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired'
-            ], 401);
-        }
-        $user = Auth::guard('web')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('web')->user();
         if (!$user) {
             return response()->json([
                 'success' => false,
@@ -115,16 +90,7 @@ class TwoFactorController extends Controller
 
     public function verifyShow(Request $request)
     {
-        $credentials = $request->session()->get('web_login_credentials');
-        if (!$credentials) {
-            return redirect()->route('login')->withErrors([
-                'email' => __('auth.session_expired')
-            ]);
-        }
-        $user = Auth::guard('web')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('web')->user();
         if (!$user) {
             return redirect()->route('login')->withErrors([
                 'email' => __('auth.failed')
@@ -132,8 +98,8 @@ class TwoFactorController extends Controller
         }
         $lastCode = VerificationCode::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
-            ->latest()
             ->valid()
+            ->latest()
             ->first();
         if (!$lastCode) {
             return redirect()->route('2fa.show');
@@ -153,16 +119,7 @@ class TwoFactorController extends Controller
         $request->validate([
             'code' => 'required|size:6'
         ]);
-        $credentials = $request->session()->get('web_login_credentials');
-        if (!$credentials) {
-            return redirect()->route('login')->withErrors([
-                'email' => __('auth.session_expired')
-            ]);
-        }
-        $user = Auth::guard('web')->getProvider()->retrieveByCredentials([
-            'email' => $credentials['email'],
-            'password' => $credentials['password']
-        ]);
+        $user = Auth::guard('web')->user();
         if (!$user) {
             return redirect()->route('login')->withErrors([
                 'email' => __('auth.failed')
@@ -171,23 +128,14 @@ class TwoFactorController extends Controller
         $code = $request->get('code');
         $lastCode = VerificationCode::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
-            ->latest()
             ->valid()
+            ->latest()
             ->first();
         if (!$lastCode) {
             return back()->withErrors(['code' => 'No verification code found. Please request a new one.']);
         }
         if ($this->twoFactorService->verifyCode($user, $code, $lastCode->method)) {
             $request->session()->put('web_2fa_verified', true);
-            $request->session()->forget('web_login_credentials');
-            $loginRequest = LoginRequest::createFrom($request);
-            $loginRequest->merge([
-                'email' => $credentials['email'],
-                'password' => $credentials['password'],
-                'remember' => $credentials['remember']
-            ]);
-            $loginRequest->authenticate();
-            $request->session()->regenerate();
             return redirect()->intended(route('user.dashboard', absolute: false));
         }
         return back()->withErrors(['code' => 'Invalid verification code']);

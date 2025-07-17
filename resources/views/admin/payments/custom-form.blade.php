@@ -181,7 +181,7 @@
                                 $companies = $client_contact['companies'] ?? $client_contact->companies;
                             @endphp
 
-                            <optgroup label="🧍 {{ $contactName }}">
+                            <optgroup label="🧍 {{ $contactName }}" style="display: none;">
                             @foreach($companies as $company)
                                 @php
                                     $companyKey = $company['special_key'] ?? $company->special_key;
@@ -296,7 +296,9 @@
                             behavior: 'smooth',
                             block: 'center'
                         });
-                        toastr.info('Modifying fields will generate a new invoice.');
+                        if(document.getElementById("invoice_key").value != ''){
+                            toastr.info('Modifying fields will generate a new invoice.');
+                        }
                     }
                     const currentField = $(this);
                     const fieldsToReset = ['#invoice_key'
