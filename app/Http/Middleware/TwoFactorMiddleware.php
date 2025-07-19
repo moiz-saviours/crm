@@ -28,10 +28,12 @@ class TwoFactorMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $guard = $this->detectGuard($request);
-        if ($this->isTwoFactorRoute($request, $guard)) {
-            return $this->handleTwoFactorRoute($request, $guard, $next);
-        }
         $user = Auth::guard($guard)->user();
+        if ($this->isTwoFactorRoute($request, $guard)) {
+            if ($user) {
+                return $this->handleTwoFactorRoute($request, $guard, $next);
+            }
+        }
         if (!$user) {
             return $next($request);
         }
