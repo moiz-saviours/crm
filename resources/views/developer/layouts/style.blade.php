@@ -159,7 +159,7 @@
     }
 
     .dt-buttons .btn.btn-secondary span:hover {
-        color: #fff;
+        color: var(--bs-primary);
     }
 
     /** Status */
@@ -212,5 +212,45 @@
     }
     button.btn.btn-sm {
         /*padding: 0px;*/
+    }
+    .dropdown-menu.dt-button-collection {
+        display: block !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+        visibility: visible !important;
+        position: absolute !important;
+        animation: none !important;
+        transition: none !important;
+        border: none;
+        z-index: 12;
+    }
+
+    .mainnav .dropdown-menu:not(.dt-button-collection) {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+        transform: scale(0);
+    }
+
+    .dropdown-item:focus, .dropdown-item:hover {
+        color: var(--bs-primary-color);
+        background-color: var(--bs-primary);
+    }
+
+    div.dt-button-background {
+        position: absolute !important;
+        z-index: 11 !important;;
+    }
+
+    div.dt-button-background {
+        background: radial-gradient(ellipse farthest-corner at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.15) 100%) !important;
+        border-radius: inherit;
+    }
+    table.dataTable input.dt-select-checkbox {
+        border: none !important;
+    }
+    th.select-checkbox.dt-select.dt-orderable-none .dt-select-checkbox {
+        border: 1px solid !important;
     }
 </style>

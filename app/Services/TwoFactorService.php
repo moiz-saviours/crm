@@ -27,6 +27,20 @@ class TwoFactorService
         ]);
     }
 
+    /**
+     * Delete a verification code for a given user and method.
+     *
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param string $method
+     * @return int Number of deleted records
+     */
+    public function deleteCode($user, string $method): int
+    {
+        return VerificationCode::where('morph_id', $user->id)
+            ->where('morph_type', get_class($user))
+            ->delete();
+    }
+
     public function sendEmailCode($user, string $code): array
     {
         try {
@@ -77,7 +91,7 @@ class TwoFactorService
             ];
             if (!app()->environment('local')) {
                 $messageParams['statusCallback'] = route('api.twilio.status.callback');
-            }else{
+            } else {
                 $baseUrl = rtrim(env('DEV_BASE_URL'), '/');
                 $messageParams['statusCallback'] = $baseUrl . route('api.twilio.status.callback', [], false);
             }

@@ -106,6 +106,14 @@ class PaymentController extends Controller
             'type.required' => 'The invoice type is required.',
             'type.in' => 'The type field must be fresh or upsale.',
         ]);
+        $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number', 'brand:brand_key,name', 'team:team_key,name', 'agent:id,name', 'customer_contact:special_key,name', 'payment_gateway:id,name,payment_method,descriptor'])->where('invoice_key', 940367211)->first();
+        $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
+        $unpaid_invoices = Invoice::select(['invoice_key', 'invoice_number', 'brand_key', 'team_key', 'agent_id', 'cus_contact_key', 'currency', 'total_amount', 'created_at',])->with(['customer_contact:special_key,name'])->where('status', 0)->orderBy('created_at', 'desc')->get()->map(function ($invoice) {
+            $invoice->formatted_date = $invoice->created_at->format('jS F Y');
+            return $invoice;
+        });
+        return response()->json(['data' => $payment, 'unpaid_invoices' => $unpaid_invoices,
+            'success' => 'Record created successfully!']);
         $validator->after(function ($validator) use ($request) {
             if ($request->filled('invoice_key')) {
                 $invoice = Invoice::where('invoice_key', $request->invoice_key)->first();
@@ -203,11 +211,15 @@ class PaymentController extends Controller
                 $paymentData['agent_type'] = 'App\Models\User';
             }
             $payment = Payment::create($paymentData);
-            $payment->refresh();
             DB::commit();
-            $payment->loadMissing('invoice', 'customer_contact', 'brand', 'team', 'agent', 'payment_gateway:id,c_contact_key,c_company_key,name,payment_method,name,descriptor');
+            $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'agent_type', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'amount', 'status', 'payment_date', 'created_at')->findOrFail($payment->id);
             $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
-            return response()->json(['data' => $payment, 'success' => 'Record created successfully!']);
+            $unpaid_invoices = Invoice::select(['invoice_key', 'invoice_number', 'brand_key', 'team_key', 'agent_id', 'cus_contact_key', 'currency', 'total_amount', 'created_at',])->with(['customer_contact:special_key,name'])->where('status', 0)->orderBy('created_at', 'desc')->get()->map(function ($invoice) {
+                $invoice->formatted_date = $invoice->created_at->format('jS F Y');
+                return $invoice;
+            });
+            return response()->json(['data' => $payment, 'unpaid_invoices' => $unpaid_invoices,
+                'success' => 'Record created successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while creating the record', 'message' => $e->getMessage()], 500);

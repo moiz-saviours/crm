@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 
 class NavigationHelper
 {
-    public static function hasAccess($routeName)
+    public static function hasAccess($routeName): bool
     {
         $user = Auth::user();
         if (!$user || !$user->department) {
