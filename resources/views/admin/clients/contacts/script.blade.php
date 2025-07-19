@@ -72,11 +72,20 @@
         function initializeDatatable(table_div, index) {
             let datatable = table_div.DataTable({
                 dom:
-                // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
+                "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
                     "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
-                buttons: exportButtons,
+
+                buttons: [
+                    'showSelected','colvis',
+                ],
+                layout: {
+                    topStart: {
+                        buttons: ['colvis']
+                    }
+                },
+                stateSave: true,
                 order: [[1, 'desc']],
                 responsive: false,
                 scrollX: true,
