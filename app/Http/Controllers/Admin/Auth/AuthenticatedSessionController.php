@@ -18,6 +18,13 @@ use function view;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected TwoFactorService $twoFactorService;
+
+    public function __construct(TwoFactorService $twoFactorService)
+    {
+        $this->twoFactorService = $twoFactorService;
+    }
+
     /**
      * Display the login view.
      */
@@ -41,14 +48,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $userId = Auth::guard('admin')->id();
+        $user = Auth::guard('admin');
         Auth::guard('admin')->logout();
         /** It will destroy every user session */
 //        $request->session()->invalidate();
         $request->session()->regenerateToken();
         session()->put('admin_2fa_verified', false);
-        if ($userId) {
-            Cache::forget("admin_2fa_verified:{$userId}");
+        if ($user) {
+            Cache::forget("admin_2fa_verified:{$user->id}");
+            $this->twoFactorService->deleteCode($user, 'email');
         }
         return redirect(route('admin.login'));
     }
