@@ -74,7 +74,7 @@
                                         <thead>
 
                                         <tr>
-                                            <th></th>
+                                            <th>SELECT</th>
                                             <th class="align-middle text-center text-nowrap">SNO.</th>
                                             <th class="align-middle text-center text-nowrap">NAME</th>
                                             <th class="align-middle text-center text-nowrap">EMAIL</th>
