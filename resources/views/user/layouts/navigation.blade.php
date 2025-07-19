@@ -432,10 +432,10 @@
                             </li>
                             {{--                            @endcan--}}
                         @endif
-                        @if(\App\Helpers\NavigationHelper::hasAccess('payment.index'))
+                        @if(\App\Helpers\NavigationHelper::hasAccess('user.payment.index'))
                             {{--                            @can('viewAny', App\Models\Payment::class)--}}
                             <li class="nav-item">
-                                <a href="{{route('payment.index')}}"
+                                <a href="{{route('user.payment.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('payments*') ? 'active' : '' }}">
                                     <i class="demo-pli-wallet-2 fs-5 me-2"></i>
 
