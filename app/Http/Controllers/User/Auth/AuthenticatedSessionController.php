@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,13 @@ use function view;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected TwoFactorService $twoFactorService;
+
+    public function __construct(TwoFactorService $twoFactorService)
+    {
+        $this->twoFactorService = $twoFactorService;
+    }
+
     /**
      * Display the login view.
      */
@@ -38,14 +46,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $userId = Auth::guard('web')->id();
+        $user = Auth::guard('web');
         Auth::guard('web')->logout();
         /** It will destroy every user session */
 //        $request->session()->invalidate();
         $request->session()->regenerateToken();
         session()->put('web_2fa_verified', false);
-        if ($userId) {
-            Cache::forget("web_2fa_verified:{$userId}");
+        if ($user) {
+            Cache::forget("web_2fa_verified:{$user->id}");
+            $this->twoFactorService->deleteCode($user, 'email');
         }
         return redirect('/login');
     }
