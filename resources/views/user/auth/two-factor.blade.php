@@ -167,6 +167,19 @@
                 </button>
             </div>
         </form>
+        <div class="flex items-center justify-end mt-4">
+            <div class="text-sm">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+
+                    <x-dropdown-link :href="route('logout')"  class="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500"
+                                     onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                        Login with different account?
+                    </x-dropdown-link>
+                </form>
+            </div>
+        </div>
 
         <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div class="flex justify-center">
