@@ -276,7 +276,7 @@
             }
             handleFormVisibility();
 
-            $(document).on('click', function (event) {
+            $(document).on('dblclick', function (event) {
                 if (
                     (!$(event.target).closest('.form-container').length &&
                         !$(event.target).is('.form-container') &&
