@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\StripePaymentController;
 use App\Http\Controllers\SmsServiceContoller;
 use App\Http\Controllers\User\SettingController;
 use App\Models\ClientContact;
@@ -89,7 +88,13 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
             Route::get('/payment-proofs', [InvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
         });
     });
-    Route::get('/payments', [PaymentController::class, 'index'])->name('payment.index');
+    /** Payment Routes */
+    Route::name('user.payment.')->group(function () {
+        Route::get('/payments', [PaymentController::class, 'index'])->name('index');
+        Route::prefix('payment')->group(function () {
+            Route::post('/store', [PaymentController::class, 'store'])->name('store');
+        });
+    });
     /** Payment Transaction Logs Route */
     Route::get('payment-transaction-logs', [PaymentTransactionLogController::class, 'getLogs'])->name('payment-transaction-logs');
     /** Client Contacts Routes */
@@ -190,14 +195,13 @@ Route::middleware(['restrict.dev'])->group(function () {
         ], 403);
     })->middleware('restrict.dev')->name('model.command');
 });
-
 Route::fallback(function (Request $request) {
     $attempts = session('fallback_attempts', 0) + 1;
     session(['fallback_attempts' => $attempts]);
     if ($attempts < 2 && auth()->check()) {
         return back();
     }
-    if((!str_contains(url()->current(), 'checkout') && !$request->has('InvoiceID')) && (!str_contains(url()->current(), 'invoice') && !$request->has('InvoiceID'))){
+    if ((!str_contains(url()->current(), 'checkout') && !$request->has('InvoiceID')) && (!str_contains(url()->current(), 'invoice') && !$request->has('InvoiceID'))) {
         return redirect('/login');
     }
     abort(404, 'Page not found');
