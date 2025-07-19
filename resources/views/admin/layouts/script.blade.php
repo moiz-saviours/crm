@@ -875,18 +875,23 @@
                 }
             });
         }
-        $(document).on('click', function (event) {
+        $(document).on('dblclick', function (event) {
             if (
-                // (!$(event.target).closest('.form-container').length &&
-                //     !$(event.target).is('.form-container') &&
-                //     !$(event.target).closest('.open-form-btn').length &&
-                //     !$(event.target).is('.editBtn') &&
-                //     !$(event.target).is('.changePwdBtn')
-                // ) ||
+                (!$(event.target).closest('.form-container').length &&
+                    !$(event.target).is('.form-container') &&
+                    !$(event.target).closest('.open-form-btn').length &&
+                    !$(event.target).is('.editBtn') &&
+                    !$(event.target).is('.changePwdBtn')
+                    && !window.getSelection().toString().length.trim() > 0
+                ) ||
                 $(event.target).is('.form-container .close-btn')
             ) {
                 closeCustomForm(formContainer, manageForm);
             }
+        });
+
+        $(document).on('click', '.form-container .close-btn', function () {
+            closeCustomForm(formContainer, manageForm);
         });
         // Function to close the form and reset form fields
         function closeCustomForm(formContainer, manageForm) {
