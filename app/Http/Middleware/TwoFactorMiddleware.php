@@ -125,10 +125,23 @@ class TwoFactorMiddleware
      */
     protected function detectGuard(Request $request): string
     {
+        $guards = array_keys(config('auth.guards'));
         $routeName = $request->route()?->getName();
-        $guards = ['admin', 'developer', 'web'];
+        if ($routeName) {
+            foreach ($guards as $guard) {
+                if (str_starts_with($routeName, $guard . '.')) {
+                    return $guard;
+                }
+            }
+        }
+        $path = $request->path();
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check() && str_starts_with($routeName ?? '', $guard)) {
+            if ($guard !== 'web' && str_starts_with($path, $guard . '/')) {
+                return $guard;
+            }
+        }
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
                 return $guard;
             }
         }
