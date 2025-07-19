@@ -42,7 +42,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         $currentPath = $referer ? parse_url($referer, PHP_URL_PATH) : '/';
         $debugDetails = [];
         $isLocalEnvironment = app()->environment('local');
-
         foreach ($allChannels as $channel) {
             $channelUrl = $channel->url;
             $parsedUrl = parse_url($channelUrl);
@@ -52,7 +51,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             $channelName = $channel->name;
             $isLocal = str_contains($baseDomain, 'localhost');
             $ssl = $isLocal ? 'http' : 'https';
-
             // Skip current domain to avoid self-checking
             if ($baseDomain === $request->getHost() && $port == $request->getPort()) {
                 $debugDetails[] = [
@@ -62,7 +60,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 ];
                 continue;
             }
-
             // Only allow local-to-local redirects in local environment
             if (!$isLocalEnvironment && $isLocal) {
                 $debugDetails[] = [
@@ -72,11 +69,9 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 ];
                 continue;
             }
-
             // Build the proper URL with port if exists
             $portPart = $port ? ":{$port}" : '';
             $finalUrl = "{$ssl}://{$baseDomain}{$portPart}{$currentPath}";
-
             // Generate access token
             $payload = [
                 'table' => $tableToCheck,
@@ -84,20 +79,18 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 'ip_address' => $request->ip(),
                 'expires_at' => now()->addSeconds(config('session.lifetime') * 60),
             ];
-
             $key = base64_decode("AxS9/+trvgrFBcvBwuYl0kjVocGf8t+eiol6LtErpck=");
             $encrypter = new Encrypter($key, 'AES-256-CBC');
             $accessToken = $encrypter->encrypt($payload);
             $validChannels[] = [
                 'domain' => $displayDomain,
                 'name' => $channelName,
-                'access_token' =>  urlencode($accessToken),
+                'access_token' => urlencode($accessToken),
                 'url' => $finalUrl,
                 'logo' => $channel->logo ? asset($channel->logo) : null,
                 'favicon' => $channel->favicon ? asset($channel->favicon) : null,
                 'is_local' => $isLocal,
             ];
-
             // For local environments, skip the API check
             if ($isLocalEnvironment) {
                 $debugDetails[] = [
@@ -108,7 +101,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 ];
                 continue;
             }
-
             // For non-local environments, perform API check
             $prefix = app()->environment('development') ? '/crm-development' : '';
             $checkUrl = "{$ssl}://{$baseDomain}{$prefix}/api/check-user";
@@ -120,16 +112,13 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 'responseData' => null,
                 'exception' => null,
             ];
-
             try {
                 $response = Http::timeout(3)->post($checkUrl, [
                     'email' => $authUser->email,
                     'table' => $tableToCheck
                 ]);
-
                 $domainDebug['responseStatus'] = $response->status();
                 $domainDebug['responseData'] = $response->json();
-
                 if (!$response->ok() || !$response->json('exists')) {
                     array_pop($validChannels); // Remove the channel if check fails
                 }
@@ -138,10 +127,8 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 $domainDebug['exception'] = $e->getMessage();
                 array_pop($validChannels); // Remove the channel if check fails
             }
-
             $debugDetails[] = $domainDebug;
         }
-
         return response()->json([
             'success' => true,
             'validChannels' => $validChannels,
@@ -153,7 +140,8 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             ],
             'debug' => $debugDetails
         ]);
-    })->name('check.channels');    Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
+    })->name('check.channels');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index_1'])->name('dashboard');
     Route::get('/dashboard-2', [AdminDashboardController::class, 'index_2'])->name('dashboard.2');
     Route::get('/dashboard-2-update-stats', [AdminDashboardController::class, 'index_2_update_stats'])->name('dashboard.2.update.stats');
     /** Channel Routes */
@@ -301,7 +289,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         });
     });
     /** Payment Routes */
-    Route::prefix('payment')->name('payment.')->group(function () {
+    Route::prefix('payments')->name('payment.')->group(function () {
         Route::get('/', [AdminPaymentController::class, 'index'])->name('index');
         Route::get('/create', [AdminPaymentController::class, 'create'])->name('create');
         Route::post('/store', [AdminPaymentController::class, 'store'])->name('store');
@@ -352,5 +340,4 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
-    Route::get('/sales/sales-kpi', [AdminSalesKpiController::class, 'index'])->name('sales.kpi');
 });
