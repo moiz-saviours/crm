@@ -35,7 +35,7 @@
                             </option>
                         @endforeach
                     </select>
-                    @error('brand_key')
+                    @error('invoice_key')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
