@@ -79,7 +79,7 @@
                 order: [[1, 'desc']],
                 responsive: false,
                 scrollX: true,
-                scrollY:  ($(window).height() - 350),
+                scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
                 columnDefs: [
@@ -220,6 +220,9 @@
                             //     </button>
                             // </td>
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                            if (response.unpaid_invoices) {
+                                updateInvoices(response.unpaid_invoices);
+                            }
                             $('#manage-form')[0].reset();
                             $('#formContainer').removeClass('open');
                         }
@@ -322,6 +325,51 @@
                     .catch(error => console.error('An error occurred while updating the record.', error));
             }
         });
+
+        function updateInvoices(invoices) {
+            const $select = $('#invoice_key');
+            $select.empty();
+            $select.append(`<option value="">Create New Invoice</option>`);
+
+            invoices.forEach(invoice => {
+                const invoiceNumber = invoice.invoice_number ?? '---';
+                const invoiceKey = invoice.invoice_key ?? '---';
+                const customerName = invoice.customer_contact?.name ?? '---';
+                const customerKey = invoice.customer_contact?.special_key ?? '';
+                const currency = invoice.currency ?? 'USD';
+                const totalAmount = invoice.total_amount ?? '0.00';
+                const formattedDate = invoice.formatted_date ?? '---';
+
+                const option = `<option
+                    value="${invoiceKey}"
+                    data-brand="${invoice.brand_key}"
+                    data-team="${invoice.team_key}"
+                    data-agent="${invoice.agent_id}"
+                    data-amount="${totalAmount}"
+                    data-customer="${customerKey}"
+                >
+                    ${invoiceNumber} - ${invoiceKey} - ${customerName} - ${currency} ${totalAmount} - ${formattedDate}
+                </option>`;
+
+                $select.append(option);
+            });
+
+            // Utility: Get date suffix (st, nd, rd, th)
+            function getDaySuffix(day) {
+                if (day >= 11 && day <= 13) return 'th';
+                switch (day % 10) {
+                    case 1:
+                        return 'st';
+                    case 2:
+                        return 'nd';
+                    case 3:
+                        return 'rd';
+                    default:
+                        return 'th';
+                }
+            }
+        }
+
         function ucwords(str) {
             if (!str) return '';
             return str
