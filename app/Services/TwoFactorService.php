@@ -17,7 +17,6 @@ class TwoFactorService
         VerificationCode::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
             ->where('method', $method)
-            ->whereNull('verified_at')
             ->delete();
         return VerificationCode::create([
             'morph_id' => $user->id,
