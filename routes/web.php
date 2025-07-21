@@ -4,6 +4,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\SmsServiceContoller;
 use App\Http\Controllers\User\SettingController;
 use App\Models\ClientContact;
+use App\Models\Permission;
 use App\Http\Controllers\User\{BrandController,
     Customer\CompanyController as UserCustomerCompanyController,
     Customer\ContactController as UserCustomerContactController,
@@ -31,8 +32,50 @@ Route::get('/', function () {
     return redirect()->route('login');
 //    return view('welcome');
 });
+//Route::get('/check-permissions', function () {
+//    $user = auth()->user();
+//    $contact = \App\Models\ClientContact::first();
+//    return [
+//        'can_view' => $user->can('view', 'dashboard'),
+//        'policy_check' => app(\App\Policies\Client\ContactPolicy::class)
+//            ->view($user, $contact),
+//        'direct_check' => $user->hasPermission('client_contact', 'view'),
+//        'model_types' => [
+//            'database' => Permission::distinct()->pluck('model_type'),
+//            'expected' => 'client_contact'
+//        ]
+//    ];
+//});
+//Route::get('assign-permission', function () {
+//    $user = auth()->user();
+//    $types = ['view', 'view_any', 'create', 'update', 'change_status'];
+//    $permissionIds = [];
+//    foreach ($types as $type) {
+//        $permission = Permission::firstOrCreate([
+//            'model_type' => ClientContact::class,
+//            'action' => $type,
+//        ]);
+//        $permissionIds[] = $permission->id;
+//    }
+//    if (true) {
+//        foreach ($permissionIds as $permissionId) {
+//            $user->permissions()->syncWithoutDetaching([
+//                $permissionId => [
+//                    'granted' => true,
+//                    'scope' => 'team'
+//                ]
+//            ]);
+//        }
+//    } else {
+//        $user->permissions()->detach($permissionIds);
+//    }
+//    return response()->json([
+//        'message' => 'Permissions assigned successfully',
+//        'permissions' => $user->permissions->pluck('action')->toArray()
+//    ]);
+//})->middleware('auth');
 require __DIR__ . '/auth.php';
-Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1', 'dynamic.access'])->group(function () {
+Route::middleware(['auth', 'verified:verification.notice', 'throttle:60,1', 'dynamic.access'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard')//->middleware('can:dashboard_view')
     ;
     Route::get('/profile', [ProfileController::class, 'edit'])->name('user.profile');

@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 require __DIR__ . '/admin-auth.php';
-Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
 //Route::middleware(['auth:admin','2fa:admin', 'verified:admin.verification.notice', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
