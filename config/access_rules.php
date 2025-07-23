@@ -22,7 +22,7 @@ return [
             'invoice.update',
             'invoice.payment_proofs',
             'user.client.account.by.brand',
-            'payment.index',
+            'user.payment.index',
             'payment-transaction-logs',
             'save.settings',
         ],
