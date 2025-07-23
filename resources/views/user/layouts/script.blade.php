@@ -920,7 +920,7 @@
                     !$(event.target).closest('.open-form-btn').length &&
                     !$(event.target).is('.editBtn') &&
                     !$(event.target).is('.changePwdBtn')
-                    && !window.getSelection().toString().length.trim() > 0
+                    && !window.getSelection().toString().trim().length > 0
                 ) ||
                 $(event.target).is('.form-container .close-btn')
             ) {
