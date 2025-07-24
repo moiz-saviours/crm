@@ -29,6 +29,10 @@ class VerificationCode extends Model
         'method',
         'expires_at',
         'verified_at',
+        'device_id',
+        'ip_address',
+        'user_agent',
+        'session_id',
         'response',
         'response_id',
         'status',
@@ -53,7 +57,16 @@ class VerificationCode extends Model
         return $query->where('expires_at', '>', now())
             ->whereNull('verified_at');
     }
+    public function scopeForUser($query, Model $user)
+    {
+        return $query->where('morph_id', $user->id)
+            ->where('morph_type', get_class($user));
+    }
 
+    public function scopeByMethod($query, string $method)
+    {
+        return $query->where('method', $method);
+    }
     public function markAsVerified(): void
     {
         $this->update(['verified_at' => now()]);
