@@ -25,12 +25,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('reset-password', [AdminNewPasswordController::class, 'store'])->name('password.store');
     });
     Route::middleware(['auth:admin'])->group(function () {
-//        Route::middleware('2fa:admin')->group(function () {
+        Route::middleware('2fa:admin')->group(function () {
             Route::get('/two-factor-auth', [AdminTwoFactorController::class, 'show'])->name('2fa.show');
             Route::post('/two-factor-auth/send', [AdminTwoFactorController::class, 'send'])->name('2fa.send');
             Route::get('/two-factor-auth/verify-show', [AdminTwoFactorController::class, 'verifyShow'])->name('2fa.verify.show');
             Route::post('/two-factor-auth/verify', [AdminTwoFactorController::class, 'verify'])->name('2fa.verify');
-//        });
+        });
 //        Route::get('verify', AdminEmailVerificationPromptController::class)->name('verification.notice');
 //        Route::get('verify/{id}/{hash}', AdminVerifyEmailController::class)->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
         Route::get('verify-email', AdminEmailVerificationPromptController::class)->name('verification.notice');
