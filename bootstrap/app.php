@@ -2,10 +2,13 @@
 
 use App\Http\Middleware\Cooldown;
 use App\Http\Middleware\DynamicAccessMiddleware;
+use App\Http\Middleware\FilterAssetRequests;
 use App\Http\Middleware\LastSeen;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\RestrictDevAccess;
+use App\Http\Middleware\SetGuardSessionCookie;
+use App\Http\Middleware\TwoFactorMiddleware;
 use App\Http\Middleware\VerifyCrossDomainToken;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -37,11 +40,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [LastSeen::class, Cooldown::class]);
-        $middleware->web(prepend: [StartSession::class, VerifyCrossDomainToken::class]);
+        $middleware->web(prepend: [SetGuardSessionCookie::class, StartSession::class, VerifyCrossDomainToken::class, FilterAssetRequests::class,]);
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
             'auth' => Authenticate::class,
-            '2fa' => \App\Http\Middleware\TwoFactorMiddleware::class,
+            '2fa' => TwoFactorMiddleware::class,
             'restrict.dev' => RestrictDevAccess::class,
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
@@ -52,7 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->respond(function (Response $response) {
             if ($response->getStatusCode() === 419) {
                 return back()->with([
-                    'message' => 'Your session expired, please try again.',
+                    'message' => 'Your session expired, please try again..',
                 ]);
             }
             return $response;
