@@ -31,12 +31,12 @@ Route::middleware(['guest:web'])->group(function () {
 
 });
 Route::middleware('auth:web')->group(function () {
-//    Route::middleware('2fa')->group(function () {
+    Route::middleware('2fa')->group(function () {
         Route::get('/two-factor-auth', [UserTwoFactorController::class, 'show'])->name('2fa.show');
         Route::post('/two-factor-auth/send', [UserTwoFactorController::class, 'send'])->name('2fa.send');
         Route::get('/two-factor-auth/verify', [UserTwoFactorController::class, 'verifyShow'])->name('2fa.verify.show');
         Route::post('/two-factor-auth/verify', [UserTwoFactorController::class, 'verify'])->name('2fa.verify');
-//    });
+    });
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
