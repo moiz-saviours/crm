@@ -91,8 +91,12 @@ class TwoFactorMiddleware
      */
     protected function hasRecentVerification(mixed $user, $guard): bool
     {
+        $sessionKey = "{$guard}_device_fingerprint";
+        if (!session()->has($sessionKey)) {
+            session([$sessionKey => $this->twoFactorService->generateDeviceFingerprint()]);
+        }
+        $deviceId = session($sessionKey);
         $cacheKey = "{$guard}_2fa_verified:{$user->id}";
-        $deviceId = $this->twoFactorService->generateDeviceFingerprint();
         return Cache::remember($cacheKey, 300, function () use ($user, $guard, $deviceId) {
             return VerificationCode::forUser($user)
                 ->whereNotNull('verified_at')
