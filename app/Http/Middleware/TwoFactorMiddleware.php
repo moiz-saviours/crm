@@ -97,7 +97,7 @@ class TwoFactorMiddleware
         }
         $deviceId = session($sessionKey);
         $cacheKey = "{$guard}_2fa_verified:{$user->id}";
-        return Cache::remember($cacheKey, 300, function () use ($user, $guard, $deviceId) {
+        return Cache::remember($cacheKey, 86400, function () use ($user, $guard, $deviceId) {
             return VerificationCode::forUser($user)
                 ->whereNotNull('verified_at')
                 ->where('device_id', $deviceId)
