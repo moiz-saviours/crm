@@ -3,10 +3,12 @@
 namespace App\Http\Middleware;
 
 use App\Models\VerificationCode;
+use App\Services\TwoFactorService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -18,6 +20,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TwoFactorMiddleware
 {
+    protected TwoFactorService $twoFactorService;
+
+    public function __construct(TwoFactorService $twoFactorService)
+    {
+        $this->twoFactorService = $twoFactorService;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -27,7 +36,14 @@ class TwoFactorMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($request->is('assets/*') || $request->is('*.js') || $request->is('*.css') || $request->is('*.map') || $request->expectsJson()) {
+            return $next($request);
+        }
         $guard = $this->detectGuard($request);
+        $prefix = $this->detectPrefix($request);
+        if ($guard != $prefix) {
+            return $next($request);
+        }
         $user = Auth::guard($guard)->user();
         if ($this->isTwoFactorRoute($request, $guard)) {
             if ($user) {
@@ -41,7 +57,6 @@ class TwoFactorMiddleware
             return $next($request);
         }
         if ($this->hasRecentVerification($user, $guard)) {
-            session([$guard . '_2fa_verified' => true]);
             return $next($request);
         }
         if (str_contains($request->route()?->getName(), '2fa')) {
@@ -76,11 +91,17 @@ class TwoFactorMiddleware
      */
     protected function hasRecentVerification(mixed $user, $guard): bool
     {
-        return Cache::remember("{$guard}_2fa_verified:{$user->id}", 300, function () use ($user) {
-            return VerificationCode::where('morph_id', $user->id)
-                ->where('morph_type', get_class($user))
+        $sessionKey = "{$guard}_device_fingerprint";
+        if (!session()->has($sessionKey)) {
+            session([$sessionKey => $this->twoFactorService->generateDeviceFingerprint()]);
+        }
+        $deviceId = session($sessionKey);
+        $cacheKey = "{$guard}_2fa_verified:{$user->id}";
+        return Cache::remember($cacheKey, 86400, function () use ($user, $guard, $deviceId) {
+            return VerificationCode::forUser($user)
                 ->whereNotNull('verified_at')
-                ->where('verified_at', '>', now()->subHours(2))
+                ->where('device_id', $deviceId)
+                ->where('verified_at', '>', now()->subDay())
                 ->exists();
         });
     }
@@ -106,6 +127,7 @@ class TwoFactorMiddleware
      */
     protected function isTwoFactorRoute(Request $request, string $guard): bool
     {
+
         $prefix = $guard === 'web' ? '' : $guard . '.';
         $twoFactorRoutes = [
             $prefix . '2fa.show',
@@ -125,10 +147,30 @@ class TwoFactorMiddleware
      */
     protected function detectGuard(Request $request): string
     {
+        $guards = array_keys(config('auth.guards'));
         $routeName = $request->route()?->getName();
-        $guards = ['admin', 'developer', 'web'];
+        $path = trim($request->path(), '/');
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check() && str_starts_with($routeName ?? '', $guard)) {
+            if (Auth::guard($guard)->check() && $guard !== 'web' && str_starts_with($path, $guard . '/') && str_starts_with($routeName, $guard . '.')) {
+                return $guard;
+            }
+        }
+        return Auth::getDefaultDriver();
+    }
+
+    /**
+     * Detect the appropriate authentication guard for the request
+     *
+     * @param Request $request
+     * @return string
+     */
+    protected function detectPrefix(Request $request): string
+    {
+        $guards = array_keys(config('auth.guards'));
+        $routeName = $request->route()?->getName();
+        $path = trim($request->path(), '/');
+        foreach ($guards as $guard) {
+            if ($guard !== 'web' && str_starts_with($path, $guard . '/') && str_starts_with($routeName, $guard . '.')) {
                 return $guard;
             }
         }

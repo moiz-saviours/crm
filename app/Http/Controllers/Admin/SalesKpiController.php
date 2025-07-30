@@ -197,7 +197,7 @@ class SalesKpiController extends Controller
             'up_to_target' => $upToTarget,
             'above_target' => $aboveTarget,
             'achieved_percentage' => $percentage,
-            'above_target_percentage' => $aboveTarget > 0 ? round(($aboveTarget / $target) * 100, 2) : 0,
+            'above_target_percentage' => $aboveTarget > 0 && $target > 0 ? round(($aboveTarget / $target) * 100, 2) : 0,
             'commission' => $individualCommission,
             'wire' => $wirePayments,
             'above_target2x' => $bonusTiers['tier1'],
@@ -468,12 +468,13 @@ class SalesKpiController extends Controller
     {
         $tier1 = $tier2 = $tier3 = 0;
         $percentage -= 100;
+        $difference = max(0, ($achieved ?? 0) - ($target ?? 0));
         if ($percentage > CommissionRates::BONUS_TIERS['3x']) {
-            $tier3 = max(0, $achieved - ($target * (CommissionRates::BONUS_TIERS['3x'] + 100) / 100)) * 3;
+            $tier3 = $difference * 3;
         } else if ($percentage > CommissionRates::BONUS_TIERS['2_5x']) {
-            $tier2 = max(0, $achieved - ($target * (CommissionRates::BONUS_TIERS['2_5x'] + 100) / 100)) * 2.5;
+            $tier2 = $difference * 2.5;
         } else if ($percentage > CommissionRates::BONUS_TIERS['2x']) {
-            $tier1 = max(0, $achieved - ($target * (CommissionRates::BONUS_TIERS['2x'] + 100) / 100)) * 2;
+            $tier1 = $difference * 2;
         }
         return [
             'tier1' => $tier1,

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,11 +25,15 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
+        if ($request->attributes->get('is_asset', false)) {
+            return $next($request);
+        }
         $guards = empty($guards) ? [null] : $guards;
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 if (!$this->isPathForGuard($request->path(), $guard) || $this->isGuestRoute($request, $guard)) {
-                    return redirect($this->redirectTo($request));
+                    $redirectUrl = $this->redirectTo($request);
+                    return redirect($redirectUrl);
                 }
             }
         }
@@ -46,14 +51,16 @@ class RedirectIfAuthenticated
             } elseif (str_contains($request->path(), 'developer')) {
                 return route('developer.dashboard');
             }
-        } elseif (Auth::guard('admin')->check()) {
+        } elseif (Auth::guard('admin')->check() && str_contains($request->path(), 'admin')) {
             return route('admin.dashboard');
-        } elseif (Auth::guard('developer')->check()) {
+        } elseif (Auth::guard('developer')->check() && str_contains($request->path(), 'developer')) {
             return route('developer.dashboard');
         }
-        return static::$redirectToCallback
-            ? call_user_func(static::$redirectToCallback, $request)
-            : $this->defaultRedirectUri();
+        if (static::$redirectToCallback) {
+            return call_user_func(static::$redirectToCallback, $request);
+        }
+        $defaultUri = $this->defaultRedirectUri();
+        return $defaultUri;
     }
 
     /**
@@ -66,7 +73,8 @@ class RedirectIfAuthenticated
             'developer' => 'developer',
             'web' => '', // No prefix for normal users
         ];
-        return isset($guardPrefixes[$guard]) && str_starts_with($path, $guardPrefixes[$guard]);
+        $result = isset($guardPrefixes[$guard]) && str_starts_with($path, $guardPrefixes[$guard]);
+        return $result;
     }
 
     /**
@@ -92,7 +100,7 @@ class RedirectIfAuthenticated
         ];
         $prefix = $guardPrefixes[$guard] ?? '';
         $prefix = $prefix ? "$prefix/" : '';
-        $guestRoutes = ['login', 'register', 'forgot-password', 'reset-password', '2fa/show', '2fa/verify', '2fa/send'];
+        $guestRoutes = ['login', 'register', 'forgot-password', 'reset-password'];
         foreach ($guestRoutes as $route) {
             if ($request->is("{$prefix}{$route}*")) {
                 return true;

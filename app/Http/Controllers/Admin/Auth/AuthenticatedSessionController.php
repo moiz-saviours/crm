@@ -40,7 +40,7 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        return redirect()->route('admin.dashboard');
     }
 
     /**
@@ -49,15 +49,16 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $user = Auth::guard('admin')->user();
+        session()->put('admin_2fa_verified', false);
+        if ($user) {
+            Cache::forget("admin_2fa_verified:{$user->id}");
+            $deviceId = $this->twoFactorService->generateDeviceFingerprint();
+            $this->twoFactorService->deleteCode($user, $deviceId);
+        }
         Auth::guard('admin')->logout();
         /** It will destroy every user session */
 //        $request->session()->invalidate();
         $request->session()->regenerateToken();
-        session()->put('admin_2fa_verified', false);
-        if ($user) {
-            Cache::forget("admin_2fa_verified:{$user->id}");
-            $this->twoFactorService->deleteCode($user, 'email');
-        }
         return redirect(route('admin.login'));
     }
 

@@ -4,27 +4,53 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\VerificationCode;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TwoFactorCodeMail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Twilio\Rest\Client;
+use Jenssegers\Agent\Agent;
 
 class TwoFactorService
 {
-    public function generateCode($user, string $method): VerificationCode
+    public function generateCode(Model $user, string $method, string $deviceId = null): VerificationCode
     {
-        VerificationCode::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
-            ->where('method', $method)
-            ->delete();
+        VerificationCode::forUser($user)->whereNull('verified_at')->where('device_id', $deviceId)->delete();
         return VerificationCode::create([
             'morph_id' => $user->id,
             'morph_type' => get_class($user),
             'code' => str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT),
             'method' => $method,
             'expires_at' => now()->addMinutes(5),
+            'device_id' => $deviceId,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'session_id' => session()->getId(),
         ]);
+    }
+
+    /**
+     * Send the verification code via specified method with rate limiting
+     */
+    public function sendCode(Model $user, VerificationCode $verificationCode): array
+    {
+        // Rate limiting by device
+        $key = '2fa-attempts:' . $verificationCode->device_id;
+        if (RateLimiter::tooManyAttempts($key, 3)) {
+            return [
+                'success' => false,
+                'message' => 'Too many attempts. Please wait before requesting a new code.',
+                'retry_after' => RateLimiter::availableIn($key)
+            ];
+        }
+        RateLimiter::hit($key);
+        return match ($verificationCode->method) {
+            'email' => $this->sendEmailCode($user, $verificationCode->code),
+            'sms' => $this->sendSmsCode($user, $verificationCode->code),
+            default => throw new \InvalidArgumentException("Unsupported verification method")
+        };
     }
 
     /**
@@ -34,11 +60,9 @@ class TwoFactorService
      * @param string $method
      * @return int Number of deleted records
      */
-    public function deleteCode($user, string $method): int
+    public function deleteCode(Model $user, string $deviceId = null): int
     {
-        return VerificationCode::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
-            ->delete();
+        return VerificationCode::forUser($user)->where('device_id', $deviceId)->delete();
     }
 
     public function sendEmailCode($user, string $code): array
@@ -163,18 +187,45 @@ class TwoFactorService
         }
     }
 
-    public function verifyCode($user, string $code, string $method): bool
+    public function verifyCode($user, string $code, string $method, string $deviceId = null): bool
     {
-        $verificationCode = VerificationCode::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
+        $verificationCode = VerificationCode::forUser($user)
             ->where('code', $code)
-            ->where('method', $method)
+            ->byMethod($method)
+            ->where('device_id', $deviceId)
             ->valid()
             ->first();
         if ($verificationCode) {
             $verificationCode->markAsVerified();
+            RateLimiter::clear('2fa-attempts:' . $deviceId);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Check if device has active verification
+     */
+    public function hasActiveVerification(Model $user, string $deviceId): bool
+    {
+        return VerificationCode::forUser($user)
+            ->where('device_id', $deviceId)
+            ->valid()
+            ->exists();
+    }
+
+    public function generateDeviceFingerprint(): string
+    {
+        $agent = new Agent();
+        $components = [
+            $agent->browser(),
+            $agent->version($agent->browser()),
+            $agent->platform(),
+            $agent->version($agent->platform()),
+            $agent->device(),
+            request()->ip(),
+            session()->getId()
+        ];
+        return hash('sha256', implode('|', array_filter($components)));
     }
 }

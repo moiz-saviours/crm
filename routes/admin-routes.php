@@ -136,7 +136,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 'name' => config('app.name'),
                 'url' => url('/'),
                 'logo' => asset('images/logo.png'),
-                'favicon' => asset('favicon.ico'),
+                'favicon' => asset('assets/img/favicon.png'),
             ],
             'debug' => $debugDetails
         ]);

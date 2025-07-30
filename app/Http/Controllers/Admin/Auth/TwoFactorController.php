@@ -53,36 +53,26 @@ class TwoFactorController extends Controller
             ], 400);
         }
         try {
-            $verificationCode = $this->twoFactorService->generateCode($user, $method);
-            $response = null;
-            if ($method === 'email' || $method === 'sms') {
-                if ($method === 'email') {
-                    $response = $this->twoFactorService->sendEmailCode($user, $verificationCode->code);
-                } elseif ($method === 'sms') {
-                    $response = $this->twoFactorService->sendSmsCode($user, $verificationCode->code);
-                }
-                if ($response['success'] === false) {
-                    return response()->json([
-                        'success' => false,
-                        'error' => $response['error'],
-                        'message' => $response['message'],
-                        'method' => $method
-                    ], 500);
-                }
-                $response_data = [
-                    'success' => true,
+            $deviceId = $this->twoFactorService->generateDeviceFingerprint();
+            $verificationCode = $this->twoFactorService->generateCode($user, $method, $deviceId);
+            $response = $this->twoFactorService->sendCode($user, $verificationCode);
+            if ($response['success'] === false) {
+                return response()->json([
+                    'success' => false,
+                    'error' => $response['error'],
                     'message' => $response['message'],
-                    'method' => $method,
-                ];
-                if ($method === 'sms' && isset($response['response_id'])) {
-                    $response_data['response_id'] = $response['response_id'];
-                }
-                return response()->json($response_data);
+                    'method' => $method
+                ], 500);
             }
-            return response()->json([
-                'success' => false,
-                'error' => 'Failed to send verification code. Please try again later.'
-            ], 400);
+            $response_data = [
+                'success' => true,
+                'message' => $response['message'],
+                'method' => $method,
+            ];
+            if ($method === 'sms' && isset($response['response_id'])) {
+                $response_data['response_id'] = $response['response_id'];
+            }
+            return response()->json($response_data);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => 'Failed to send verification code. Please try again later.', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
@@ -96,8 +86,7 @@ class TwoFactorController extends Controller
                 'email' => __('auth.session_expired')
             ]);
         }
-        $lastCode = VerificationCode::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
+        $lastCode = VerificationCode::forUser($user)
             ->latest()
             ->valid()
             ->first();
@@ -126,22 +115,17 @@ class TwoFactorController extends Controller
             ]);
         }
         $code = $request->get('code');
-        $lastCode = VerificationCode::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
+        $lastCode = VerificationCode::forUser($user)
             ->latest()
             ->valid()
             ->first();
         if (!$lastCode) {
             return back()->withErrors(['code' => 'No verification code found. Please request a new one.']);
         }
-        if ($this->twoFactorService->verifyCode($user, $code, $lastCode->method)) {
-            $request->session()->put('admin_2fa_verified', true);
-            if (!session()->has('session_removing')) {
-                $request->session()->put('session_removing', 1);
-            } else {
-                $request->session()->put('session_removing', session()->get('session_removing') + 1);
-            }
-            return redirect()->intended(route('admin.dashboard', absolute: false));
+        $deviceId = $this->twoFactorService->generateDeviceFingerprint();
+        if ($this->twoFactorService->verifyCode($user, $code, $lastCode->method, $deviceId)) {
+            session(['admin_2fa_verified' => true, 'admin_verified_device' => $deviceId]);
+            return redirect()->route('admin.dashboard');
         }
         return back()->withErrors(['code' => 'Invalid verification code']);
     }

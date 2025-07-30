@@ -72,6 +72,16 @@ return [
             'path' => storage_path('logs/merchant-log.log'),
             'level' => 'info',
         ],
+        'redirect' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/redirect-log.log'),
+            'level' => 'debug',
+        ],
+        '2fa' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/2fa-log.log'),
+            'level' => 'debug',
+        ],
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

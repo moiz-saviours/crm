@@ -192,8 +192,12 @@
                     url: '{{ route("admin.sales.kpi.update.2") }}',
                     data: function (d) {
                         var dates = $('#dateRangePicker').data('daterangepicker');
+                        const team_key = $('#teamSelect').val();
+                        const brand_key = $('#brandSelect').val();
                         d.start_date = dates.startDate.format('YYYY-MM-DD');
                         d.end_date = dates.endDate.format('YYYY-MM-DD');
+                        d.team_key = team_key;
+                        d.brand_key = brand_key;
                     },
                     dataSrc: function (json) {
                         if (json.success && json.data) {
@@ -300,6 +304,7 @@
             $('#dateRangePicker').on('apply.daterangepicker', function () {
                 table.ajax.reload();
             });
+            $('#teamSelect, #brandSelect').on('change', () => table.ajax.reload());
 
             // Refresh button
             $('#refreshData').click(function () {
@@ -641,10 +646,10 @@
                     '<td class="text-right">' + formatCurrency(d.total_bonus, '₨') + '</td>' +
                     '</tr>' +
                     (d?.teamsData?.is_lead ?
-                    '<tr class="font-weight-bold">' +
-                    '<td>Above Target Spiff Lead</td>' +
-                    '<td class="text-right">' + formatCurrency(d.lead_bonus, '₨') + '</td>' +
-                    '</tr>':""
+                            '<tr class="font-weight-bold">' +
+                            '<td>Above Target Spiff Lead</td>' +
+                            '<td class="text-right">' + formatCurrency(d.lead_bonus, '₨') + '</td>' +
+                            '</tr>' : ""
                     ) +
                     '<tr class="font-weight-bold table-primary">' +
                     '<td>Total Amount To Disburse</td>' +

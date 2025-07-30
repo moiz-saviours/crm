@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use function redirect;
 use function route;
@@ -28,6 +29,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        session(['AuthenticatedSessionController' => session('AuthenticatedSessionController') + 1, 'AuthenticatedSessionControllerNow' => [now()->format('Y-m-d H:i:s.v')]]);
         return view('user.auth.login');
     }
 
@@ -38,7 +40,8 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-        return redirect()->intended(route('user.dashboard', absolute: false));
+        Log::info('User authenticated with guard', ["intended_url" => session("url.intended"), 'sessions' => session()->all()]);
+        return redirect()->route('user.dashboard');
     }
 
     /**
@@ -47,15 +50,16 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $user = Auth::guard('web')->user();
+        session()->put('web_2fa_verified', false);
+        if ($user) {
+            Cache::forget("web_2fa_verified:{$user->id}");
+            $deviceId = $this->twoFactorService->generateDeviceFingerprint();
+            $this->twoFactorService->deleteCode($user, $deviceId);
+        }
         Auth::guard('web')->logout();
         /** It will destroy every user session */
 //        $request->session()->invalidate();
         $request->session()->regenerateToken();
-        session()->put('web_2fa_verified', false);
-        if ($user) {
-            Cache::forget("web_2fa_verified:{$user->id}");
-            $this->twoFactorService->deleteCode($user, 'email');
-        }
         return redirect('/login');
     }
 
