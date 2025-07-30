@@ -254,6 +254,9 @@
             div.dt-container div.dt-paging {
                 padding: 0px 10px 0 0;
             }
+            .dsh_btn {
+                display: flex;
+            }
 
             /* DATATABLE */
         </style>

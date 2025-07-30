@@ -83,17 +83,23 @@
                 font-size: 0.7rem !important;
                 border-radius: 3px;
             }
+            .dsh_btn {
+                display: flex;
+            }
         </style>
     @endpush
     <section id="content" class="content">
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                <h1 class="page-title mb-2  ">Dashboard</h1>
+               <div class="dsh_btn">
+                   <h1 class="page-title mb-2">Dashboard </h1>
+                   <button class="start-tour-btn my-btn tour-dashboard1-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard1"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+
+               </div>
                 <h2 class="h5">Welcome to the CRM Dashboard.</h2>
 
 
-                <button class="start-tour-btn my-btn tour-dashboard1-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard1"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                 <!-- END : Page title and information -->
             </div>
         </div>
@@ -317,9 +323,9 @@
         <div class="content__boxed">
             <div class="content__wrap">
                 <div class="row">
-                    <div class="col-md-8 tour-dashboard1-recenpayment">
+                    <div class="col-md-8">
                         <h2>Recent Payments</h2>
-                        <table class="table table-striped dashbord_tbl initTable">
+                        <table class="table table-striped dashbord_tbl initTable tour-dashboard1-recenpayment">
                             <thead>
                             <tr class="tabl_tr">
                                 <th class="tabl_th align-middle text-center text-nowrap">Serial No</th>
