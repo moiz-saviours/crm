@@ -204,6 +204,11 @@
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
                                                             data-id="{{ $brand->id }}" title="Delete"><i
                                                             class="fas fa-trash"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-primary copyScriptBtn"
+                                                            data-script='<script src="{{ url('script.js') }}?token={{ $brand->script_token }}"></script>'
+                                                            title="Copy Script">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -225,5 +230,20 @@
 
     @push('script')
         @include('admin.brands.script')
+        <script>
+            $(document).ready(function () {
+                $(document).on('click', '.copyScriptBtn', function () {
+                    const scriptText = $(this).data('script');
+                    navigator.clipboard.writeText(scriptText)
+                        .then(() => {
+                            toastr.success('Script copied to clipboard!');
+                        })
+                        .catch(err => {
+                            toastr.error('Failed to copy script');
+                            console.error(err);
+                        });
+                });
+            });
+        </script>
     @endpush
 @endsection

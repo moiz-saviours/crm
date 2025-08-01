@@ -490,6 +490,8 @@
                             const {id, logo, brand_key, name, email, description, url, status} = response.data;
                             const logoUrl = isValidUrl(logo) ? logo : (logo ? `{{ asset('assets/images/brand-logos/') }}/${logo}` : '{{ asset("assets/images/no-image-available.png") }}');
                             const index = table.rows().count() + 1;
+                            const scriptTag = `<script src="{{ url('script.js') }}?token=${response.data.script_token}"><\/script>`;
+
                             const columns = `
                                 <td class="align-middle text-center text-nowrap"></td>
                                 <td class="align-middle text-center text-nowrap">${index}</td>
@@ -511,6 +513,9 @@
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
                                         <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-primary copyScriptBtn" data-script='${scriptTag}' title="Copy Script">
+                                        <i class="fas fa-copy"></i>
                                     </button>
                                 </td>
                         `;
@@ -606,6 +611,16 @@
                         console.error('An error occurred while deleting the record:', error);
                     }
                 });
+        });
+
+            $(document).on('click', '.copyScriptBtn', function () {
+                const script = $(this).data('script');
+
+                navigator.clipboard.writeText(script).then(function () {
+                    toastr.success("Script copied to clipboard!");
+                }, function (err) {
+                    toastr.error("Failed to copy script.");
+            });
         });
     });
 </script>

@@ -34,6 +34,8 @@ class Lead extends Model
         'zipcode',
         'note',
         'status',
+        'lead_response',
+        'device_info',
     ];
 
     public function brand(): \Illuminate\Database\Eloquent\Relations\BelongsTo

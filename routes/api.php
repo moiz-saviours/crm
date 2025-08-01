@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\{
     ApiSecurePaymentController,
     ApiStripePaymentController
 };
+use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\ApiInvoiceController;
 use App\Http\Controllers\ApiPaymentAttachmentController;
 use App\Http\Controllers\SmsServiceContoller;
@@ -137,3 +138,6 @@ Route::fallback(function () {
     return response()->json(['error' => 'Controller or function not found'], 404);
 });
 Route::post('twilio/status-callback', [SmsServiceContoller::class, 'statusCallback'])->name('api.twilio.status.callback');
+
+Route::post('/brand-leads', [LeadController::class, 'storeFromScript']);
+

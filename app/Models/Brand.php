@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\ActivityLoggable;
+use Illuminate\Support\Str;
 
 class Brand extends Model
 {
@@ -146,5 +147,21 @@ class Brand extends Model
         return $query->where('status', 1);
     }
     /** Scope */
+
+    // This will create a "virtual" attribute
+    protected $appends = ['script_token'];
+
+    public function getScriptTokenAttribute(): string
+    {
+        return self::generateScriptTokenFromName($this->name);
+    }
+
+    public static function generateScriptTokenFromName(string $name): string
+    {
+        $normalized = Str::lower($name);
+        $normalized = preg_replace('/[^a-z0-9]/', '', $normalized);
+
+        return substr(hash_hmac('sha256', $normalized, 'brand_token'), 0, 15);
+    }
 }
 

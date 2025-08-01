@@ -283,4 +283,84 @@ class LeadController extends Controller
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
+
+    public function storeFromScript(Request $request)
+    {
+        $userAgent = $request->userAgent();
+
+        $deviceInfo = array_merge($request->device_info ?? [], [
+            'ip' => $request->ip(),
+            'user_agent' => $userAgent,
+            'browser_name' => $this->getBrowserName($userAgent),
+        ]);
+
+
+        $formData = $request->form_data;
+        $fieldMapping = [
+            'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
+            'email' => ['email'],
+            'phone' => ['tel','tele','phone','telephone','your-phone','phone-number','phonenumber'],
+        ];
+
+        $dataToSave = [];
+
+        foreach ($fieldMapping as $column => $possibleFields) {
+            foreach ($possibleFields as $field) {
+                if (isset($formData[$field])) {
+                    $dataToSave[$column] = $formData[$field];
+                    break;
+                }
+            }
+        }
+
+        try {
+
+            // Find the brand by script_token
+            $brand = Brand::all()->firstWhere('script_token', $request->script_token);
+
+            if (!$brand) {
+                return response()->json(['error' => 'Invalid script token.'], 404);
+            }
+
+            $lead = Lead::create([
+                'brand_key'=> $brand->brand_key,
+                'lead_status_id' => 2,
+                'name'=> $dataToSave['name'],
+                'email'=> $dataToSave['email'],
+                'phone'=> $dataToSave['phone'],
+                'lead_response' => json_encode($request->form_data),
+                'device_info' => json_encode($deviceInfo),
+            ]);
+
+            return response()->json([
+                'message' => 'Lead saved successfully!',
+                'lead_id' => $lead->id
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    private function getBrowserName($userAgent)
+    {
+        $browsers = [
+            'Edge' => 'Edg',
+            'Opera' => 'OPR',
+            'Vivaldi' => 'Vivaldi',
+            'Brave' => 'Brave',
+            'Chrome' => 'Chrome',
+            'Firefox' => 'Firefox',
+            'Safari' => 'Safari',
+            'Internet Explorer' => 'MSIE|Trident'
+        ];
+
+        foreach ($browsers as $browser => $pattern) {
+            if (preg_match("/$pattern/i", $userAgent)) {
+                return $browser;
+            }
+        }
+
+        return 'Unknown';
+    }
 }
