@@ -152,7 +152,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
     /** Profile Routes */
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [AdminProfileController::class, 'edit'])->name('edit');
-        //Route::post('/update', [AdminProfileController::class, 'update'])->name('update');
+        Route::post('/update', [AdminProfileController::class, 'update'])->name('update');
         Route::post('/image-update', [AdminProfileController::class, 'image_update'])->name('image.update');
     });
     /** Admin Accounts Routes */
