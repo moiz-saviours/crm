@@ -30,6 +30,7 @@ class LeadStatusSeeder extends Seeder
             ['name' => 'Pending Approval', 'color' => '#8e44ad', 'description' => 'Lead approval is pending.'],
             ['name' => 'On Hold', 'color' => '#2c3e50', 'description' => 'Lead is on hold for now.'],
             ['name' => 'Rejected', 'color' => '#c0392b', 'description' => 'Lead has been rejected.'],
+            ['name' => 'Test', 'color' => '#000000', 'description' => 'Testing lead.'],
         ];
 
         foreach ($statuses as $status) {
