@@ -92,17 +92,19 @@
                 <header class="custm_header">
                     <div class="new_head">
                         <h1 class="page-title mb-2">Brands <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
-{{--                        <h2 id="record-count" class="h6">{{count($brands)}} records</h2>--}}
+                        {{--                        <h2 id="record-count" class="h6">{{count($brands)}} records</h2>--}}
                     </div>
                     <div class="filters">
                         <div class="actions">
                             {{--                            <h1><i class="fa fa-lock" aria-hidden="true"></i> Data Quality</h1>--}}
 
-{{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
-{{--                            </button>--}}
-{{--                            <button class="header_btn" disabled>Import</button>--}}
+                            {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
+                            {{--                            </button>--}}
+                            {{--                            <button class="header_btn" disabled>Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="brand_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                                    data-tour="brand_create"><i class="fas fa-exclamation-circle custom-dot"></i>
+                            </button>
                             <button class="create-contact open-form-btn tour-createbrand">Create New</button>
 
                         </div>
@@ -117,7 +119,11 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Brands
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-brandtitle" data-toggle="tooltip" title="Take a Tour" data-tour="brands"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px">
+                                <button class="my-btn start-tour-btn tour-brandtitle" data-toggle="tooltip"
+                                        title="Take a Tour" data-tour="brands"><i
+                                            class="fas fa-exclamation-circle custom-dot"></i></button>
+                            </li>
 
                         </ul>
                     </div>
@@ -128,21 +134,21 @@
                                     <div class="container" style="min-width: 100%;">
                                         <div class="row fltr-sec">
                                             <div class="col-md-8">
-{{--                                                <ul class="custm-filtr">--}}
-{{--                                                    <div class="table-li">--}}
-{{--                                                        <li class="">Company Owner <i class="fa fa-caret-down"--}}
-{{--                                                                                      aria-hidden="true"></i></li>--}}
-{{--                                                        <li class="">Create date <i class="fa fa-caret-down"--}}
-{{--                                                                                    aria-hidden="true"></i></li>--}}
-{{--                                                        <li class="">Last activity date <i class="fa fa-caret-down"--}}
-{{--                                                                                           aria-hidden="true"></i>--}}
-{{--                                                        </li>--}}
+                                                {{--                                                <ul class="custm-filtr">--}}
+                                                {{--                                                    <div class="table-li">--}}
+                                                {{--                                                        <li class="">Company Owner <i class="fa fa-caret-down"--}}
+                                                {{--                                                                                      aria-hidden="true"></i></li>--}}
+                                                {{--                                                        <li class="">Create date <i class="fa fa-caret-down"--}}
+                                                {{--                                                                                    aria-hidden="true"></i></li>--}}
+                                                {{--                                                        <li class="">Last activity date <i class="fa fa-caret-down"--}}
+                                                {{--                                                                                           aria-hidden="true"></i>--}}
+                                                {{--                                                        </li>--}}
 
-{{--                                                        <li class=""><i class="fa fa-bars" aria-hidden="true"></i> All--}}
-{{--                                                            filters--}}
-{{--                                                        </li>--}}
-{{--                                                    </div>--}}
-{{--                                                </ul>--}}
+                                                {{--                                                        <li class=""><i class="fa fa-bars" aria-hidden="true"></i> All--}}
+                                                {{--                                                            filters--}}
+                                                {{--                                                        </li>--}}
+                                                {{--                                                    </div>--}}
+                                                {{--                                                </ul>--}}
                                             </div>
                                             <div class="col-md-4 right-icon" id="right-icon-0"></div>
                                         </div>
@@ -161,7 +167,8 @@
                                             <th class="align-middle text-center text-nowrap">Brand Key</th>
                                             <th class="align-middle text-center text-nowrap">Name</th>
                                             <th class="align-middle text-center text-nowrap">Url</th>
-                                            <th class="align-middle text-center text-nowrap tour-brandstatus">Status</th>
+                                            <th class="align-middle text-center text-nowrap tour-brandstatus">Status
+                                            </th>
                                             <th class="tour-contactaction">Action</th>
                                         </tr>
                                         </thead>
@@ -175,16 +182,16 @@
                                                         $logoUrl = filter_var($brand->logo, FILTER_VALIDATE_URL) ? $brand->logo : asset('assets/images/brand-logos/'.$brand->logo);
                                                     @endphp
                                                     <object
-                                                        data="{{ $logoUrl }}"
-                                                        class="avatar avatar-sm me-3"
+                                                            data="{{ $logoUrl }}"
+                                                            class="avatar avatar-sm me-3"
 
-                                                        title="{{ $brand->name }}"
+                                                            title="{{ $brand->name }}"
                                                     >
                                                         <img
-                                                            src="{{ $logoUrl }}"
-                                                            alt="{{ $brand->name }}"
-                                                            class="avatar avatar-sm me-3"
-                                                            title="{{ $brand->name }}">
+                                                                src="{{ $logoUrl }}"
+                                                                alt="{{ $brand->name }}"
+                                                                class="avatar avatar-sm me-3"
+                                                                title="{{ $brand->name }}">
                                                     </object>
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{$brand->brand_key}}</td>
@@ -198,17 +205,17 @@
                                                            {{ $brand->status == 1 ? 'checked' : '' }} data-bs-toggle="toggle">
                                                 </td>
                                                 <td class="align-middle text-center table-actions">
-                                                    <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $brand->id }}" title="Edit"><i
-                                                            class="fas fa-edit"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-danger deleteBtn"
-                                                            data-id="{{ $brand->id }}" title="Delete"><i
-                                                            class="fas fa-trash"></i></button>
                                                     <button type="button" class="btn btn-sm btn-primary copyScriptBtn"
-                                                            data-script='<script src="{{ url('script.js') }}?token={{ $brand->script_token }}"></script>'
+                                                            data-script='<script src="{{ asset('assets/js/wl-script.js') }}?token={{ $brand->script_token }}"></script>'
                                                             title="Copy Script">
                                                         <i class="fas fa-copy"></i>
                                                     </button>
+                                                    <button type="button" class="btn btn-sm btn-primary editBtn"
+                                                            data-id="{{ $brand->id }}" title="Edit"><i
+                                                                class="fas fa-edit"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-danger deleteBtn"
+                                                            data-id="{{ $brand->id }}" title="Delete"><i
+                                                                class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -225,8 +232,8 @@
     </section>
 
     <!-- Modal -->
-{{--    @include('admin.brands.create-modal')--}}
-{{--    @include('admin.brands.edit-modal')--}}
+    {{--    @include('admin.brands.create-modal')--}}
+    {{--    @include('admin.brands.edit-modal')--}}
 
     @push('script')
         @include('admin.brands.script')
