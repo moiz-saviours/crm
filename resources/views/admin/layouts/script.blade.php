@@ -669,6 +669,10 @@
                     const response = jqXHR.responseJSON;
                     const message = response?.message || response?.error || errorThrown || 'Something went wrong. Please try again.';
                     if (jqXHR.status === 419 || message.includes("CSRF token mismatch")) {
+                        console.log("Page Expire. Please try again.");
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
                         return refreshCsrfToken().then(() => {
                             return AjaxRequestPromise(url, data, method, options);
                         }).catch(() => {
