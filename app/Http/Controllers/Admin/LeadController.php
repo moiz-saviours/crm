@@ -121,7 +121,7 @@ class LeadController extends Controller
             ]);
             DB::commit();
             $lead->refresh();
-            $lead->loadMissing('customer_contact','brand','team','leadStatus');
+            $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             } else {
@@ -218,7 +218,7 @@ class LeadController extends Controller
                 'status' => $request->input('status'),
             ]);
             DB::commit();
-            $lead->loadMissing('customer_contact','brand','team','leadStatus');
+            $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             } else {
@@ -287,23 +287,19 @@ class LeadController extends Controller
     public function storeFromScript(Request $request)
     {
         $userAgent = $request->userAgent();
-
         $deviceInfo = array_merge($request->device_info ?? [], [
             'ip' => $request->ip(),
             'user_agent' => $userAgent,
             'browser_name' => $this->getBrowserName($userAgent),
         ]);
-
-
         $formData = $request->form_data;
         $fieldMapping = [
-            'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
+            'name' => ['fname', 'name', 'firstname', 'first-name', 'first_name', 'fullname', 'full_name', 'yourname', 'your-name'],
             'email' => ['email'],
-            'phone' => ['tel','tele','phone','telephone','your-phone','phone-number','phonenumber'],
+            'phone' => ['tel', 'tele', 'phone', 'telephone', 'your-phone', 'phone-number', 'phonenumber'],
+            'note' => ['message', 'msg', 'desc', 'description', 'note'],
         ];
-
         $dataToSave = [];
-
         foreach ($fieldMapping as $column => $possibleFields) {
             foreach ($possibleFields as $field) {
                 if (isset($formData[$field])) {
@@ -312,26 +308,23 @@ class LeadController extends Controller
                 }
             }
         }
-
         try {
 
             // Find the brand by script_token
             $brand = Brand::all()->firstWhere('script_token', $request->script_token);
-
             if (!$brand) {
                 return response()->json(['error' => 'Invalid script token.'], 404);
             }
-
             $lead = Lead::create([
-                'brand_key'=> $brand->brand_key,
+                'brand_key' => $brand->brand_key,
                 'lead_status_id' => 1,
-                'name'=> $dataToSave['name'],
-                'email'=> $dataToSave['email'],
-                'phone'=> $dataToSave['phone'],
+                'name' => $dataToSave['name'] ?? "",
+                'email' => $dataToSave['email'] ?? "",
+                'phone' => $dataToSave['phone'] ?? "",
+                'note' => $dataToSave['note'] ?? "",
                 'lead_response' => json_encode($request->form_data),
                 'device_info' => json_encode($deviceInfo),
             ]);
-
             return response()->json([
                 'message' => 'Lead saved successfully!',
                 'lead_id' => $lead->id
@@ -342,6 +335,7 @@ class LeadController extends Controller
             ], 500);
         }
     }
+
     private function getBrowserName($userAgent)
     {
         $browsers = [
@@ -354,13 +348,11 @@ class LeadController extends Controller
             'Safari' => 'Safari',
             'Internet Explorer' => 'MSIE|Trident'
         ];
-
         foreach ($browsers as $browser => $pattern) {
             if (preg_match("/$pattern/i", $userAgent)) {
                 return $browser;
             }
         }
-
         return 'Unknown';
     }
 }
