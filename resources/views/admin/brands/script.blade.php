@@ -187,7 +187,7 @@
                 order: [[1, 'asc']],
                 responsive: false,
                 scrollX: true,
-                scrollY:  ($(window).height() - 350),
+                scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
                 columnDefs: [
@@ -490,7 +490,7 @@
                             const {id, logo, brand_key, name, email, description, url, status} = response.data;
                             const logoUrl = isValidUrl(logo) ? logo : (logo ? `{{ asset('assets/images/brand-logos/') }}/${logo}` : '{{ asset("assets/images/no-image-available.png") }}');
                             const index = table.rows().count() + 1;
-                            const scriptTag = `<script src="{{ url('script.js') }}?token=${response.data.script_token}"><\/script>`;
+                            const scriptTag = `<script src="{{ asset('assets/js/wl-script.js') }}?token=${response.data.script_token}"><\/script>`;
 
                             const columns = `
                                 <td class="align-middle text-center text-nowrap"></td>
@@ -508,14 +508,14 @@
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
                                 <td class="align-middle text-center table-actions">
+                                    <button type="button" class="btn btn-sm btn-primary copyScriptBtn" data-script='${scriptTag}' title="Copy Script">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
                                         <i class="fas fa-trash"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-primary copyScriptBtn" data-script='${scriptTag}' title="Copy Script">
-                                        <i class="fas fa-copy"></i>
                                     </button>
                                 </td>
                         `;
@@ -525,7 +525,7 @@
                             $('#formContainer').removeClass('open')
                         }
                     })
-                    .catch(error => console.error('An error occurred while updating the record.',error));
+                    .catch(error => console.error('An error occurred while updating the record.', error));
             } else {
                 const url = $(this).attr('action');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
@@ -613,13 +613,13 @@
                 });
         });
 
-            $(document).on('click', '.copyScriptBtn', function () {
-                const script = $(this).data('script');
+        $(document).on('click', '.copyScriptBtn', function () {
+            const script = $(this).data('script');
 
-                navigator.clipboard.writeText(script).then(function () {
-                    toastr.success("Script copied to clipboard!");
-                }, function (err) {
-                    toastr.error("Failed to copy script.");
+            navigator.clipboard.writeText(script).then(function () {
+                toastr.success("Script copied to clipboard!");
+            }, function (err) {
+                toastr.error("Failed to copy script.");
             });
         });
     });
