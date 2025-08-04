@@ -25,47 +25,47 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-//    public function update(Request $request)
-//    {
-//        $user = $request->user();
-//        $messages = [
-//            'name.string' => 'The name must be a string.',
-//            'name.max' => 'The first name must not exceed 255 characters.',
-//            'email.email' => 'The email must be a valid email address.',
-//            'email.max' => 'The email must not exceed 255 characters.',
-//            'email.unique' => 'The email has already been taken.',
-//            'phone_number.string' => 'The phone number must be a string.',
-//            'phone_number.max' => 'The phone number must not exceed 20 characters.',
-//        ];
-//        $validatedData = $request->validate([
-//            'name' => 'nullable|string|max:255',
-//            'email' => 'nullable|email|max:255|unique:admins,email,' . $user->id,
-//            'phone_number' => 'nullable|string|max:20',
-//        ], $messages);
-//        try {
-//
-//            $user->name = $validatedData['name'] ?? $user->name;
-////            if ($user->isDirty('email')) {
-////                $user->email_verified_at = null;
-////            }
-//            $user->email = $validatedData['email'] ?? $user->email;
-//            $user->phone_number = $validatedData['phone_number'] ?? $user->phone_number;
-//            $user->save();
-//            return response()->json([
-//                'data' => [
-//                    'user' => $user->fresh(),
-//                ],
-//                'message' => 'Profile updated successfully.'
-//            ]);
-//
-//        } catch (\Exception $e) {
-//            Log::error('Profile update error: ' . $e->getMessage());
-//            return response()->json([
-//                'error' => 'Internal Server Error',
-//                'message' => 'Failed to update profile. Please try again.'
-//            ], 500);
-//        }
-//    }
+    public function update(Request $request)
+    {
+        $user = $request->user();
+        $messages = [
+            'name.string' => 'The name must be a string.',
+            'name.max' => 'The first name must not exceed 255 characters.',
+            'email.email' => 'The email must be a valid email address.',
+            'email.max' => 'The email must not exceed 255 characters.',
+            'email.unique' => 'The email has already been taken.',
+            'phone_number.string' => 'The phone number must be a string.',
+            'phone_number.max' => 'The phone number must not exceed 20 characters.',
+        ];
+        $validatedData = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255|unique:admins,email,' . $user->id,
+            'phone_number' => 'nullable|string|max:20',
+        ], $messages);
+        try {
+
+            $user->name = $validatedData['name'] ?? $user->name;
+//            if ($user->isDirty('email')) {
+//                $user->email_verified_at = null;
+//            }
+            $user->email = $validatedData['email'] ?? $user->email;
+            $user->phone_number = $validatedData['phone_number'] ?? $user->phone_number;
+            $user->save();
+            return response()->json([
+                'data' => [
+                    'user' => $user->fresh(),
+                ],
+                'message' => 'Profile updated successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Profile update error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Internal Server Error',
+                'message' => 'Failed to update profile. Please try again.'
+            ], 500);
+        }
+    }
 
     /**
      * Update the user's profile image.
