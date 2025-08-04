@@ -324,7 +324,7 @@ class LeadController extends Controller
 
             $lead = Lead::create([
                 'brand_key'=> $brand->brand_key,
-                'lead_status_id' => 2,
+                'lead_status_id' => 1,
                 'name'=> $dataToSave['name'],
                 'email'=> $dataToSave['email'],
                 'phone'=> $dataToSave['phone'],
