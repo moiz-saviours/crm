@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('leads', function (Blueprint $table) {
             if (!Schema::hasColumn('leads', 'lead_response')) {
-                $table->json('lead_response')->nullable()->after('status');
+                $table->json('lead_response')->nullable()->after('note');
             }
 
             if (!Schema::hasColumn('leads', 'device_info')) {
