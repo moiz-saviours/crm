@@ -19,10 +19,10 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     PaymentController as AdminPaymentController,
     ProfileController as AdminProfileController,
     SettingController as AdminSettingController,
+    TaskController as AdminTaskController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController,
-    SalesKpiController as AdminSalesKpiController,
-};
+    SalesKpiController as AdminSalesKpiController};
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -263,6 +263,9 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             });
         });
     });
+    /** Task Management Routes */
+    Route::get('/tasks', [AdminTaskController::class, 'index'])->name('tasks.index');
+
     /** Lead Routes */
     Route::name('lead.')->group(function () {
         Route::get('/leads', [AdminLeadController::class, 'index'])->name('index');
