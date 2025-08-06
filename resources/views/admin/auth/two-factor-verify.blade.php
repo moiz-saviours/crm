@@ -41,7 +41,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-dark-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-dark-900 text-gray-800 dark:text-gray-200 transition-colors duration-300" style="display:flex">
 <div class="w-full max-w-md mx-4">
     <div class="card bg-white dark:bg-dark-800 p-8">
         <div class="flex justify-between items-center mb-6">

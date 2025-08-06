@@ -8,7 +8,7 @@
     <meta http-equiv="refresh" content="7199">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
-{{--    <link rel="stylesheet" href="./style.css/">--}}
+    {{--    <link rel="stylesheet" href="./style.css/">--}}
     <link rel="stylesheet" href="{{asset ('assets/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/toaster/css/toastr.min.css')}}">
     <link rel="apple-touch-icon" sizes="76x76" href="{{asset('assets/img/apple-icon.png')}}">
@@ -25,11 +25,11 @@
         <div class="main-login-row">
             <div class="row justify-content-end">
                 <div class="col-lg-4">
-{{--                    <div class="text-center">--}}
-{{--                        <img src="{{asset('assets/images/aim-logo.png')}}" class="img-fluid logo-h" >--}}
-{{--                        <h1 class="main-logo-heading">CRM</h1>--}}
+                    {{--                    <div class="text-center">--}}
+                    {{--                        <img src="{{asset('assets/images/aim-logo.png')}}" class="img-fluid logo-h" >--}}
+                    {{--                        <h1 class="main-logo-heading">CRM</h1>--}}
 
-{{--                    </div>--}}
+                    {{--                    </div>--}}
                     <div class="left-side-box">
 
                         <h4> Admin Login </h4>
@@ -41,7 +41,7 @@
                             <x-text-input id="email" class="login-inputs" type="email" name="email"
                                           :value="old('email')" required autofocus
                                           autocomplete="username"/>
-{{--                            <x-input-error :messages="$errors->get('email')" class="mt-2"/>--}}
+                            {{--                            <x-input-error :messages="$errors->get('email')" class="mt-2"/>--}}
                             <x-input-label for="password" class="login-labels" :value="__('Password')"/>
 
                             <x-text-input id="password" class="login-inputs"
@@ -54,17 +54,17 @@
                             <div class="forgot-password-div">
                                 <div class="save-password-div">
                                     <label class="switch">
-                                        <input type="checkbox" name="remember" checked>
+                                        <input id="remember" type="checkbox" name="remember" checked>
                                         <span class="slider round"></span>
                                     </label>
-
+                                    <x-input-label for="remember" class="login-labels" :value="__('Remember Me')"/>
                                 </div>
-{{--                                <a href="{{ route('password.request') }}" class="password-link">--}}
-{{--                                    @if (Route::has('password.request'))--}}
-{{--                                        {{ __('Forgot your password?') }}--}}
-{{--                                    @endif--}}
+                                {{--                                <a href="{{ route('password.request') }}" class="password-link">--}}
+                                {{--                                    @if (Route::has('password.request'))--}}
+                                {{--                                        {{ __('Forgot your password?') }}--}}
+                                {{--                                    @endif--}}
 
-{{--                                </a>--}}
+                                {{--                                </a>--}}
                             </div>
                             <button type="submit" class="login-btn">
                                 {{ __('Log in') }}

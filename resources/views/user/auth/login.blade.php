@@ -56,6 +56,7 @@
                                         <input type="checkbox" name="remember" checked>
                                         <span class="slider round"></span>
                                     </label>
+                                    <x-input-label for="remember" class="login-labels" :value="__('Remember Me')"/>
 
                                 </div>
 {{--                                <a href="{{ route('password.request') }}" class="password-link">--}}
