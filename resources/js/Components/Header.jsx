@@ -17,11 +17,11 @@ const Header = () => {
                     <div className="row">
                         <div className="col-md-2 d-flex">
                             <div className="logo_icon">
-                                <img src="/images/logo_icon.png" alt=" logo icon"/>
+                                <img src="/assets/images/task-management/logo_icon.png" alt=" logo icon"/>
                             </div>
                             <div className="img_box d-flex">
-                                <img src="/images/logo.png" alt="header logo"/>
-                                <span>Trello</span>
+                                <img src="/assets/images/task-management/logo.png" alt="header logo"/>
+                                <span>Task Management</span>
                             </div>
                         </div>
 
