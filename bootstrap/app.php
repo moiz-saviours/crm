@@ -3,6 +3,7 @@
 use App\Http\Middleware\Cooldown;
 use App\Http\Middleware\DynamicAccessMiddleware;
 use App\Http\Middleware\FilterAssetRequests;
+use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LastSeen;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\Authenticate;
@@ -39,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [LastSeen::class, Cooldown::class]);
+        $middleware->web(append: [LastSeen::class, Cooldown::class,HandleInertiaRequests::class]);
         $middleware->web(prepend: [SetGuardSessionCookie::class, StartSession::class, VerifyCrossDomainToken::class, FilterAssetRequests::class,]);
         $middleware->alias([
             'guest' => RedirectIfAuthenticated::class,
