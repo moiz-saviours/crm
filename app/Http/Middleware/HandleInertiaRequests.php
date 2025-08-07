@@ -35,10 +35,7 @@ class HandleInertiaRequests extends Middleware
         if ($request->is('admin/*')) {
             return 'admin.layouts.inertia';
         }
-        if ($request->is('user/*')) {
-            return 'user.layouts.inertia';
-        }
-        return 'app';
+        return 'user.layouts.inertia';
     }
 
     /**
