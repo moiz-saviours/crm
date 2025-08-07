@@ -9,7 +9,7 @@ const Board = () => {
                         <div className="col-md-6">
                             <div className="left_sec d-flex">
                                 <h1>Development Board</h1>
-                                <img src="/assets/images/task-management/board-icon.png" alt="board icon"/>
+                                <img src="./assets/images/task-management/board-icon.png" alt="board icon"/>
                             </div>
                         </div>
                         <div className="col-md-6">

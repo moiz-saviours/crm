@@ -6,7 +6,7 @@ const BoardCard = () => {
             <div className="board-card" data-bs-toggle="modal" data-bs-target="#cardDetailModal"
                  style={{cursor: "pointer"}}>
                 <div className="board-card-img">
-                    <img src="/assets/images/task-management/card_img.webp" alt=""/>
+                    <img src="./assets/images/task-management/card_img.webp" alt=""/>
                 </div>
                 <div className="board-content-box">
                     <div className="priority_sec"></div>

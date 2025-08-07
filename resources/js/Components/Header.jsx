@@ -20,7 +20,7 @@ const Header = () => {
                                 <img src="/assets/images/task-management/logo_icon.png" alt=" logo icon"/>
                             </div>
                             <div className="img_box d-flex">
-                                <img src="/assets/images/task-management/logo.png" alt="header logo"/>
+                                <img src="./assets/images/task-management/logo.png" alt="header logo"/>
                                 <span>Task Management</span>
                             </div>
                         </div>

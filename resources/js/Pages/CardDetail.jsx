@@ -92,7 +92,7 @@ const CardDetail = ({description}) => {
                                     </span>
                             </div>
                             <div className="col-md-4">
-                                <img src="/images/card_img.webp" alt="Cover Image"/>
+                                <img src="./images/card_img.webp" alt="Cover Image"/>
                             </div>
                             <div className="col-md-4">
                                 <div className="icon-group d-flex gap-2">
@@ -345,7 +345,7 @@ const CardDetail = ({description}) => {
                                         <div className="attach_files d-flex">
                                             <div className="d-flex">
                                                 <div className="attach_img">
-                                                    <img src="/images/card_img.webp" alt=""/>
+                                                    <img src="./images/card_img.webp" alt=""/>
                                                 </div>
                                                 <div className="attach_det">
                                                     <h6>curved5-samll.jpg</h6>
@@ -359,7 +359,7 @@ const CardDetail = ({description}) => {
                                         <div className="attach_files d-flex">
                                             <div className="d-flex">
                                                 <div className="attach_img">
-                                                    <img src="/images/card_img.webp" alt=""/>
+                                                    <img src="./images/card_img.webp" alt=""/>
                                                 </div>
                                                 <div className="attach_det">
                                                     <h6>curved5-samll.jpg</h6>
@@ -378,7 +378,7 @@ const CardDetail = ({description}) => {
 
                                     <div className="comment_sec">
                                         <div className="comment_head_sec d-flex">
-                                            <img src="/images/chat.png" alt=""/>
+                                            <img src="./images/chat.png" alt=""/>
                                             <span>Comments and Activity</span>
                                         </div>
 
