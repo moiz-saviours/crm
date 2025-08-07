@@ -719,4 +719,9 @@ Detailed information and more samples can be found in the documentation.
         border-top-width: 1px !important;
         border-top-color: var(--bs-secondary);
     }
+
+    .mn--min .header__brand .brand-img img.logo {
+        max-width: 70px;
+        margin-left: 20px;
+    }
 </style>
