@@ -1,42 +1,89 @@
 import React, {useState, useRef, useEffect} from 'react';
 import BoardCard from '../Pages/BoardCard.jsx';
 import CardDetail from '../Pages/CardDetail.jsx';
+import { Sortable } from 'sortablejs';
 
-const BoardList = ({product}) => {
+
+const BoardList = () => {
     const [isAddingCard, setIsAddingCard] = useState(false);
-    const columnBodyRef = useRef(null);
-    const wrapperRef = useRef(null);
+    const [columns, setColumns] = useState({
+        done: [
+            { id: 1, title: "Card 1" },
+            { id: 2, title: "Card 2" }
+        ],
+        todo: [
+            { id: 3, title: "Card 3" }
+        ],
+        inProgress: []
+    });
 
-    const handleAddClick = () => {
-        setIsAddingCard(true);
-    };
-
-    const handleClose = () => {
-        setIsAddingCard(false);
-    };
+    const doneRef = useRef(null);
+    const todoRef = useRef(null);
+    const inProgressRef = useRef(null);
 
     useEffect(() => {
-        const wrapper = wrapperRef.current;
-        const inputBoxExists = wrapper?.querySelector('.card-input-container');
+        const initializeSortable = (ref, columnId) => {
+            if (!ref.current) return;
 
-        if (!inputBoxExists && wrapper) {
-            wrapper.style.maxHeight = 'calc(400px - 34px)';
-        } else if (wrapper) {
-            wrapper.style.maxHeight = '';
-        }
+            new Sortable(ref.current, {
+                group: 'shared',
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                fallbackOnBody: true,
+                swapThreshold: 0.65,
+                forceFallback: true,
+                onEnd: (evt) => {
+                    const { from, to, oldIndex, newIndex } = evt;
+                    const fromColumn = from.id;
+                    const toColumn = to.id;
 
-        if (isAddingCard && columnBodyRef.current) {
-            // Wait for textarea to appear in DOM
-            setTimeout(() => {
-                columnBodyRef.current.scrollTop = columnBodyRef.current.scrollHeight;
-            }, 50);
-        }
-    }, [isAddingCard]);
+                    if (!fromColumn || !toColumn || oldIndex === undefined || newIndex === undefined) return;
+
+                    setColumns(prev => {
+                        const newColumns = { ...prev };
+                        const movedItem = newColumns[fromColumn][oldIndex];
+
+                        // Remove from old column
+                        newColumns[fromColumn] = [...newColumns[fromColumn]];
+                        newColumns[fromColumn].splice(oldIndex, 1);
+
+                        // Add to new column
+                        newColumns[toColumn] = [...newColumns[toColumn]];
+                        newColumns[toColumn].splice(newIndex, 0, movedItem);
+
+                        return newColumns;
+                    });
+
+                    // Revert DOM change, React will re-render correctly
+                    evt.from.insertBefore(evt.item, evt.from.children[oldIndex]);
+                }
+            });
+        };
+
+
+        initializeSortable(doneRef, 'done');
+        initializeSortable(todoRef, 'todo');
+        initializeSortable(inProgressRef, 'inProgress');
+
+        return () => {
+            // Cleanup Sortable instances if needed
+            [doneRef, todoRef, inProgressRef].forEach(ref => {
+                if (ref.current?.sortable) {
+                    ref.current.sortable.destroy();
+                }
+            });
+        };
+    }, []);
+
+    const handleAddClick = () => setIsAddingCard(true);
+    const handleClose = () => setIsAddingCard(false);
 
     return (
-        <>
-            <div className="board-position">
+
+        <div className="board-position">
+            <div className="board-wrapper">
                 <div className="board-container">
+                    {/* Done Column */}
                     <div className="board-column">
                         <div className="column-header">
                             <span className="column-title">Done</span>
@@ -44,23 +91,14 @@ const BoardList = ({product}) => {
                                 <i className="fa-solid fa-ellipsis"></i>
                             </span>
                         </div>
-
-                        <div
-                            className={`column-body-wrapper ${!isAddingCard ? 'adjusted-height' : ''}`}
-                            ref={wrapperRef}
-                        >
-                            <div className="column-body" ref={columnBodyRef}>
-                                {/* Cards */}
-                                <BoardCard product={product}/>
-                                <BoardCard product={product}/>
-
-                                {/* Input Box */}
+                        <div className="column-body-wrapper">
+                            <div className="column-body" id="done" ref={doneRef}>
+                                {columns.done.map(card => (
+                                    <BoardCard key={card.id} card={card}/>
+                                ))}
                                 {isAddingCard && (
                                     <div className="card-input-container">
-                                        <textarea
-                                            className="card-input"
-                                            placeholder="Enter card title..."
-                                        />
+                                        <textarea className="card-input" placeholder="Enter card title..."/>
                                         <div className="card-input-actions">
                                             <button className="add-card-btn">Add Card</button>
                                             <button className="close-card-btn" onClick={handleClose}>
@@ -70,24 +108,54 @@ const BoardList = ({product}) => {
                                     </div>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Footer */}
-                        {!isAddingCard && (
-                            <div className="column-footer" onClick={handleAddClick}>
-                                <div className="add-card-div">
-                                <span className="add-icon">
-                                    <i className="fa-solid fa-plus"></i>
-                                </span>
+                            {!isAddingCard && (
+                                <div className="add-card" onClick={handleAddClick}>
+                                    <span className="add-icon">
+                                        <i className="fa-solid fa-plus"></i>
+                                    </span>
                                     <span className="add-title">Add a card</span>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                    <CardDetail/>
+
+                    <div className="board-column">
+                        <div className="column-header">
+                            <span className="column-title">Todo</span>
+                            <span className="column-menu">
+                                <i className="fa-solid fa-ellipsis"></i>
+                            </span>
+                        </div>
+                        <div className="column-body-wrapper">
+                            <div className="column-body" id="todo" ref={todoRef}>
+                                {columns.todo.map(card => (
+                                    <BoardCard key={card.id} card={card}/>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* In Progress Column */}
+                    <div className="board-column">
+                        <div className="column-header">
+                            <span className="column-title">In Progress</span>
+                            <span className="column-menu">
+                                <i className="fa-solid fa-ellipsis"></i>
+                            </span>
+                        </div>
+                        <div className="column-body-wrapper">
+                            <div className="column-body" id="inProgress" ref={inProgressRef}>
+                                {columns.inProgress.map(card => (
+                                    <BoardCard key={card.id} card={card}/>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </>
+        </div>
+
     );
 };
 

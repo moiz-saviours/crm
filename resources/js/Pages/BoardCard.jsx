@@ -1,9 +1,12 @@
 import React from 'react'
 
-const BoardCard = () => {
+const BoardCard = ({ card }) => {
     return (
         <>
-            <div className="board-card" data-bs-toggle="modal" data-bs-target="#cardDetailModal"
+            <div className="board-card"
+                 data-id={card.id}
+                 data-bs-toggle="modal"
+                 data-bs-target="#cardDetailModal"
                  style={{cursor: "pointer"}}>
                 <div className="board-card-img">
                     <img src="/assets/images/task-management/card_img.webp" alt=""/>
@@ -11,7 +14,7 @@ const BoardCard = () => {
                 <div className="board-content-box">
                     <div className="priority_sec"></div>
                     <div className="board-card-title">
-                        <h3>New Card</h3>
+                        <h3>{card.title}</h3>
                     </div>
                     <div className="board-card-detail d-flex">
                         <i className="fa-solid fa-eye"></i>
