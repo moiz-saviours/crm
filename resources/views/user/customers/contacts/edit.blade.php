@@ -142,7 +142,7 @@
                 /*height: 850px;*/
                 overflow-y: auto !important;
 
-                 height: 100%;
+                height: 100%;
                 /*height: calc(-200px + 100vh);*/
                 /*flex-grow: 1;*/
                 border-radius: 20px 0px 0px 0px;
@@ -245,7 +245,7 @@
                 margin: 0;
                 font-size: 24px;
                 text-align: left;
-                font-weight: 400;
+                font-weight: 100;
                 color: #2d3e50;
                 /* margin-bottom: -3px; */
             }
@@ -259,7 +259,7 @@
 
             .contact-info p {
                 /* margin: 5px 0; */
-                font-size: 12px;
+                font-size: 0.8rem;
                 font-weight: 400;
                 color: gray;
                 margin: 0;
@@ -1087,16 +1087,21 @@
                         </div>
                         <div>
                             <div class="profile_box">
-                                <!-- <div class="avatar">MM</div> -->
-                                <div class="avatar-img-box">
-{{--                                    <img class="img-fluid avatar-img" src="img/user.png">--}}
-                                     <img class="img-fluid avatar-img" src="{{asset ('assets/images/user.png')}}">
-                                </div>
-                                <div class="contact-info">
-                                    <h2>Mr Malik</h2>
-                                    <!-- <h5>Business Development Executive</h5> -->
-                                    <p>seo.hannywebdeveloper14@outlook.com
-                                    </p>
+                                <div class="avatar-img-box" style="padding-inline-end: 10px;">
+                                    @if(file_exists(public_path('assets/images/user1.png')))
+                                        <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
+                                             src="{{ asset('assets/images/user1.png') }}">
+                                    @else
+                                        @php
+                                            $words = explode(' ', $customer_contact->name ?? $customer_contact->email);
+                                            $initials = strtoupper($words[0][0] . (count($words) > 1 ? $words[1][0] : ''));
+                                        @endphp
+                                        <div
+                                            class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                            style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
+                                            {{ $initials }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
 
@@ -1614,11 +1619,10 @@
 
                                                                     <div class="new-profile-email-wrapper">
                                                                         <div
-                                                                            class="activities-seprater  open-email-form" style="position: relative">
+                                                                            class="activities-seprater  open-email-form"
+                                                                            style="position: relative">
                                                                             Reply
                                                                         </div>
-
-
 
 
                                                                         <div
