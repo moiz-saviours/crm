@@ -161,7 +161,7 @@
                         <img src="{{asset('assets/img/favicon.png')}}" alt="Logo" class="logo"
                              {{--                             width="16"--}}
                              {{--                             height="16"--}}
-                             style="width:110px;height:40px">
+                             style="max-width:110px;max-height:30px">
                     </a>
 
 
