@@ -44,7 +44,7 @@
     "isEntry": true
   },
   "resources/js/Pages/Board.jsx": {
-    "file": "assets/Board-Dv6kZ2y1.js",
+    "file": "assets/Board-oDFz-i_-.js",
     "name": "Board",
     "src": "resources/js/Pages/Board.jsx",
     "isDynamicEntry": true,
@@ -54,7 +54,7 @@
     ]
   },
   "resources/js/Pages/BoardCard.jsx": {
-    "file": "assets/BoardCard-B--mVlC4.js",
+    "file": "assets/BoardCard-dbUWnL-h.js",
     "name": "BoardCard",
     "src": "resources/js/Pages/BoardCard.jsx",
     "isDynamicEntry": true,
@@ -64,7 +64,7 @@
     ]
   },
   "resources/js/Pages/BoardList.jsx": {
-    "file": "assets/BoardList-CMJqxNSX.js",
+    "file": "assets/BoardList-D6FLjNaj.js",
     "name": "BoardList",
     "src": "resources/js/Pages/BoardList.jsx",
     "isDynamicEntry": true,
@@ -76,7 +76,7 @@
     ]
   },
   "resources/js/Pages/CardDetail.jsx": {
-    "file": "assets/CardDetail-DHtCEpk0.js",
+    "file": "assets/CardDetail-BcxzNdI1.js",
     "name": "CardDetail",
     "src": "resources/js/Pages/CardDetail.jsx",
     "isDynamicEntry": true,
@@ -89,7 +89,7 @@
     ]
   },
   "resources/js/Pages/Index.jsx": {
-    "file": "assets/Index-BhyNzKuu.js",
+    "file": "assets/Index-BeUb7ogX.js",
     "name": "Index",
     "src": "resources/js/Pages/Index.jsx",
     "isDynamicEntry": true,
@@ -112,7 +112,7 @@
     ]
   },
   "resources/js/react-app.jsx": {
-    "file": "assets/react-app-DjcHdNpz.js",
+    "file": "assets/react-app-Fm9ppLj0.js",
     "name": "react-app",
     "src": "resources/js/react-app.jsx",
     "isEntry": true,
