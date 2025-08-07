@@ -25,6 +25,7 @@
         "@vitejs/plugin-react": "^4.7.0",
         "bootstrap": "^5.3.7",
         "emoji-picker-react": "^4.13.2",
-        "react-datepicker": "^8.4.0"
+        "react-datepicker": "^8.4.0",
+        "sortablejs": "^1.15.6"
     }
 }
