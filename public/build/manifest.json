@@ -44,7 +44,7 @@
     "isEntry": true
   },
   "resources/js/Pages/Board.jsx": {
-    "file": "assets/Board-oDFz-i_-.js",
+    "file": "assets/Board-NdgplQPe.js",
     "name": "Board",
     "src": "resources/js/Pages/Board.jsx",
     "isDynamicEntry": true,
@@ -54,7 +54,7 @@
     ]
   },
   "resources/js/Pages/BoardCard.jsx": {
-    "file": "assets/BoardCard-dbUWnL-h.js",
+    "file": "assets/BoardCard-CnbkPuQ0.js",
     "name": "BoardCard",
     "src": "resources/js/Pages/BoardCard.jsx",
     "isDynamicEntry": true,
@@ -64,19 +64,18 @@
     ]
   },
   "resources/js/Pages/BoardList.jsx": {
-    "file": "assets/BoardList-D6FLjNaj.js",
+    "file": "assets/BoardList-BKlYC2Zs.js",
     "name": "BoardList",
     "src": "resources/js/Pages/BoardList.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/react-app.jsx",
       "resources/js/Pages/BoardCard.jsx",
-      "resources/js/Pages/CardDetail.jsx",
       "_bootstrap-Bo9YfFDN.js"
     ]
   },
   "resources/js/Pages/CardDetail.jsx": {
-    "file": "assets/CardDetail-BcxzNdI1.js",
+    "file": "assets/CardDetail-DYczdkRu.js",
     "name": "CardDetail",
     "src": "resources/js/Pages/CardDetail.jsx",
     "isDynamicEntry": true,
@@ -89,7 +88,7 @@
     ]
   },
   "resources/js/Pages/Index.jsx": {
-    "file": "assets/Index-BeUb7ogX.js",
+    "file": "assets/Index-Cij-3Uwa.js",
     "name": "Index",
     "src": "resources/js/Pages/Index.jsx",
     "isDynamicEntry": true,
@@ -98,8 +97,7 @@
       "resources/js/Pages/Board.jsx",
       "resources/js/Pages/BoardList.jsx",
       "_bootstrap-Bo9YfFDN.js",
-      "resources/js/Pages/BoardCard.jsx",
-      "resources/js/Pages/CardDetail.jsx"
+      "resources/js/Pages/BoardCard.jsx"
     ]
   },
   "resources/js/app.js": {
@@ -112,7 +110,7 @@
     ]
   },
   "resources/js/react-app.jsx": {
-    "file": "assets/react-app-Fm9ppLj0.js",
+    "file": "assets/react-app-AqRrQzLP.js",
     "name": "react-app",
     "src": "resources/js/react-app.jsx",
     "isEntry": true,
@@ -127,7 +125,7 @@
       "resources/js/Pages/Index.jsx"
     ],
     "css": [
-      "assets/react-app-BWjE0YjL.css"
+      "assets/react-app-BzK7jIHt.css"
     ],
     "assets": [
       "assets/fa-brands-400-D_cYUPeE.woff2",
