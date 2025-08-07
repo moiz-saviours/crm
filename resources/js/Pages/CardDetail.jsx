@@ -1,5 +1,4 @@
-import React from 'react'
-import {useState, useRef} from 'react';
+import React, { useEffect,useState, useRef } from 'react';
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import EmojiPicker from 'emoji-picker-react';
@@ -8,6 +7,14 @@ import "react-datepicker/dist/react-datepicker.css";
 
 
 const CardDetail = ({description}) => {
+    useEffect(() => {
+        const modalElement = document.getElementById('cardDetailModal');
+        if (modalElement && window.bootstrap) {
+            // Pre-initialize the modal to prevent errors
+            new window.bootstrap.Modal(modalElement);
+        }
+    }, []);
+
     // Attachment Select Code
     const fileInputRef = useRef(null);
     const handleFileClick = () => {
