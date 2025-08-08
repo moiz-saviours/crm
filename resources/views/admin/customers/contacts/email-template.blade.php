@@ -7,9 +7,10 @@
     .email-template.open {
         display: block;
         position: fixed;
+        justify-content: end;
         /*position: absolute;*/
         bottom: 0;
-        left: -42px;
+        right: 50px;
         z-index: 10026;
     }
 
@@ -18,7 +19,7 @@
         display: flex;
         justify-content: space-between;
         padding: 10px 30px;
-        background-color: #506e91;
+        background-color: #2d3e50;
     }
 
     .email-child-wrapper-one {
@@ -34,6 +35,16 @@
         background-color: #fff;
     }
 
+    .email-child-wrapper input {
+        width: 500px;
+        border: none;
+    }
+
+    .email-child-wrapper input:focus-visible {
+        outline: none;
+    }
+
+
     .email-titles {
         font-weight: 500;
         margin: 0;
@@ -46,7 +57,7 @@
     }
 
     .email-titles-show {
-        color: #0091ae;
+        color: #2d3e50;
         font-weight: 600;
         margin: 0px;
     }
@@ -100,6 +111,18 @@
         text-align: center;
 
     }
+    .main-content-email-box textarea {
+        width: 95%;
+        min-height: 200px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: 0px 30px;
+        resize: vertical;
+
+    }
+    .main-content-email-box textarea:focus-visible {
+        outline: none;
+    }
 
     .main-content-email-text {
         color: #000;
@@ -114,7 +137,7 @@
     }
 
     .connect-to-inbox-btn {
-        background-color: #FF5F1F;
+        background-color: #2d3e50;
         border: none;
         color: #fff;
         font-size: 13px;
@@ -133,8 +156,8 @@
 
     .email-footer-btn {
         background-color: #fff;
-        border: 1px solid #FF5F1F;
-        color: #FF5F1F;
+        border: 1px solid #2d3e50;
+        color: #2d3e50;
         font-size: 12px;
         font-weight: 400;
         padding: 3px 17px;
@@ -149,7 +172,7 @@
 
     .email-sender-emailid {
         font-size: 12px;
-        color: #0091ae;
+        color: #2d3e50;
         font-weight: 500;
     }
 
@@ -160,7 +183,7 @@
     }
 
     .email-titles-dropdown {
-        color: #0091ae;
+        color: #2d3e50;
         font-weight: 600;
         margin: 0px;
         background-color: transparent;
@@ -208,14 +231,14 @@
     }
 
     .quotes-titles-link {
-        color: #0091ae;
+        color: #2d3e50;
         font-weight: 600;
         margin: 0px;
 
     }
 
     .quotes-titles-link:hover {
-        color: #0091ae;
+        color: #2d3e50;
     }
 
 </style>
@@ -224,7 +247,7 @@
 <section class= "new-template-mail email-template" id="emailTemplate">
     <div class="container-fluid p-0">
         <div class="row justify-content-end">
-            <div class="col-lg-5">
+            <div class="col-lg-12">
                 <div class="email-header-main-wrapper">
                     <div class="email-child-wrapper-one">
                         <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -232,7 +255,7 @@
                     </div>
                     <div class="email-child-wrapper-one">
                         <i class="fa fa-external-link-square" aria-hidden="true"></i>
-                        <i class="fa fa-times close-btn" aria-hidden="true"></i>
+                        <i class="fa fa-times close-btn" aria-hidden="true" style="cursor:pointer;"></i>
                     </div>
                 </div>
                 <div class="email-child-wrapper" style="  padding: 10px 30px;">
@@ -285,48 +308,43 @@
                             </li>
                         </ul>
                     </div>
-
-
-                    </p>
-
                 </div>
                 <div class="email-divider "></div>
                 <div class="email-child-wrapper" style="  padding: 10px 30px;">
                     <p class="email-sending-titles"> To </p>
-                    <p class="email-sender-box"> Harry Brown <span> <i class="fa fa-times email-sender-box-icon"
-                                                                       aria-hidden="true"></i>
-                            </span></p>
+                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span
+                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>
                 </div>
                 <div class="email-sending-box">
                     <div class="email-child-wrapper">
                         <p class="email-sending-titles"> From </p>
-                        <p class="email-sender-name"> Hussain Khan <span
-                                class="email-sender-emailid">(hussainkahn.aimdigital.com)</span><span>
-                                    <i class="fa fa-exclamation-triangle email-warning-icon" aria-hidden="true"></i>
+                        <p class="email-sender-name"> {{($customer_contact->creator)->name ?? "---"}} <span
+                                class="email-sender-emailid">({{($customer_contact->creator)->email ?? "---"}})</span><span>
                                 </span></p>
                     </div>
-                    <div class="email-child-wrapper">
-                        <p class="email-titles-show">Cc</p>
-                        <p class="email-titles-show">Bcc</p>
-                    </div>
+{{--                    <div class="email-child-wrapper">--}}
+{{--                        <p class="email-titles-show">Cc</p>--}}
+{{--                        <p class="email-titles-show">Bcc</p>--}}
+{{--                    </div>--}}
                 </div>
                 <div class="email-divider "></div>
                 <div class="email-child-wrapper" style="  padding: 10px 30px;">
                     <p class="email-sending-titles"> Subject </p>
-                    <p class="" style="margin: 0;">Re: <span> #Professional Image Editing</i>
-                            </span></p>
+{{--                    <p class="" style="margin: 0;">Re: <span> #Professional Image Editing</i>--}}
+{{--                            </span></p>--}}
+                    <input type="text" name="subject" />
                 </div>
-                <div class="email-divider "></div>
+                <div class="email-divider"></div>
                 <div class="main-content-email-box">
-                    <h4 class="main-content-email-text">Connect with your Email</h4>
-                    <p class="main-content-email-para">Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                        Obcaecati culpa optio ex et,
-                        explicabo, aliquam autem ea, dignissimos odio asperiores nisi delectus tempora cupiditate
-                        hic voluptatum ab. Provident, error impedit?</p>
-                    <button class="connect-to-inbox-btn">Connect Inbox</button>
+                    <textarea
+
+                        placeholder="Type your email here..."></textarea>
+
                 </div>
-                <div class="email-footer-div">
-                    <button class="email-footer-btn">Cancel</button>
+
+                <div class="email-footer-div ">
+                    <button class="email-footer-btn" id="sendEmailBtn">Send</button>
+                    <button class="email-footer-btn close-btn gap-2">Cancel</button>
                 </div>
             </div>
 

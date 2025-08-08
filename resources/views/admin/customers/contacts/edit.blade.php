@@ -1640,7 +1640,7 @@
 
                                         <div class="collapse" id="collapseExampleweb">
                                             <div class="card custom-contact-cards card-body">
-                                                <p class="contact-card-subscription-para ">
+                                                <p class="contact-card-subscription-para">
                                                     Use subscription types to manage the communication this contact
                                                     receives from you
                                                 </p>
@@ -2226,7 +2226,7 @@
                                                         <button class="threading-email-btn-one">
                                                             Log Email
                                                         </button>
-                                                        <button class="threading-email-btn-two">
+                                                        <button class="threading-email-btn-two open-email-form">
                                                             Create Email
                                                         </button>
                                                     </div>
@@ -2868,9 +2868,7 @@
                                                                         <i class="fa fa-caret-down"
                                                                            style="padding-right: 5px;"
                                                                            aria-hidden="true"></i>
-                                                                        <span style="text-decoration: underline;">
-                                                                                                                                Collapse threads
-                                                                                                                            </span>
+                                                                        <span style="text-decoration: underline;"> Collapse threads </span>
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -3231,7 +3229,7 @@
     @include('admin.customers.contacts.notes-add-modal')
     @include('admin.customers.contacts.notes-edit-modal')
     @include('admin.customers.companies.custom-form')
-    @include('admin.customers.companies.email-template')
+    @include('admin.customers.contacts.email-template')
 
     @push('script')
         @include('admin.customers.companies.script')
