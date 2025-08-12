@@ -40,11 +40,13 @@
           content="Crm Management System">
     <title>@yield('title')</title>
 
+    @vite(['resources/js/app.js'])
 
     <!-- STYLESHEETS -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     @include('admin.layouts.style')
     @stack('style')
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 
