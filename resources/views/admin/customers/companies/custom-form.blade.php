@@ -5,7 +5,7 @@
             <input type="text" id="crsf_token" name="crsf_token" value="" style="opacity:0;position:absolute;"/>
             <!-- Form Header -->
             <div class="form-header fh-1">
-                <span id="custom-form-heading">Manage Employee</span>
+                <span id="custom-form-heading">Manage Company</span>
                 <button type="button" class="close-btn">×</button>
             </div>
             <!-- Form Body -->
