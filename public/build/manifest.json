@@ -1,10 +1,7 @@
 {
-  "_bootstrap-Bo9YfFDN.js": {
-    "file": "assets/bootstrap-Bo9YfFDN.js",
-    "name": "bootstrap",
-    "css": [
-      "assets/app-D3FZ32Rz.css"
-    ]
+  "_bootstrap-BA2Cz7cT.js": {
+    "file": "assets/bootstrap-BA2Cz7cT.js",
+    "name": "bootstrap"
   },
   "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf": {
     "file": "assets/fa-brands-400-D1LuMI3I.ttf",
@@ -44,51 +41,51 @@
     "isEntry": true
   },
   "resources/js/Pages/Board.jsx": {
-    "file": "assets/Board-NdgplQPe.js",
+    "file": "assets/Board-s8_BeQzu.js",
     "name": "Board",
     "src": "resources/js/Pages/Board.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/react-app.jsx",
-      "_bootstrap-Bo9YfFDN.js"
+      "_bootstrap-BA2Cz7cT.js"
     ]
   },
   "resources/js/Pages/BoardCard.jsx": {
-    "file": "assets/BoardCard-CnbkPuQ0.js",
+    "file": "assets/BoardCard-Dxn4nQiX.js",
     "name": "BoardCard",
     "src": "resources/js/Pages/BoardCard.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/react-app.jsx",
-      "_bootstrap-Bo9YfFDN.js"
+      "_bootstrap-BA2Cz7cT.js"
     ]
   },
   "resources/js/Pages/BoardList.jsx": {
-    "file": "assets/BoardList-BKlYC2Zs.js",
+    "file": "assets/BoardList-znlS8ihn.js",
     "name": "BoardList",
     "src": "resources/js/Pages/BoardList.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/react-app.jsx",
       "resources/js/Pages/BoardCard.jsx",
-      "_bootstrap-Bo9YfFDN.js"
+      "_bootstrap-BA2Cz7cT.js"
     ]
   },
   "resources/js/Pages/CardDetail.jsx": {
-    "file": "assets/CardDetail-DYczdkRu.js",
+    "file": "assets/CardDetail-DHkhk7fB.js",
     "name": "CardDetail",
     "src": "resources/js/Pages/CardDetail.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/react-app.jsx",
-      "_bootstrap-Bo9YfFDN.js"
+      "_bootstrap-BA2Cz7cT.js"
     ],
     "css": [
       "assets/CardDetail-DdjxYr1F.css"
     ]
   },
   "resources/js/Pages/Index.jsx": {
-    "file": "assets/Index-Cij-3Uwa.js",
+    "file": "assets/Index-ByM1bQlb.js",
     "name": "Index",
     "src": "resources/js/Pages/Index.jsx",
     "isDynamicEntry": true,
@@ -96,26 +93,29 @@
       "resources/js/react-app.jsx",
       "resources/js/Pages/Board.jsx",
       "resources/js/Pages/BoardList.jsx",
-      "_bootstrap-Bo9YfFDN.js",
+      "_bootstrap-BA2Cz7cT.js",
       "resources/js/Pages/BoardCard.jsx"
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-B8L2XXqz.js",
+    "file": "assets/app-BvCIJes9.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_bootstrap-Bo9YfFDN.js"
+      "_bootstrap-BA2Cz7cT.js"
+    ],
+    "css": [
+      "assets/app-V36qSI5w.css"
     ]
   },
   "resources/js/react-app.jsx": {
-    "file": "assets/react-app-AqRrQzLP.js",
+    "file": "assets/react-app-AFMcx8yv.js",
     "name": "react-app",
     "src": "resources/js/react-app.jsx",
     "isEntry": true,
     "imports": [
-      "_bootstrap-Bo9YfFDN.js"
+      "_bootstrap-BA2Cz7cT.js"
     ],
     "dynamicImports": [
       "resources/js/Pages/Board.jsx",
@@ -125,7 +125,7 @@
       "resources/js/Pages/Index.jsx"
     ],
     "css": [
-      "assets/react-app-BzK7jIHt.css"
+      "assets/react-app-DPHS2v6M.css"
     ],
     "assets": [
       "assets/fa-brands-400-D_cYUPeE.woff2",
