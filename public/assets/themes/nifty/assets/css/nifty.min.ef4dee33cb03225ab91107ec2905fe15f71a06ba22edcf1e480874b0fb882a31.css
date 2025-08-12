@@ -1027,7 +1027,7 @@ html[data-overlayscrollbars] > body::-webkit-scrollbar {
     }
 
     .mn--min .mainnav__avatar {
-        height: auto;
+        height: 2rem;
         width: 2rem
     }
 
