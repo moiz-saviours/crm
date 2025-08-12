@@ -343,4 +343,43 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
+
+    Route::post('/send-email', function (Request $request) {
+        $validated = $request->validate([
+            'subject' => 'required|string',
+            'email_content' => 'required|string',
+            'to' => 'required|string',
+            'cc' => 'sometimes|string',
+            'bcc' => 'sometimes|string'
+        ]);
+
+        try {
+            $toEmails  = json_decode($request->input('to'), true) ?? [];
+            $ccEmails  = json_decode($request->input('cc'), true) ?? [];
+            $bccEmails = json_decode($request->input('bcc'), true) ?? [];
+
+            Mail::send([], [], function($message) use ($validated, $toEmails, $ccEmails, $bccEmails) {
+                $message->to($toEmails)
+                    ->subject($validated['subject'])
+                    ->html($validated['email_content']);
+
+                if (!empty($ccEmails) && is_array($ccEmails) && count($ccEmails)) {
+                    $message->cc($ccEmails);
+                }
+
+                if (!empty($bccEmails) && is_array($bccEmails) && count($bccEmails)) {
+                    $message->bcc($bccEmails);
+                }
+            });
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    })->name('send.email');
+
 });
