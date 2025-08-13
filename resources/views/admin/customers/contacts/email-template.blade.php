@@ -12,7 +12,9 @@
         bottom: 0;
         right: 50px;
         z-index: 10026;
+        width: 47%;
         background-color: #fff;
+
     }
 
     .email-template input[type="text"]:focus, .email-child-wrapper tags.tagify:focus-within {
@@ -27,12 +29,14 @@
         padding: .3em .5em
     }
 
+
     .email-header-main-wrapper {
         color: #fff;
         display: flex;
         justify-content: space-between;
         padding: 10px 30px;
         background-color: #2d3e50;
+        cursor: move;
     }
 
     .email-child-wrapper-one {
@@ -953,6 +957,18 @@
     .rich-email-editor {
         border: none !important;
     }
+
+    .email-minimized .email-template-body,
+    .email-minimized .email-child-wrapper,
+    .email-minimized .email-footer-div {
+        display: none;
+    }
+
+    .email-minimized .email-divider {
+        display: none;
+    }
+
+
 </style>
 
 
@@ -962,11 +978,11 @@
             <div class="col-lg-12">
                 <div class="email-header-main-wrapper">
                     <div class="email-child-wrapper-one">
-                        <i class="fa fa-angle-down" aria-hidden="true"></i>
-                        <p class="email-titles">Email</p>
+                        <i class="fa fa-angle-down minimize-btn" aria-hidden="true" style="cursor:pointer;"></i>
+                        <p class="email-titles" style="cursor:pointer;">Email</p>
                     </div>
                     <div class="email-child-wrapper-one">
-                        <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        <i class="fa fa-external-link-square" aria-hidden="true" style="cursor:pointer;"></i>
                         <i class="fa fa-times close-btn" aria-hidden="true" style="cursor:pointer;"></i>
                     </div>
                 </div>
@@ -1254,6 +1270,62 @@
                     })
                     .catch(error => console.error('Error:', error));
             });
+        })
+
+        //minimize and show email template (jQuery version)
+        $(document).ready(function () {
+            var $emailTemplate = $("#emailTemplate");
+            var $minimizeBtn = $emailTemplate.find(".minimize-btn");
+
+            $minimizeBtn.on("click", function () {
+                $emailTemplate.toggleClass("email-minimized");
+
+                // Change icon
+                if ($emailTemplate.hasClass("email-minimized")) {
+                    $minimizeBtn.removeClass("fa-angle-down").addClass("fa-angle-up");
+                } else {
+                    $minimizeBtn.removeClass("fa-angle-up").addClass("fa-angle-down");
+                }
+            });
         });
+         // dragggable email form
+        $(function () {
+            let offsetX = 0, offsetY = 0, isDragging = false;
+
+            const $dragElement = $("#emailTemplate");
+            const $dragHandle = $dragElement.find(".email-header-main-wrapper");
+
+            $dragHandle.on("mousedown", function (e) {
+                isDragging = true;
+
+                const rect = $dragElement[0].getBoundingClientRect();
+                $dragElement.css({
+                    top: rect.top,
+                    left: rect.left,
+                    bottom: "auto",
+                    right: "auto",
+                    position: "fixed"
+                });
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                $("body").css("user-select", "none");
+            });
+
+            $(document).on("mousemove", function (e) {
+                if (!isDragging) return;
+                $dragElement.css({
+                    left: e.clientX - offsetX,
+                    top: e.clientY - offsetY
+                });
+            });
+
+            $(document).on("mouseup", function () {
+                isDragging = false;
+                $("body").css("user-select", "auto");
+            });
+        });
+
     </script>
 @endpush
