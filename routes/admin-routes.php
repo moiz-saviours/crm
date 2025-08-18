@@ -381,5 +381,5 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             ], 500);
         }
     })->name('send.email');
-    
+
 });
