@@ -46,9 +46,25 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3">
+                    <label for="pseudo_name" class="form-label">Pseudo Name</label>
+                    <input type="text" class="form-control" id="pseudo_name" name="pseudo_name"
+                           placeholder="Enter Pseudo name">
+                    @error('pseudo_name')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control tour-adminemail" id="email" name="email" placeholder="Enter email" required>
                     @error('email')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
+                    <label for="pseudo_email" class="form-label">Pseudo Email</label>
+                    <input type="email" class="form-control" id="pseudo_email" name="pseudo_email"
+                           placeholder="Enter Pseudo Email">
+                    @error('pseudo_email')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
@@ -76,6 +92,14 @@
                     <input type="text" class="form-control tour-adminphone" id="phone_number" name="phone_number"
                            placeholder="e.g. +1234567890">
                     @error('phone_number')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
+                    <label for="pseudo_phone" class="form-label">Pseudo Phone Number</label>
+                    <input type="text" class="form-control" id="pseudo_phone" name="pseudo_phone"
+                           placeholder="e.g. +1234567890">
+                    @error('pseudo_phone')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
