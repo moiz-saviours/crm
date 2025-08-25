@@ -20,7 +20,7 @@ class Admin extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'password', 'type', 'designation', 'gender', 'image', 'phone_number', 'address', 'city', 'country', 'postal_code', 'age', 'dob', 'about', 'status', 'settings',];
+    protected $fillable = ['name', 'pseudo_name', 'email', 'pseudo_email', 'password', 'type', 'designation', 'gender', 'image', 'phone_number', 'pseudo_phone', 'address', 'city', 'country', 'postal_code', 'age', 'dob', 'about', 'status', 'settings',];
     /**
      * The attributes that should be hidden for serialization.
      *
