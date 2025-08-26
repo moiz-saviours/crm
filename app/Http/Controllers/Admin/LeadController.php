@@ -294,9 +294,9 @@ class LeadController extends Controller
         ]);
         $formData = $request->form_data;
         $fieldMapping = [
-            'name' => ['fname', 'name', 'firstname', 'first-name', 'first_name', 'fullname', 'full_name', 'yourname', 'your-name'],
-            'email' => ['email'],
-            'phone' => ['tel', 'tele', 'phone', 'telephone', 'your-phone', 'phone-number', 'phonenumber'],
+            'name' => ['fname','Name','NAME', 'name', 'firstname', 'first-name', 'first_name', 'fullname', 'full_name', 'yourname', 'your-name'],
+            'email' => ['email','Email','EMAIL'],
+            'phone' => ['tel', 'tele','Number', 'NUMBER', 'num','phone','Phone', 'PHONE', 'telephone', 'your-phone', 'phone-number', 'phonenumber'],
             'note' => ['message', 'msg', 'desc', 'description', 'note'],
         ];
         $dataToSave = [];
