@@ -246,7 +246,7 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
             showLoading();
 
             try {
-                const response = await fetch("http://ip-api.com/json/");
+                const response = await fetch("https://reallyfreegeoip.org/json/");
 
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status}`);
