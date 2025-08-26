@@ -47,7 +47,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="pseudo_name" class="form-label">Pseudo Name</label>
-                    <input type="text" class="form-control" id="pseudo_name" name="pseudo_name"
+                    <input type="text" class="form-control tour-adminpseudoname" id="pseudo_name" name="pseudo_name"
                            placeholder="Enter Pseudo name">
                     @error('pseudo_name')
                     <span class="text-danger">{{ $message }}</span>
@@ -62,7 +62,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="pseudo_email" class="form-label">Pseudo Email</label>
-                    <input type="email" class="form-control" id="pseudo_email" name="pseudo_email"
+                    <input type="email" class="form-control tour-adminpseudoemail" id="pseudo_email" name="pseudo_email"
                            placeholder="Enter Pseudo Email">
                     @error('pseudo_email')
                     <span class="text-danger">{{ $message }}</span>

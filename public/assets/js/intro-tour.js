@@ -204,10 +204,20 @@ const tours = {
                 position: 'left',
 
             },
+            {
+                element: '.tour-adminpseudoname',
+                intro: "Enter the admin pseudo name.",
+                position: 'left',
+            },
 
             {
                 element: '.tour-adminemail',
                 intro: "Enter the admin email address.",
+                position: 'left',
+            },
+            {
+                element: '.tour-adminpseudoemail',
+                intro: "Enter the admin pseudo email address.",
                 position: 'left',
 
             },
@@ -1870,6 +1880,39 @@ const tours = {
 
         ],
     },
+    kpi_dashboard_1: {
+        steps: [
+            {
+                element: '.tour-kpi-dashboard1-alldata',
+                intro: "View sales performance by selecting team, brand, and date, and download the report as PDF.",
+                position: 'right'
+            },
+            {
+                element: '.tour-kpi-dashboard1-team',
+                intro: 'Choose a specific team to filter data .',
+                position: 'bottom',
+            },
+            {
+                element: '.tour-kpi-dashboard1-brand',
+                intro: "After selecting a team, pick a brand to view its related metrics.",
+                position: 'bottom'
+            },
+            {
+                element: '.tour-kpi-dashboard1-date',
+                intro: "Set a custom date range to view data for a specific time period.",
+                position: 'bottom'
+            },
+            {
+                element: '.tour-kpi-dashboard1-tabledata',
+                intro: "See detailed sales KPIs for each user including Target, Commission, Wire SPIFF, Lead bonus and total earnings.",
+                position: 'bottom'
+            },
+
+
+        ],
+
+    },
+
 
 
 };
@@ -1879,8 +1922,8 @@ let currentTour = null;
 
 function startTour(tourName) {
     // Cancel existing tour if running
-    if (currentTour) {
-        currentTour.cancel();
+    if (currentTour && currentTour.isActive()) {
+        return;
 
     }
 
@@ -1956,7 +1999,29 @@ function startTour(tourName) {
     tour.on('complete', tourData.onComplete || (() => {}));
 
     tour.start();
-    currentTour = tour; // Update the global variable
+    currentTour = tour;
+
+    // document.addEventListener('click', function (e) {
+    //     if (e.target.classList.contains('close-btn')) {
+    //         if (currentTour) {
+    //             currentTour.cancel();
+    //             currentTour = null;
+    //         }
+    //     }
+    // });
+
+    function cancelTourIfRunning() {
+        if (currentTour) {
+            currentTour.cancel();
+            currentTour = null;
+        }
+    }
+
+// 1️⃣ Close via .close-btn
+    $('.close-btn').on('click', function () {
+        cancelTourIfRunning();
+    });
+
 
 }
 
