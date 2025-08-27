@@ -1061,7 +1061,6 @@
                             class="email-sender-name" id="ccFieldInput"
                             type="email"
                             name="cc"
-
                             placeholder="Add Cc recipients"
                             style="border: none;"
                         >
@@ -1107,7 +1106,7 @@
                             <p class="email-sending-titles" onclick="toggleBccField(this)">Bcc</p>
                         </div>
                     </div>
-                    <div class="email-divider "></div>
+                    <div class="email-divider"></div>
                     <div class="email-child-wrapper" style="  padding: 5px 30px;">
                         <p class="email-sending-titles"> Subject </p>
                         {{--                    <p class="" style="margin: 0;">Re: <span> #Professional Image Editing</i>--}}
@@ -1259,16 +1258,43 @@
                 formData.append('from_name', document.querySelector('[name="from_name"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
 
-                AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: true})
+                {{--AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: true})--}}
+                {{--    .then(response => {--}}
+                {{--        if (data.success) {--}}
+                {{--            console.log('Email sent successfully!');--}}
+                {{--            document.querySelector('.email-template').classList.remove('open');--}}
+                {{--        } else {--}}
+                {{--            console.log('Error sending email: ' + (data.message || 'Unknown error'));--}}
+                {{--        }--}}
+                {{--    })--}}
+                {{--    .catch(error => console.error('Error:', error));--}}
+                AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: false})
                     .then(response => {
-                        if (data.success) {
-                            console.log('Email sent successfully!');
-                            document.querySelector('.email-template').classList.remove('open');
+                        if (response.success) {
+                            toastr.success("Email sent successfully!");
+
+                            document.getElementById('emailSubject').value = "";
+
+                            if (window.quillInstances && window.quillInstances['editor_0']) {
+                                window.quillInstances['editor_0'].root.innerHTML = "";
+                            }
+
+                            const ccField = document.querySelector('[name="cc"]');
+                            const bccField = document.querySelector('[name="bcc"]');
+
+                            if (ccField) ccField.value = "";
+                            if (bccField) bccField.value = "";
+
+                            document.querySelector('#emailTemplate').classList.remove('open');
                         } else {
-                            console.log('Error sending email: ' + (data.message || 'Unknown error'));
+                            toastr.error(response.message || "Failed to send email");
                         }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        toastr.error("Something went wrong while sending email!");
+                    });
+
             });
         })
 
@@ -1289,6 +1315,43 @@
             });
         });
          // dragggable email form
+        // $(function () {
+        //     let offsetX = 0, offsetY = 0, isDragging = false;
+        //
+        //     const $dragElement = $("#emailTemplate");
+        //     const $dragHandle = $dragElement.find(".email-header-main-wrapper");
+        //
+        //     $dragHandle.on("mousedown", function (e) {
+        //         isDragging = true;
+        //
+        //         const rect = $dragElement[0].getBoundingClientRect();
+        //         $dragElement.css({
+        //             top: rect.top,
+        //             left: rect.left,
+        //             bottom: "auto",
+        //             right: "auto",
+        //             position: "fixed"
+        //         });
+        //
+        //         offsetX = e.clientX - rect.left;
+        //         offsetY = e.clientY - rect.top;
+        //
+        //         $("body").css("user-select", "none");
+        //     });
+        //
+        //     $(document).on("mousemove", function (e) {
+        //         if (!isDragging) return;
+        //         $dragElement.css({
+        //             left: e.clientX - offsetX,
+        //             top: e.clientY - offsetY
+        //         });
+        //     });
+        //
+        //     $(document).on("mouseup", function () {
+        //         isDragging = false;
+        //         $("body").css("user-select", "auto");
+        //     });
+        // });
         $(function () {
             let offsetX = 0, offsetY = 0, isDragging = false;
 
@@ -1315,9 +1378,25 @@
 
             $(document).on("mousemove", function (e) {
                 if (!isDragging) return;
+
+                const winW = $(window).width();
+                const winH = $(window).height();
+                const elemW = $dragElement.outerWidth();
+                const elemH = $dragElement.outerHeight();
+
+                // calculate new position
+                let newLeft = e.clientX - offsetX;
+                let newTop = e.clientY - offsetY;
+
+                // clamp values to viewport
+                if (newLeft < 0) newLeft = 0;
+                if (newTop < 0) newTop = 0;
+                if (newLeft + elemW > winW) newLeft = winW - elemW;
+                if (newTop + elemH > winH) newTop = winH - elemH;
+
                 $dragElement.css({
-                    left: e.clientX - offsetX,
-                    top: e.clientY - offsetY
+                    left: newLeft,
+                    top: newTop
                 });
             });
 
@@ -1326,6 +1405,35 @@
                 $("body").css("user-select", "auto");
             });
         });
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const closeBtns = document.querySelectorAll(".close-btn");
+            const emailTemplate = document.querySelector("#emailTemplate");
+
+            closeBtns.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.getElementById('emailSubject').value = "";
+
+                    if (window.quillInstances && window.quillInstances['editor_0']) {
+                        window.quillInstances['editor_0'].root.innerHTML = "";
+                    }
+                    const toField = document.querySelector('[name="to"]')
+                    const ccField = document.querySelector('[name="cc"]');
+                    const bccField = document.querySelector('[name="bcc"]');
+
+                    if (ccField) ccField.value = "";
+                    if (bccField) bccField.value = "";
+
+                    if (emailTemplate) {
+                        emailTemplate.classList.remove("open");
+                    }
+                });
+            });
+        });
+
 
     </script>
 @endpush
