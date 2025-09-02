@@ -1268,7 +1268,7 @@
                 {{--        }--}}
                 {{--    })--}}
                 {{--    .catch(error => console.error('Error:', error));--}}
-                AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: false})
+                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
                     .then(response => {
                         if (response.success) {
                             toastr.success("Email sent successfully!");

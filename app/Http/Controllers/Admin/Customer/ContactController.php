@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\CustomerContact;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Team;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
@@ -200,4 +201,46 @@ class ContactController extends Controller
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
+
+
+    public function sendEmail(Request $request)
+    {
+        $validated = $request->validate([
+            'subject' => 'required|string',
+            'email_content' => 'required|string',
+            'to' => 'required|string',
+            'cc' => 'sometimes|string',
+            'bcc' => 'sometimes|string'
+        ]);
+
+        try {
+            $toEmails  = json_decode($request->input('to'), true) ?? [];
+            $ccEmails  = json_decode($request->input('cc'), true) ?? [];
+            $bccEmails = json_decode($request->input('bcc'), true) ?? [];
+
+            Mail::send([], [], function($message) use ($validated, $toEmails, $ccEmails, $bccEmails) {
+                $message->to($toEmails)
+                    ->subject($validated['subject'])
+                    ->html($validated['email_content']);
+
+                if (!empty($ccEmails) && is_array($ccEmails) && count($ccEmails)) {
+                    $message->cc($ccEmails);
+                }
+
+                if (!empty($bccEmails) && is_array($bccEmails) && count($bccEmails)) {
+                    $message->bcc($bccEmails);
+                }
+            });
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
+
