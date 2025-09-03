@@ -120,12 +120,14 @@
         display: flex;
         justify-content: space-between;
         background-color: #fff;
-        padding: 10px 30px;
+        padding: 5px 20px;
+        min-height: 40px;
     }
+
 
     .main-content-email-box {
         background-color: #fff;
-        padding: 10px 0px;
+        padding: 0px;
         text-align: center;
 
     }
@@ -170,7 +172,7 @@
     .email-footer-div {
         background-color: #f8f9fa;
         border-top: 1px solid #ddd;
-        padding: 10px 30px;
+        padding: 10px 20px;
     }
 
     .email-footer-btn {
@@ -190,7 +192,6 @@
     }
 
     .email-sender-emailid {
-        font-size: 12px;
         color: #2d3e50;
         font-weight: 500;
     }
@@ -941,21 +942,19 @@
     }
 
     .main-content-email-box {
-        max-width: 641px;
+        max-width: 720px;
     }
 
     .rich-email-editor {
         min-height: 100px;
         max-height: 400px;
         overflow: auto;
-    }
-
-    .rich-email-editor {
-        padding: 10px 30px;
-    }
-
-    .rich-email-editor {
         border: none !important;
+        padding: 5px 10px;
+    }
+
+    .rich-email-editor.ql-container.ql-snow .ql-editor::before {
+        padding: 0px 10px;
     }
 
     .email-minimized .email-template-body,
@@ -986,7 +985,7 @@
                         <i class="fa fa-times close-btn" aria-hidden="true" style="cursor:pointer;"></i>
                     </div>
                 </div>
-                <div class="email-child-wrapper" style="  padding: 10px 30px;">
+                <div class="email-child-wrapper" style="  padding: 10px 20px;">
                     <p class="email-titles-hide">Templates</p>
                     <p class="email-titles-show">Sequence <span><i class="fa fa-lock icon-display-email-box"
                                                                    aria-hidden="true"></i></span></p>
@@ -1039,7 +1038,7 @@
                 </div>
                 <div class="email-divider "></div>
                 <div class="email-template-body">
-                    <div class="email-child-wrapper" style="  padding: 10px 30px;">
+                    <div class="email-child-wrapper" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> To </p>
                         {{--                        <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
                         {{--                                class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
@@ -1053,7 +1052,7 @@
                             style="border: none;"
                         >
                     </div>
-                    <div class="email-child-wrapper d-none" id="ccField" style="  padding: 0px 30px;">
+                    <div class="email-child-wrapper d-none" id="ccField" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Cc </p>
                         {{--                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
                         {{--                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
@@ -1065,7 +1064,7 @@
                             style="border: none;"
                         >
                     </div>
-                    <div class="email-child-wrapper d-none" id="bccField" style="  padding: 0px 30px;">
+                    <div class="email-child-wrapper d-none" id="bccField" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Bcc </p>
                         {{--                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
                         {{--                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
@@ -1079,7 +1078,7 @@
                     <div class="email-sending-box">
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles">From</p>
-                            <p class="email-sender-name">
+                            <p class="email-sender-name" style="min-width: 550px;">
                                 {{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}
                                 @php
                                     $email = auth()->user()->pseudo_email ?? env('MAIL_USERNAME');
@@ -1107,7 +1106,7 @@
                         </div>
                     </div>
                     <div class="email-divider"></div>
-                    <div class="email-child-wrapper" style="  padding: 5px 30px;">
+                    <div class="email-child-wrapper" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Subject </p>
                         {{--                    <p class="" style="margin: 0;">Re: <span> #Professional Image Editing</i>--}}
                         {{--                            </span></p>--}}
@@ -1314,7 +1313,7 @@
                 }
             });
         });
-         // dragggable email form
+        // dragggable email form
         // $(function () {
         //     let offsetX = 0, offsetY = 0, isDragging = false;
         //
@@ -1405,9 +1404,6 @@
                 $("body").css("user-select", "auto");
             });
         });
-
-
-
 
         document.addEventListener("DOMContentLoaded", function () {
             const closeBtns = document.querySelectorAll(".close-btn");
