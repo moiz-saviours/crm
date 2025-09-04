@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\CustomerContact;
+use App\Models\User;
+use App\Models\UserPseudoRecord;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Team;
 use Illuminate\Support\Facades\Mail;
@@ -59,15 +61,12 @@ class ContactController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -89,7 +88,7 @@ class ContactController extends Controller
                 'creator_id', 'status',
             ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
         $customer_contact->save();
-        $customer_contact->loadMissing('team', 'brand','company');
+        $customer_contact->loadMissing('team', 'brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Created Successfully!']);
     }
 
@@ -107,11 +106,54 @@ class ContactController extends Controller
     public function edit(CustomerContact $customer_contact)
     {
         if (!$customer_contact->id) return response()->json(['error' => 'Oops! Customer contact not found!']);
-        $customer_contact->load('creator', 'company', 'invoices', 'payments','notes');
-        $brands = Brand::where('status', 1)->orderBy('name')->get();
+        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $countries = config('countries');
-        return view('admin.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
+        $brands = Brand::pluck('name', 'url');
+        $resolveCompany = function ($email) use ($brands) {
+            $domain = substr(strrchr($email, "@"), 1);
+            $brand = $brands->first(function ($name, $url) use ($domain) {
+                return str_contains($url, $domain);
+            });
+            return $brand ?? $domain;
+        };
+        $auth_pseudo_emails = [];
+        if (auth()->user()->pseudo_email) {
+            $auth_pseudo_emails[] = [
+                'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+                'email' => auth()->user()->pseudo_email,
+                'company' => $resolveCompany(auth()->user()->pseudo_email),
+            ];
+        }
+        //Todo for admin
+//        if (auth()->user()->userPseudoRecords) {
+//            foreach (auth()->user()->userPseudoRecords as $pseudo) {
+//                $auth_pseudo_emails[] = [
+//                    'name'  => $pseudo->pseudo_name ?? 'Unknown Sender',
+//                    'email' => $pseudo->pseudo_email,
+//                    'company' => $resolveCompany($pseudo->pseudo_email),
+//                ];
+//            }
+//        }
+        $userPseudoEmails = User::whereNotNull('pseudo_email')
+            ->get(['id', 'pseudo_name', 'pseudo_email'])
+            ->map(function ($user) use ($resolveCompany) {
+                return [
+                    'name' => $user->pseudo_name ?? 'Unknown Sender',
+                    'email' => $user->pseudo_email,
+                    'company' => $resolveCompany($user->pseudo_email),
+                ];
+            });
+        $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+            ->map(function ($pseudo) use ($resolveCompany) {
+                return [
+                    'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+                    'email' => $pseudo->pseudo_email,
+                    'company' => $resolveCompany($pseudo->pseudo_email),
+                ];
+            });
+        $pseudo_emails = collect($auth_pseudo_emails)->merge($userPseudoEmails)->merge($extraPseudoEmails)->unique('email')->values();
+        return view('admin.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'pseudo_emails', 'countries'));
 //        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
     }
 
@@ -139,15 +181,12 @@ class ContactController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -168,8 +207,8 @@ class ContactController extends Controller
             'country', 'zipcode', 'ip_address', 'status',
         ]));
         $customer_contact->save();
-        $customer_contact->loadMissing('team', 'brand','company');
-        return response()->json(['data' => $customer_contact,'success' => 'Contact Updated Successfully!']);
+        $customer_contact->loadMissing('team', 'brand', 'company');
+        return response()->json(['data' => $customer_contact, 'success' => 'Contact Updated Successfully!']);
     }
 
     /**
@@ -202,36 +241,32 @@ class ContactController extends Controller
         }
     }
 
-
     public function sendEmail(Request $request)
     {
         $validated = $request->validate([
             'subject' => 'required|string',
             'email_content' => 'required|string',
             'to' => 'required|string',
+            'from' => 'required|string',
             'cc' => 'sometimes|string',
             'bcc' => 'sometimes|string'
         ]);
-
         try {
-            $toEmails  = json_decode($request->input('to'), true) ?? [];
-            $ccEmails  = json_decode($request->input('cc'), true) ?? [];
+            $toEmails = json_decode($request->input('to'), true) ?? [];
+            $from = $request->input('from');
+            $ccEmails = json_decode($request->input('cc'), true) ?? [];
             $bccEmails = json_decode($request->input('bcc'), true) ?? [];
-
-            Mail::send([], [], function($message) use ($validated, $toEmails, $ccEmails, $bccEmails) {
+            Mail::send([], [], function ($message) use ($validated, $toEmails, $from, $ccEmails, $bccEmails) {
                 $message->to($toEmails)
                     ->subject($validated['subject'])
                     ->html($validated['email_content']);
-
                 if (!empty($ccEmails) && is_array($ccEmails) && count($ccEmails)) {
                     $message->cc($ccEmails);
                 }
-
                 if (!empty($bccEmails) && is_array($bccEmails) && count($bccEmails)) {
                     $message->bcc($bccEmails);
                 }
             });
-
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
@@ -241,6 +276,5 @@ class ContactController extends Controller
             ], 500);
         }
     }
-
 }
 
