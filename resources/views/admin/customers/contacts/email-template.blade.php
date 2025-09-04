@@ -1213,12 +1213,12 @@
                     enforceWhitelist: false,
                     whitelist: suggestions,
                     dropdown: {
-                        enabled: 1,                 // ✅ show after typing 1 character
+                        enabled: 1,
                         maxItems: 5,
-                        position: "input",          // show directly under input
+                        position: "input",
                         closeOnSelect: true,
                         highlightFirst: true,
-                        fuzzySearch: true,          // ✅ allows partial matching
+                        fuzzySearch: true,
                         searchKeys: ['value', 'name']
                     }
                 });
@@ -1308,7 +1308,9 @@
                             if (ccField) ccField.value = "";
                             if (bccField) bccField.value = "";
 
-                            document.querySelector('#emailTemplate').classList.remove('open');
+                            resetEmailTemplatePosition();
+
+
                         } else {
                             toastr.error(response.message || "Failed to send email");
                         }
@@ -1321,6 +1323,22 @@
             });
         })
 
+        // dynamic function for reset position
+
+        function resetEmailTemplatePosition() {
+            const emailTemplate = document.querySelector('#emailTemplate');
+            if (emailTemplate) {
+                emailTemplate.classList.remove('open');
+                emailTemplate.classList.remove("email-minimized");
+
+                emailTemplate.style.position = "fixed";
+                emailTemplate.style.bottom = "0";
+                emailTemplate.style.right = "50px";
+                emailTemplate.style.left = "auto";
+                emailTemplate.style.top = "auto";
+            }
+        }
+
         //minimize and show email template (jQuery version)
         $(document).ready(function () {
             var $emailTemplate = $("#emailTemplate");
@@ -1329,7 +1347,6 @@
             $minimizeBtn.on("click", function () {
                 $emailTemplate.toggleClass("email-minimized");
 
-                // Change icon
                 if ($emailTemplate.hasClass("email-minimized")) {
                     $minimizeBtn.removeClass("fa-angle-down").addClass("fa-angle-up");
                 } else {
@@ -1337,44 +1354,7 @@
                 }
             });
         });
-        // dragggable email form
-        // $(function () {
-        //     let offsetX = 0, offsetY = 0, isDragging = false;
-        //
-        //     const $dragElement = $("#emailTemplate");
-        //     const $dragHandle = $dragElement.find(".email-header-main-wrapper");
-        //
-        //     $dragHandle.on("mousedown", function (e) {
-        //         isDragging = true;
-        //
-        //         const rect = $dragElement[0].getBoundingClientRect();
-        //         $dragElement.css({
-        //             top: rect.top,
-        //             left: rect.left,
-        //             bottom: "auto",
-        //             right: "auto",
-        //             position: "fixed"
-        //         });
-        //
-        //         offsetX = e.clientX - rect.left;
-        //         offsetY = e.clientY - rect.top;
-        //
-        //         $("body").css("user-select", "none");
-        //     });
-        //
-        //     $(document).on("mousemove", function (e) {
-        //         if (!isDragging) return;
-        //         $dragElement.css({
-        //             left: e.clientX - offsetX,
-        //             top: e.clientY - offsetY
-        //         });
-        //     });
-        //
-        //     $(document).on("mouseup", function () {
-        //         isDragging = false;
-        //         $("body").css("user-select", "auto");
-        //     });
-        // });
+
         $(function () {
             let offsetX = 0, offsetY = 0, isDragging = false;
 
@@ -1440,19 +1420,18 @@
                     if (window.quillInstances && window.quillInstances['editor_0']) {
                         window.quillInstances['editor_0'].root.innerHTML = "";
                     }
-                    const toField = document.querySelector('[name="to"]')
+
                     const ccField = document.querySelector('[name="cc"]');
                     const bccField = document.querySelector('[name="bcc"]');
-
                     if (ccField) ccField.value = "";
                     if (bccField) bccField.value = "";
 
-                    if (emailTemplate) {
-                        emailTemplate.classList.remove("open");
-                    }
+                    resetEmailTemplatePosition();
+
                 });
             });
         });
+
 
 
     </script>
