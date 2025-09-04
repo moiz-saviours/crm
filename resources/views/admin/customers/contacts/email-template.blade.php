@@ -1079,24 +1079,41 @@
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles">From</p>
                             <p class="email-sender-name" style="min-width: 550px;">
-                                {{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}
-                                @php
-                                    $email = auth()->user()->pseudo_email ?? env('MAIL_USERNAME');
-                                    $domain = $email ? substr(strrchr($email, "@"), 1) : '';
-                                    $brand = $email ? App\Models\Brand::where('url', 'like', '%'.$domain.'%')->first() : null;
-                                    $company = $brand?->name ?: $domain;
-                                @endphp
+                                <select name="from_email" id="from_email" class="form-select form-control"
+                                        style="width: auto; display: inline-block;border:none;">
+                                    @foreach($pseudo_emails as $item)
+                                        <option value="{{ $item['email'] }}"
+                                                data-name="{{ $item['name'] }}"
+                                                data-company="{{ $item['company'] }}"
+                                            {{ $loop->first ? 'selected' : '' }}>
+                                            {{ $item['name'] }} ({{ $item['email'] }})
+                                        </option>
+                                    @endforeach
+                                </select>
 
-                                @if($company)
-                                    from {{ $company }}
-                                @endif
-                                <span class="email-sender-emailid {{ $domain ? 'has-domain' : '' }}">
-            ( {{ $email }} )
-        </span>
+                                <span id="from_company">
+                                        from {{ $pseudo_emails->first()['company'] ?? 'Unknown' }}
+                                </span>
                             </p>
-                            <input type="hidden" name="from_email" value="{{ $email }}">
-                            <input type="hidden" name="from_name"
-                                   value="{{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}">
+                            {{--                            <p class="email-sender-name" style="min-width: 550px;">--}}
+                            {{--                                {{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}--}}
+                            {{--                                @php--}}
+                            {{--                                    $email = auth()->user()->pseudo_email ?? env('MAIL_USERNAME');--}}
+                            {{--                                    $domain = $email ? substr(strrchr($email, "@"), 1) : '';--}}
+                            {{--                                    $brand = $email ? App\Models\Brand::where('url', 'like', '%'.$domain.'%')->first() : null;--}}
+                            {{--                                    $company = $brand?->name ?: $domain;--}}
+                            {{--                                @endphp--}}
+
+                            {{--                                @if($company)--}}
+                            {{--                                    from {{ $company }}--}}
+                            {{--                                @endif--}}
+                            {{--                                <span class="email-sender-emailid {{ $domain ? 'has-domain' : '' }}">--}}
+                            {{--            ( {{ $email }} )--}}
+                            {{--        </span>--}}
+                            {{--                            </p>--}}
+                            {{--                            <input type="hidden" name="from_email" value="{{ $email }}">--}}
+                            {{--                            <input type="hidden" name="from_name"--}}
+                            {{--                                   value="{{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}">--}}
                         </div>
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles" onclick="toggleCcField(this)" style="padding:0 5px;">Cc</p>
@@ -1133,6 +1150,14 @@
 </section>
 @push('script')
     <script>
+        $(function () {
+            $("#from_email").on("change", function () {
+                let selected = $(this).find(":selected");
+
+                $("#from_name").val(selected.data("name"));
+                $("#from_company").text("from " + selected.data("company"));
+            });
+        });
         function toggleCcField(element) {
             document.getElementById('ccField').classList.toggle('d-none');
             element.parentElement.classList.add('d-none');
@@ -1253,8 +1278,7 @@
                 if (bccEmails.length) {
                     formData.append('bcc', JSON.stringify(bccEmails));
                 }
-                formData.append('from_email', document.querySelector('[name="from_email"]').value);
-                formData.append('from_name', document.querySelector('[name="from_name"]').value);
+                formData.append('from',document.querySelector('[name="from_email"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
 
                 {{--AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: true})--}}
