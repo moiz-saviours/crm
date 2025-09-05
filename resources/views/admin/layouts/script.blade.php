@@ -47,6 +47,7 @@
 <script src="{{asset ('assets/js/tour.js')}}"></script>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <!-- Jquery UI -->
 {{--<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>--}}
 <!-- End Jquery UI -->
@@ -479,6 +480,7 @@
         if (manageForm.length > 0) {
             manageForm[0].reset();
             manageForm.removeData('id');
+
         }
         if (jqXHR.status === 429) {
             Swal.fire({
@@ -814,6 +816,7 @@
         $('.second-field-inputs').prop('required', false);
         $('.image-div').css('display', 'none');
         $('.extra-dynamic-fields').empty();
+        $('.unique-select-2').val('').trigger('change');
         window.resetHooks.forEach(hook => {
             if (typeof hook === 'function') {
                 hook();

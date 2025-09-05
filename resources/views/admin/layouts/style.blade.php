@@ -15,6 +15,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js/dist/css/shepherd.css"/>
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
@@ -100,23 +101,23 @@
         font-display: swap;
     }
 
-    @font-face {
-        font-family: Poppins;
-        font-style: normal;
-        font-weight: 700;
-        src: url(https://preview.themeon.net/cf-fonts/s/poppins/5.0.11/devanagari/700/normal.woff2);
-        unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF;
-        font-display: swap;
-    }
+    /*@font-face {*/
+    /*    font-family: Poppins;*/
+    /*    font-style: normal;*/
+    /*    font-weight: 700;*/
+    /*    src: url(https://preview.themeon.net/cf-fonts/s/poppins/5.0.11/devanagari/700/normal.woff2);*/
+    /*    unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF;*/
+    /*    font-display: swap;*/
+    /*}*/
 
-    @font-face {
-        font-family: Poppins;
-        font-style: normal;
-        font-weight: 700;
-        src: url(https://preview.themeon.net/cf-fonts/s/poppins/5.0.11/latin-ext/700/normal.woff2);
-        unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-        font-display: swap;
-    }
+    /*@font-face {*/
+    /*    font-family: Poppins;*/
+    /*    font-style: normal;*/
+    /*    font-weight: 700;*/
+    /*    src: url(https://preview.themeon.net/cf-fonts/s/poppins/5.0.11/latin-ext/700/normal.woff2);*/
+    /*    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;*/
+    /*    font-display: swap;*/
+    /*}*/
 
     @font-face {
         font-family: Poppins;
@@ -715,5 +716,18 @@ Detailed information and more samples can be found in the documentation.
     .mn--min .header__brand .brand-img img.logo {
         max-width: 70px;
         margin-left: 20px;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        color: var(--nf-sidebar-color) !important;
+
+    }
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible{
+        color: var(--nf-sidebar-color) !important;
+        border: none !important;
+
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--bs-primary); !important;
     }
 </style>
