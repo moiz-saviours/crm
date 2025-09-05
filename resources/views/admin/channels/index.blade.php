@@ -102,7 +102,7 @@
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if($channel->favicon)
-                                                        <img src="{{$channel->favicon}}" alt="Favicon" style="max-height: 30px;">
+                                                        <img src="{{$channel->faviconUrl}}" alt="Favicon" style="max-height: 30px;">
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{ Str::limit($channel->description, 50) }}</td>
