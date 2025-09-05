@@ -24,6 +24,7 @@
                                 data-brand="{{ $unpaid_invoice->brand_key }}"
                                 data-team="{{ $unpaid_invoice->team_key }}"
                                 data-agent="{{ $unpaid_invoice->agent_id }}"
+                                data-currency="{{ $unpaid_invoice->currency }}"
                                 data-amount="{{ $unpaid_invoice->total_amount }}"
                                 data-customer="{{ optional($unpaid_invoice->customer_contact)->special_key }}"
 
@@ -151,6 +152,18 @@
                 {{--                    @enderror--}}
                 {{--                </div>--}}
 
+                <div class="form-group mb-3">
+                    <label for="currency" class="form-label">Currency</label>
+                    <select class="form-control tour-paymentcurselect" id="currency" name="currency">
+                        <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
+                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }}>GBP</option>
+                        <option value="AUD" {{ old('currency') == 'AUD' ? 'selected' : '' }} disabled>AUD</option>
+                        <option value="CAD" {{ old('currency') == 'CAD' ? 'selected' : '' }} disabled>CAD</option>
+                    </select>
+                    @error('currency')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
                 <div class="form-group mb-3">
                     <label for="amount" class="form-label">Amount</label>
                     <input type="number" class="form-control tour-paymentamount" id="amount" name="amount" step="0.01" min="1"
@@ -282,13 +295,14 @@
                 $('#agent_id').val(selected.data('agent') || '').trigger('change');
                 $('#type').val(selected.data('customer') ? 1 : 0).trigger('change');
                 $('#cus_contact_key').val(selected.data('customer') || '').trigger('change');
+                $('#currency').val(selected.data('currency') || '');
                 $('#amount').val(selected.data('amount') || '');
 
                 if ($(this).val()) {
                     t = false;
                 }
             });
-            $('#brand_key,#team_key,#agent_id,#type,#cus_contact_key,#amount').on('change', function (e) {
+            $('#brand_key,#team_key,#agent_id,#type,#cus_contact_key,#currency,#amount').on('change', function (e) {
                 if (!e.isTrigger) {
                     if (!t) {
                         t = true;
