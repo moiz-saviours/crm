@@ -267,7 +267,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
     });
     /** Task Management Routes */
     Route::get('/tasks', [AdminTaskController::class, 'index'])->name('tasks.index');
-
     /** Lead Routes */
     Route::name('lead.')->group(function () {
         Route::get('/leads', [AdminLeadController::class, 'index'])->name('index');
@@ -337,7 +336,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::get('/edit/{client_account?}', [AdminPaymentMerchantController::class, 'edit'])->name('edit');
             Route::post('/update/{client_account?}', [AdminPaymentMerchantController::class, 'update'])->name('update');
             Route::get('/change-status/{client_account?}', [AdminPaymentMerchantController::class, 'change_status'])->name('change.status');
-            Route::get('/by-brand/{brand_key?}', [AdminPaymentMerchantController::class, 'by_brand'])->name('by.brand');
+            Route::get('/by-brand/{brand_key?}/{currency?}', [AdminPaymentMerchantController::class, 'by_brand'])->name('by.brand');
             Route::delete('/delete/{client_account?}', [AdminPaymentMerchantController::class, 'delete'])->name('delete');
         });
     });
@@ -345,7 +344,5 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
-
-
 
 });
