@@ -154,7 +154,7 @@
                     <label for="currency" class="form-label">Currency</label>
                     <select class="form-control tour-userinvoicecurselect" id="currency" name="currency">
                         <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
-                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }} disabled>GBP</option>
+                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }}>GBP</option>
                         <option value="AUD" {{ old('currency') == 'AUD' ? 'selected' : '' }} disabled>AUD</option>
                         <option value="CAD" {{ old('currency') == 'CAD' ? 'selected' : '' }} disabled>CAD</option>
                     </select>
