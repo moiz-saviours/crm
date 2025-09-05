@@ -135,6 +135,7 @@
                                 payment_method,
                                 transaction_id,
                                 customer_contact,
+                                currency,
                                 amount,
                                 status,
                                 payment_date,
@@ -157,7 +158,7 @@
                         <td class="align-middle text-center text-nowrap">${payment_gateway?.descriptor ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">${transaction_id ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">${customer_contact?.name ?? "---"}</td>
-                        <td class="align-middle text-center text-nowrap">$${amount ?? "0.00"}</td>
+                        <td class="align-middle text-center text-nowrap">${currency} ${parseFloat(amount ?? "0.00").toFixed(2)}</td>
                         <td class="align-middle text-center text-nowrap">${statusBadge}</td>
                         <td class="align-middle text-center text-nowrap">${formattedPaymentDate}</td>
                         <td class="align-middle text-center text-nowrap">${formattedDate}</td>
