@@ -171,6 +171,35 @@ class PaymentMerchantController extends Controller
      */
     public function update(Request $request, PaymentMerchant $client_account)
     {
+//        if ($request->input('payment_method') == 'authorize') {
+//            $this->globalFunction('getMerchantDetails', ['loginId' => '4N9sW62gpb', 'transactionKey' => '22H7H58sx8NZjM5C', 'environment' => 'sandbox',]);
+//        }
+//        if ($request->input('payment_method') == 'authorize') {
+//            $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+//            $merchantAuthentication->setName('4N9sW62gpb');
+//            $merchantAuthentication->setTransactionKey("22H7H58sx8NZjM5C");
+//            $requestApi = new AnetAPI\GetMerchantDetailsRequest();
+//            $requestApi->setMerchantAuthentication($merchantAuthentication);
+//            $controller = new AnetController\GetMerchantDetailsController($requestApi);
+//            $response = $controller->executeWithApiResponse(ANetEnvironment::SANDBOX);
+//            if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+//                echo "SUCCESS: Merchant Name:" . $response->getMerchantName() . "\n";
+//                echo "                Gateway Id:" . $response->getGatewayId() . "\n";
+//                foreach ($response->getProcessors() as $processor) {
+//                    echo "		->Name	: " . $processor->getName() . "\n";
+//                }
+//                foreach ($response->getCurrencies() as $currency) {
+//                    echo "		->Currency	: " . $currency . "\n";
+//                }
+//            } else {
+//                echo "ERROR :  Invalid response\n";
+//                $errorMessages = $response->getMessages()->getMessage();
+//                echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+//            }
+//            /** Note : For testing purpose only when environment is on sandbox (in testing) */
+//            $data['test_login_id'] = "4N9sW62gpb";
+//            $data['test_transaction_key'] = "22H7H58sx8NZjM5C";
+//        }
         DB::beginTransaction();
         try {
             $request->validate([
@@ -292,7 +321,7 @@ class PaymentMerchantController extends Controller
     /**
      * Showing accounts of specified resource.
      */
-    public function by_brand($brand_key)
+    public function by_brand($brand_key, $currency)
     {
         if (!$brand_key) {
             return response()->json(['error' => 'Oops! Brand not found.'], 404);
@@ -301,8 +330,12 @@ class PaymentMerchantController extends Controller
         if (!$brand) {
             return response()->json(['error' => 'Oops! Brand not found.'], 404);
         }
-        $brand->load('client_accounts');
-        $client_accounts = $brand->client_accounts;
+        $allowedMethods = strtoupper($currency) === 'GBP' ? ['stripe', 'paypal'] : null;
+        $client_accounts = $brand->client_accounts()
+            ->when($allowedMethods, function ($query) use ($allowedMethods) {
+                $query->whereIn('payment_method', $allowedMethods);
+            })
+            ->get();
         $groupedAccounts = $client_accounts
             ->map(function ($account) {
                 $payment_merchant = PaymentMerchant::where('id', $account->id)->withMonthlyUsage()->first();
