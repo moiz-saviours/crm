@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Admin\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\CustomerContact;
 use App\Models\User;
 use App\Models\UserPseudoRecord;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Team;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ContactController extends Controller
 {
@@ -241,40 +246,147 @@ class ContactController extends Controller
         }
     }
 
-    public function sendEmail(Request $request)
+    /**
+     * Send an email with professional handling
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function sendEmail(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'subject' => 'required|string',
+            'subject' => 'required|string|max:255',
             'email_content' => 'required|string',
             'to' => 'required|string',
-            'from' => 'required|string',
-            'cc' => 'sometimes|string',
-            'bcc' => 'sometimes|string'
+            'from' => 'required|email',
+            'cc' => 'sometimes|string|nullable',
+            'bcc' => 'sometimes|string|nullable'
         ]);
         try {
-            $toEmails = json_decode($request->input('to'), true) ?? [];
-            $from = $request->input('from');
-            $ccEmails = json_decode($request->input('cc'), true) ?? [];
-            $bccEmails = json_decode($request->input('bcc'), true) ?? [];
-            Mail::send([], [], function ($message) use ($validated, $toEmails, $from, $ccEmails, $bccEmails) {
-                $message->to($toEmails)
-                    ->subject($validated['subject'])
-                    ->html($validated['email_content']);
-                if (!empty($ccEmails) && is_array($ccEmails) && count($ccEmails)) {
-                    $message->cc($ccEmails);
-                }
-                if (!empty($bccEmails) && is_array($bccEmails) && count($bccEmails)) {
-                    $message->bcc($bccEmails);
-                }
-            });
-            return response()->json(['success' => true]);
+            $sender = $this->findSender($request->from);
+            if (!$sender) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sender not authorized or not found'
+                ], 403);
+            }
+            $toEmails = $this->parseEmailList($request->to);
+            $ccEmails = $this->parseEmailList($request->cc);
+            $bccEmails = $this->parseEmailList($request->bcc);
+            if (empty($toEmails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No valid recipients specified'
+                ], 400);
+            }
+            $fromUnformattedEmail = $request->from;
+            $fromFormattedEmail = $this->formatFromEmail($fromUnformattedEmail);
+            $fromName = $this->getSenderName($sender, $fromUnformattedEmail);
+            $this->sendMail($validated, $toEmails,$fromUnformattedEmail, $fromFormattedEmail , $fromName, $ccEmails, $bccEmails);
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent successfully'
+            ]);
 
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
+            Log::error('Email sending failed', [
+                'error' => $e->getMessage(),
+                'from' => $request->from,
+                'to' => $request->to
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Failed to send email. Please try again.'
             ], 500);
         }
+    }
+
+    /**
+     * Find sender across multiple data sources
+     */
+    private function findSender(string $email): ?object
+    {
+        return Admin::where('email', $email)
+            ->orWhere('pseudo_email', $email)
+            ->first()
+            ?? User::where('email', $email)
+            ->orWhere('pseudo_email', $email)
+            ->first()
+            ?? UserPseudoRecord::where('pseudo_email', $email)->first();
+    }
+
+    /**
+     * Parse JSON email list with validation
+     */
+    private function parseEmailList(?string $emails): array
+    {
+        if (empty($emails)) {
+            return [];
+        }
+        $parsed = json_decode($emails, true);
+        return is_array($parsed) ? array_filter($parsed) : [];
+    }
+
+    /**
+     * Format from email address
+     */
+    private function formatFromEmail(string $email): string
+    {
+        [$localPart, $domain] = explode('@', $email);
+        $configDomain = explode('@', config('mail.from.address'))[1];
+        return "{$localPart}={$domain}@{$configDomain}";
+    }
+
+    /**
+     * Get sender display name with brand information
+     */
+    private function getSenderName(object $sender, string $email): string
+    {
+        $senderName = $sender->pseudo_name ?? explode('@', $email)[0];
+        $domain = explode('@', $email)[1];
+        $brand = Brand::where('url', 'like', "%{$domain}%")->first();
+        $brandName = $brand->name ?? $domain;
+        return "{$senderName} from {$brandName}";
+    }
+
+    /**
+     * Send the email message
+     */
+    private function sendMail(
+        array  $validated,
+        array  $toEmails,
+        string $fromUnformattedEmail,
+        string $fromFormattedEmail,
+        string $fromName,
+        array  $ccEmails,
+        array  $bccEmails
+    ): void
+    {
+        Mail::send([], [], function (Message $message) use (
+            $validated,
+            $toEmails,
+            $fromUnformattedEmail,
+            $fromFormattedEmail,
+            $fromName,
+            $ccEmails,
+            $bccEmails
+        ) {
+            $message->to($toEmails)
+                ->from($fromUnformattedEmail, $fromName)
+                ->replyTo($fromUnformattedEmail, $fromName)
+                ->returnPath($fromFormattedEmail)
+                ->subject($validated['subject'])
+                ->html($validated['email_content']);
+            if (!empty($ccEmails)) {
+                $message->cc($ccEmails);
+            }
+            if (!empty($bccEmails)) {
+                $message->bcc($bccEmails);
+            }
+        });
     }
 }
 
