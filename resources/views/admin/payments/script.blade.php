@@ -144,6 +144,7 @@
             $('#customer_contact_email').val(payment.customer_contact?.email);
             $('#customer_contact_phone').val(payment.customer_contact?.phone);
             $('#cus_contact_key').val(payment.customer_contact?.special_key);
+            $('#currency').val(payment.currency);
             $('#amount').val(payment.amount);
             $('#description').val(payment.description);
             $('#payment_method').val(payment.payment_method);
@@ -183,6 +184,7 @@
                                 team,
                                 agent,
                                 customer_contact,
+                                currency,
                                 amount,
                                 status,
                                 payment_date,
@@ -208,7 +210,7 @@
                         <td class="align-middle text-center text-nowrap">${team?.name ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">${agent?.name ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">${customer_contact?.name ?? "---"}</td>
-                        <td class="align-middle text-center text-nowrap">$${amount ?? "0.00"}</td>
+                        <td class="align-middle text-center text-nowrap">${currency} ${parseFloat(amount ?? "0.00").toFixed(2)}</td>
                         <td class="align-middle text-center text-nowrap">${statusBadge}</td>
                         <td class="align-middle text-center text-nowrap">${formattedPaymentDate}</td>
                         <td class="align-middle text-center text-nowrap">${formattedDate}</td>
@@ -244,6 +246,7 @@
                                 team,
                                 agent,
                                 customer_contact,
+                                currency,
                                 amount,
                                 status,
                                 payment_date,
@@ -299,7 +302,7 @@
                             }
 
                             // Column 11: Amount
-                            if (decodeHtml(rowData[10]) !== `$${amount ?? "0.00"}`) {
+                            if (decodeHtml(rowData[10]) !== `${currency} ${parseFloat(amount ?? "0.00").toFixed(2)}`) {
                                 table.cell(index, 10).data(`$${amount ?? "0.00"}`).draw();
                             }
 
