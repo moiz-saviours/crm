@@ -162,7 +162,7 @@ class ChannelController extends Controller
 //            if ($channel->favicon && file_exists(public_path($channel->favicon))) {
 //                unlink(public_path($channel->favicon));
 //            }
-            $originalFileName = time() . '_' . $request->file('logo')->getClientOriginalName();
+            $originalFileName = time() . '_' . $request->file('favicon')->getClientOriginalName();
             $request->file('favicon')->move(public_path('assets/images/channel-favicons'), $originalFileName);
             $channel->update(['favicon' => $originalFileName]);
         }
