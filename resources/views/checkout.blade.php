@@ -246,7 +246,7 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
             showLoading();
 
             try {
-                const response = await fetch("https://geolocation-db.com/json/");
+                const response = await fetch("https://ipapi.co/json/");
 
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status}`);
@@ -255,7 +255,7 @@ $shouldCheckGeolocation = !$isLocalhost && !$isInvoicePaid;
                 const data = await response.json();
                 console.debug('data:', data?.IPv4, data?.country_code);
 
-                const userCountry = (data.country_code || '').toUpperCase();
+                const userCountry = (data.country_code || data.countryCode || '').toUpperCase();
                 console.debug('user country:', userCountry);
 
                 if (blockedCountries.includes(userCountry)) {
