@@ -207,7 +207,7 @@ class PaymentController extends Controller
             }
             $payment = Payment::create($paymentData);
             DB::commit();
-            $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number', 'brand:brand_key,name', 'team:team_key,name', 'agent:id,name', 'customer_contact:special_key,name', 'payment_gateway:id,name,payment_method,descriptor'])->findOrFail($payment->id);
+            $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'currency', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number', 'brand:brand_key,name', 'team:team_key,name', 'agent:id,name', 'customer_contact:special_key,name', 'payment_gateway:id,name,payment_method,descriptor'])->findOrFail($payment->id);
             $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             $unpaid_invoices = Invoice::select(['invoice_key', 'invoice_number', 'brand_key', 'team_key', 'agent_id', 'cus_contact_key', 'currency', 'total_amount', 'created_at',])->with(['customer_contact:special_key,name'])->where('status', 0)->orderBy('created_at', 'desc')->get()->map(function ($invoice) {
                 $invoice->formatted_date = $invoice->created_at->format('jS F Y');
