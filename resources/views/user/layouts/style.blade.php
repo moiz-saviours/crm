@@ -339,7 +339,7 @@
         display: none;
     }
 
-    .profile-image{
+    .profile-image {
         object-fit: contain;
     }
 
@@ -468,7 +468,8 @@ Detailed information and more samples can be found in the documentation.
     span.dt-column-title {
         color: var(--bs-primary);
     }
-    .custm-filtr{
+
+    .custm-filtr {
         padding: 0;
     }
 
@@ -483,6 +484,7 @@ Detailed information and more samples can be found in the documentation.
         box-shadow: inset 0 0 0 9999px var(--bs-primary);
         color: var(--bs-primary-color);
     }
+
     .table.dataTable.table-striped > tbody > tr > td *:not(button):not(button *):not(.badge.bg-success) {
         color: var(--bs-primary);
     }
@@ -500,6 +502,7 @@ Detailed information and more samples can be found in the documentation.
     .table.dataTable.table-striped > tbody > tr.selected > td > button * {
         color: inherit;
     }
+
     .right-icon {
         display: flex;
         justify-content: end;
@@ -539,7 +542,7 @@ Detailed information and more samples can be found in the documentation.
     }
 
     .status-toggle:checked {
-        background-color: #8392ab;
+        background-color: var(--bs-primary);
     }
 
     .status-toggle::before {
@@ -564,12 +567,14 @@ Detailed information and more samples can be found in the documentation.
         color: var(--bs-primary);
         font-weight: 600;
     }
+
     .table a:hover {
         text-decoration: underline;
     }
+
     .table th.move-col {
         position: relative;
-        padding-left: 5px!important;
+        padding-left: 5px !important;
         transition: background-color 0.2s ease;
     }
 
@@ -597,14 +602,16 @@ Detailed information and more samples can be found in the documentation.
         opacity: 1;
         transform: translateY(-50%) scale(1.1);
     }
+
     table object.avatar.avatar-sm.me-3 {
         max-width: 50px;
         max-height: 50px;
     }
 
-    .root .mainnav__inner .nav-link.active ~ .nav .active,.root .mainnav__inner .nav-link.active ~ .nav .active:hover {
+    .root .mainnav__inner .nav-link.active ~ .nav .active, .root .mainnav__inner .nav-link.active ~ .nav .active:hover {
         color: var(--nf-mainnav-submenu-active-color);
     }
+
     .mn--min .mininav-content h3 {
         color: var(--nf-mainnav-link-color);
         font-size: var(--nf-brand-size);
@@ -641,6 +648,7 @@ Detailed information and more samples can be found in the documentation.
     #_dm-settingsContainer .form-check-input[type=checkbox]::after {
         content: '';
     }
+
     .form-check-input:checked[type=checkbox] {
         --bs-form-check-bg-image: none;
         background-color: var(--bs-primary);
@@ -655,12 +663,13 @@ Detailed information and more samples can be found in the documentation.
         transform: translate(-50%, -50%);
         color: white;
         font-size: 1.1em;
-        font-weight:700;
+        font-weight: 700;
     }
 
     .form-check-input[type=checkbox]:checked::after {
         display: block;
     }
+
     .dropdown-menu.dt-button-collection {
         display: block !important;
         opacity: 1 !important;
@@ -695,14 +704,17 @@ Detailed information and more samples can be found in the documentation.
         background: radial-gradient(ellipse farthest-corner at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.15) 100%) !important;
         border-radius: inherit;
     }
+
     table.dataTable input.dt-select-checkbox {
         border: none !important;
     }
+
     th.select-checkbox.dt-select.dt-orderable-none .dt-select-checkbox {
         border: 1px solid !important;
     }
-    table.dataTable>tbody>tr.selected>td.select-checkbox:before, table.dataTable>tbody>tr.selected>th.select-checkbox:before {
-        content: ""!important;
+
+    table.dataTable > tbody > tr.selected > td.select-checkbox:before, table.dataTable > tbody > tr.selected > th.select-checkbox:before {
+        content: "" !important;
     }
 
     .dt-scroll-head table.dataTable.table-bordered th {
@@ -711,6 +723,7 @@ Detailed information and more samples can be found in the documentation.
         border-bottom-width: 1px !important;
         border-bottom-color: var(--bs-secondary);
     }
+
     .dt-scroll-head table.dataTable.table-bordered tr:not(:first-child) th {
         border-top-width: 0 !important;
     }
