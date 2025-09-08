@@ -45,6 +45,14 @@
         gap: 12px
     }
 
+    .email-child-wrapper-one i {
+        height: 20px;
+        width: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .email-child-wrapper {
         display: flex;
         align-items: center;
@@ -1278,7 +1286,7 @@
                 if (bccEmails.length) {
                     formData.append('bcc', JSON.stringify(bccEmails));
                 }
-                formData.append('from',document.querySelector('[name="from_email"]').value);
+                formData.append('from', document.querySelector('[name="from_email"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
 
                 {{--AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: true})--}}
@@ -1309,7 +1317,6 @@
                             if (bccField) bccField.value = "";
 
                             resetEmailTemplatePosition();
-
 
                         } else {
                             toastr.error(response.message || "Failed to send email");
@@ -1431,7 +1438,6 @@
                 });
             });
         });
-
 
 
     </script>
