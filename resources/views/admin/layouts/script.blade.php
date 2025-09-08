@@ -940,7 +940,8 @@
                 targetTable.DataTable().columns.adjust().draw();
             }
         });
-        $(".searchbox__btn").on('click', function () {
+        $(".searchbox").on('submit', function (e) {
+            e.preventDefault();
             const searchTerm = $("#header-search-input").val().trim();
             if (searchTerm) {
                 const currentUrl = window.location.origin + window.location.pathname;
@@ -949,6 +950,9 @@
             } else {
                 window.location.href = window.location.origin + window.location.pathname;
             }
+        });
+        $(".searchbox__btn").on("click", function () {
+            $(".searchbox").submit();
         });
 
         const params = new URLSearchParams(window.location.search);
