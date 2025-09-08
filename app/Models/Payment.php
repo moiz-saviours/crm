@@ -34,6 +34,7 @@ class Payment extends Model
         'transaction_id',
         'response',
         'transaction_response',
+        'currency',
         'amount',
         'payment_type',
         'payment_method',

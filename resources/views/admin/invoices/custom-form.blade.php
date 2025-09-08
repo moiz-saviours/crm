@@ -40,7 +40,8 @@
             <div class="form-body">
                 <div class="form-group mb-3 ">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control select2 searchable tour-invoicecreatebrand" id="brand_key" name="brand_key"
+                    <select class="form-control select2 searchable tour-invoicecreatebrand" id="brand_key"
+                            name="brand_key"
                             title="Please select a brand" required autocomplete="off">
                         <option value="" selected disabled>Please select brand</option>
                         @foreach($brands as $brand)
@@ -70,7 +71,8 @@
 
                 <div class="form-group mb-3">
                     <label for="type" class="form-label">Type</label>
-                    <select class="form-control tour-invoiceusertype" id="type" name="type" title="Please select customer type" required>
+                    <select class="form-control tour-invoiceusertype" id="type" name="type"
+                            title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
                         <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
                     </select>
@@ -164,8 +166,10 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3 tour-invoicemerchant">
-                    <div id="merchant-types-container">
-                    </div>
+                    <label class="form-label">Payment Gateways</label>
+                    <div class="extra-dynamic-fields-to-show d-none"><p class="text-muted">Try selecting a different brand or changing currency
+                            as no payment gateway is available.</p></div>
+                    <div id="merchant-types-container" class="extra-dynamic-fields"></div>
                     @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -247,7 +251,9 @@
                 </div>
             </div>
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn tour-invoicecomplete"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-invoicecomplete"><i class="fas fa-save me-2"></i>
+                    Save
+                </button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
         </div>

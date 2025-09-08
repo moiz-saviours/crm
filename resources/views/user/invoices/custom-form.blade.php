@@ -163,8 +163,10 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3 tour-userinvoicemerchant">
-                    <div id="merchant-types-container">
-                    </div>
+                    <label class="form-label">Payment Gateways</label>
+                    <div class="extra-dynamic-fields-to-show d-none"><p class="text-muted">Try selecting a different brand or changing currency
+                            as no payment gateway is available.</p></div>
+                    <div id="merchant-types-container" class="extra-dynamic-fields"></div>
                     @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror

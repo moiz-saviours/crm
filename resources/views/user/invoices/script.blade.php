@@ -301,7 +301,7 @@
             }
 
             updateTotalAmount();
-            getMerchants($('#brand_key'), invoice);
+            getMerchants(invoice.brand_key, invoice, invoice.currency);
             $('#manage-form').attr('action', `{{route('invoice.update')}}/` + invoice.id);
             $('#formContainer').addClass('open');
         }
@@ -793,33 +793,34 @@
         {{--    }--}}
         {{--});--}}
 
-        $(document).on('click', function (event) {
-            if (
-                (!$(event.target).closest('.form-container').length &&
-                    !$(event.target).is('.form-container')
-                )
-                || $(event.target).is('.form-container .close-btn')
-                || $(event.target).is('.editBtn')
-                || $(event.target).is('.open-form-btn')
-            ) {
-                $('#merchant-types-container').empty();
-            }
-        });
         /**Api Hit */
-        $('#brand_key').on('change', function () {
+        $('#brand_key,#currency').on('change', function () {
+            /**Required*/
             invoice = null;
-            getMerchants($(this));
+            getMerchants($('#brand_key').val(), invoice, $("#currency").val());
         });
 
-        function getMerchants(brand, invoice = null) {
-            const selectedBrand = brand.val();
+        function getMerchants(brand, invoice = null, currency = 'USD') {
+            const selectedBrand = brand;
             const merchantTypesContainer = $('#merchant-types-container');
             merchantTypesContainer.empty();
             if (selectedBrand) {
-                AjaxRequestPromise(`{{ route('user.client.account.by.brand') }}/${selectedBrand}`, null, 'GET',)
+                AjaxRequestPromise(`{{ route('user.client.account.by.brand') }}/${selectedBrand}/${currency}`, null, 'GET',)
                     .then(response => {
                         if (response.data) {
-                            const merchant_types = response.data;
+                            let merchant_types = response.data;
+                            if (currency === 'GBP') {
+                                merchant_types = Object.keys(merchant_types)
+                                    .filter(type => ['stripe', 'paypal'].includes(type.toLowerCase()))
+                                    .reduce((obj, key) => {
+                                        obj[key] = merchant_types[key];
+                                        return obj;
+                                    }, {});
+                            }
+                            if (Object.keys(merchant_types).length === 0) {
+                                merchantTypesContainer.html(`<p class="text-muted">Try selecting a different brand or changing currency as no payment gateway is available.</p>`);
+                                return;
+                            }
                             Object.keys(merchant_types).forEach(type => {
                                 const safeType = type.replace(/\s+/g, '_');
                                 const checkboxId = `${safeType}_checkbox`;

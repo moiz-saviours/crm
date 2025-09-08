@@ -127,7 +127,8 @@
                                                 @endif
                                                 <td class="align-middle text-center text-nowrap">{{optional($payment->customer_contact)->name ?? "---"}}</td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    ${{$payment->amount}}</td>
+                                                    {{ $payment->currency ." ". number_format($payment->amount, 2, '.', '') }}
+                                                </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if($payment->status == 0)
                                                         <span class="badge bg-warning text-dark">Due</span>

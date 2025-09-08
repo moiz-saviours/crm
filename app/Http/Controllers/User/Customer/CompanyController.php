@@ -37,7 +37,9 @@ class CompanyController extends Controller
             ]);
             if ($response->successful() && isset($response->json()['data'])) {
                 $companyData = $response->json()['data'];
-                CustomerCompany::create([
+                CustomerCompany::updateOrCreate(
+                    ['domain' => $domain],
+                    [
                     'name' => $companyData['organization'] ?? $domain,
                     'email' => 'no-reply@' . $domain,
                     'domain' => $domain,

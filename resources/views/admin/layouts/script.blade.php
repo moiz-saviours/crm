@@ -807,7 +807,6 @@
         return password;
     }
 
-
     window.resetHooks = [];
     function resetFields() {
         $('.second-fields').fadeOut();
@@ -817,6 +816,10 @@
         $('.image-div').css('display', 'none');
         $('.extra-dynamic-fields').empty();
         $('.unique-select-2').val('').trigger('change');
+        let placeholderMsg = $('.extra-dynamic-fields-to-show')?.html()?.trim();
+        if (placeholderMsg) {
+            $('.extra-dynamic-fields').html(placeholderMsg);
+        }
         window.resetHooks.forEach(hook => {
             if (typeof hook === 'function') {
                 hook();

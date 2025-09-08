@@ -181,7 +181,7 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
                 Route::get('/edit/{client_account?}', [UserClientPaymentMerchantController::class, 'edit'])->name('edit');
                 Route::post('/update/{client_account?}', [UserClientPaymentMerchantController::class, 'update'])->name('update');
                 Route::get('/change-status/{client_account?}', [UserClientPaymentMerchantController::class, 'change_status'])->name('change.status');
-                Route::get('/by-brand/{brand_key?}', [UserClientPaymentMerchantController::class, 'by_brand'])->name('by.brand');
+                Route::get('/by-brand/{brand_key?}/{currency?}', [UserClientPaymentMerchantController::class, 'by_brand'])->name('by.brand');
             });
         });
     });
