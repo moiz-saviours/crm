@@ -974,5 +974,77 @@
                 targetTable.DataTable().columns.adjust().draw();
             }
         });
+        $(".searchbox").on('submit', function (e) {
+            e.preventDefault();
+            const searchTerm = $("#header-search-input").val().trim();
+            if (searchTerm) {
+                const currentUrl = window.location.origin + window.location.pathname;
+                window.location.href = `${currentUrl}?search=${searchTerm}`;
+                // window.location.href = `${currentUrl}?search=${encodeURIComponent(searchTerm)}`;
+            } else {
+                window.location.href = window.location.origin + window.location.pathname;
+            }
+        });
+        $(".searchbox__btn").on("click", function () {
+            $(".searchbox").submit();
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        function onAllDataTablesReady(callback) {
+            const tables = $.fn.dataTable.tables({api: true});
+            let readyCount = 0;
+
+            if (!tables.length) {
+                callback();
+                return;
+            }
+
+            tables.each(function () {
+                const dt = new $.fn.dataTable.Api(this);
+                if (dt.settings()[0]._bInitComplete) {
+                    readyCount++;
+                } else {
+                    $(dt.table().node()).on('init.dt', function () {
+                        readyCount++;
+                        if (readyCount === tables.length) {
+                            callback();
+                        }
+                    });
+                }
+                if (readyCount === tables.length) {
+                    callback();
+                }
+            });
+        }
+
+        setTimeout(function () {
+            onAllDataTablesReady(function () {
+                const searchId = params.get('ref');
+                const searchTerm = params.get('search');
+
+                if (searchId) {
+                    $('.editBtn').each(function () {
+                        if ($(this).data('id') == searchId) {
+                            $(this).click();
+                        }
+                    });
+                }
+                if (searchTerm) {
+                    $($.fn.dataTable.tables({visible: true})).each(function () {
+                        const dt = $(this).DataTable();
+                        dt.search(searchTerm).draw();
+                    });
+                }
+            });
+        }, 100);
+
+        function strLimit(string, limit = 100, end = '...') {
+            if (!string) return '---';
+            return string.length > limit ? string.substring(0, limit) + end : string;
+        }
+
     });
+    !function () {
+        document.currentScript?.remove()
+    }();
 </script>
