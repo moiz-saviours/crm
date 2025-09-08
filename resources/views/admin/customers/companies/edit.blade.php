@@ -49,7 +49,7 @@
                 text-align: left;
                 padding-left: 15px;
                 font-size: 17px;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px
             }
 
@@ -81,9 +81,8 @@
             }
 
             .nav-tabs .nav-link.customize.active {
-                border-bottom: 3px solid #2d3e50;
+                border-bottom: 3px solid var(--bs-primary);
                 background: transparent;
-                border-width: 0px 0px 3px 0px;
                 border-radius: 3px;
             }
 
@@ -91,7 +90,7 @@
                 background: transparent;
                 border: none;
                 padding: 0;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 font-size: 12px;
                 /* border-radius: 5px; */
                 font-weight: 600;
@@ -246,7 +245,7 @@
                 font-size: 24px;
                 text-align: left;
                 font-weight: 400;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 /* margin-bottom: -3px; */
             }
 
@@ -336,7 +335,7 @@
 
             .collapsible-header {
                 background-color: transparent;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 cursor: pointer;
                 padding: 5px 0px;
                 width: 100%;
@@ -479,7 +478,7 @@
             }
 
             .headerr .tablink.active {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 color: white;
             }
 
@@ -532,7 +531,7 @@
                 text-align: left;
                 /* padding-left: 15px; */
                 font-size: 14px;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px;
             }
 
@@ -662,13 +661,13 @@
                 /* padding-left: 15px;
                 padding-bottom: 15px; */
                 font-size: 14px;
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .data-row h5 {
                 font-size: 11px;
                 font-weight: 500;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 3px;
                 text-align: center;
             }
@@ -680,7 +679,7 @@
             }
 
             span.user_name {
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .new-sidebar-icons {
@@ -903,9 +902,9 @@
 
             .right_collab {
                 float: right;
-                /* background: #2d3e50; */
+                /* background: var(--bs-primary); */
                 color: #0091ae;
-                /*color: #2d3e50;*/
+                /*color: var(--bs-primary);*/
                 padding: 5px;
                 border-radius: 5px;
                 font-size: 11px;
@@ -1039,7 +1038,7 @@
             .user_cont h4 {
                 font-size: 13px;
                 font-weight: 600;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 4px;
             }
 

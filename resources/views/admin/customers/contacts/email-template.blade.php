@@ -35,7 +35,7 @@
         display: flex;
         justify-content: space-between;
         padding: 10px 30px;
-        background-color: #2d3e50;
+        background-color: var(--bs-primary);
         cursor: move;
     }
 
@@ -74,7 +74,7 @@
     }
 
     .email-titles-show {
-        color: #2d3e50;
+        color: var(--bs-primary);
         font-weight: 600;
         margin: 0px;
     }
@@ -158,7 +158,7 @@
     }
 
     .connect-to-inbox-btn {
-        background-color: #2d3e50;
+        background-color: var(--bs-primary);
         border: none;
         color: #fff;
         font-size: 13px;
@@ -177,8 +177,8 @@
 
     .email-footer-btn {
         background-color: #fff;
-        border: 1px solid #2d3e50;
-        color: #2d3e50;
+        border: 1px solid var(--bs-primary);
+        color: var(--bs-primary);
         font-size: 12px;
         font-weight: 400;
         padding: 3px 17px;
@@ -192,7 +192,7 @@
     }
 
     .email-sender-emailid {
-        color: #2d3e50;
+        color: var(--bs-primary);
         font-weight: 500;
     }
 
@@ -203,7 +203,7 @@
     }
 
     .email-titles-dropdown {
-        color: #2d3e50;
+        color: var(--bs-primary);
         font-weight: 600;
         margin: 0px;
         background-color: transparent;
@@ -251,14 +251,14 @@
     }
 
     .quotes-titles-link {
-        color: #2d3e50;
+        color: var(--bs-primary);
         font-weight: 600;
         margin: 0px;
 
     }
 
     .quotes-titles-link:hover {
-        color: #2d3e50;
+        color: var(--bs-primary);
     }
 
     tags.tagify.email-sender-name * {

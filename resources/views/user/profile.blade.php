@@ -9,7 +9,7 @@
             }
 
             .profile-card img {
-                border: 1px solid #2d3e50;
+                border: 1px solid var(--bs-primary);
                 padding: 10px;
             }
 

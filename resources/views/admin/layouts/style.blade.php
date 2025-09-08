@@ -542,7 +542,7 @@ Detailed information and more samples can be found in the documentation.
     }
 
     .status-toggle:checked {
-        background-color: #8392ab;
+        background-color: var(--bs-primary);
     }
 
     .status-toggle::before {
@@ -705,6 +705,7 @@ Detailed information and more samples can be found in the documentation.
         border-bottom-width: 1px !important;
         border-bottom-color: var(--bs-secondary);
     }
+
     .dt-scroll-head table.dataTable.table-bordered tr:not(:first-child) th {
         border-top-width: 0 !important;
     }
@@ -713,6 +714,7 @@ Detailed information and more samples can be found in the documentation.
         border-top-width: 1px !important;
         border-top-color: var(--bs-secondary);
     }
+
     .mn--min .header__brand .brand-img img.logo {
         max-width: 70px;
         margin-left: 20px;

@@ -15,13 +15,13 @@
             }
 
             .clos_btn {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 color: #fff;
                 font-size: 12px;
             }
 
             .clos_btn:hover {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 color: #fff;
             }
 
@@ -39,7 +39,7 @@
             }
 
             .tabl_th {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 text-align: center;
                 padding: 15px 0px;
                 color: #fff;
@@ -404,7 +404,7 @@
                             height: 350,
                             type: 'bar',
                         },
-                        colors: ['#2d3e50'],
+                        colors: ['var(--bs-primary)'],
                         dataLabels: {
                             enabled: false,
                         },
@@ -441,7 +441,7 @@
                             type: 'solid',
                             opacity: [0.35],
                         },
-                        colors: ['#2d3e50'],
+                        colors: ['var(--bs-primary)'],
                         xaxis: {
                             categories: monthlyLabels,
                             labels: {

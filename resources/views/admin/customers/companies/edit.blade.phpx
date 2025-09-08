@@ -60,7 +60,7 @@
                 font-size: 20px;
                 text-align: left;
                 font-weight: 600;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: -3px;
             }
 
@@ -126,7 +126,7 @@
 
             .collapsible-header {
                 background-color: transparent;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 cursor: pointer;
                 padding: 5px 0px;
                 width: 100%;
@@ -178,7 +178,7 @@
             }
 
             .headerr .tablink.active {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 color: white;
             }
 
@@ -229,7 +229,7 @@
                 text-align: left;
                 padding-left: 15px;
                 font-size: 17px;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px;
             }
 
@@ -305,13 +305,13 @@
                 padding-left: 15px;
                 padding-bottom: 15px;
                 font-size: 17px;
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .data-row h5 {
                 font-size: 15px;
                 font-weight: 500;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 3px;
             }
 
@@ -321,7 +321,7 @@
             }
 
             span.user_name {
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .avatarr {
@@ -360,7 +360,7 @@
 
             .right_collab i {
                 float: right;
-                background: #2d3e50;
+                background: var(--bs-primary);
                 color: white;
                 padding: 5px;
                 border-radius: 5px;
@@ -370,7 +370,7 @@
             .user_cont h4 {
                 font-size: 13px;
                 font-weight: 600;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 4px;
             }
 

@@ -51,7 +51,7 @@
                 text-align: left;
                 padding-left: 15px;
                 font-size: 1.063rem;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px
             }
 
@@ -92,7 +92,7 @@
             }
 
             .nav-tabs .nav-link.customize.active {
-                border-bottom: 3px solid #2d3e50;
+                border-bottom: 3px solid var(--bs-primary);
                 background: transparent;
                 border-width: 0px 0px 3px 0px;
                 border-radius: 3px;
@@ -102,7 +102,7 @@
                 background: transparent;
                 border: none;
                 padding: 0;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 font-size: var(--nf-profile-para-size);
                 /*font-size: 0.75rem;*/
                 /* border-radius: 5px; */
@@ -164,7 +164,7 @@
                 /* Enables vertical scrolling */
                 /*height: calc(-200px + 100vh);*/
                 /*flex-grow: 1;*/
-                border-radius: 20px 0px 0px 0px;
+                border-radius: 0px 0px 0px 0px;
 
             }
 
@@ -362,7 +362,7 @@
 
             .collapsible-header {
                 background-color: transparent;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 cursor: pointer;
                 padding: 5px 0px;
                 width: 100%;
@@ -505,12 +505,13 @@
             }
 
             .headerr .tablink.active {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 color: white;
             }
 
             .content {
                 height: calc(100% - 60px);
+                background-color: #f5f8fa;
             }
 
             .data-highlights,
@@ -563,7 +564,7 @@
                 text-align: left;
                 /* padding-left: 15px; */
                 font-size: var(--nf-profile-heading-size);
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px;
             }
 
@@ -700,13 +701,13 @@
                 /* padding-left: 15px;
             padding-bottom: 15px; */
                 font-size: var(--nf-profile-heading-size);
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .data-row h5 {
                 font-size: 11px;
                 font-weight: 500;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 3px;
                 text-align: center;
             }
@@ -718,7 +719,7 @@
             }
 
             span.user_name {
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .new-sidebar-icons {
@@ -950,9 +951,9 @@
 
             .right_collab {
                 float: right;
-                /* background: #2d3e50; */
+                /* background: var(--bs-primary); */
                 color: #0091ae;
-                /*color: #2d3e50;*/
+                /*color: var(--bs-primary);*/
                 padding: 5px;
                 border-radius: 5px;
                 font-size: var(--nf-profile-para-size);
@@ -1088,7 +1089,7 @@
             .user_cont h4 {
                 font-size: 0.813rem;
                 font-weight: 600;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 4px;
             }
 
@@ -1141,8 +1142,8 @@
             }
 
             .threading-email-btn-two {
-                background-color: #2d3f4f;
-                border-color: #2d3f4f;
+                background-color: var(--bs-primary);
+                border-color: var(--bs-primary);
                 color: #fff;
                 font-size: 0.813rem;
                 font-weight: 400;
