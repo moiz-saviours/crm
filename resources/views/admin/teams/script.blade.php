@@ -136,10 +136,15 @@
 
             $('#name').val(data.name);
             $('#description').val(data.description);
-            $('#lead_id').val(data.lead_id);
+            $('#lead_id').val(data.lead_id).trigger('change');
+
+
+
             data.assign_user_ids.forEach(id => {
                 $(`#user-${id}`).prop('checked', true).siblings('.checkmark-overlay').show();
             });
+
+
 
             $('#brands').val(data.assign_brand_keys);
             if (Array.isArray(data.assign_brand_keys) && data.assign_brand_keys.length === $('#brands option').length) {

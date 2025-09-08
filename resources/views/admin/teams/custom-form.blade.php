@@ -114,7 +114,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="email" class="form-label">Team Lead</label>
-                    <select class="form-control select2 tour-teamlead" id="lead_id" name="lead_id">
+                    <select class="form-control select2 tour-teamlead unique-select-2" id="lead_id" name="lead_id">
                         <option value="" selected>Select Team Lead</option>
                         @foreach($users as $user)
                             <option
@@ -320,6 +320,15 @@
         });
         observer.observe($formContainer[0], {
             attributes: true
+        });
+
+        // Select 2
+        $(document).ready(function() {
+            $('#lead_id').select2({
+                placeholder: "Select Team Lead",
+                allowClear: true,
+                width: '100%',
+            });
         });
     </script>
 

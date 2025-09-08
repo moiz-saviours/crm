@@ -112,8 +112,7 @@
                 </div>
                 <div id="upsale-customer-contact-fields" class="form-group mb-3 first-fields">
                     <label for="cus_contact_key" class="form-label">Select Customer Contact</label>
-                    <select class="form-control first-field-inputs tour-invoicecusselect" id="cus_contact_key"
-                            name="cus_contact_key">
+                    <select class="form-control first-field-inputs tour-invoicecusselect unique-select-2" id="cus_contact_key" name="cus_contact_key">
                         <option value="">Select Customer Contact</option>
                         @foreach($customer_contacts as $customer_contact)
                             <option
@@ -129,9 +128,8 @@
 
                 <div class="form-group mb-3">
                     <label for="agent_id" class="form-label">Agent</label>
-                    <select class="form-control searchable tour-invoiceagentselect" id="agent_id" name="agent_id"
-                            title="Please select agent">
-                        <option value="" disabled>Select Agent</option>
+                    <select class="form-control searchable tour-invoiceagentselect unique-select-2" id="agent_id" name="agent_id" title="Please select agent">
+                        <option value="" >Select Agent</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ old('agent_id') == $user->id ? 'selected' : '' }}>
                                 {{ $user->name }} ({{ $user->email }})
@@ -363,6 +361,21 @@
                     }
                     $('#total_amount').val(totalAmount.toFixed(2));
                 }
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('#cus_contact_key').select2({
+                    placeholder: "Select Customer Contact",
+                    allowClear: true,
+                    width: '100%' // bootstrap form-control ki width maintain karne ke liye
+                });
+
+                $('#agent_id').select2({
+                    placeholder: "Select Agent",
+                    allowClear: true,
+                    width: '100%'
+                });
             });
         </script>
         <!------- CUSTOM FORM -------->
