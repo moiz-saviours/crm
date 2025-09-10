@@ -346,5 +346,3 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
 
 });
-
-
