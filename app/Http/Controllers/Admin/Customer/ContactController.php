@@ -130,15 +130,18 @@ class ContactController extends Controller
      */
     public function edit(CustomerContact $customer_contact)
     {
-        $imapConfig = [
-            'host'          => 'mail.pivotbookwriting.com',
-            'port'          => 993,
-            'protocol'      => 'imap',
-            'encryption'    => 'ssl',
-            'validate_cert' => false,
-            'username'      => 'hasnat.developer@pivotbookwriting.com',
-            'password'      => 'ATko513Wqyabs',
+       $imapConfig = [
+            'host'          => env('IMAP_HOST'),
+            'port'          => env('IMAP_PORT', 993),
+            'protocol'      => env('IMAP_PROTOCOL', 'imap'),
+            'encryption'    => env('IMAP_ENCRYPTION', 'ssl'),
+            'validate_cert' => env('IMAP_VALIDATE_CERT', false),
+            'username'      => env('IMAP_USERNAME'),
+            'password'      => env('IMAP_PASSWORD'),
         ];
+
+
+        
 
         // email-code-open
         $folder = request()->get('folder', 'INBOX');
@@ -147,8 +150,9 @@ class ContactController extends Controller
         $offset = ($page - 1) * $limit;
         // allow refresh with ?refresh=1
         if (request()->get('refresh') || !session()->has('dev_emails')) {
+            dd($this->imapService->connect($imapConfig));
             if (!$this->imapService->connect($imapConfig)) {
-                dd('IMAP connection failed. Please check your configuration.');
+                return redirect()->back()->with('error', 'Failed to connect to the IMAP server. Please check the configuration.');
             }
 
             $folders = $this->imapService->getFolders();
