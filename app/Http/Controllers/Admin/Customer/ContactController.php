@@ -150,7 +150,6 @@ class ContactController extends Controller
         $offset = ($page - 1) * $limit;
         // allow refresh with ?refresh=1
         if (request()->get('refresh') || !session()->has('dev_emails')) {
-            dd($this->imapService->connect($imapConfig));
             if (!$this->imapService->connect($imapConfig)) {
                 return redirect()->back()->with('error', 'Failed to connect to the IMAP server. Please check the configuration.');
             }
