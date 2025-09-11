@@ -16,14 +16,24 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use App\Services\ImapService;
 
 class ContactController extends Controller
 {
+    private ImapService $imapService;
+
+    public function __construct(ImapService $imapService)
+    {
+        $this->imapService = $imapService;
+    }
+
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+
         $brands = Brand::all();
         $teams = Team::all();
         $countries = config('countries');
@@ -87,11 +97,21 @@ class ContactController extends Controller
             'team_key.exists' => 'Please select a valid team.',
         ]);
         $customer_contact = new CustomerContact($request->only([
-                'brand_key', 'team_key', 'name',
-                'email', 'phone', 'address', 'city', 'state',
-                'country', 'zipcode', 'ip_address', 'creator_type',
-                'creator_id', 'status',
-            ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
+            'brand_key',
+            'team_key',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'state',
+            'country',
+            'zipcode',
+            'ip_address',
+            'creator_type',
+            'creator_id',
+            'status',
+        ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
         $customer_contact->save();
         $customer_contact->loadMissing('team', 'brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Created Successfully!']);
@@ -110,6 +130,43 @@ class ContactController extends Controller
      */
     public function edit(CustomerContact $customer_contact)
     {
+        // email-code-open
+        $folder = request()->get('folder', 'INBOX');
+        $page   = (int) request()->get('page', 1);
+        $limit  = 5;
+        $offset = ($page - 1) * $limit;
+        // allow refresh with ?refresh=1
+        if (request()->get('refresh') || !session()->has('dev_emails')) {
+            if (!$this->imapService->connect()) {
+                dd('IMAP connection failed. Please check your configuration.');
+            }
+
+            $folders = $this->imapService->getFolders();
+            $emails  = $this->imapService->getEmails($folder, $limit, $offset);
+            $total   = count($emails);
+
+            $this->imapService->disconnect();
+
+            session()->put('dev_emails', [
+                'emails'  => $emails,
+                'folders' => $folders,
+                'folder'  => $folder,
+                'page'    => $page,
+                'limit'   => $limit,
+                'total'   => $total,
+            ]);
+        }
+
+        $sessionData = session('dev_emails');
+        $emails  = $sessionData['emails'];
+        $folders = $sessionData['folders'];
+        $folder  = $sessionData['folder'];
+        $page    = $sessionData['page'];
+        $limit   = $sessionData['limit'];
+        $total   = $sessionData['total'];
+        // email-code-end
+
+
         if (!$customer_contact->id) return response()->json(['error' => 'Oops! Customer contact not found!']);
         $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
         $teams = Team::where('status', 1)->orderBy('name')->get();
@@ -131,15 +188,15 @@ class ContactController extends Controller
             ];
         }
         //Todo for admin
-//        if (auth()->user()->userPseudoRecords) {
-//            foreach (auth()->user()->userPseudoRecords as $pseudo) {
-//                $auth_pseudo_emails[] = [
-//                    'name'  => $pseudo->pseudo_name ?? 'Unknown Sender',
-//                    'email' => $pseudo->pseudo_email,
-//                    'company' => $resolveCompany($pseudo->pseudo_email),
-//                ];
-//            }
-//        }
+        //        if (auth()->user()->userPseudoRecords) {
+        //            foreach (auth()->user()->userPseudoRecords as $pseudo) {
+        //                $auth_pseudo_emails[] = [
+        //                    'name'  => $pseudo->pseudo_name ?? 'Unknown Sender',
+        //                    'email' => $pseudo->pseudo_email,
+        //                    'company' => $resolveCompany($pseudo->pseudo_email),
+        //                ];
+        //            }
+        //        }
         $userPseudoEmails = User::whereNotNull('pseudo_email')
             ->get(['id', 'pseudo_name', 'pseudo_email'])
             ->map(function ($user) use ($resolveCompany) {
@@ -158,8 +215,20 @@ class ContactController extends Controller
                 ];
             });
         $pseudo_emails = collect($auth_pseudo_emails)->merge($userPseudoEmails)->merge($extraPseudoEmails)->unique('email')->values();
-        return view('admin.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'pseudo_emails', 'countries'));
-//        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
+        return view('admin.customers.contacts.edit', compact(
+            'customer_contact',
+            'brands',
+            'teams',
+            'pseudo_emails',
+            'countries',
+            'emails',
+            'folders',
+            'folder',
+            'page',
+            'limit',
+            'total'
+        ));
+        //        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
     }
 
     /**
@@ -207,9 +276,19 @@ class ContactController extends Controller
             'team_key.exists' => 'Please select a valid team.',
         ]);
         $customer_contact->fill($request->only([
-            'special_key', 'brand_key', 'team_key', 'name',
-            'email', 'phone', 'address', 'city', 'state',
-            'country', 'zipcode', 'ip_address', 'status',
+            'special_key',
+            'brand_key',
+            'team_key',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'state',
+            'country',
+            'zipcode',
+            'ip_address',
+            'status',
         ]));
         $customer_contact->save();
         $customer_contact->loadMissing('team', 'brand', 'company');
@@ -226,7 +305,6 @@ class ContactController extends Controller
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
             return response()->json(['error' => 'An error occurred while deleting the record.']);
-
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
@@ -283,12 +361,11 @@ class ContactController extends Controller
             $fromUnformattedEmail = $request->from;
             $fromFormattedEmail = $this->formatFromEmail($fromUnformattedEmail);
             $fromName = $this->getSenderName($sender, $fromUnformattedEmail);
-            $this->sendMail($validated, $toEmails,$fromUnformattedEmail, $fromFormattedEmail , $fromName, $ccEmails, $bccEmails);
+            $this->sendMail($validated, $toEmails, $fromUnformattedEmail, $fromFormattedEmail, $fromName, $ccEmails, $bccEmails);
             return response()->json([
                 'success' => true,
                 'message' => 'Email sent successfully'
             ]);
-
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -363,8 +440,7 @@ class ContactController extends Controller
         string $fromName,
         array  $ccEmails,
         array  $bccEmails
-    ): void
-    {
+    ): void {
         Mail::send([], [], function (Message $message) use (
             $validated,
             $toEmails,
@@ -389,4 +465,3 @@ class ContactController extends Controller
         });
     }
 }
-
