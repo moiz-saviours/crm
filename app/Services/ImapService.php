@@ -9,50 +9,37 @@ class ImapService
 {
     private $connection;
      private $config;
-    // private $config;
+   
 
-    // public function __construct()
-    // {
-    //     $this->config = [
-    //         'host'       => 'mail.pivotbookwriting.com',
-    //         'port'       => 993,
-    //         'protocol'   => 'imap',
-    //         'encryption' => 'ssl',
-    //         'validate_cert' => false,
-    //         'username'   => 'hasnat.developer@pivotbookwriting.com',
-    //         'password'   => 'ATko513Wqyabs',
-    //     ];
-    // }
+public function connect(array $imapConfig): bool
+{
+    // Save globally for other methods
+    $this->config = $imapConfig;
 
-      public function connect(array $imapConfig): bool
-    {
-        // Save globally for other methods
-        $this->config = $imapConfig;
+    // Build mailbox string correctly
+    $mailbox = sprintf(
+        "{%s:%d/%s%s%s}INBOX",
+        $this->config['host'],
+        $this->config['port'],
+        $this->config['protocol'],
+        $this->config['encryption'] ? '/' . $this->config['encryption'] : '',
+        !$this->config['validate_cert'] ? '/novalidate-cert' : ''
+    );
 
-        $mailbox = sprintf(
-            "{%s:%d/%s%s}INBOX",
-            $this->config['host'],
-            $this->config['port'],
-            $this->config['protocol'],
-            $this->config['encryption'] ? '/' . $this->config['encryption'] : ''
-        );
 
-        if (!$this->config['validate_cert']) {
-            $mailbox .= '/novalidate-cert';
-        }
+    $this->connection = @imap_open(
+        $mailbox,
+        $this->config['username'],
+        $this->config['password']
+    );
 
-        $this->connection = @imap_open(
-            $mailbox,
-            $this->config['username'],
-            $this->config['password']
-        );
-
-        if (!$this->connection) {
-            logger()->error('IMAP connection failed: ' . imap_last_error());
-        }
-
-        return $this->connection !== false;
+    if (!$this->connection) {
+        logger()->error('IMAP connection failed: ' . imap_last_error());
     }
+
+    return $this->connection !== false;
+}
+
 
     public function disconnect(): void
     {
