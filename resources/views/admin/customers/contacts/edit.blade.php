@@ -1396,6 +1396,13 @@
                 font-size: var(--nf-profile-para-size);
             }
 
+            .note-para {
+                padding: 10px 10px;
+                text-align: center;
+                font-size: var(--nf-profile-para-size);
+                color: grey;
+            }
+
         </style>
 
     @endpush
@@ -2163,60 +2170,72 @@
                                                 <div class="tab-pane fade show active" id="notes" role="tabpanel"
                                                      aria-labelledby="notes-tab">
                                                     <div class="email-threading-row">
+
                                                         <button class="threading-email-btn-two" data-bs-toggle="modal"
                                                                 data-bs-target="#addNoteModal">
                                                             Create Notes
                                                         </button>
                                                     </div>
-                                                    @foreach($customer_contact->notes as $noteKey=> $note)
-                                                        <div class="data-highlights ">
-                                                            <div class="cstm_note">
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <div class="data-top-heading-header">
-                                                                            <h2>Note</h2>
-                                                                            <p>{{ $note->created_at->format('Y-m-d') ?? "---" }}</p>
+                                                    <p class="date-by-order">{{ \Carbon\Carbon::now()->format('F Y') }}</p>
+
+                                                    @if($customer_contact->notes->count() > 0)
+                                                        @foreach($customer_contact->notes as $noteKey => $note)
+                                                            <div class="data-highlights">
+                                                                <div class="cstm_note">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="data-top-heading-header">
+                                                                                <h2>Note</h2>
+                                                                                <p>
+                                                                                    {{ $note->created_at
+                                                                                        ? \Carbon\Carbon::parse($note->created_at)->timezone('Asia/Karachi')->format('M j, Y \a\t g:i A \G\M\TP')
+                                                                                        : '---' }}
+                                                                                </p>
+
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <!-- Edit & Delete Icons -->
-                                                            <div class="cstm_note_2">
-                                                                <div class="row">
-                                                                    <div class="col-md-12 cstm_note_cont">
-
-                                                                        <p class="user_cont"
-                                                                           id="note-text-{{$note->id}}">
-                                                                            {{ $note->note ?? "No Note Available" }}
-                                                                        </p>
-                                                                        <div class="cstm_right_icon">
-                                                                            <!-- Edit Icon -->
-                                                                            <button class="p-0 border-0 cstm_btn">
-                                                                                <i class="fas fa-edit me-2 editNoteModal "
-                                                                                   style="cursor: pointer;"
-                                                                                   data-bs-toggle="modal"
-                                                                                   data-bs-target="#editNoteModal"
-                                                                                   data-id="{{$note->id}}"
-                                                                                   data-note="{{$note->note}}"></i>
-                                                                            </button>
-                                                                            <!-- Delete Form -->
-                                                                            <form
-                                                                                action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
-                                                                                method="POST" class="deleteNoteForm">
-                                                                                @csrf
-                                                                                @method('DELETE')
-                                                                                <button type="submit"
-                                                                                        class=" p-0 border-0 cstm_btn">
-                                                                                    <i class="fas fa-trash"></i>
+                                                                <!-- Edit & Delete Icons -->
+                                                                <div class="cstm_note_2">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12 cstm_note_cont">
+                                                                            <p class="user_cont" id="note-text-{{$note->id}}">
+                                                                                {{ $note->note ?? "No Note Available" }}
+                                                                            </p>
+                                                                            <div class="cstm_right_icon">
+                                                                                <!-- Edit Icon -->
+                                                                                <button class="p-0 border-0 cstm_btn">
+                                                                                    <i class="fas fa-edit me-2 editNoteModal"
+                                                                                       style="cursor: pointer;"
+                                                                                       data-bs-toggle="modal"
+                                                                                       data-bs-target="#editNoteModal"
+                                                                                       data-id="{{$note->id}}"
+                                                                                       data-note="{{$note->note}}"></i>
                                                                                 </button>
-                                                                            </form>
+                                                                                <!-- Delete Form -->
+                                                                                <form action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
+                                                                                      method="POST" class="deleteNoteForm">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button type="submit" class="p-0 border-0 cstm_btn">
+                                                                                        <i class="fas fa-trash"></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
+                                                        @endforeach
+                                                    @else
+                                                        <p class="note-para">
+                                                            Take notes about this record to keep track of important info.
+                                                            You can even @mention a teammate if you need to.
+                                                        </p>
+                                                    @endif
+
                                                 </div>
 
 
@@ -2232,7 +2251,7 @@
                                                         </button>
                                                     </div>
                                                     <div>
-                                                        <p class="date-by-order"> May 2021</p>
+                                                        <p class="date-by-order">{{ \Carbon\Carbon::now()->format('F Y') }}</p>
                                                         <div class="recent-activities">
                                                             <div class="email-box-container"
                                                                  style="margin: 0; border-radius: 0;">
@@ -2592,14 +2611,14 @@
                                                                                 <div class="user_profile_text">
                                                                                     <h2
                                                                                         style="padding: 0; margin: 0;">
-                                                                                        Devod
-                                                                                        Word </h2>
+                                                                                        Devozd
+                                                                                        Words </h2>
 
                                                                                     <p
                                                                                         style="font-weight: 500; padding-left: 0;">
                                                                                         to
                                                                                         info@opexwebdesign.com,
-                                                                                        bett@hudsoninfo.com
+                                                                                        betta@hudsoninfo.com
                                                                                     </p>
                                                                                 </div>
                                                                             </div>
