@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->string('server_password')->nullable()->default(null);
             $table->enum('imap_type', ['imap', 'smtp', 'custom'])->default('imap');
             $table->nullableMorphs('creator');
+            $table->tinyInteger('is_verified')->nullable()->default(0)->comment('0 = unverified, 1 = verified');
             $table->tinyInteger('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
             $table->timestamps();
             $table->softDeletes();
