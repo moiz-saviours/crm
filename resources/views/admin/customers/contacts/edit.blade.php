@@ -70,8 +70,7 @@
             .nav-tabs .nav-link.main-tabs-view {
                 border-radius: 0px;
                 font-weight: 400;
-                font-size: var(--nf-profile-para-size);
-                ;
+                font-size: var(--nf-profile-para-size);;
                 /*font-size: 0.813rem;*/
                 padding: 12px 28px;
                 color: rgb(51, 71, 91);
@@ -413,7 +412,8 @@
                 margin: 5px 0px;
             }
 
-            .custom-right-detail-column {}
+            .custom-right-detail-column {
+            }
 
             .contact-card-details-para {
                 font-weight: 500;
@@ -823,7 +823,8 @@
                 border: 1px solid #ddd;
             }
 
-            .your-comment-btn {}
+            .your-comment-btn {
+            }
 
             .toolbar {
                 background-color: #dddddda6;
@@ -1381,7 +1382,8 @@
 
             }
 
-            .showhide:hover {}
+            .showhide:hover {
+            }
 
 
             .show_btn:hover {
@@ -1393,6 +1395,14 @@
                 margin: 10px 0px;
                 font-size: var(--nf-profile-para-size);
             }
+
+            .note-para {
+                padding: 10px 10px;
+                text-align: center;
+                font-size: var(--nf-profile-para-size);
+                color: grey;
+            }
+
         </style>
     @endpush
     <div class="new-class-hide-scroll">
@@ -1406,7 +1416,8 @@
 
                             <div class="sidebarr">
                                 <div class="main-left-sidebar-actions">
-                                    <a href="{{ route('admin.customer.contact.index') }}" class="view-subscription-link">
+                                    <a href="{{ route('admin.customer.contact.index') }}"
+                                       class="view-subscription-link">
                                         <span><i class="fa fa-angle-left " aria-hidden="true"></i>
                                             contacts</span>
                                     </a>
@@ -1420,7 +1431,7 @@
                                         <div class="avatar-img-box" style="padding-inline-end: 10px;">
                                             @if (file_exists(public_path('assets/images/user1.png')))
                                                 <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
-                                                    src="{{ asset('assets/images/user1.png') }}">
+                                                     src="{{ asset('assets/images/user1.png') }}">
                                             @else
                                                 @php
                                                     $words = explode(
@@ -1431,7 +1442,8 @@
                                                         $words[0][0] . (count($words) > 1 ? $words[1][0] : ''),
                                                     );
                                                 @endphp
-                                                <div class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                                <div
+                                                    class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
                                                     style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
                                                     {{ $initials }}
                                                 </div>
@@ -1449,8 +1461,8 @@
                                             <div class="email_sec">
                                                 <p id="customerEmail">{{ $customer_contact->email }}</p>
                                                 <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="Copy email to clipboard"></i>
+                                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   title="Copy email to clipboard"></i>
                                             </div>
                                         </div>
                                         <div>
@@ -1538,10 +1550,11 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplecontact"
-                                                    aria-expanded="true" aria-controls="collapseExamplecontact">
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExamplecontact"
+                                                        aria-expanded="true" aria-controls="collapseExamplecontact">
                                                     <i class="fa fa-chevron-down toggle-icon" aria-hidden="true"
-                                                        style="padding-right: 5px;"></i>
+                                                       style="padding-right: 5px;"></i>
                                                     About this contact
                                                 </button>
                                             </div>
@@ -1664,9 +1677,11 @@
                                     {{--                                        </button> --}}
                                     {{--                                    </li> --}}
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link main-tabs-view active" id="profile-tab" data-bs-toggle="tab"
-                                            data-bs-target="#profile" type="button" role="tab" aria-controls="profile"
-                                            aria-selected="true">Activities
+                                        <button class="nav-link main-tabs-view active" id="profile-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#profile" type="button" role="tab"
+                                                aria-controls="profile"
+                                                aria-selected="true">Activities
                                         </button>
                                     </li>
                                 </ul>
@@ -1909,7 +1924,7 @@
 
 
                                     <div class="tab-pane fade active show" id="profile" role="tabpanel"
-                                        aria-labelledby="profile-tab">
+                                         aria-labelledby="profile-tab">
 
                                         <div class="activ_head mt-3">
 
@@ -1917,7 +1932,7 @@
                                             <div class="search-containers">
                                                 <form id="search-form" style="margin:0;">
                                                     <input type="text" class="search-inputs"
-                                                        placeholder="Search activities" name="query">
+                                                           placeholder="Search activities" name="query">
                                                     <button class="search-btns">
                                                         <i class="fa fa-search" aria-hidden="true"></i>
                                                     </button>
@@ -1947,27 +1962,27 @@
                                             <ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize disabled" id="act-tab"
-                                                        data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                        role="tab" aria-controls="act" aria-selected="true">Activity
+                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                            role="tab" aria-controls="act" aria-selected="true">Activity
                                                     </button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize active" id="notes-tab"
-                                                        data-bs-toggle="tab" data-bs-target="#notes" type="button"
-                                                        role="tab" aria-controls="notes" aria-selected="true">Notes
+                                                            data-bs-toggle="tab" data-bs-target="#notes" type="button"
+                                                            role="tab" aria-controls="notes" aria-selected="true">Notes
                                                     </button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize" id="emails-tab"
-                                                        data-bs-toggle="tab" data-bs-target="#email" type="button"
-                                                        role="tab" aria-controls="emails" aria-selected="true">
+                                                            data-bs-toggle="tab" data-bs-target="#email" type="button"
+                                                            role="tab" aria-controls="emails" aria-selected="true">
                                                         Emails
                                                     </button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize disabled" id="calls-tab"
-                                                        data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                        role="tab" aria-controls="calls" aria-selected="true">Calls
+                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                            role="tab" aria-controls="calls" aria-selected="true">Calls
                                                     </button>
                                                 </li>
                                                 {{--                                                <li class="nav-item" role="presentation"> --}}
@@ -2160,69 +2175,83 @@
                                                 {{--                                                    </div> --}}
                                                 {{--                                                </div> --}}
                                                 <div class="tab-pane fade show active" id="notes" role="tabpanel"
-                                                    aria-labelledby="notes-tab">
+                                                     aria-labelledby="notes-tab">
                                                     <div class="email-threading-row">
                                                         <button class="threading-email-btn-two" data-bs-toggle="modal"
-                                                            data-bs-target="#addNoteModal">
+                                                                data-bs-target="#addNoteModal">
                                                             Create Notes
                                                         </button>
                                                     </div>
-                                                    @foreach ($customer_contact->notes as $noteKey => $note)
-                                                        <div class="data-highlights ">
-                                                            <div class="cstm_note">
-                                                                <div class="row">
-                                                                    <div class="col-md-12">
-                                                                        <div class="data-top-heading-header">
-                                                                            <h2>Note</h2>
-                                                                            <p>{{ $note->created_at->format('Y-m-d') ?? '---' }}
+                                                    <p class="date-by-order">{{ \Carbon\Carbon::now()->format('F Y') }}</p>
+
+                                                    @if($customer_contact->notes->count() > 0)
+                                                        @foreach($customer_contact->notes as $noteKey => $note)
+                                                            <div class="data-highlights">
+                                                                <div class="cstm_note">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="data-top-heading-header">
+                                                                                <h2>Note</h2>
+                                                                                <p>
+                                                                                    {{ $note->created_at
+                                                                                        ? \Carbon\Carbon::parse($note->created_at)->timezone('Asia/Karachi')->format('M j, Y \a\t g:i A \G\M\TP')
+                                                                                        : '---' }}
+                                                                                </p>
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Edit & Delete Icons -->
+                                                                <div class="cstm_note_2">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12 cstm_note_cont">
+                                                                            <p class="user_cont"
+                                                                               id="note-text-{{$note->id}}">
+                                                                                {{ $note->note ?? "No Note Available" }}
                                                                             </p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Edit & Delete Icons -->
-                                                            <div class="cstm_note_2">
-                                                                <div class="row">
-                                                                    <div class="col-md-12 cstm_note_cont">
-
-                                                                        <p class="user_cont"
-                                                                            id="note-text-{{ $note->id }}">
-                                                                            {{ $note->note ?? 'No Note Available' }}
-                                                                        </p>
-                                                                        <div class="cstm_right_icon">
-                                                                            <!-- Edit Icon -->
-                                                                            <button class="p-0 border-0 cstm_btn">
-                                                                                <i class="fas fa-edit me-2 editNoteModal "
-                                                                                    style="cursor: pointer;"
-                                                                                    data-bs-toggle="modal"
-                                                                                    data-bs-target="#editNoteModal"
-                                                                                    data-id="{{ $note->id }}"
-                                                                                    data-note="{{ $note->note }}"></i>
-                                                                            </button>
-                                                                            <!-- Delete Form -->
-                                                                            <form
-                                                                                action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
-                                                                                method="POST" class="deleteNoteForm">
-                                                                                @csrf
-                                                                                @method('DELETE')
-                                                                                <button type="submit"
-                                                                                    class=" p-0 border-0 cstm_btn">
-                                                                                    <i class="fas fa-trash"></i>
+                                                                            <div class="cstm_right_icon">
+                                                                                <!-- Edit Icon -->
+                                                                                <button class="p-0 border-0 cstm_btn">
+                                                                                    <i class="fas fa-edit me-2 editNoteModal"
+                                                                                       style="cursor: pointer;"
+                                                                                       data-bs-toggle="modal"
+                                                                                       data-bs-target="#editNoteModal"
+                                                                                       data-id="{{$note->id}}"
+                                                                                       data-note="{{$note->note}}"></i>
                                                                                 </button>
-                                                                            </form>
+                                                                                <!-- Delete Form -->
+                                                                                <form
+                                                                                    action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
+                                                                                    method="POST"
+                                                                                    class="deleteNoteForm">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button type="submit"
+                                                                                            class="p-0 border-0 cstm_btn">
+                                                                                        <i class="fas fa-trash"></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    @endforeach
+                                                        @endforeach
+                                                    @else
+                                                        <p class="note-para">
+                                                            Take notes about this record to keep track of important
+                                                            info.
+                                                            You can even @mention a teammate if you need to.
+                                                        </p>
+                                                    @endif
                                                 </div>
 
 
                                                 <div class="tab-pane fade" id="email" role="tabpanel"
-                                                    aria-labelledby="email-tab">
-                                   
+                                                     aria-labelledby="email-tab">
+
 
                                                     <div class="email-threading-row">
                                                         <p class="activities-seprater"> Thread email replies </p>
@@ -2241,13 +2270,13 @@
                                                             @forelse ($emails as $index => $email)
 
                                                                 <div class="email-box-container"
-                                                                    style="margin: 0; border-radius: 0;">
+                                                                     style="margin: 0; border-radius: 0;">
                                                                     <div class="toggle-btnss"
-                                                                        data-target="#{{ $email['uuid'] }}">
+                                                                         data-target="#{{ $email['uuid'] }}">
                                                                         <div class="activ_head">
                                                                             <div class="email-child-wrapper">
                                                                                 <i class="fa fa-caret-right"
-                                                                                    aria-hidden="true"></i>
+                                                                                   aria-hidden="true"></i>
                                                                                 <div>
                                                                                     <h2>
                                                                                         {{ $email['from'][0]['name'] ?? 'Unknown Sender' }}
@@ -2272,7 +2301,8 @@
                                                                     </div>
 
                                                                     <div id="{{ $email['uuid'] }}"
-                                                                        class="contentdisplaytwo" style="display: none;">
+                                                                         class="contentdisplaytwo"
+                                                                         style="display: none;">
                                                                         <div class="user_cont user-email-template">
                                                                             <div class="email-preview">
                                                                                 {!! $email['body']['html'] ?? nl2br(e($email['body']['text'] ?? '')) !!}
@@ -2285,7 +2315,7 @@
                                                                         <div class="doc-attachment-container">
                                                                             @foreach ($email['attachments'] as $attachment)
                                                                                 <a href="{{ $attachment['download_url'] ?? '#' }}"
-                                                                                    class="doc-attachment">
+                                                                                   class="doc-attachment">
                                                                                     <div class="icon-doc">📎</div>
                                                                                     <div class="file-info-doc">
                                                                                         <p class="file-name-doc">
@@ -2305,11 +2335,6 @@
                                                             @endforelse
                                                         </div>
                                                     </div>
-
-
-
-
-
 
 
                                                 </div>
@@ -2409,11 +2434,13 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExample"
-                                                    aria-expanded="true" aria-controls="collapseExample">
-                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
-                                                    Company <span> ( {{ $customer_contact->companies->count() }} )</span>
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                                                        aria-expanded="true" aria-controls="collapseExample">
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
+                                                       aria-hidden="true"></i>
+                                                    Company
+                                                    <span> ( {{ $customer_contact->companies->count() }} )</span>
                                                 </button>
                                             </div>
 
@@ -2435,7 +2462,7 @@
                                                     <span> Domain :
                                                         @if (!empty($customer_contact->company->domain))
                                                             <a href="https://{{ $customer_contact->company->domain }}"
-                                                                target="_blank">
+                                                               target="_blank">
                                                                 {{ $customer_contact->company->domain }}
                                                             </a>
                                                         @else
@@ -2457,10 +2484,12 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplepayment"
-                                                    aria-expanded="true" aria-controls="collapseExamplepayment">
-                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExamplepayment"
+                                                        aria-expanded="true" aria-controls="collapseExamplepayment">
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
+                                                       aria-hidden="true"></i>
                                                     Payments <span> ( {{ $customer_contact->payments->count() ?? '---' }} )
                                                     </span>
                                                 </button>
@@ -2497,7 +2526,8 @@
                                                                 @elseif($payment->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($payment->status == 2)
-                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span
+                                                                        class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($payment->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -2536,10 +2566,12 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleinvoice"
-                                                    aria-expanded="true" aria-controls="collapseExampleinvoice">
-                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExampleinvoice"
+                                                        aria-expanded="true" aria-controls="collapseExampleinvoice">
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
+                                                       aria-hidden="true"></i>
                                                     Invoices <span> ({{ $customer_contact->invoices->count() }}) </span>
                                                 </button>
                                             </div>
@@ -2568,7 +2600,8 @@
                                                                 @elseif($invoice->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($invoice->status == 2)
-                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span
+                                                                        class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($invoice->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -2669,8 +2702,8 @@
 
         {{--        MY SCRIPT --}}
         <script>
-            $(document).ready(function() {
-                $('.showhide-payment, .showhide-invoice').click(function() {
+            $(document).ready(function () {
+                $('.showhide-payment, .showhide-invoice').click(function () {
                     // Determine which type: "payment" or "invoice"
                     let type = $(this).hasClass('showhide-payment') ? 'payment' : 'invoice';
 
@@ -2689,20 +2722,20 @@
         </script>
 
         <script>
-            $(document).ready(function() {
-                $('.toggle-collapse').each(function() {
+            $(document).ready(function () {
+                $('.toggle-collapse').each(function () {
                     var $button = $(this);
                     var target = $button.data('bs-target'); // Get target id from data-bs-target
                     var $collapse = $(target);
 
                     // On show event
-                    $collapse.on('show.bs.collapse', function() {
+                    $collapse.on('show.bs.collapse', function () {
                         $button.find('.toggle-icon').removeClass('fa-chevron-right').addClass(
                             'fa-chevron-down');
                     });
 
                     // On hide event
-                    $collapse.on('hide.bs.collapse', function() {
+                    $collapse.on('hide.bs.collapse', function () {
                         $button.find('.toggle-icon').removeClass('fa-chevron-down').addClass(
                             'fa-chevron-right');
                     });
@@ -2722,8 +2755,8 @@
             }
 
             // Second comment function
-            $(document).ready(function() {
-                $('#toggleButton').click(function() {
+            $(document).ready(function () {
+                $('#toggleButton').click(function () {
                     const contents = $('#contents');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2735,21 +2768,21 @@
                 });
             });
             // select to function
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Toggle dropdown visibility
-                $(".dropdown-toggle").on("click", function() {
+                $(".dropdown-toggle").on("click", function () {
                     $(".dropdown-content").toggle();
                 });
                 // Filter list based on search input
-                $(".search-input").on("input", function() {
+                $(".search-input").on("input", function () {
                     const filter = $(this).val().toLowerCase();
-                    $(".checkbox-item").each(function() {
+                    $(".checkbox-item").each(function () {
                         const label = $(this).find("label").text().toLowerCase();
                         $(this).toggle(label.includes(filter));
                     });
                 });
                 // Close dropdown if clicked outside
-                $(document).on("click", function(e) {
+                $(document).on("click", function (e) {
                     if (!$(e.target).closest(".dropdown").length) {
                         $(".dropdown-content").hide();
                     }
@@ -2757,15 +2790,15 @@
             });
             // $('select>option:eq(3)').attr('selected', true);
             // Searching Input function
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Expand and collapse the search bar
-                $(".search-btns").on("click", function(e) {
+                $(".search-btns").on("click", function (e) {
                     e.preventDefault(); // Prevent form submission on button click
                     $(".search-containers").toggleClass("expanded");
                     $(".search-inputs").focus();
                 });
                 // Handle form submission for search
-                $("#search-form").on("submit", function(e) {
+                $("#search-form").on("submit", function (e) {
                     e.preventDefault(); // Prevent default form submission
                     const query = $(".search-inputs").val().trim();
                     if (query) {
@@ -2778,7 +2811,7 @@
                     }
                 });
                 // Collapse the search bar when clicking outside
-                $(document).on("click", function(e) {
+                $(document).on("click", function (e) {
                     if (!$(e.target).closest(".search-containers").length) {
                         $(".search-containers").removeClass("expanded");
                     }
@@ -2787,8 +2820,8 @@
 
             // NEw
             // Function hide and show
-            $(document).ready(function() {
-                $(".toggle-btnss").click(function() {
+            $(document).ready(function () {
+                $(".toggle-btnss").click(function () {
                     let targetId = $(this).data("target");
                     $(targetId).slideToggle(); // Only toggle this email's content
 
@@ -2800,24 +2833,24 @@
             //new
 
             // EMAIL TEMPLATE OPEN AND CLOSE
-            $(document).ready(function() {
+            $(document).ready(function () {
                 const emailTemplate = $('#emailTemplate');
 
                 // Open form
-                $('.open-email-form').click(function() {
+                $('.open-email-form').click(function () {
                     emailTemplate.addClass('open');
 
                 });
 
                 // Close form
-                $('.close-btn').click(function() {
+                $('.close-btn').click(function () {
                     emailTemplate.removeClass('open');
 
                 });
             });
             // view threads function
-            $(document).ready(function() {
-                $('#toggleButtonThread').click(function() {
+            $(document).ready(function () {
+                $('#toggleButtonThread').click(function () {
                     const contents = $('#thread');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2831,7 +2864,7 @@
                 });
             });
             // read more text function
-            $('.moreless-button').click(function() {
+            $('.moreless-button').click(function () {
                 $('.moretext').slideToggle();
                 if ($('.moreless-button').text() == "See more") {
                     $(this).text("See less")
@@ -2842,11 +2875,11 @@
 
             // Copy Clipboard Email
 
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Initialize Bootstrap tooltips
                 $('[data-bs-toggle="tooltip"]').tooltip();
 
-                $(document).on('click', '.copyEmail', async function() {
+                $(document).on('click', '.copyEmail', async function () {
                     try {
                         let emailText = $("#customerEmail").text().trim();
                         await navigator.clipboard.writeText(emailText);
