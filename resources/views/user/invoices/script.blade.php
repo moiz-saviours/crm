@@ -282,6 +282,7 @@
             $('#cus_contact_key').val(invoice.customer_contact?.special_key);
             $('#agent_id').val(invoice.agent_id);
             $('#due_date').val(invoice.due_date);
+            $('#currency').val(invoice.currency);
             $('#amount').val(invoice.amount);
             $('#total_amount').val(invoice.total_amount);
             $('#description').val(invoice.description);
@@ -386,8 +387,8 @@
                         <td class="align-middle text-center text-nowrap">
                             ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${date}</td>
                         <td class="align-middle text-center text-nowrap">${due_date}</td>
+                        <td class="align-middle text-center text-nowrap">${date}</td>
                         <td class="align-middle text-center table-actions">
                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                             data-id="${id}"
