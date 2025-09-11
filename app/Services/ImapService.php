@@ -8,25 +8,29 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 class ImapService
 {
     private $connection;
-    private $config;
+     private $config;
+    // private $config;
 
-    public function __construct()
-    {
-        $this->config = [
-            'host'       => 'mail.stellers.org',
-            'port'       => 993,
-            'protocol'   => 'imap',
-            'encryption' => 'ssl',
-            'validate_cert' => false,
-            'username'   => 'hasnat.khan@stellers.org',
-            'password'   => '9k,98f+0xvJ)',
-        ];
-    }
+    // public function __construct()
+    // {
+    //     $this->config = [
+    //         'host'       => 'mail.pivotbookwriting.com',
+    //         'port'       => 993,
+    //         'protocol'   => 'imap',
+    //         'encryption' => 'ssl',
+    //         'validate_cert' => false,
+    //         'username'   => 'hasnat.developer@pivotbookwriting.com',
+    //         'password'   => 'ATko513Wqyabs',
+    //     ];
+    // }
 
-    public function connect(): bool
+      public function connect(array $imapConfig): bool
     {
+        // Save globally for other methods
+        $this->config = $imapConfig;
+
         $mailbox = sprintf(
-            "{%s:%d/%s%s}",
+            "{%s:%d/%s%s}INBOX",
             $this->config['host'],
             $this->config['port'],
             $this->config['protocol'],
@@ -37,11 +41,15 @@ class ImapService
             $mailbox .= '/novalidate-cert';
         }
 
-        $this->connection = imap_open(
+        $this->connection = @imap_open(
             $mailbox,
             $this->config['username'],
             $this->config['password']
         );
+
+        if (!$this->connection) {
+            logger()->error('IMAP connection failed: ' . imap_last_error());
+        }
 
         return $this->connection !== false;
     }

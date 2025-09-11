@@ -130,6 +130,16 @@ class ContactController extends Controller
      */
     public function edit(CustomerContact $customer_contact)
     {
+        $imapConfig = [
+            'host'          => 'mail.pivotbookwriting.com',
+            'port'          => 993,
+            'protocol'      => 'imap',
+            'encryption'    => 'ssl',
+            'validate_cert' => false,
+            'username'      => 'hasnat.developer@pivotbookwriting.com',
+            'password'      => 'ATko513Wqyabs',
+        ];
+
         // email-code-open
         $folder = request()->get('folder', 'INBOX');
         $page   = (int) request()->get('page', 1);
@@ -137,7 +147,7 @@ class ContactController extends Controller
         $offset = ($page - 1) * $limit;
         // allow refresh with ?refresh=1
         if (request()->get('refresh') || !session()->has('dev_emails')) {
-            if (!$this->imapService->connect()) {
+            if (!$this->imapService->connect($imapConfig)) {
                 dd('IMAP connection failed. Please check your configuration.');
             }
 
