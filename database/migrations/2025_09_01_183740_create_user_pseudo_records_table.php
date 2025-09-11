@@ -10,21 +10,23 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        if (!Schema::hasTable('user_pseudo_records')) {
-            Schema::create('user_pseudo_records', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('user_id')->nullable()->default(null);
-                $table->string('pseudo_name')->nullable()->default(null);
-                $table->string('pseudo_email')->nullable()->default(null);
-                $table->string('pseudo_phone')->nullable()->default(null);
-                $table->nullableMorphs('creator');
-                $table->tinyInteger('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
-                $table->timestamps();
-                $table->softDeletes();
-                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-                $table->index('user_id');
-            });
-        }
+        Schema::create('user_pseudo_records', function (Blueprint $table) {
+            $table->id();
+            $table->nullableMorphs('morph');
+            $table->string('pseudo_name')->nullable()->default(null);
+            $table->string('pseudo_email')->nullable()->default(null)->unique();
+            $table->string('pseudo_phone')->nullable()->default(null);
+            $table->string('server_host')->nullable()->default(null);
+            $table->string('server_port')->nullable()->default(null);
+            $table->string('server_encryption')->nullable()->default(null);
+            $table->string('server_username')->nullable()->default(null);
+            $table->string('server_password')->nullable()->default(null);
+            $table->enum('imap_type', ['imap', 'smtp', 'custom'])->default('imap');
+            $table->nullableMorphs('creator');
+            $table->tinyInteger('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -32,8 +34,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        if (Schema::hasTable('user_pseudo_records')) {
-            Schema::dropIfExists('user_pseudo_records');
-        }
+        Schema::dropIfExists('user_pseudo_records');
     }
 };
