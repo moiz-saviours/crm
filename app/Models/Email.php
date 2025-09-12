@@ -2,13 +2,23 @@
 
 namespace App\Models;
 
+use App\Traits\ActivityLoggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Email extends Model
 {
-    use SoftDeletes;
+    use Notifiable, SoftDeletes, ActivityLoggable;
 
+    protected $table = 'emails';
+    protected $guarded = [];
+    protected $primaryKey = 'id';
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'pseudo_record_id',
         'thread_id',
@@ -36,7 +46,6 @@ class Email extends Model
         'sent_at',
         'received_at',
     ];
-
     protected $casts = [
         'to' => 'array',
         'cc' => 'array',
@@ -51,19 +60,22 @@ class Email extends Model
         'received_at' => 'datetime',
     ];
 
+    /**
+     * Relationships
+     */
     public function pseudoRecord()
     {
-        return $this->belongsTo(UserPseudoRecord::class, 'pseudo_record_id');
+        return $this->belongsTo(UserPseudoRecord::class, 'pseudo_record_id', 'id');
     }
 
     public function attachments()
     {
-        return $this->hasMany(EmailAttachment::class, 'email_id');
+        return $this->hasMany(EmailAttachment::class, 'email_id', 'id');
     }
 
     public function labels()
     {
-        return $this->belongsToMany(EmailLabel::class, 'email_label_pivot', 'email_id', 'label_id')
+        return $this->belongsToMany(EmailLabel::class, EmailLabelPivot::class, 'email_id', 'label_id', 'id', 'id')
             ->withTimestamps();
     }
 }
