@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,15 +13,12 @@ return new class extends Migration
         Schema::create('email_label_pivots', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('email_id')->nullable()->default(null);
-
             $table->unsignedBigInteger('label_id')->nullable()->default(null);
-
             $table->timestamps();
-
+            $table->softDeletes();
             $table->unique(['email_id', 'label_id']);
-
-            $table->foreign('email_id')->references( 'id')->on('emails')->onDelete('NO ACTION');
-            $table->foreign('label_id')->references( 'id')->on('email_labels')->onDelete('NO ACTION');
+            $table->foreign('email_id')->references('id')->on('emails')->onDelete('NO ACTION');
+            $table->foreign('label_id')->references('id')->on('email_labels')->onDelete('NO ACTION');
 
         });
     }
