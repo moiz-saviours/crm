@@ -1411,6 +1411,14 @@
             <div class="container-fluid p-0 ">
 
                 <div class="">
+@if($imapError)
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ $imapError }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+
                     <div class="row ">
                         <div class="col-lg-3">
 
@@ -2263,76 +2271,121 @@
                                                         </button>
                                                     </div>
 
+
+
                                                     <div>
                                                         <p class="date-by-order">{{ now()->format('F Y') }}</p>
 
                                                         <div class="recent-activities">
-                                                            @forelse ($emails as $index => $email)
+@forelse ($emails as $index => $email)
+    <div class="email-box-container" style="margin: 0; border-radius: 0;">
+        <div class="toggle-btnss" data-target="#{{ $email['uuid'] }}">
+            <div class="activ_head">
+                <div class="email-child-wrapper">
+                    <i class="fa fa-caret-right" aria-hidden="true"></i>
+                    <div>
+                        <h2>
+                            {{ $email['from'][0]['name'] ?? 'Unknown Sender' }}
+                            -
+                            {{ $email['subject'] ?? '(No Subject)' }}
+                        </h2>
+                        <p class="user_cont">
+                            from: {{ $email['from'][0]['email'] ?? 'Unknown' }}
+                        </p>
+                        <p class="user_cont">
+                            to: {{ $email['to'][0]['email'] ?? 'Unknown' }}
+                        </p>
+                    </div>
+                </div>
 
-                                                                <div class="email-box-container"
-                                                                     style="margin: 0; border-radius: 0;">
-                                                                    <div class="toggle-btnss"
-                                                                         data-target="#{{ $email['uuid'] }}">
-                                                                        <div class="activ_head">
-                                                                            <div class="email-child-wrapper">
-                                                                                <i class="fa fa-caret-right"
-                                                                                   aria-hidden="true"></i>
-                                                                                <div>
-                                                                                    <h2>
-                                                                                        {{ $email['from'][0]['name'] ?? 'Unknown Sender' }}
-                                                                                        -
-                                                                                        {{ $email['subject'] ?? '(No Subject)' }}
-                                                                                    </h2>
-                                                                                    <p class="user_cont">
-                                                                                        from:
-                                                                                        {{ $email['from'][0]['email'] ?? 'Unknown' }}
-                                                                                    </p>
-                                                                                    <p class="user_cont">
-                                                                                        to:
-                                                                                        {{ $email['to'][0]['email'] ?? 'Unknown' }}
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
+                <div style="text-align: right;">
+                    <p>
+                        {{ $email['date'] ? \Carbon\Carbon::parse($email['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
+                    </p>
+                    
+                    {{-- Show attachment count in header --}}
+                    @if (!empty($email['attachments']))
+                        <p class="attachment-count" style="font-size: 12px; color: #666; margin: 2px 0;">
+                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                            {{ count($email['attachments']) }} attachment{{ count($email['attachments']) > 1 ? 's' : '' }}
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
 
-                                                                            <p>
-                                                                                {{ $email['date'] ? \Carbon\Carbon::parse($email['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
+        <div id="{{ $email['uuid'] }}" class="contentdisplaytwo" style="display: none;">
+            <div class="user_cont user-email-template">
+                <div class="email-preview">
+                    {!! $email['body']['html'] ?? nl2br(e($email['body']['text'] ?? '')) !!}
+                </div>
 
-                                                                    <div id="{{ $email['uuid'] }}"
-                                                                         class="contentdisplaytwo"
-                                                                         style="display: none;">
-                                                                        <div class="user_cont user-email-template">
-                                                                            <div class="email-preview">
-                                                                                {!! $email['body']['html'] ?? nl2br(e($email['body']['text'] ?? '')) !!}
-                                                                            </div>
-
-                                                                        </div>
-                                                                    </div>
-
-                                                                    @if (!empty($email['attachments']))
-                                                                        <div class="doc-attachment-container">
-                                                                            @foreach ($email['attachments'] as $attachment)
-                                                                                <a href="{{ $attachment['download_url'] ?? '#' }}"
-                                                                                   class="doc-attachment">
-                                                                                    <div class="icon-doc">📎</div>
-                                                                                    <div class="file-info-doc">
-                                                                                        <p class="file-name-doc">
-                                                                                            {{ $attachment['name'] ?? 'file' }}
-                                                                                        </p>
-                                                                                        <p class="file-size-doc">
-                                                                                            {{ $attachment['size'] ?? '' }}
-                                                                                        </p>
-                                                                                    </div>
-                                                                                </a>
-                                                                            @endforeach
-                                                                        </div>
-                                                                    @endif
-                                                                </div>
-                                                            @empty
-                                                                <p class="text-muted">No emails found.</p>
-                                                            @endforelse
+                {{-- Attachments Section --}}
+                @if (!empty($email['attachments']))
+                    <div class="attachments-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <h4 style="margin-bottom: 10px; color: #333;">
+                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                            Attachments ({{ count($email['attachments']) }})
+                        </h4>
+                        
+                        <div class="attachments-list">
+                            @foreach ($email['attachments'] as $attachment)
+                                <div class="attachment-item" style="display: flex; align-items: center; padding: 8px 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 8px;">
+                                    <div class="attachment-icon" style="margin-right: 10px; font-size: 16px; color: #6c757d;">
+                                        @php
+                                            $fileType = strtolower($attachment['type'] ?? 'unknown');
+                                            $iconClass = match($fileType) {
+                                                'pdf' => 'fa-file-pdf-o',
+                                                'doc', 'docx' => 'fa-file-word-o',
+                                                'xls', 'xlsx' => 'fa-file-excel-o',
+                                                'ppt', 'pptx' => 'fa-file-powerpoint-o',
+                                                'jpg', 'jpeg', 'png', 'gif', 'bmp' => 'fa-file-image-o',
+                                                'txt' => 'fa-file-text-o',
+                                                'zip', 'rar', '7z' => 'fa-file-archive-o',
+                                                default => 'fa-file-o'
+                                            };
+                                        @endphp
+                                        <i class="fa {{ $iconClass }}" aria-hidden="true"></i>
+                                    </div>
+                                    
+                                    <div class="attachment-info" style="flex: 1;">
+                                        <div class="attachment-name" style="font-weight: 500; color: #212529;">
+                                            {{ $attachment['filename'] ?? 'Unknown File' }}
+                                        </div>
+                                        <div class="attachment-details" style="font-size: 12px; color: #6c757d;">
+                                            Type: {{ strtoupper($attachment['type'] ?? 'unknown') }} 
+                                            @if (isset($attachment['size']) && $attachment['size'] > 0)
+                                                | Size: {{ number_format($attachment['size'] / 1024, 1) }} KB
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="attachment-actions">
+                                        @if (isset($attachment['download_url']))
+                                            <a href="{{ $attachment['download_url'] }}" 
+                                               download="{{ $attachment['filename'] ?? 'attachment' }}"
+                                               class="btn btn-sm btn-outline-primary"
+                                               style="text-decoration: none; padding: 4px 8px; border: 1px solid #007bff; color: #007bff; border-radius: 3px; font-size: 12px;">
+                                                <i class="fa fa-download" aria-hidden="true"></i> Download
+                                            </a>
+                                        @else
+                                            <span class="text-muted" style="font-size: 12px;">
+                                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                                No download link
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+@empty
+    <p class="text-muted">No emails found.</p>
+@endforelse
                                                         </div>
                                                     </div>
 

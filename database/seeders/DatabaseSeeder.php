@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             DepartmentsTableSeeder::class,
             RolesTableSeeder::class,
             PositionsTableSeeder::class,
+            // UserPseudoRecordSeeder::class,
+            
         ]);
     }
 }

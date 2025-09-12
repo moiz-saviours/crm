@@ -32,6 +32,7 @@ public function connect(array $imapConfig): bool
         $this->config['username'],
         $this->config['password']
     );
+   
 
     if (!$this->connection) {
         logger()->error('IMAP connection failed: ' . imap_last_error());
@@ -126,50 +127,53 @@ public function connect(array $imapConfig): bool
         $start = max(1, $totalEmails - $offset - $limit + 1);
         $end   = max(1, $totalEmails - $offset);
 
-        for ($i = $end; $i >= $start; $i--) {
-            try {
-                $header    = @imap_headerinfo($this->connection, $i) ?: new \stdClass();
-                $structure = @imap_fetchstructure($this->connection, $i) ?: null;
 
-                $body = $this->getMessageBody($i, $structure);
+        
+   for ($i = $end; $i >= $start; $i--) {
+    try {
+        $header    = @imap_headerinfo($this->connection, $i) ?: new \stdClass();
+        $structure = @imap_fetchstructure($this->connection, $i) ?: null;
+        $attachments = $this->getAttachments($i, $structure);
 
-                if (!empty($body['html'])) {
-                    $body['html'] = $this->inlineEmailCss($body['html']);
-                }
+        $body = $this->getMessageBody($i, $structure);
 
-                // Parse fields with safety
-                $emails[] = [
-                    'uid'            => @imap_uid($this->connection, $i) ?: null,
-                    'uuid'           => $this->generateUuidFromMessageId($header->message_id ?? ''),
-                    'message_id'     => $header->message_id ?? '',
-                    'subject'        => $this->decodeHeader($header->subject ?? '(No Subject)'),
-                    'from'           => $this->parseAddress($header->from ?? []) ?: [['name' => 'Unknown', 'email' => 'Unknown']],
-                    'to'             => $this->parseAddress($header->to ?? []) ?: [['name' => '', 'email' => 'Unknown']],
-                    'cc'             => $this->parseAddress($header->cc ?? []),
-                    'date'           => $this->safeDate($header->date ?? null),
-                    'size'           => $header->Size ?? 0,
-                    'seen'           => isset($header->Unseen) ? !$header->Unseen : false,
-                    'flagged'        => $header->Flagged ?? false,
-                    'answered'       => $header->Answered ?? false,
-                    'deleted'        => $header->Deleted ?? false,
-                    'draft'          => $header->Draft ?? false,
-                    'has_attachments' => $this->hasAttachments($structure),
-                    'thread_id'      => $this->getThreadId($header) ?? '',
-                    'body'           => $body,
-                ];
-            } catch (\Throwable $e) {
-                // Skip bad email but keep loop running
-                $emails[] = [
-                    'uid'        => null,
-                    'subject'    => '(Error fetching email)',
-                    'from'       => [['name' => 'Unknown', 'email' => 'Unknown']],
-                    'to'         => [['name' => '', 'email' => 'Unknown']],
-                    'date'       => null,
-                    'body'       => ['html' => null, 'text' => null],
-                    'has_attachments' => false,
-                ];
-            }
+        if (!empty($body['html'])) {
+            $body['html'] = $this->inlineEmailCss($body['html']);
         }
+
+        $from = $this->parseAddress($header->from ?? []);
+        $fromEmail = strtolower($from[0]['email'] ?? '');
+
+        // ✅ Only allow developer@pivotbookwriting.com
+        if ($fromEmail !== 'developer@pivotbookwriting.com') {
+            continue;
+        }
+
+        $emails[] = [
+            'uid'            => @imap_uid($this->connection, $i) ?: null,
+            'uuid'           => $this->generateUuidFromMessageId($header->message_id ?? ''),
+            'message_id'     => $header->message_id ?? '',
+            'subject'        => $this->decodeHeader($header->subject ?? '(No Subject)'),
+            'from'           => $from ?: [['name' => 'Unknown', 'email' => 'Unknown']],
+            'to'             => $this->parseAddress($header->to ?? []) ?: [['name' => '', 'email' => 'Unknown']],
+            'cc'             => $this->parseAddress($header->cc ?? []),
+            'date'           => $this->safeDate($header->date ?? null),
+            'size'           => $header->Size ?? 0,
+            'seen'           => isset($header->Unseen) ? !$header->Unseen : false,
+            'flagged'        => $header->Flagged ?? false,
+            'answered'       => $header->Answered ?? false,
+            'deleted'        => $header->Deleted ?? false,
+            'draft'          => $header->Draft ?? false,
+            'has_attachments' => $this->hasAttachments($structure),
+            'thread_id'      => $this->getThreadId($header) ?? '',
+            'body'           => $body,
+            'attachments' => $attachments, // ✅ added
+        ];
+    } catch (\Throwable $e) {
+        continue; // skip bad emails
+    }
+}
+
 
         return $emails;
     }
@@ -420,7 +424,7 @@ public function connect(array $imapConfig): bool
         return $attachments;
     }
 
-    private function extractAttachment(int $messageNum, $part, string $partNum, array &$attachments): void
+private function extractAttachment(int $messageNum, $part, string $partNum, array &$attachments): void
     {
         if (isset($part->disposition) && strtolower($part->disposition) === 'attachment') {
             $filename = '';
@@ -443,11 +447,35 @@ public function connect(array $imapConfig): bool
                 }
             }
 
+            // Get the attachment content
+            $attachmentData = imap_fetchbody($this->connection, $messageNum, $partNum);
+            
+            // Decode based on encoding
+            if (isset($part->encoding)) {
+                switch ($part->encoding) {
+                    case 3: // Base64
+                        $attachmentData = base64_decode($attachmentData);
+                        break;
+                    case 4: // Quoted-printable
+                        $attachmentData = quoted_printable_decode($attachmentData);
+                        break;
+                }
+            }
+
+            // Get MIME type
+            $mimeType = $this->getMimeType($part);
+            
+            // Create data URI for direct download
+            $base64Data = base64_encode($attachmentData);
+            $downloadUrl = "data:{$mimeType};base64,{$base64Data}";
+
             $attachments[] = [
                 'filename' => $this->decodeHeader($filename),
-                'size' => $part->bytes ?? 0,
+                'size' => $part->bytes ?? strlen($attachmentData),
                 'type' => $part->subtype ?? 'unknown',
+                'mime_type' => $mimeType,
                 'part_number' => $partNum,
+                'download_url' => $downloadUrl, // ✅ Direct download URL
             ];
         }
 
@@ -456,6 +484,94 @@ public function connect(array $imapConfig): bool
                 $this->extractAttachment($messageNum, $subPart, $partNum . '.' . ($subPartNum + 1), $attachments);
             }
         }
+    }
+
+    /**
+     * Get MIME type from email part structure
+     */
+    private function getMimeType($part): string
+    {
+        $primaryType = strtolower($part->type ?? 0);
+        $subType = strtolower($part->subtype ?? 'unknown');
+
+        $typeMap = [
+            0 => 'text',      // TYPETEXT
+            1 => 'multipart', // TYPEMULTIPART  
+            2 => 'message',   // TYPEMESSAGE
+            3 => 'application', // TYPEAPPLICATION
+            4 => 'audio',     // TYPEAUDIO
+            5 => 'image',     // TYPEIMAGE
+            6 => 'video',     // TYPEVIDEO
+            7 => 'model',     // TYPEMODEL
+            8 => 'other'      // TYPEOTHER
+        ];
+
+        $primaryTypeName = $typeMap[$primaryType] ?? 'application';
+        
+        return "{$primaryTypeName}/{$subType}";
+    }
+
+    /**
+     * Alternative method: Get attachment download URL by UID and part number
+     */
+    public function getAttachmentDownloadUrl(string $uid, string $partNumber, string $folder = 'INBOX'): ?string
+    {
+        $this->selectFolder($folder);
+        
+        $messageNum = imap_msgno($this->connection, $uid);
+        if (!$messageNum) {
+            return null;
+        }
+
+        $structure = imap_fetchstructure($this->connection, $messageNum);
+        $part = $this->getPartByNumber($structure, $partNumber);
+        
+        if (!$part) {
+            return null;
+        }
+
+        // Get the attachment content
+        $attachmentData = imap_fetchbody($this->connection, $messageNum, $partNumber);
+        
+        // Decode based on encoding
+        if (isset($part->encoding)) {
+            switch ($part->encoding) {
+                case 3: // Base64
+                    $attachmentData = base64_decode($attachmentData);
+                    break;
+                case 4: // Quoted-printable
+                    $attachmentData = quoted_printable_decode($attachmentData);
+                    break;
+            }
+        }
+
+        // Get MIME type
+        $mimeType = $this->getMimeType($part);
+        
+        // Create data URI for direct download
+        $base64Data = base64_encode($attachmentData);
+        return "data:{$mimeType};base64,{$base64Data}";
+    }
+
+    /**
+     * Helper method to get specific part by part number
+     */
+    private function getPartByNumber($structure, string $partNumber)
+    {
+        $parts = explode('.', $partNumber);
+        $currentPart = $structure;
+        
+        foreach ($parts as $partIndex) {
+            $index = intval($partIndex) - 1;
+            
+            if (isset($currentPart->parts) && isset($currentPart->parts[$index])) {
+                $currentPart = $currentPart->parts[$index];
+            } else {
+                return null;
+            }
+        }
+        
+        return $currentPart;
     }
 
     private function getThreadId($header): string

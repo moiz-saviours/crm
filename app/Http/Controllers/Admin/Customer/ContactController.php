@@ -128,35 +128,83 @@ class ContactController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CustomerContact $customer_contact)
-    {
-       $imapConfig = [
-            'host'          => env('IMAP_HOST'),
-            'port'          => env('IMAP_PORT', 993),
-            'protocol'      => env('IMAP_PROTOCOL', 'imap'),
-            'encryption'    => env('IMAP_ENCRYPTION', 'ssl'),
-            'validate_cert' => env('IMAP_VALIDATE_CERT', false),
-            'username'      => env('IMAP_USERNAME'),
-            'password'      => env('IMAP_PASSWORD'),
+public function edit(CustomerContact $customer_contact)
+{
+    $imapConfig = [
+        'host'          => env('IMAP_HOST'),
+        'port'          => env('IMAP_PORT', 993),
+        'protocol'      => env('IMAP_PROTOCOL', 'imap'),
+        'encryption'    => env('IMAP_ENCRYPTION', 'ssl'),
+        'validate_cert' => env('IMAP_VALIDATE_CERT', false),
+        'username'      => env('IMAP_USERNAME'),
+        'password'      => env('IMAP_PASSWORD'),
+    ];
+
+    $emails = [];
+    $folders = [];
+    $imapError = null;
+
+    $folder = request()->get('folder', 'INBOX');
+    $page   = (int) request()->get('page', 1);
+    $limit  = 5;
+    $offset = ($page - 1) * $limit;
+
+    if (!$customer_contact->id) {
+        return response()->json(['error' => 'Oops! Customer contact not found!']);
+    }
+
+    $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
+
+    $teams = Team::where('status', 1)->orderBy('name')->get();
+    $countries = config('countries');
+    $brands = Brand::pluck('name', 'url');
+
+    $resolveCompany = function ($email) use ($brands) {
+        $domain = substr(strrchr($email, "@"), 1);
+        $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
+        return $brand ?? $domain;
+    };
+
+    $auth_pseudo_emails = [];
+    if (auth()->user()->pseudo_email) {
+        $auth_pseudo_emails[] = [
+            'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+            'email' => auth()->user()->pseudo_email,
+            'company' => $resolveCompany(auth()->user()->pseudo_email),
         ];
+    }
 
+    $userPseudoEmails = User::whereNotNull('pseudo_email')
+        ->get(['id', 'pseudo_name', 'pseudo_email'])
+        ->map(fn($user) => [
+            'name' => $user->pseudo_name ?? 'Unknown Sender',
+            'email' => $user->pseudo_email,
+            'company' => $resolveCompany($user->pseudo_email),
+        ]);
 
-        
+    $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+        ->map(fn($pseudo) => [
+            'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+            'email' => $pseudo->pseudo_email,
+            'company' => $resolveCompany($pseudo->pseudo_email),
+        ]);
 
-        // email-code-open
-        $folder = request()->get('folder', 'INBOX');
-        $page   = (int) request()->get('page', 1);
-        $limit  = 5;
-        $offset = ($page - 1) * $limit;
-        // allow refresh with ?refresh=1
+    $pseudo_emails = collect($auth_pseudo_emails)
+        ->merge($userPseudoEmails)
+        ->merge($extraPseudoEmails)
+        ->unique('email')
+        ->values();
+
+    try {
         if (request()->get('refresh') || !session()->has('dev_emails')) {
             if (!$this->imapService->connect($imapConfig)) {
-                return redirect()->back()->with('error', 'Failed to connect to the IMAP server. Please check the configuration.');
+                throw new \Exception(
+                    'Something went wrong while trying to fetch your emails. Please try again later.'
+                );
             }
 
             $folders = $this->imapService->getFolders();
             $emails  = $this->imapService->getEmails($folder, $limit, $offset);
-            $total   = count($emails);
 
             $this->imapService->disconnect();
 
@@ -166,83 +214,41 @@ class ContactController extends Controller
                 'folder'  => $folder,
                 'page'    => $page,
                 'limit'   => $limit,
-                'total'   => $total,
+                'total'   => count($emails),
             ]);
+        } else {
+            $sessionData = session('dev_emails');
+            $emails  = $sessionData['emails'];
+            $folders = $sessionData['folders'];
+            $folder  = $sessionData['folder'];
+            $page    = $sessionData['page'];
+            $limit   = $sessionData['limit'];
         }
+    } catch (\Exception $e) {
+        // Log technical details for debugging
+        \Log::error('IMAP connection error: ' . imap_last_error());
 
-        $sessionData = session('dev_emails');
-        $emails  = $sessionData['emails'];
-        $folders = $sessionData['folders'];
-        $folder  = $sessionData['folder'];
-        $page    = $sessionData['page'];
-        $limit   = $sessionData['limit'];
-        $total   = $sessionData['total'];
-        // email-code-end
-
-
-        if (!$customer_contact->id) return response()->json(['error' => 'Oops! Customer contact not found!']);
-        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
-        $teams = Team::where('status', 1)->orderBy('name')->get();
-        $countries = config('countries');
-        $brands = Brand::pluck('name', 'url');
-        $resolveCompany = function ($email) use ($brands) {
-            $domain = substr(strrchr($email, "@"), 1);
-            $brand = $brands->first(function ($name, $url) use ($domain) {
-                return str_contains($url, $domain);
-            });
-            return $brand ?? $domain;
-        };
-        $auth_pseudo_emails = [];
-        if (auth()->user()->pseudo_email) {
-            $auth_pseudo_emails[] = [
-                'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
-                'email' => auth()->user()->pseudo_email,
-                'company' => $resolveCompany(auth()->user()->pseudo_email),
-            ];
-        }
-        //Todo for admin
-        //        if (auth()->user()->userPseudoRecords) {
-        //            foreach (auth()->user()->userPseudoRecords as $pseudo) {
-        //                $auth_pseudo_emails[] = [
-        //                    'name'  => $pseudo->pseudo_name ?? 'Unknown Sender',
-        //                    'email' => $pseudo->pseudo_email,
-        //                    'company' => $resolveCompany($pseudo->pseudo_email),
-        //                ];
-        //            }
-        //        }
-        $userPseudoEmails = User::whereNotNull('pseudo_email')
-            ->get(['id', 'pseudo_name', 'pseudo_email'])
-            ->map(function ($user) use ($resolveCompany) {
-                return [
-                    'name' => $user->pseudo_name ?? 'Unknown Sender',
-                    'email' => $user->pseudo_email,
-                    'company' => $resolveCompany($user->pseudo_email),
-                ];
-            });
-        $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
-            ->map(function ($pseudo) use ($resolveCompany) {
-                return [
-                    'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
-                    'email' => $pseudo->pseudo_email,
-                    'company' => $resolveCompany($pseudo->pseudo_email),
-                ];
-            });
-        $pseudo_emails = collect($auth_pseudo_emails)->merge($userPseudoEmails)->merge($extraPseudoEmails)->unique('email')->values();
-        return view('admin.customers.contacts.edit', compact(
-            'customer_contact',
-            'brands',
-            'teams',
-            'pseudo_emails',
-            'countries',
-            'emails',
-            'folders',
-            'folder',
-            'page',
-            'limit',
-            'total'
-        ));
-        //        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
+        // Set user-friendly error
+        $imapError = 'We couldn’t connect to your mailbox at the moment. Please try again later.';
     }
+
+    return view('admin.customers.contacts.edit', compact(
+        'customer_contact',
+        'brands',
+        'teams',
+        'pseudo_emails',
+        'countries',
+        'emails',
+        'folders',
+        'folder',
+        'page',
+        'limit',
+        'imapError'
+    ));
+}
+
+
+
 
     /**
      * Update the specified resource in storage.
