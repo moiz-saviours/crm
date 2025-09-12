@@ -29,6 +29,7 @@ class Payment extends Model
         'cus_contact_key',
         'cc_info_key',
         'agent_id',
+        'agent_type',
         'merchant_id',
         'merchant_name',
         'transaction_id',
