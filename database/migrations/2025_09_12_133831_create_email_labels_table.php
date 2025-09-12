@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,14 +13,13 @@ return new class extends Migration
         Schema::create('email_labels', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('pseudo_record_id')->nullable()->default(null);
-
-            $table->string('name');
+            $table->string('name')->nullable()->default(null);
             $table->string('color')->default('#64748b');
             $table->integer('order')->default(0);
             $table->timestamps();
-
+            $table->softDeletes();
             $table->unique(['pseudo_record_id', 'name']);
-            $table->foreign('pseudo_record_id')->references( 'id')->on('user_pseudo_records')->onDelete('NO ACTION');
+            $table->foreign('pseudo_record_id')->references('id')->on('user_pseudo_records')->onDelete('NO ACTION');
 
         });
     }
