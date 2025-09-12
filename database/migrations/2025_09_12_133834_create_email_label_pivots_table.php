@@ -32,12 +32,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        
-        Schema::table('email_label_pivot', function (Blueprint $table) {
-            if (Schema::hasColumn('email_label_pivot', 'email_id')) {
+
+        Schema::table('email_label_pivots', function (Blueprint $table) {
+            if (Schema::hasColumn('email_label_pivots', 'email_id')) {
                 $table->dropForeign(['email_id']);
             }
-            if (Schema::hasColumn('email_label_pivot', 'label_id')) {
+            if (Schema::hasColumn('email_label_pivots', 'label_id')) {
                 $table->dropForeign(['label_id']);
             }
         });
