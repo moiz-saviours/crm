@@ -23,24 +23,23 @@ class UserPseudoRecord extends Model
      *
      * @var array<int, string>
      */
-protected $fillable = [
-    'morph_type',
-    'morph_id',
-    'pseudo_name',
-    'pseudo_email',
-    'pseudo_phone',
-    'server_host',
-    'server_port',
-    'server_encryption',
-    'server_username',
-    'server_password',
-    'imap_type',
-    'creator_type',
-    'creator_id',
-    'is_verified',
-    'status',
-];
-
+    protected $fillable = [
+        'morph_type',
+        'morph_id',
+        'pseudo_name',
+        'pseudo_email',
+        'pseudo_phone',
+        'server_host',
+        'server_port',
+        'server_encryption',
+        'server_username',
+        'server_password',
+        'imap_type',
+        'creator_type',
+        'creator_id',
+        'is_verified',
+        'status',
+    ];
     /**
      * The attributes that should be cast.
      *
@@ -80,6 +79,6 @@ protected $fillable = [
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }
