@@ -88,7 +88,6 @@ class User extends Authenticatable
 
     public function pseudo_records()
     {
-        return $this->hasMany(UserPseudoRecord::class, 'user_id');
         return $this->morphMany(UserPseudoRecord::class, 'morph');
     }
 
