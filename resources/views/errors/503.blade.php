@@ -320,30 +320,75 @@
 </div>
 
 <script>
-    // Countdown timer
+    // Countdown timer with session storage
     function startCountdown(duration, display) {
-        let timer = duration, hours, minutes, seconds;
-        setInterval(function () {
-            hours = parseInt(timer / 3600, 10);
-            minutes = parseInt((timer % 3600) / 60, 10);
-            seconds = parseInt(timer % 60, 10);
+        // Check if we have a saved timer in session storage
+        let savedTime = sessionStorage.getItem('maintenanceTimer');
+        let startTime = Date.now();
+        let timer;
 
+        if (savedTime) {
+            // Use the saved time remaining
+            timer = parseInt(savedTime);
+        } else {
+            // Start new timer
+            timer = duration;
+            sessionStorage.setItem('maintenanceTimer', timer);
+            sessionStorage.setItem('maintenanceStartTime', startTime);
+        }
+
+        let interval = setInterval(function () {
+            // Calculate hours, minutes, and seconds
+            let hours = parseInt(timer / 3600, 10);
+            let minutes = parseInt((timer % 3600) / 60, 10);
+            let seconds = parseInt(timer % 60, 10);
+
+            // Format with leading zeros
             hours = hours < 10 ? "0" + hours : hours;
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
+            // Display the timer
             display.textContent = hours + ":" + minutes + ":" + seconds;
 
+            // Save current time to session storage
+            sessionStorage.setItem('maintenanceTimer', timer);
+
+            // Check if timer has expired
             if (--timer < 0) {
-                timer = duration;
+                clearInterval(interval);
+                display.textContent = "00:00:00";
+                // Clear session storage when timer completes
+                sessionStorage.removeItem('maintenanceTimer');
+                sessionStorage.removeItem('maintenanceStartTime');
+
+                // Optional: Check if maintenance is over
+                checkMaintenanceStatus();
             }
         }, 1000);
     }
 
+    // Function to check if maintenance is over
+    function checkMaintenanceStatus() {
+        // This would typically make an API call to check maintenance status
+        console.log("Checking if maintenance is complete...");
+        // In a real implementation, you would ping your server here
+    }
+
     window.onload = function () {
-        const twoHours = 2 * 60 * 60;
+        const twoHours = 2 * 60 * 60; // 2 hours in seconds
         const display = document.querySelector('#countdown');
-        startCountdown(twoHours, display);
+
+        if (display) {
+            startCountdown(twoHours, display);
+        }
+
+        // Clear session storage when page is about to be closed/refreshed
+        window.addEventListener('beforeunload', function() {
+            // Note: We're not clearing here to maintain timer across refreshes
+            // sessionStorage.removeItem('maintenanceTimer');
+            // sessionStorage.removeItem('maintenanceStartTime');
+        });
     };
 </script>
 </body>
