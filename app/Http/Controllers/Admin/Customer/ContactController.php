@@ -3,19 +3,37 @@
 namespace App\Http\Controllers\Admin\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\CustomerContact;
+use App\Models\User;
+use App\Models\UserPseudoRecord;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Team;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use App\Services\ImapService;
 
 class ContactController extends Controller
 {
+    private ImapService $imapService;
+
+    public function __construct(ImapService $imapService)
+    {
+        $this->imapService = $imapService;
+    }
+
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+
         $brands = Brand::all();
         $teams = Team::all();
         $countries = config('countries');
@@ -58,15 +76,12 @@ class ContactController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -82,13 +97,23 @@ class ContactController extends Controller
             'team_key.exists' => 'Please select a valid team.',
         ]);
         $customer_contact = new CustomerContact($request->only([
-                'brand_key', 'team_key', 'name',
-                'email', 'phone', 'address', 'city', 'state',
-                'country', 'zipcode', 'ip_address', 'creator_type',
-                'creator_id', 'status',
-            ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
+            'brand_key',
+            'team_key',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'state',
+            'country',
+            'zipcode',
+            'ip_address',
+            'creator_type',
+            'creator_id',
+            'status',
+        ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
         $customer_contact->save();
-        $customer_contact->loadMissing('team', 'brand','company');
+        $customer_contact->loadMissing('team', 'brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Created Successfully!']);
     }
 
@@ -103,16 +128,127 @@ class ContactController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CustomerContact $customer_contact)
-    {
-        if (!$customer_contact->id) return response()->json(['error' => 'Oops! Customer contact not found!']);
-        $customer_contact->load('creator', 'company', 'invoices', 'payments','notes');
-        $brands = Brand::where('status', 1)->orderBy('name')->get();
-        $teams = Team::where('status', 1)->orderBy('name')->get();
-        $countries = config('countries');
-        return view('admin.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
-//        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
+public function edit(CustomerContact $customer_contact)
+{
+    $imapConfig = [
+        'host'          => env('IMAP_HOST'),
+        'port'          => env('IMAP_PORT', 993),
+        'protocol'      => env('IMAP_PROTOCOL', 'imap'),
+        'encryption'    => env('IMAP_ENCRYPTION', 'ssl'),
+        'validate_cert' => env('IMAP_VALIDATE_CERT', false),
+        'username'      => env('IMAP_USERNAME'),
+        'password'      => env('IMAP_PASSWORD'),
+    ];
+
+    $emails = [];
+    $folders = [];
+    $imapError = null;
+
+    $folder = request()->get('folder', 'INBOX');
+    $page   = (int) request()->get('page', 1);
+    $limit  = 5;
+    $offset = ($page - 1) * $limit;
+
+    if (!$customer_contact->id) {
+        return response()->json(['error' => 'Oops! Customer contact not found!']);
     }
+
+    $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
+
+    $teams = Team::where('status', 1)->orderBy('name')->get();
+    $countries = config('countries');
+    $brands = Brand::pluck('name', 'url');
+
+    $resolveCompany = function ($email) use ($brands) {
+        $domain = substr(strrchr($email, "@"), 1);
+        $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
+        return $brand ?? $domain;
+    };
+
+    $auth_pseudo_emails = [];
+    if (auth()->user()->pseudo_email) {
+        $auth_pseudo_emails[] = [
+            'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+            'email' => auth()->user()->pseudo_email,
+            'company' => $resolveCompany(auth()->user()->pseudo_email),
+        ];
+    }
+
+    $userPseudoEmails = User::whereNotNull('pseudo_email')
+        ->get(['id', 'pseudo_name', 'pseudo_email'])
+        ->map(fn($user) => [
+            'name' => $user->pseudo_name ?? 'Unknown Sender',
+            'email' => $user->pseudo_email,
+            'company' => $resolveCompany($user->pseudo_email),
+        ]);
+
+    $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+        ->map(fn($pseudo) => [
+            'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+            'email' => $pseudo->pseudo_email,
+            'company' => $resolveCompany($pseudo->pseudo_email),
+        ]);
+
+    $pseudo_emails = collect($auth_pseudo_emails)
+        ->merge($userPseudoEmails)
+        ->merge($extraPseudoEmails)
+        ->unique('email')
+        ->values();
+
+    try {
+        if (request()->get('refresh') || !session()->has('dev_emails')) {
+            if (!$this->imapService->connect($imapConfig)) {
+                throw new \Exception(
+                    'Something went wrong while trying to fetch your emails. Please try again later.'
+                );
+            }
+
+            $folders = $this->imapService->getFolders();
+            $emails  = $this->imapService->getEmails($folder, $limit, $offset);
+
+            $this->imapService->disconnect();
+
+            session()->put('dev_emails', [
+                'emails'  => $emails,
+                'folders' => $folders,
+                'folder'  => $folder,
+                'page'    => $page,
+                'limit'   => $limit,
+                'total'   => count($emails),
+            ]);
+        } else {
+            $sessionData = session('dev_emails');
+            $emails  = $sessionData['emails'];
+            $folders = $sessionData['folders'];
+            $folder  = $sessionData['folder'];
+            $page    = $sessionData['page'];
+            $limit   = $sessionData['limit'];
+        }
+    } catch (\Exception $e) {
+        // Log technical details for debugging
+        \Log::error('IMAP connection error: ' . imap_last_error());
+
+        // Set user-friendly error
+        $imapError = 'We couldn’t connect to your mailbox at the moment. Please try again later.';
+    }
+
+    return view('admin.customers.contacts.edit', compact(
+        'customer_contact',
+        'brands',
+        'teams',
+        'pseudo_emails',
+        'countries',
+        'emails',
+        'folders',
+        'folder',
+        'page',
+        'limit',
+        'imapError'
+    ));
+}
+
+
+
 
     /**
      * Update the specified resource in storage.
@@ -138,15 +274,12 @@ class ContactController extends Controller
                         if (empty($value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field is required when type is Fresh.");
                         }
-
                         if (!preg_match('/^(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/', $value)) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " field format is invalid.");
                         }
-
                         if (strlen($value) < 8) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must be at least 8 characters.");
                         }
-
                         if (strlen($value) > 20) {
                             $fail("The " . ucwords(str_replace("_", " ", $attribute)) . " must not be greater than 20 characters.");
                         }
@@ -162,13 +295,23 @@ class ContactController extends Controller
             'team_key.exists' => 'Please select a valid team.',
         ]);
         $customer_contact->fill($request->only([
-            'special_key', 'brand_key', 'team_key', 'name',
-            'email', 'phone', 'address', 'city', 'state',
-            'country', 'zipcode', 'ip_address', 'status',
+            'special_key',
+            'brand_key',
+            'team_key',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'state',
+            'country',
+            'zipcode',
+            'ip_address',
+            'status',
         ]));
         $customer_contact->save();
-        $customer_contact->loadMissing('team', 'brand','company');
-        return response()->json(['data' => $customer_contact,'success' => 'Contact Updated Successfully!']);
+        $customer_contact->loadMissing('team', 'brand', 'company');
+        return response()->json(['data' => $customer_contact, 'success' => 'Contact Updated Successfully!']);
     }
 
     /**
@@ -181,7 +324,6 @@ class ContactController extends Controller
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
             return response()->json(['error' => 'An error occurred while deleting the record.']);
-
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
@@ -199,5 +341,146 @@ class ContactController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
+    }
+
+    /**
+     * Send an email with professional handling
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
+     */
+    public function sendEmail(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'subject' => 'required|string|max:255',
+            'email_content' => 'required|string',
+            'to' => 'required|string',
+            'from' => 'required|email',
+            'cc' => 'sometimes|string|nullable',
+            'bcc' => 'sometimes|string|nullable'
+        ]);
+        try {
+            $sender = $this->findSender($request->from);
+            if (!$sender) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sender not authorized or not found'
+                ], 403);
+            }
+            $toEmails = $this->parseEmailList($request->to);
+            $ccEmails = $this->parseEmailList($request->cc);
+            $bccEmails = $this->parseEmailList($request->bcc);
+            if (empty($toEmails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No valid recipients specified'
+                ], 400);
+            }
+            $fromUnformattedEmail = $request->from;
+            $fromFormattedEmail = $this->formatFromEmail($fromUnformattedEmail);
+            $fromName = $this->getSenderName($sender, $fromUnformattedEmail);
+            $this->sendMail($validated, $toEmails, $fromUnformattedEmail, $fromFormattedEmail, $fromName, $ccEmails, $bccEmails);
+            return response()->json([
+                'success' => true,
+                'message' => 'Email sent successfully'
+            ]);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Email sending failed', [
+                'error' => $e->getMessage(),
+                'from' => $request->from,
+                'to' => $request->to
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send email. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Find sender across multiple data sources
+     */
+    private function findSender(string $email): ?object
+    {
+        return Admin::where('email', $email)
+            ->orWhere('pseudo_email', $email)
+            ->first()
+            ?? User::where('email', $email)
+            ->orWhere('pseudo_email', $email)
+            ->first()
+            ?? UserPseudoRecord::where('pseudo_email', $email)->first();
+    }
+
+    /**
+     * Parse JSON email list with validation
+     */
+    private function parseEmailList(?string $emails): array
+    {
+        if (empty($emails)) {
+            return [];
+        }
+        $parsed = json_decode($emails, true);
+        return is_array($parsed) ? array_filter($parsed) : [];
+    }
+
+    /**
+     * Format from email address
+     */
+    private function formatFromEmail(string $email): string
+    {
+        [$localPart, $domain] = explode('@', $email);
+        $configDomain = explode('@', config('mail.from.address'))[1];
+        return "{$localPart}={$domain}@{$configDomain}";
+    }
+
+    /**
+     * Get sender display name with brand information
+     */
+    private function getSenderName(object $sender, string $email): string
+    {
+        $senderName = $sender->pseudo_name ?? explode('@', $email)[0];
+        $domain = explode('@', $email)[1];
+        $brand = Brand::where('url', 'like', "%{$domain}%")->first();
+        $brandName = $brand->name ?? $domain;
+        return "{$senderName} from {$brandName}";
+    }
+
+    /**
+     * Send the email message
+     */
+    private function sendMail(
+        array  $validated,
+        array  $toEmails,
+        string $fromUnformattedEmail,
+        string $fromFormattedEmail,
+        string $fromName,
+        array  $ccEmails,
+        array  $bccEmails
+    ): void {
+        Mail::send([], [], function (Message $message) use (
+            $validated,
+            $toEmails,
+            $fromUnformattedEmail,
+            $fromFormattedEmail,
+            $fromName,
+            $ccEmails,
+            $bccEmails
+        ) {
+            $message->to($toEmails)
+                ->from($fromUnformattedEmail, $fromName)
+                ->replyTo($fromUnformattedEmail, $fromName)
+                ->returnPath($fromFormattedEmail)
+                ->subject($validated['subject'])
+                ->html($validated['email_content']);
+            if (!empty($ccEmails)) {
+                $message->cc($ccEmails);
+            }
+            if (!empty($bccEmails)) {
+                $message->bcc($bccEmails);
+            }
+        });
     }
 }

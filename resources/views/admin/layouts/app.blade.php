@@ -37,14 +37,16 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
     <link rel="icon" type="image/png" href="{{asset('assets/img/favicon.png')}}">
     <meta name="description"
-          content="is a responsive admin dashboard template based on Bootstrap 5 framework. There are a lot of useful components.">
+          content="Crm Management System">
     <title>@yield('title')</title>
 
+    @vite(['resources/js/app.js'])
 
     <!-- STYLESHEETS -->
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     @include('admin.layouts.style')
     @stack('style')
+
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 
@@ -159,7 +161,7 @@
                         <img src="{{asset('assets/img/favicon.png')}}" alt="Logo" class="logo"
                              {{--                             width="16"--}}
                              {{--                             height="16"--}}
-                             style="width:110px;height:40px">
+                             style="max-width:110px;max-height:30px">
                     </a>
 
 
@@ -186,8 +188,7 @@
 
 
                     <!-- Navigation Toggler -->
-                    <button type="button" class="nav-toggler header__btn btn btn-icon btn-sm" aria-label="Nav Toggler"
-                            disabled>
+                    <button type="button" class="nav-toggler header__btn btn btn-icon btn-sm" aria-label="Nav Toggler">
                         <i class="demo-psi-list-view"></i>
                     </button>
 

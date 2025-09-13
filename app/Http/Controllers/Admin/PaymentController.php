@@ -63,6 +63,7 @@ class PaymentController extends Controller
             'brand_key' => 'required|integer|exists:brands,brand_key',
             'team_key' => 'required|integer|exists:teams,team_key',
             'agent_id' => 'required|integer|exists:users,id',
+            'currency' => 'nullable|in:USD,GBP,AUD,CAD',
             'amount' => 'required|numeric|min:1|max:' . config('invoice.max_amount'),
             'description' => 'nullable|string|max:500',
             'type' => 'required|integer|in:0,1',
@@ -174,6 +175,7 @@ class PaymentController extends Controller
                     'team_key' => $request->input('team_key'),
                     'cus_contact_key' => $customer_contact->special_key,
                     'description' => $request->description,
+                    'currency' => $request->currency,
                     'amount' => $request->amount,
                     'total_amount' => $request->input('amount'),
                     'type' => $request->input('type'),
@@ -191,6 +193,7 @@ class PaymentController extends Controller
                 'cus_contact_key' => $customer_contact->special_key,
                 'invoice_key' => $invoice->invoice_key,
                 'invoice_number' => $invoice->invoice_number,
+                'currency' => $request->input('currency', 'USD'),
                 'amount' => $request->amount,
                 'transaction_id' => $request->transaction_id,
                 'payment_type' => $request->input('type'),
@@ -204,7 +207,7 @@ class PaymentController extends Controller
             }
             $payment = Payment::create($paymentData);
             DB::commit();
-            $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number', 'brand:brand_key,name', 'team:team_key,name', 'agent:id,name', 'customer_contact:special_key,name', 'payment_gateway:id,name,payment_method,descriptor'])->findOrFail($payment->id);
+            $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'currency', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number', 'brand:brand_key,name', 'team:team_key,name', 'agent:id,name', 'customer_contact:special_key,name', 'payment_gateway:id,name,payment_method,descriptor'])->findOrFail($payment->id);
             $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             $unpaid_invoices = Invoice::select(['invoice_key', 'invoice_number', 'brand_key', 'team_key', 'agent_id', 'cus_contact_key', 'currency', 'total_amount', 'created_at',])->with(['customer_contact:special_key,name'])->where('status', 0)->orderBy('created_at', 'desc')->get()->map(function ($invoice) {
                 $invoice->formatted_date = $invoice->created_at->format('jS F Y');
@@ -266,6 +269,7 @@ class PaymentController extends Controller
             'brand_key' => 'required|integer|exists:brands,brand_key',
             'team_key' => 'required|integer|exists:teams,team_key',
             'agent_id' => 'required|integer|exists:users,id',
+            'currency' => 'nullable|in:USD,GBP,AUD,CAD',
             'amount' => 'required|numeric|min:1|max:' . config('invoice.max_amount'),
             'description' => 'nullable|string|max:500',
             'type' => 'required|integer|in:0,1', /** 0 = fresh, 1 = upsale */
@@ -344,6 +348,7 @@ class PaymentController extends Controller
                 'team_key' => $request->input('team_key'),
                 'cus_contact_key' => $customer_contact->special_key,
                 'agent_id' => $request->agent_id,
+                'currency' => $request->input('currency', 'USD'),
                 'amount' => $request->amount,
                 'transaction_id' => $request->transaction_id,
                 'payment_type' => $request->input('type'),

@@ -40,7 +40,8 @@
             <div class="form-body">
                 <div class="form-group mb-3 ">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control select2 searchable tour-invoicecreatebrand" id="brand_key" name="brand_key"
+                    <select class="form-control select2 searchable tour-invoicecreatebrand" id="brand_key"
+                            name="brand_key"
                             title="Please select a brand" required autocomplete="off">
                         <option value="" selected disabled>Please select brand</option>
                         @foreach($brands as $brand)
@@ -70,7 +71,8 @@
 
                 <div class="form-group mb-3">
                     <label for="type" class="form-label">Type</label>
-                    <select class="form-control tour-invoiceusertype" id="type" name="type" title="Please select customer type" required>
+                    <select class="form-control tour-invoiceusertype" id="type" name="type"
+                            title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
                         <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
                     </select>
@@ -110,7 +112,7 @@
                 </div>
                 <div id="upsale-customer-contact-fields" class="form-group mb-3 first-fields">
                     <label for="cus_contact_key" class="form-label">Select Customer Contact</label>
-                    <select class="form-control first-field-inputs tour-invoicecusselect" id="cus_contact_key" name="cus_contact_key">
+                    <select class="form-control first-field-inputs tour-invoicecusselect unique-select-2" id="cus_contact_key" name="cus_contact_key">
                         <option value="">Select Customer Contact</option>
                         @foreach($customer_contacts as $customer_contact)
                             <option
@@ -126,8 +128,8 @@
 
                 <div class="form-group mb-3">
                     <label for="agent_id" class="form-label">Agent</label>
-                    <select class="form-control searchable tour-invoiceagentselect" id="agent_id" name="agent_id" title="Please select agent">
-                        <option value="" disabled>Select Agent</option>
+                    <select class="form-control searchable tour-invoiceagentselect unique-select-2" id="agent_id" name="agent_id" title="Please select agent">
+                        <option value="" >Select Agent</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ old('agent_id') == $user->id ? 'selected' : '' }}>
                                 {{ $user->name }} ({{ $user->email }})
@@ -155,7 +157,7 @@
                     <label for="currency" class="form-label">Currency</label>
                     <select class="form-control tour-invoicecurselect" id="currency" name="currency">
                         <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
-                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }} disabled>GBP</option>
+                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }}>GBP</option>
                         <option value="AUD" {{ old('currency') == 'AUD' ? 'selected' : '' }} disabled>AUD</option>
                         <option value="CAD" {{ old('currency') == 'CAD' ? 'selected' : '' }} disabled>CAD</option>
                     </select>
@@ -164,8 +166,10 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3 tour-invoicemerchant">
-                    <div id="merchant-types-container">
-                    </div>
+                    <label class="form-label">Payment Gateways</label>
+                    <div class="extra-dynamic-fields-to-show d-none"><p class="text-muted">Try selecting a different brand or changing currency
+                            as no payment gateway is available.</p></div>
+                    <div id="merchant-types-container" class="extra-dynamic-fields"></div>
                     @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -247,7 +251,9 @@
                 </div>
             </div>
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn tour-invoicecomplete"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-invoicecomplete"><i class="fas fa-save me-2"></i>
+                    Save
+                </button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
         </div>
@@ -355,6 +361,21 @@
                     }
                     $('#total_amount').val(totalAmount.toFixed(2));
                 }
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('#cus_contact_key').select2({
+                    placeholder: "Select Customer Contact",
+                    allowClear: true,
+                    width: '100%' // bootstrap form-control ki width maintain karne ke liye
+                });
+
+                $('#agent_id').select2({
+                    placeholder: "Select Agent",
+                    allowClear: true,
+                    width: '100%'
+                });
             });
         </script>
         <!------- CUSTOM FORM -------->

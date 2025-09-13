@@ -29,7 +29,7 @@ return new class extends Migration {
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->foreign('invoice_key')->references('invoice_key')->on('invoices')->onDelete('NO ACTION');
+                $table->foreign('invoice_key')->references( 'invoice_key')->on('invoices')->onDelete('NO ACTION');
 
             });
         }

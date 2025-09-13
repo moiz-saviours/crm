@@ -11,17 +11,19 @@
                 <header class="custm_header">
                     <div class="new_head">
                         <h1 class="page-title mb-2 ">Payments <i class="fa fa-caret-down" aria-hidden="true"></i></h1>
-{{--                        <h2 id="record-count" class="h6">{{ count($payments) }} records</h2>--}}
+                        {{--                        <h2 id="record-count" class="h6">{{ count($payments) }} records</h2>--}}
 
                     </div>
                     <div class="filters">
                         <div class="actions">
                             {{--                            <h1><i class="fa fa-lock" aria-hidden="true"></i> Data Quality</h1>--}}
 
-{{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
-{{--                            </button>--}}
-{{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="paymentcreate"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
+                            {{--                            </button>--}}
+                            {{--                            <button class="header_btn" disabled>Import</button>--}}
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                                    data-tour="paymentcreate"><i class="fas fa-exclamation-circle custom-dot"></i>
+                            </button>
                             <button class="create-contact open-form-btn tour-createpayment">Create New</button>
                         </div>
                     </div>
@@ -35,37 +37,41 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Payments
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-paymenttitle" data-toggle="tooltip" title="Take a Tour" data-tour="payment"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px">
+                                <button class="my-btn start-tour-btn tour-paymenttitle" data-toggle="tooltip"
+                                        title="Take a Tour" data-tour="payment"><i
+                                        class="fas fa-exclamation-circle custom-dot"></i></button>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
                         <div class="tab-pane active" id="home">
                             <div class="card">
-{{--                                <div class="card-header">--}}
-{{--                                    <div class="container" style="min-width: 100%;">--}}
-{{--                                        <div class="row fltr-sec">--}}
-{{--                                            <div class="col-md-8">--}}
-{{--                                                <ul class="custm-filtr">--}}
-{{--                                                    <div class="table-li">--}}
-{{--                                                        <li class="">Company Owner <i class="fa fa-caret-down"--}}
-{{--                                                                                      aria-hidden="true"></i></li>--}}
-{{--                                                        <li class="">Create date <i class="fa fa-caret-down"--}}
-{{--                                                                                    aria-hidden="true"></i></li>--}}
-{{--                                                        <li class="">Last activity date <i class="fa fa-caret-down"--}}
-{{--                                                                                           aria-hidden="true"></i>--}}
-{{--                                                        </li>--}}
-{{--                                                        <li class="">Lead status <i class="fa fa-caret-down"--}}
-{{--                                                                                    aria-hidden="true"></i></li>--}}
-{{--                                                        <li class=""><i class="fa fa-bars" aria-hidden="true"></i> All--}}
-{{--                                                            filters--}}
-{{--                                                        </li>--}}
-{{--                                                    </div>--}}
-{{--                                                </ul>--}}
-{{--                                            </div>--}}
-{{--                                            <div class="col-md-4 right-icon" id="right-icon-0"></div>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
+                                {{--                                <div class="card-header">--}}
+                                {{--                                    <div class="container" style="min-width: 100%;">--}}
+                                {{--                                        <div class="row fltr-sec">--}}
+                                {{--                                            <div class="col-md-8">--}}
+                                {{--                                                <ul class="custm-filtr">--}}
+                                {{--                                                    <div class="table-li">--}}
+                                {{--                                                        <li class="">Company Owner <i class="fa fa-caret-down"--}}
+                                {{--                                                                                      aria-hidden="true"></i></li>--}}
+                                {{--                                                        <li class="">Create date <i class="fa fa-caret-down"--}}
+                                {{--                                                                                    aria-hidden="true"></i></li>--}}
+                                {{--                                                        <li class="">Last activity date <i class="fa fa-caret-down"--}}
+                                {{--                                                                                           aria-hidden="true"></i>--}}
+                                {{--                                                        </li>--}}
+                                {{--                                                        <li class="">Lead status <i class="fa fa-caret-down"--}}
+                                {{--                                                                                    aria-hidden="true"></i></li>--}}
+                                {{--                                                        <li class=""><i class="fa fa-bars" aria-hidden="true"></i> All--}}
+                                {{--                                                            filters--}}
+                                {{--                                                        </li>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                </ul>--}}
+                                {{--                                            </div>--}}
+                                {{--                                            <div class="col-md-4 right-icon" id="right-icon-0"></div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                </div>--}}
                                 <div class="card-body ">
                                     <table id="allPaymentsTable" class="table table-striped datatable-exportable
                             stripe row-border order-column nowrap
@@ -88,7 +94,7 @@
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
                                             <th class="align-middle text-center text-nowrap">PAYMENT DATE</th>
                                             <th class="align-middle text-center text-nowrap">CREATE DATE</th>
-{{--                                            <th class="align-middle text-center text-nowrap">ACTION</th>--}}
+                                            {{--                                            <th class="align-middle text-center text-nowrap">ACTION</th>--}}
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -110,7 +116,8 @@
                                                 <td class="align-middle text-center text-nowrap">{{optional($payment->agent)->name ?? "---"}}</td>
                                                 <td class="align-middle text-center text-nowrap">{{optional($payment->customer_contact)->name ?? "---"}}</td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    ${{$payment->amount}}</td>
+                                                    {{ $payment->currency ." ". number_format($payment->amount, 2, '.', '') }}
+                                                </td>
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if($payment->status == 0)
                                                         <span class="badge bg-warning text-dark">Due</span>
@@ -134,11 +141,11 @@
                                                         GMT+5
                                                     @endif
                                                 </td>
-{{--                                                <td class="align-middle text-center table-actions">--}}
-{{--                                                    <button type="button" class="btn btn-sm btn-primary editBtn"--}}
-{{--                                                            data-id="{{ $payment->id }}" title="Edit"><i--}}
-{{--                                                            class="fas fa-edit"></i></button>--}}
-{{--                                                </td>--}}
+                                                {{--                                                <td class="align-middle text-center table-actions">--}}
+                                                {{--                                                    <button type="button" class="btn btn-sm btn-primary editBtn"--}}
+                                                {{--                                                            data-id="{{ $payment->id }}" title="Edit"><i--}}
+                                                {{--                                                            class="fas fa-edit"></i></button>--}}
+                                                {{--                                                </td>--}}
                                             </tr>
 
                                         @endforeach

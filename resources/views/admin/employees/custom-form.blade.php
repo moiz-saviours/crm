@@ -23,8 +23,21 @@
             background-color: var(--bs-light);
             border: 1px solid var(--bs-primary);
         }
+
+        .remove-pseudo {
+            cursor: pointer;
+            color: #dc3545;
+            font-size: 18px;
+            margin-top: 32px;
+            display: inline-block;
+        }
+
+        .remove-pseudo:hover {
+            color: #a71d2a;
+        }
     </style>
 @endpush
+
 <div class="custom-form">
     <form id="manage-form" class="manage-form" method="POST" enctype="multipart/form-data">
         <div class="form-container" id="formContainer">
@@ -85,15 +98,25 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="emp_id" class="form-label">Employee Id</label>
-                    <input type="text" class="form-control tour-employeeid" id="emp_id" name="emp_id" placeholder="Enter Employee Id">
+                    <input type="text" class="form-control tour-employeeid" id="emp_id" name="emp_id"
+                           placeholder="Enter Employee Id">
                     @error('emp_id')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="form-group mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control tour-employeename" id="name" name="name" placeholder="Enter name" required>
+                    <input type="text" class="form-control tour-employeename" id="name" name="name"
+                           placeholder="Enter name" required>
                     @error('name')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control tour-employeeemail" id="email" name="email"
+                           placeholder="Enter email" required>
+                    @error('email')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
@@ -106,26 +129,35 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control tour-employeeemail" id="email" name="email" placeholder="Enter email" required>
-                    @error('email')
-                    <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                </div>
-                <div class="form-group mb-3">
                     <label for="pseudo_email" class="form-label">Pseudo Email</label>
-                    <input type="email" class="form-control tour-employeepseudoemail" id="pseudo_email" name="pseudo_email"
+                    <input type="email" class="form-control tour-employeepseudoemail" id="pseudo_email"
+                           name="pseudo_email"
                            placeholder="Enter Pseudo Email">
                     @error('pseudo_email')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="form-group mb-3">
+                    <label for="pseudo_phone" class="form-label">Pseudo Phone Number</label>
+                    <input type="text" class="form-control tour-employeepseudophone" id="pseudo_phone"
+                           name="pseudo_phone"
+                           placeholder="e.g. +1234567890">
+                    @error('pseudo_phone')
+                    <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group mb-3 " id="extra-pseudo-container" style="display:none;">
+                    <label class="form-label">Extra Pseudos</label>
+                    <div id="extra-pseudo-fields" class="extra-dynamic-fields"></div>
+                    <button type="button" id="add-pseudo-btn" class="btn btn-sm btn-outline-primary mt-2">+ Add More
+                    </button>
+                </div>
+                <div class="form-group mb-3">
                     <label for="designation" class="form-label">Designation</label>
                     <input type="text" class="form-control tour-employeedesignation" id="designation" name="designation"
                            placeholder="e.g. Software Engineer">
                     @error('designation')
-                    <span class="text-danger">{{ $message }}</span>
+                    firstError = true;
                     @enderror
                 </div>
                 <div class="form-group mb-3">
@@ -148,14 +180,6 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3">
-                    <label for="pseudo_phone" class="form-label">Pseudo Phone Number</label>
-                    <input type="text" class="form-control tour-employeepseudophone" id="pseudo_phone" name="pseudo_phone"
-                           placeholder="e.g. +1234567890">
-                    @error('pseudo_phone')
-                    <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                </div>
-                <div class="form-group mb-3">
                     <label for="image" class="form-label d-block">Profile Image (Optional)</label>
 
                     <div class="d-flex align-items-start">
@@ -172,7 +196,8 @@
                         <!-- Input Fields (Right) -->
                         <div class="flex-grow-1">
                             <div class="">
-                                <input type="file" class="form-control tour-employeeimage" id="image" name="image" accept="image/*"
+                                <input type="file" class="form-control tour-employeeimage" id="image" name="image"
+                                       accept="image/*"
                                        aria-describedby="imageHelp">
                             </div>
                             <div class="input-group">
@@ -201,21 +226,24 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="city" class="form-label">City</label>
-                    <input type="text" class="form-control tour-employeecity" id="city" name="city" placeholder="Enter City"/>
+                    <input type="text" class="form-control tour-employeecity" id="city" name="city"
+                           placeholder="Enter City"/>
                     @error('city')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="form-group mb-3">
                     <label for="state" class="form-label">State</label>
-                    <input type="text" class="form-control tour-employeestate" id="state" name="state" placeholder="Enter State"/>
+                    <input type="text" class="form-control tour-employeestate" id="state" name="state"
+                           placeholder="Enter State"/>
                     @error('state')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="form-group mb-3">
                     <label for="country" class="form-label">Country</label>
-                    <input type="text" class="form-control tour-employeecountry" id="country" name="country" placeholder="Enter Country"/>
+                    <input type="text" class="form-control tour-employeecountry" id="country" name="country"
+                           placeholder="Enter Country"/>
                     @error('country')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -230,7 +258,8 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="dob" class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control tour-employeedob" id="dob" name="dob" placeholder="Enter Date of Birth"/>
+                    <input type="date" class="form-control tour-employeedob" id="dob" name="dob"
+                           placeholder="Enter Date of Birth"/>
                     @error('dob')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -245,7 +274,8 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="target" class="form-label">Target</label>
-                    <input type="number" class="form-control tour-employeetarget" id="target" name="target" placeholder="25000" min="1"/>
+                    <input type="number" class="form-control tour-employeetarget" id="target" name="target"
+                           placeholder="25000" min="1"/>
                     @error('target')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -253,7 +283,8 @@
                 <div class="form-group mb-3">
                     <label for="createPassword" class="form-label">Password</label>
                     <div class="d-flex align-items-center">
-                        <input type="text" id="createPassword" name="password" class="form-control tour-employeepassword"
+                        <input type="text" id="createPassword" name="password"
+                               class="form-control tour-employeepassword"
                                placeholder="Generated Password">
                         <i id="generatePassword" class="generatePassword fa fa-key ms-2" title="Generate Password"></i>
                     </div>
@@ -275,7 +306,9 @@
             </div>
 
             <div class="form-button">
-                <button type="submit" class="btn-primary save-btn tour-employeesubmit"><i class="fas fa-save me-2"></i> Save</button>
+                <button type="submit" class="btn-primary save-btn tour-employeesubmit"><i class="fas fa-save me-2"></i>
+                    Save
+                </button>
                 <button type="button" class="btn-secondary close-btn"><i class="fas fa-times me-2"></i> Cancel</button>
             </div>
         </div>

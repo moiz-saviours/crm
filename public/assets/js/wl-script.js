@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const scriptEl = document.querySelector('script[src*="script.js"]');
+    const scriptEl = document.querySelector('script[src*="wl-script.js"]');
     if (!scriptEl) {
         console.error("Script tag not found!");
         return;
@@ -13,33 +13,35 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // const baseUrl = url.origin;
+    // Environment detection
+    let apiBaseUrl = "";
+    if (url.pathname.includes("/crm-development/")) {
+        apiBaseUrl = url.origin + "/crm-development/api"; // Development
+    } else {
+        apiBaseUrl = url.origin + "/api"; // Live
+    }
+
     const forms = document.querySelectorAll("form");
 
     forms.forEach(form => {
-        form.addEventListener("submit", function (e) {
-            e.preventDefault();
-
+        form.addEventListener("submit", function () {
             const formData = {};
             const fields = form.querySelectorAll("label, input, textarea, select");
 
-
-            fields.forEach((field,index) => {
+            fields.forEach((field, index) => {
                 if (field.name) {
                     formData[field.name] = field.value;
-                }
-                else if (field.label)
-                {
+                } else if (field.label) {
                     formData[field.label] = field.value;
-                }
-                else {
+                } else {
                     formData["field_" + index] = field.value;
                 }
-
             });
 
             const deviceInfo = {
                 url: window.location.href,
-                title:document.title,
+                title: document.title,
                 referrer: document.referrer || null,
                 platform: navigator.platform,
                 language: navigator.language,
@@ -50,9 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 submission_time: new Date().toLocaleString()
             };
 
-            const baseUrl = url.origin;
 
-            fetch(`${baseUrl}/api/brand-leads`, {
+
+            fetch(`${apiBaseUrl}/brand-leads`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -65,15 +67,10 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(res => res.json())
                 .then(res => {
-                    if (res.message) {
-                        alert("Lead submitted successfully!");
-                    } else {
-                        alert("Something went wrong: " + JSON.stringify(res));
-                    }
+                    console.log("Lead submission response:", res);
                 })
                 .catch(err => {
                     console.error("Form submission failed", err);
-                    alert("Error: " + err.message);
                 });
         });
     });

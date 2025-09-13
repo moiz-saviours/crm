@@ -180,10 +180,13 @@
             $('#manage-form').data('id', data.id);
 
             $('#name').val(data.name);
+            $('#pseudo_name').val(data.pseudo_name);
             $('#email').val(data.email);
+            $('#pseudo_email').val(data.pseudo_email);
             $('#designation').val(data.designation);
             $('#gender').val(data.gender);
             $('#phone_number').val(data.phone_number);
+            $('#pseudo_phone').val(data.pseudo_phone);
             $('#address').val(data.address);
             $('#status').val(data.status);
             if (data.image) {
@@ -227,7 +230,7 @@
                                 </td>
                                 <td class="align-middle text-center text-nowrap">${name}</td>
                                 <td class="align-middle text-center text-nowrap">${email}</td>
-                                <td class="align-middle text-center text-nowrap">${designation}</td>
+                                <td class="align-middle text-center text-nowrap">${designation??""}</td>
                                 <td class="align-middle text-center text-nowrap">
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
@@ -249,7 +252,7 @@
                             // $('#formContainer').removeClass('open')
                         }
                     })
-                    .catch(error => console.error('An error occurred while updating the record.',error));
+                    .catch(error => console.error('An error occurred while updating the record.', error));
             } else {
                 const url = $(this).attr('action');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})

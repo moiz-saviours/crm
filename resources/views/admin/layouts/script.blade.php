@@ -47,6 +47,7 @@
 <script src="{{asset ('assets/js/tour.js')}}"></script>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <!-- Jquery UI -->
 {{--<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>--}}
 <!-- End Jquery UI -->
@@ -479,6 +480,7 @@
         if (manageForm.length > 0) {
             manageForm[0].reset();
             manageForm.removeData('id');
+
         }
         if (jqXHR.status === 429) {
             Swal.fire({
@@ -695,10 +697,11 @@
                         } else if (response.errors) {
                             let firstError = false;
                             for (let field in response.errors) {
-                                firstError = true;
-                                const fieldSelector = $(isUpdate ? `#edit_${field}` : `#edit_${field}`).length > 0 ? `#edit_${field}` : `#${field}`;
-                                if (firstError) {
-                                    document.getElementById(field).scrollIntoView({
+                                let normalizedField = field.replace(/\./g, '_');
+                                const fieldSelector = $(isUpdate ? `#edit_${normalizedField}` : `#edit_${normalizedField}`).length > 0 ? `#edit_${normalizedField}` : `#${normalizedField}`;
+                                if (!firstError) {
+                                    firstError = true;
+                                    document.getElementById(normalizedField).scrollIntoView({
                                         behavior: 'smooth',
                                         block: 'center'
                                     });
@@ -804,13 +807,24 @@
         return password;
     }
 
+    window.resetHooks = [];
     function resetFields() {
         $('.second-fields').fadeOut();
         $('.first-fields').fadeIn();
         $('.first-field-inputs').prop('required', true);
         $('.second-field-inputs').prop('required', false);
         $('.image-div').css('display', 'none');
-
+        $('.extra-dynamic-fields').empty();
+        $('.unique-select-2').val('').trigger('change');
+        let placeholderMsg = $('.extra-dynamic-fields-to-show')?.html()?.trim();
+        if (placeholderMsg) {
+            $('.extra-dynamic-fields').html(placeholderMsg);
+        }
+        window.resetHooks.forEach(hook => {
+            if (typeof hook === 'function') {
+                hook();
+            }
+        });
         // $('.first-fields').fadeOut(() => {
         //     $('.second-fields').fadeIn();
         //     $('.second-field-inputs').prop('required', true);
@@ -926,7 +940,8 @@
                 targetTable.DataTable().columns.adjust().draw();
             }
         });
-        $(".searchbox__btn").on('click', function () {
+        $(".searchbox").on('submit', function (e) {
+            e.preventDefault();
             const searchTerm = $("#header-search-input").val().trim();
             if (searchTerm) {
                 const currentUrl = window.location.origin + window.location.pathname;
@@ -935,6 +950,9 @@
             } else {
                 window.location.href = window.location.origin + window.location.pathname;
             }
+        });
+        $(".searchbox__btn").on("click", function () {
+            $(".searchbox").submit();
         });
 
         const params = new URLSearchParams(window.location.search);

@@ -179,6 +179,74 @@
             const roleId = parseInt(role.value, 10);
             populateDropdown(position, Object.values(positions), 'role_id', roleId);
         });
+
+        let pseudoIndex = 0;
+
+        function toggleExtraContainer() {
+            const mainPseudoName = $("#pseudo_name").val().trim();
+            const mainPseudoEmail = $("#pseudo_email").val().trim();
+            if (mainPseudoName !== "" || mainPseudoEmail !== "") {
+                $("#extra-pseudo-container").show();
+            } else {
+                $("#extra-pseudo-container").hide();
+                $("#extra-pseudo-fields").empty(); // clear extras if no main pseudo
+                pseudoIndex = 0;
+            }
+        }
+
+        $("#pseudo_name, #pseudo_email").on("input", toggleExtraContainer);
+        toggleExtraContainer();
+
+        $("#add-pseudo-btn").on("click", function () {
+            const index = pseudoIndex++;
+            createPseudoGroup(index);
+        });
+
+        $(document).on("click", ".remove-pseudo", function () {
+            $(this).closest(".pseudo-group").remove();
+        });
+        if (window.resetHooks) {
+            window.resetHooks.push(toggleExtraContainer);
+        }
+        function createPseudoGroup(index, pseudo = {}) {
+            const fieldGroup = $(`
+        <div class="pseudo-group border p-1 rounded">
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label" for="extra_pseudos_${index}_pseudo_name">Pseudo Name</label>
+                    <input type="text" class="form-control"
+                        id="extra_pseudos_${index}_pseudo_name"
+                        name="extra_pseudos[${index}][pseudo_name]"
+                        value="${pseudo.pseudo_name || ''}"
+                        placeholder="Enter Pseudo name">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="extra_pseudos_${index}_pseudo_email">Pseudo Email</label>
+                    <input type="email" class="form-control"
+                        id="extra_pseudos_${index}_pseudo_email"
+                        name="extra_pseudos[${index}][pseudo_email]"
+                        value="${pseudo.pseudo_email || ''}"
+                        placeholder="Enter Pseudo Email">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="extra_pseudos_${index}_pseudo_phone">Pseudo Phone</label>
+                    <input type="text" class="form-control"
+                        id="extra_pseudos_${index}_pseudo_phone"
+                        name="extra_pseudos[${index}][pseudo_phone]"
+                        value="${pseudo.pseudo_phone || ''}"
+                        placeholder="e.g. +1234567890">
+                </div>
+                <div class="col-md-1 d-flex align-items-end justify-content-center">
+                    <i class="fa fa-close remove-pseudo" title="Remove" style="cursor:pointer;"></i>
+                </div>
+            </div>
+        </div>
+    `);
+
+            $("#extra-pseudo-fields").append(fieldGroup);
+
+        }
+
         function setDataAndShowEdit(data) {
             let user = data.user;
             let teams = data.teams;
@@ -195,13 +263,13 @@
 
             $('#emp_id').val(user.emp_id);
             $('#name').val(user.name);
-            $('#pseudo_name').val(user.pseudo_name);
             $('#email').val(user.email);
+            $('#phone_number').val(user.phone_number);
+            $('#pseudo_name').val(user.pseudo_name);
             $('#pseudo_email').val(user.pseudo_email);
+            $('#pseudo_phone').val(user.pseudo_phone);
             $('#designation').val(user.designation);
             $('#gender').val(user.gender);
-            $('#phone_number').val(user.phone_number);
-            $('#pseudo_phone').val(user.pseudo_phone);
             $('#address').val(user.address);
             $('#city').val(user.city);
             $('#state').val(user.state);
@@ -225,6 +293,17 @@
                 $imageDisplay.attr('alt', user.name);
                 $imageDiv.show();
             }
+
+            pseudoIndex = 0;
+
+            if (user.pseudo_records && user.pseudo_records.length > 0) {
+                user.pseudo_records.forEach(pseudo => {
+                    const index = pseudoIndex++;
+                    createPseudoGroup(index, pseudo);
+                });
+            }
+            toggleExtraContainer();
+
             let $teams = $('#team_key');
             $teams.empty().append('<option value="" selected disabled>Select Team</option>');
             teams.forEach(team => {
@@ -299,7 +378,7 @@
                             $('#formContainer').removeClass('open')
                         }
                     })
-                    .catch(error => console.error('An error occurred while updating the record.',error));
+                    .catch(error => console.error('An error occurred while updating the record.', error));
             } else {
                 const url = $(this).attr('action');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})

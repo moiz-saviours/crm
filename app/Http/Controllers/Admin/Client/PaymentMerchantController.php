@@ -292,7 +292,7 @@ class PaymentMerchantController extends Controller
     /**
      * Showing accounts of specified resource.
      */
-    public function by_brand($brand_key)
+    public function by_brand($brand_key, $currency)
     {
         if (!$brand_key) {
             return response()->json(['error' => 'Oops! Brand not found.'], 404);
@@ -301,8 +301,12 @@ class PaymentMerchantController extends Controller
         if (!$brand) {
             return response()->json(['error' => 'Oops! Brand not found.'], 404);
         }
-        $brand->load('client_accounts');
-        $client_accounts = $brand->client_accounts;
+        $allowedMethods = strtoupper($currency) === 'GBP' ? ['stripe', 'paypal'] : null;
+        $client_accounts = $brand->client_accounts()
+            ->when($allowedMethods, function ($query) use ($allowedMethods) {
+                $query->whereIn('payment_method', $allowedMethods);
+            })
+            ->get();
         $groupedAccounts = $client_accounts
             ->map(function ($account) {
                 $payment_merchant = PaymentMerchant::where('id', $account->id)->withMonthlyUsage()->first();

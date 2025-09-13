@@ -154,7 +154,7 @@
                     <label for="currency" class="form-label">Currency</label>
                     <select class="form-control tour-userinvoicecurselect" id="currency" name="currency">
                         <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
-                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }} disabled>GBP</option>
+                        <option value="GBP" {{ old('currency') == 'GBP' ? 'selected' : '' }}>GBP</option>
                         <option value="AUD" {{ old('currency') == 'AUD' ? 'selected' : '' }} disabled>AUD</option>
                         <option value="CAD" {{ old('currency') == 'CAD' ? 'selected' : '' }} disabled>CAD</option>
                     </select>
@@ -163,8 +163,10 @@
                     @enderror
                 </div>
                 <div class="form-group mb-3 tour-userinvoicemerchant">
-                    <div id="merchant-types-container">
-                    </div>
+                    <label class="form-label">Payment Gateways</label>
+                    <div class="extra-dynamic-fields-to-show d-none"><p class="text-muted">Try selecting a different brand or changing currency
+                            as no payment gateway is available.</p></div>
+                    <div id="merchant-types-container" class="extra-dynamic-fields"></div>
                     @error('payment_method')
                     <span class="text-danger">{{ $message }}</span>
                     @enderror

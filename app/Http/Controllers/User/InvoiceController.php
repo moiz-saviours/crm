@@ -208,6 +208,7 @@ class InvoiceController extends Controller
                 'tax_value' => $tax_value,
                 'tax_amount' => $tax_amount,
                 'total_amount' => $total_amount,
+                'currency' => $request->input('currency', 'USD'),
                 'type' => $request->input('type'),
                 'due_date' => $request->input('due_date'),
                 'status' => 0,
@@ -423,6 +424,7 @@ class InvoiceController extends Controller
                 'tax_value' => $tax_value,
                 'tax_amount' => $tax_amount,
                 'total_amount' => $total_amount,
+                'currency' => $request->input('currency', 'USD'),
                 'type' => $request->input('type'),
                 'due_date' => $request->input('due_date'),
             ]);

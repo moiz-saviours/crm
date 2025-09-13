@@ -86,6 +86,11 @@ class User extends Authenticatable
         return $this->morphMany(Invoice::class, 'agent');
     }
 
+    public function pseudo_records()
+    {
+        return $this->hasMany(UserPseudoRecord::class, 'user_id');
+    }
+
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');

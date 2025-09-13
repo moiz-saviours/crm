@@ -731,10 +731,11 @@
                         } else if (response.errors) {
                             let firstError = false;
                             for (let field in response.errors) {
-                                firstError = true;
-                                const fieldSelector = $(isUpdate ? `#edit_${field}` : `#edit_${field}`).length > 0 ? `#edit_${field}` : `#${field}`;
-                                if (firstError) {
-                                    document.getElementById(field).scrollIntoView({
+                                let normalizedField = field.replace(/\./g, '_');
+                                const fieldSelector = $(isUpdate ? `#edit_${normalizedField}` : `#edit_${normalizedField}`).length > 0 ? `#edit_${normalizedField}` : `#${normalizedField}`;
+                                if (!firstError) {
+                                    firstError = true;
+                                    document.getElementById(normalizedField).scrollIntoView({
                                         behavior: 'smooth',
                                         block: 'center'
                                     });
@@ -842,13 +843,23 @@
         return password;
     }
 
+    window.resetHooks = [];
     function resetFields() {
         $('.second-fields').fadeOut();
         $('.first-fields').fadeIn();
         $('.first-field-inputs').prop('required', true);
         $('.second-field-inputs').prop('required', false);
         $('.image-div').css('display', 'none');
-
+        $('.extra-dynamic-fields').empty();
+        let placeholderMsg = $('.extra-dynamic-fields-to-show')?.html()?.trim();
+        if (placeholderMsg) {
+            $('.extra-dynamic-fields').html(placeholderMsg);
+        }
+        window.resetHooks.forEach(hook => {
+            if (typeof hook === 'function') {
+                hook();
+            }
+        });
         // $('.first-fields').fadeOut(() => {
         //     $('.second-fields').fadeIn();
         //     $('.second-field-inputs').prop('required', true);
@@ -963,5 +974,77 @@
                 targetTable.DataTable().columns.adjust().draw();
             }
         });
+        $(".searchbox").on('submit', function (e) {
+            e.preventDefault();
+            const searchTerm = $("#header-search-input").val().trim();
+            if (searchTerm) {
+                const currentUrl = window.location.origin + window.location.pathname;
+                window.location.href = `${currentUrl}?search=${searchTerm}`;
+                // window.location.href = `${currentUrl}?search=${encodeURIComponent(searchTerm)}`;
+            } else {
+                window.location.href = window.location.origin + window.location.pathname;
+            }
+        });
+        $(".searchbox__btn").on("click", function () {
+            $(".searchbox").submit();
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        function onAllDataTablesReady(callback) {
+            const tables = $.fn.dataTable.tables({api: true});
+            let readyCount = 0;
+
+            if (!tables.length) {
+                callback();
+                return;
+            }
+
+            tables.each(function () {
+                const dt = new $.fn.dataTable.Api(this);
+                if (dt.settings()[0]._bInitComplete) {
+                    readyCount++;
+                } else {
+                    $(dt.table().node()).on('init.dt', function () {
+                        readyCount++;
+                        if (readyCount === tables.length) {
+                            callback();
+                        }
+                    });
+                }
+                if (readyCount === tables.length) {
+                    callback();
+                }
+            });
+        }
+
+        setTimeout(function () {
+            onAllDataTablesReady(function () {
+                const searchId = params.get('ref');
+                const searchTerm = params.get('search');
+
+                if (searchId) {
+                    $('.editBtn').each(function () {
+                        if ($(this).data('id') == searchId) {
+                            $(this).click();
+                        }
+                    });
+                }
+                if (searchTerm) {
+                    $($.fn.dataTable.tables({visible: true})).each(function () {
+                        const dt = $(this).DataTable();
+                        dt.search(searchTerm).draw();
+                    });
+                }
+            });
+        }, 100);
+
+        function strLimit(string, limit = 100, end = '...') {
+            if (!string) return '---';
+            return string.length > limit ? string.substring(0, limit) + end : string;
+        }
+
     });
+    !function () {
+        document.currentScript?.remove()
+    }();
 </script>

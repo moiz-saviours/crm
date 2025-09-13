@@ -49,7 +49,7 @@
                 text-align: left;
                 padding-left: 15px;
                 font-size: 17px;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px
             }
 
@@ -81,7 +81,7 @@
             }
 
             .nav-tabs .nav-link.customize.active {
-                border-bottom: 3px solid #2d3e50;
+                border-bottom: 3px solid var(--bs-primary);
                 background: transparent;
                 border-width: 0px 0px 3px 0px;
                 border-radius: 3px;
@@ -91,7 +91,7 @@
                 background: transparent;
                 border: none;
                 padding: 0;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 font-size: 12px;
                 /* border-radius: 5px; */
                 font-weight: 600;
@@ -142,7 +142,7 @@
                 /*height: 850px;*/
                 overflow-y: auto !important;
 
-                 height: 100%;
+                height: 100%;
                 /*height: calc(-200px + 100vh);*/
                 /*flex-grow: 1;*/
                 border-radius: 20px 0px 0px 0px;
@@ -245,8 +245,8 @@
                 margin: 0;
                 font-size: 24px;
                 text-align: left;
-                font-weight: 400;
-                color: #2d3e50;
+                font-weight: 100;
+                color: var(--bs-primary);
                 /* margin-bottom: -3px; */
             }
 
@@ -259,7 +259,7 @@
 
             .contact-info p {
                 /* margin: 5px 0; */
-                font-size: 12px;
+                font-size: 0.8rem;
                 font-weight: 400;
                 color: gray;
                 margin: 0;
@@ -336,7 +336,7 @@
 
             .collapsible-header {
                 background-color: transparent;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 cursor: pointer;
                 padding: 5px 0px;
                 width: 100%;
@@ -479,7 +479,7 @@
             }
 
             .headerr .tablink.active {
-                background-color: #2d3e50;
+                background-color: var(--bs-primary);
                 color: white;
             }
 
@@ -532,7 +532,7 @@
                 text-align: left;
                 /* padding-left: 15px; */
                 font-size: 14px;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 padding-top: 10px;
             }
 
@@ -662,13 +662,13 @@
                 /* padding-left: 15px;
                 padding-bottom: 15px; */
                 font-size: 14px;
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .data-row h5 {
                 font-size: 11px;
                 font-weight: 500;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 3px;
                 text-align: center;
             }
@@ -680,7 +680,7 @@
             }
 
             span.user_name {
-                color: #2d3e50;
+                color: var(--bs-primary);
             }
 
             .new-sidebar-icons {
@@ -903,9 +903,9 @@
 
             .right_collab {
                 float: right;
-                /* background: #2d3e50; */
+                /* background: var(--bs-primary); */
                 color: #0091ae;
-                /*color: #2d3e50;*/
+                /*color: var(--bs-primary);*/
                 padding: 5px;
                 border-radius: 5px;
                 font-size: 11px;
@@ -1039,7 +1039,7 @@
             .user_cont h4 {
                 font-size: 13px;
                 font-weight: 600;
-                color: #2d3e50;
+                color: var(--bs-primary);
                 margin-bottom: 4px;
             }
 
@@ -1087,16 +1087,21 @@
                         </div>
                         <div>
                             <div class="profile_box">
-                                <!-- <div class="avatar">MM</div> -->
-                                <div class="avatar-img-box">
-{{--                                    <img class="img-fluid avatar-img" src="img/user.png">--}}
-                                     <img class="img-fluid avatar-img" src="{{asset ('assets/images/user.png')}}">
-                                </div>
-                                <div class="contact-info">
-                                    <h2>Mr Malik</h2>
-                                    <!-- <h5>Business Development Executive</h5> -->
-                                    <p>seo.hannywebdeveloper14@outlook.com
-                                    </p>
+                                <div class="avatar-img-box" style="padding-inline-end: 10px;">
+                                    @if(file_exists(public_path('assets/images/user1.png')))
+                                        <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
+                                             src="{{ asset('assets/images/user1.png') }}">
+                                    @else
+                                        @php
+                                            $words = explode(' ', $customer_contact->name ?? $customer_contact->email);
+                                            $initials = strtoupper($words[0][0] . (count($words) > 1 ? $words[1][0] : ''));
+                                        @endphp
+                                        <div
+                                            class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                            style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
+                                            {{ $initials }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div>
 
@@ -1614,11 +1619,10 @@
 
                                                                     <div class="new-profile-email-wrapper">
                                                                         <div
-                                                                            class="activities-seprater  open-email-form" style="position: relative">
+                                                                            class="activities-seprater  open-email-form"
+                                                                            style="position: relative">
                                                                             Reply
                                                                         </div>
-
-
 
 
                                                                         <div
