@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     Client\PaymentMerchantController as AdminPaymentMerchantController,
     Customer\CompanyController as AdminCustomerCompanyController,
     Customer\ContactController as AdminCustomerContactController,
+    Customer\InboxController as AdminCustomerInboxController,
     Customer\NoteController as AdminCustomerNoteController,
     EmployeeController as AdminEmployeeController,
     InvoiceController as AdminInvoiceController,
@@ -234,6 +235,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
     Route::name('customer.')->group(function () {
         Route::name('contact.')->group(function () {
             Route::get('/customer/contacts', [AdminCustomerContactController::class, 'index'])->name('index');
+            Route::get('/customer/inbox', [AdminCustomerInboxController::class, 'index'])->name('index');
             Route::prefix('customer/contact')->group(function () {
                 Route::get('/create', [AdminCustomerContactController::class, 'create'])->name('create');
                 Route::post('/store', [AdminCustomerContactController::class, 'store'])->name('store');
