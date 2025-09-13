@@ -274,7 +274,7 @@
     </div>
 
     <div class="countdown">
-        <i class="far fa-clock"></i> Estimated time remaining: <span id="countdown">02:00:00</span>
+        <i class="far fa-clock"></i> Estimated time remaining: <span id="countdown">00:00:00</span>
     </div>
 
     <div class="construction-icons">
