@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\EmailController;
 
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
@@ -251,7 +252,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::get('/change-status/{customer_contact?}', [AdminCustomerContactController::class, 'change_status'])->name('change.status');
                 Route::delete('/delete/{customer_contact?}', [AdminCustomerContactController::class, 'delete'])->name('delete');
                 Route::post('/send-email', [AdminCustomerContactController::class, 'sendEmail'])->name('send.email');
-
+                Route::get('/emails/fetch', [EmailController::class, 'fetch'])->name('emails.fetch');
             });
         });
         /** Companies Routes */
