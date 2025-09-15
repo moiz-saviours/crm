@@ -15,6 +15,7 @@
         cursor: not-allowed;
     }
 
+
     .custm_header {
         padding: 2px 20px 2px 20px;
         display: flex;
@@ -24,6 +25,8 @@
 
     .actions {
         display: flex;
+        justify-content: end;
+
     }
 
     .actions h1 {
@@ -53,6 +56,7 @@
         background-color: #ff5722;
         color: #fff;
         border: none;
+        margin-top: 20px;
     }
 
     .search-bar input {

@@ -279,8 +279,8 @@
             $('#customer_contact_name').val(invoice.customer_contact?.name).prop('readonly', true);
             $('#customer_contact_email').val(invoice.customer_contact?.email).prop('readonly', true);
             $('#customer_contact_phone').val(invoice.customer_contact?.phone).prop('readonly', true);
-            $('#cus_contact_key').val(invoice.customer_contact?.special_key);
-            $('#agent_id').val(invoice.agent_id);
+            $('#cus_contact_key').val(invoice.customer_contact?.special_key).trigger('change');
+            $('#agent_id').val(invoice.agent_id).trigger('change');
             $('#due_date').val(invoice.due_date);
             $('#currency').val(invoice.currency);
             $('#amount').val(invoice.amount);
