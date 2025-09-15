@@ -11,379 +11,332 @@ use Illuminate\Support\Facades\Storage;
 
 class FetchEmails extends Command
 {
-    protected $signature = 'emails:fetch {--limit=10 : Number of emails to fetch} {--account= : Specific account ID} {--new-only : Fetch only new emails}';
-    protected $description = 'Fetch emails from IMAP accounts using PHP IMAP extension';
+    protected $signature = 'emails:fetch {--limit=10} {--account=*} {--new-only} {--address=*}';
+    protected $description = 'Fetch emails from IMAP accounts';
 
     private $imapConnection;
     private $baseMailboxString;
 
-    public function handle()
-    {
-        try {
-            $limit = (int) $this->option('limit');
-            $accountId = $this->option('account');
-            $newOnly = $this->option('new-only');
+    //php artisan emails:fetch --limit=10 --account=hasnat.developer@pivotbookwriting.com --account=hasnat.khan@stellers.org --address=moiz.saviours@gmail.com --address=hasnat.khan@stellers.org
+  public function handle()
+{
+    // dd($this->option('account'),$this->option('address'));
+    $startTime = microtime(true); // Record start time
+    $this->info('Starting email fetch process...');
 
-            // Get active IMAP accounts
-            $query = UserPseudoRecord::where('imap_type', 'imap')
-                ->where('status', 1)
-                ->where('is_verified', 1)
-                ->whereNotNull('server_host')
-                ->whereNotNull('server_username')
-                ->whereNotNull('server_password');
+    try {
+        $accounts = $this->getAccounts();
 
-            if ($accountId) {
-                $query->where('id', $accountId);
-            }
-
-            $accounts = $query->get();
-
-            if ($accounts->isEmpty()) {
-                $this->error('No active IMAP accounts found.');
-                return 0;
-            }
-
-            foreach ($accounts as $account) {
-                $this->info("Fetching emails for account: {$account->pseudo_email}");
-                $this->fetchAccountEmails($account, $limit, $newOnly);
-            }
-
-            $this->info('Email fetching completed.');
-            return 1;
-        } catch (\Exception $e) {
-            $this->error('Fatal error in email fetching: ' . $e->getMessage());
-            Log::error('Fatal IMAP Error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'line' => $e->getLine()
-            ]);
+        if ($accounts->isEmpty()) {
+            $this->error('No active IMAP accounts found.');
             return 0;
-        } finally {
-            if ($this->imapConnection && is_resource($this->imapConnection)) {
-                imap_close($this->imapConnection);
-                $this->imapConnection = null;
-            }
         }
+
+        $this->line("Found {$accounts->count()} active IMAP accounts.");
+        foreach ($accounts as $account) {
+            $this->info("Fetching emails for: {$account->pseudo_email}");
+            $this->fetchAccountEmails($account);
+        }
+
+        $endTime = microtime(true); // Record end time
+        $totalTime = round($endTime - $startTime, 2); // Calculate total time in seconds
+        $this->info("Email fetch process completed successfully. Total time taken: {$totalTime} seconds.");
+        return 1;
+    } catch (\Exception $e) {
+        $this->error("Something went wrong please try again");
+        Log::error('IMAP Fatal Error', ['error' => $e->getMessage()]);
+        return 0;
+    } finally {
+        $this->closeConnection();
+        $endTime = microtime(true); // Ensure end time is recorded even on error
+        $totalTime = round($endTime - $startTime, 2); // Calculate total time in seconds
+        $this->info("Total time taken by command: {$totalTime} seconds.");
+    }
+}
+
+   private function getAccounts()
+{
+    $this->line('Retrieving active IMAP accounts...');
+    $query = UserPseudoRecord::where('imap_type', 'imap')
+        ->where('status', 1)
+        ->where('is_verified', 1)
+        ->whereNotNull(['server_host', 'server_username', 'server_password']);
+
+    if ($accountEmails = $this->option('account')) {
+        $this->line("Filtering for specific account emails: " . implode(', ', $accountEmails));
+        $query->whereIn('pseudo_email', $accountEmails);
     }
 
-    private function fetchAccountEmails(UserPseudoRecord $account, int $limit, bool $newOnly = false)
-    {
-        try {
-            // Connect to IMAP server
-            $this->connectImap($account);
+    $accounts = $query->get();
+    if ($accounts->isEmpty()) {
+        $this->warn("No matching accounts found for the provided criteria.");
+    }
+    return $accounts;
+}
 
-            if (!$this->imapConnection) {
-                $this->error("Failed to connect to IMAP server for {$account->pseudo_email}");
+    private function fetchAccountEmails(UserPseudoRecord $account)
+{
+    $startTime = microtime(true); // Record start time for account
+    $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
+
+    try {
+        $this->connectImap($account);
+
+        $this->line('Fetching available folders...');
+        $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
+        $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
+
+        foreach ($folders as $folder) {
+            $this->line("Processing folder: {$folder}");
+            $this->fetchFolderEmails($account, $folder);
+        }
+
+        $endTime = microtime(true); // Record end time
+        $accountTime = round($endTime - $startTime, 2); // Calculate account processing time
+        $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
+    } catch (\Exception $e) {
+        $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
+        Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
+        $endTime = microtime(true); // Record end time on error
+        $accountTime = round($endTime - $startTime, 2); // Calculate account processing time
+        $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
+    }
+}
+
+    private function connectImap(UserPseudoRecord $account)
+    {
+        $port = $account->server_port ?: 993;
+        $this->baseMailboxString = sprintf('{%s:%d/imap/ssl/novalidate-cert}', $account->server_host, $port);
+
+        $this->line("Attempting IMAP connection to {$account->server_host}:{$port}");
+        $this->imapConnection = @imap_open(
+            $this->baseMailboxString . 'INBOX',
+            $account->server_username,
+            $account->server_password,
+            OP_READONLY
+        );
+
+        if (!$this->imapConnection) {
+            throw new \Exception("IMAP connection failed: " . imap_last_error());
+        }
+        $this->comment('IMAP connection established successfully.');
+    }
+
+private function fetchFolderEmails(UserPseudoRecord $account, string $folder)
+{
+    $limit = (int) $this->option('limit');
+    $newOnly = $this->option('new-only');
+    $addresses = $this->option('address') ?: [];
+
+    $this->line("Opening folder: {$folder}");
+    if (!@imap_reopen($this->imapConnection, $folder)) {
+        $this->error("Failed to open folder: {$folder}. Error: " . imap_last_error());
+        return;
+    }
+
+    $totalEmails = imap_num_msg($this->imapConnection);
+    $this->line("Total emails in folder: {$totalEmails}");
+
+    if ($totalEmails == 0) {
+        $this->comment("No emails found in folder: {$folder}");
+        return;
+    }
+
+    $emails = [];
+    if ($newOnly && empty($addresses)) {
+        $this->line("Searching for unseen emails (limit: {$limit})...");
+        $emails = @imap_search($this->imapConnection, 'UNSEEN') ?: [];
+        $emails = array_slice($emails, 0, $limit);
+        $this->comment("Found " . count($emails) . " unseen emails.");
+    } elseif (empty($addresses)) {
+        $this->line("Fetching recent emails (limit: {$limit}, total: {$totalEmails})...");
+        $start = max(1, $totalEmails - $limit + 1);
+        $emails = range($start, $totalEmails);
+        $this->comment("Processing " . count($emails) . " recent emails.");
+    } else {
+        $this->line("Searching for emails with addresses: " . implode(', ', $addresses));
+        $searchEmails = [];
+        foreach ($addresses as $address) {
+            // Search for emails where the address appears in FROM, TO, CC, or BCC
+            $fromSearch = @imap_search($this->imapConnection, "FROM \"$address\"") ?: [];
+            $toSearch = @imap_search($this->imapConnection, "TO \"$address\"") ?: [];
+            $ccSearch = @imap_search($this->imapConnection, "CC \"$address\"") ?: [];
+            $bccSearch = @imap_search($this->imapConnection, "BCC \"$address\"") ?: [];
+            $searchEmails = array_unique(array_merge($searchEmails, $fromSearch, $toSearch, $ccSearch, $bccSearch));
+        }
+        if ($newOnly) {
+            $this->line("Filtering for unseen emails among address matches...");
+            $unseenEmails = @imap_search($this->imapConnection, 'UNSEEN') ?: [];
+            $searchEmails = array_intersect($searchEmails, $unseenEmails);
+        }
+        $emails = array_slice($searchEmails, 0, $limit);
+        $this->comment("Found " . count($emails) . " emails matching addresses" . ($newOnly ? " (unseen only)" : "") . ".");
+    }
+
+       
+    if (empty($emails)) {
+        $this->comment("No emails to process in folder: {$folder}");
+        return;
+    }
+
+    foreach ($emails as $emailNumber) {
+        if ($emailNumber <= 0) {
+            $this->warn("Invalid email number: {$emailNumber}. Skipping...");
+            continue;
+        }
+        $this->line("Processing email #{$emailNumber}...");
+        $this->processEmail($account, $folder, $emailNumber);
+    }
+}
+
+private function processEmail(UserPseudoRecord $account, string $folder, int $emailNumber)
+{
+    try {
+        $this->line("Fetching headers for email #{$emailNumber}");
+        $headers = @imap_headerinfo($this->imapConnection, $emailNumber);
+        if (!$headers || !isset($headers->from[0])) {
+            $this->warn("Skipping email #{$emailNumber}: Invalid headers");
+            return;
+        }
+
+        $addresses = $this->option('address') ?: [];
+        if (!empty($addresses)) {
+            $this->line("Validating email #{$emailNumber} against provided addresses...");
+            $emailAddresses = [];
+
+            // Collect From addresses
+            if (isset($headers->from)) {
+                $emailAddresses[] = $headers->from[0]->mailbox . '@' . $headers->from[0]->host;
+            }
+
+            // Collect To addresses
+            if (isset($headers->to)) {
+                $emailAddresses = array_merge(
+                    $emailAddresses,
+                    array_map(fn($addr) => $addr->mailbox . '@' . $addr->host, $headers->to)
+                );
+            }
+
+            // Collect CC addresses
+            if (isset($headers->cc)) {
+                $emailAddresses = array_merge(
+                    $emailAddresses,
+                    array_map(fn($addr) => $addr->mailbox . '@' . $addr->host, $headers->cc)
+                );
+            }
+
+            // Collect BCC addresses
+            if (isset($headers->bcc)) {
+                $emailAddresses = array_merge(
+                    $emailAddresses,
+                    array_map(fn($addr) => $addr->mailbox . '@' . $addr->host, $headers->bcc)
+                );
+            }
+
+            $emailAddresses = array_unique($emailAddresses);
+            $matches = array_intersect($emailAddresses, $addresses);
+            if (empty($matches)) {
+                $this->line("Skipping email #{$emailNumber}: No matching addresses found");
                 return;
             }
-
-            // Get mailbox list
-            $folders = $this->getMailboxes();
-
-            if (empty($folders)) {
-                $this->error("No mailboxes found for {$account->pseudo_email}");
-                return;
-            }
-
-            foreach ($folders as $folder) {
-                try {
-                    $this->info("Checking folder: {$folder}");
-                    $this->fetchAllEmails($account, $folder, $limit);
-                } catch (\Exception $e) {
-                    $this->error("Error processing folder {$folder}: " . $e->getMessage());
-                    Log::error('IMAP Folder Error', [
-                        'account' => $account->id,
-                        'folder' => $folder,
-                        'error' => $e->getMessage()
-                    ]);
-                    continue;
-                }
-            }
-        } catch (\Exception $e) {
-            $this->error("Error fetching emails for {$account->pseudo_email}: " . $e->getMessage());
-            Log::error('IMAP Fetch Error', [
-                'account' => $account->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            $this->comment("Email #{$emailNumber} matches addresses: " . implode(', ', $matches));
         }
-    }
 
-    private function connectImap(UserPseudoRecord $account): void
-    {
-        try {
-            $port = $account->server_port ?: 993;
-
-            $this->baseMailboxString = sprintf(
-                '{%s:%d/imap/ssl/novalidate-cert}',
-                $account->server_host,
-                $port
-            );
-
-            // Clear any previous IMAP errors
-            imap_errors();
-
-            // Open INBOX first
-            $this->imapConnection = @imap_open(
-                $this->baseMailboxString . 'INBOX',
-                $account->server_username,
-                $account->server_password,
-                OP_READONLY,
-                1
-            );
-
-            if (!$this->imapConnection) {
-                $lastError = imap_last_error();
-                throw new \Exception("IMAP connection failed: " . ($lastError ?: 'Unknown error'));
-            }
-
-            $this->info("Successfully connected to IMAP server for {$account->pseudo_email}");
-        } catch (\Exception $e) {
-            $this->error("IMAP connection error: " . $e->getMessage());
-            throw $e;
+        $overview = @imap_fetch_overview($this->imapConnection, $emailNumber)[0] ?? null;
+        if (!$overview) {
+            $this->warn("Skipping email #{$emailNumber}: No overview data");
+            return;
         }
-    }
 
-    private function getMailboxes(): array
-    {
-        try {
-            return @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
-        } catch (\Exception $e) {
-            $this->error("Error getting mailboxes: " . $e->getMessage());
-            return [];
+        // Skip if exists
+        if (
+            isset($overview->message_id) &&
+            Email::where('message_id', $overview->message_id)
+                ->where('pseudo_record_id', $account->id)
+                ->exists()
+        ) {
+            $this->line("Skipping email #{$emailNumber}: Already exists");
+            return;
         }
-    }
 
-    private function fetchUnseenEmails(UserPseudoRecord $account, string $folder, int $limit)
-    {
-        try {
-            // Search for unseen emails
-            $emails = @imap_search($this->imapConnection, 'UNSEEN');
+        $this->line("Fetching structure for email #{$emailNumber}");
+        $structure = @imap_fetchstructure($this->imapConnection, $emailNumber);
+        $body = $this->getEmailBody($emailNumber, $structure);
 
-            if (!$emails) {
-                $this->info("No new emails in folder: " . basename($folder));
-                return;
+        $this->line("Creating email record for #{$emailNumber}");
+        $email = Email::create([
+            'pseudo_record_id' => $account->id,
+            'thread_id' => $this->generateThreadId($headers),
+            'message_id' => $overview->message_id ?? null,
+            'from_email' => $headers->from[0]->mailbox . '@' . $headers->from[0]->host,
+            'from_name' => $headers->from[0]->personal ?? null,
+            'to' => $this->parseAddresses($headers->to ?? null),
+            'cc' => $this->parseAddresses($headers->cc ?? null),
+            'subject' => $overview->subject ?? 'No Subject',
+            'body_html' => $body['html'] ?? null,
+            'body_text' => $body['text'] ?? null,
+            'imap_uid' => @imap_uid($this->imapConnection, $emailNumber),
+            'imap_folder' => $folder,
+            'type' => $this->getEmailType($headers, $account),
+            'folder' => $this->mapFolder($folder),
+            'is_read' => isset($overview->seen) && $overview->seen,
+            'message_date' => $this->parseDate($overview->date ?? null),
+            'received_at' => now(),
+        ]);
+
+        $this->comment("Email #{$emailNumber} saved successfully (ID: {$email->id})");
+
+        if ($structure) {
+            $this->line("Processing attachments for email #{$emailNumber}");
+            $attachmentCount = $this->processAttachments($emailNumber, $structure, $email);
+            if ($attachmentCount > 0) {
+                $this->comment("Processed {$attachmentCount} attachments for email #{$emailNumber}");
             }
-
-            // Limit results
-            $emails = array_slice($emails, 0, $limit);
-
-            $this->info("Found " . count($emails) . " new emails in " . basename($folder));
-
-            foreach ($emails as $emailNumber) {
-                $this->processEmail($account, $folder, $emailNumber);
-            }
-        } catch (\Exception $e) {
-            $this->error("Error fetching new emails: " . $e->getMessage());
-            Log::error('Fetch New Emails Error', [
-                'account' => $account->id,
-                'folder' => $folder,
-                'error' => $e->getMessage()
-            ]);
         }
+    } catch (\Exception $e) {
+        $this->error("Error processing email #{$emailNumber}: {$e->getMessage()}");
+        Log::error('Email Processing Error', [
+            'account' => $account->id,
+            'email' => $emailNumber,
+            'error' => $e->getMessage()
+        ]);
     }
-
-    private function fetchAllEmails(UserPseudoRecord $account, string $folder, int $limit)
-    {
-        try {
-            for ($i = 1; $i <= $limit; $i++) {
-                $this->processEmail($account, $folder, $i);
-            }
-        } catch (\Exception $e) {
-            $this->error("Error fetching all emails: " . $e->getMessage());
-            Log::error('Fetch All Emails Error', [
-                'account' => $account->id,
-                'folder' => $folder,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    private function processEmail(UserPseudoRecord $account, string $folder, int $count)
-    {
-        try {
-            // Get email overview
-            $overview = @imap_fetch_overview($this->imapConnection, $count, 0);
-            $this->info(json_encode($overview));
-            if (!$overview || !isset($overview)) {
-                $this->error("No overview for email #{$count}");
-                return;
-            }
-            $overview = $overview[0];
-
-            // // Check if email already exists
-            if (isset($overview->message_id)) {
-                $existingEmail = Email::where('message_id', $overview->message_id)
-                    ->where('pseudo_record_id', $account->id)
-                    ->first();
-
-                if ($existingEmail) {
-                    $this->info("Email already exists: " . ($overview->subject ?? 'No Subject'));
-                    return;
-                }
-            }
-
-            // Get full email headers
-            $headers = @imap_headerinfo($this->imapConnection, $count);
-
-            if (!$headers) {
-                $this->error("Failed to get headers for email #{$count}");
-                return;
-            }
-
-            // Validate required header fields
-            if (!isset($headers->from) || !is_array($headers->from) || empty($headers->from)) {
-                $this->error("Invalid or missing 'from' header for email #{$count}");
-                return;
-            }
-
-            // Get email body and structure
-            $structure = @imap_fetchstructure($this->imapConnection, $count);
-            $body = $this->getEmailBody($count, $structure);
-
-            // Determine email type and folder
-            $emailType = $this->determineEmailType($headers, $account);
-            $emailFolder = $this->determineEmailFolder($folder);
-
-            // Get UID safely
-            $uid = @imap_uid($this->imapConnection, $count);
-
-            // Create email record
-            $email = Email::create([
-                'pseudo_record_id' => $account->id,
-                'thread_id' => $this->generateThreadId($headers),
-                'message_id' => $overview->message_id ?? null,
-                'in_reply_to' => $overview->in_reply_to ?? null,
-                'references' => $overview->references ?? null,
-                'from_email' => $headers->from[0]->mailbox . '@' . $headers->from[0]->host,
-                'from_name' => $headers->from[0]->personal ?? null,
-                'to' => $this->parseAddresses($headers->to ?? null),
-                'cc' => $this->parseAddresses($headers->cc ?? null),
-                'bcc' => $this->parseAddresses($headers->bcc ?? null),
-                'subject' => $overview->subject ?? 'No Subject',
-                'body_html' => $body['html'] ?? null,
-                'body_text' => $body['text'] ?? null,
-                'imap_uid' => $uid ?: null,
-                'imap_folder' => $folder,
-                'imap_flags' => $this->getImapFlags($overview),
-                'type' => $emailType,
-                'folder' => $emailFolder,
-                'is_read' => isset($overview->seen) && $overview->seen,
-                'message_date' => $this->parseMessageDate($overview->date ?? null),
-                'received_at' => now(),
-            ]);
-
-            // Process attachments
-            if ($structure) {
-                $this->processAttachments($count, $structure, $email);
-            }
-
-            $this->info("Stored email: " . ($overview->subject ?? 'No Subject'));
-        } catch (\Exception $e) {
-            $this->error("Error processing email #{$count}: " . $e->getMessage());
-            Log::error('Email Processing Error', [
-                'account' => $account->id,
-                'email_number' => $count,
-                'folder' => $folder,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-        }
-    }
-
-
-
-
-    private function parseMessageDate($date): string
-    {
-        try {
-            if (empty($date)) {
-                return now()->format('Y-m-d H:i:s');
-            }
-
-            $timestamp = strtotime($date);
-            if ($timestamp === false) {
-                return now()->format('Y-m-d H:i:s');
-            }
-
-            return date('Y-m-d H:i:s', $timestamp);
-        } catch (\Exception $e) {
-            Log::warning('Date parsing error', ['date' => $date, 'error' => $e->getMessage()]);
-            return now()->format('Y-m-d H:i:s');
-        }
-    }
+}
 
     private function getEmailBody(int $emailNumber, $structure)
     {
+        $this->line("Fetching body for email #{$emailNumber}");
         $body = ['html' => null, 'text' => null];
 
-        try {
-            if (!$structure || !isset($structure->parts)) {
-                // Simple email, no attachments
-                $content = @imap_body($this->imapConnection, $emailNumber);
+        if (!$structure || !isset($structure->parts)) {
+            $content = @imap_body($this->imapConnection, $emailNumber);
+            if ($content && isset($structure->subtype)) {
+                $body[strtoupper($structure->subtype) == 'HTML' ? 'html' : 'text'] = $content;
+                $this->line("Fetched single-part body (type: {$structure->subtype})");
+            }
+            return $body;
+        }
 
-                if ($content === false) {
-                    return $body;
-                }
+        foreach ($structure->parts as $i => $part) {
+            if ($part->type != 0) continue; // Only text parts
 
-                if (isset($structure->type) && $structure->type == 0) {
-                    if (isset($structure->subtype)) {
-                        if (strtoupper($structure->subtype) == 'HTML') {
-                            $body['html'] = $content;
-                        } else {
-                            $body['text'] = $content;
-                        }
-                    } else {
-                        $body['text'] = $content;
-                    }
-                }
+            $content = @imap_fetchbody($this->imapConnection, $emailNumber, $i + 1);
+            if (!$content) continue;
 
-                return $body;
+            if ($part->encoding == 3) {
+                $this->line("Decoding base64 content for part " . ($i + 1));
+                $content = imap_base64($content);
+            }
+            if ($part->encoding == 4) {
+                $this->line("Decoding quoted-printable content for part " . ($i + 1));
+                $content = imap_qprint($content);
             }
 
-            // Multipart email
-            foreach ($structure->parts as $partNumber => $part) {
-                $partNumber++; // Part numbers start from 1
-
-                try {
-                    if (isset($part->type) && $part->type == 0) { // Text content
-                        $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber);
-
-                        if ($content === false) {
-                            continue;
-                        }
-
-                        // Decode content
-                        if (isset($part->encoding)) {
-                            if ($part->encoding == 3) {
-                                $content = imap_base64($content);
-                            } elseif ($part->encoding == 4) {
-                                $content = imap_qprint($content);
-                            }
-                        }
-
-                        if (isset($part->subtype)) {
-                            if (strtoupper($part->subtype) == 'HTML') {
-                                $body['html'] = $content;
-                            } elseif (strtoupper($part->subtype) == 'PLAIN') {
-                                $body['text'] = $content;
-                            }
-                        }
-                    }
-                } catch (\Exception $e) {
-                    Log::warning('Error processing email part', [
-                        'email_number' => $emailNumber,
-                        'part_number' => $partNumber,
-                        'error' => $e->getMessage()
-                    ]);
-                    continue;
-                }
+            if (isset($part->subtype)) {
+                $key = strtoupper($part->subtype) == 'HTML' ? 'html' : 'text';
+                $body[$key] = $content;
+                $this->line("Stored {$key} content for part " . ($i + 1));
             }
-        } catch (\Exception $e) {
-            Log::error('Email body extraction error', [
-                'email_number' => $emailNumber,
-                'error' => $e->getMessage()
-            ]);
         }
 
         return $body;
@@ -391,238 +344,204 @@ class FetchEmails extends Command
 
     private function processAttachments(int $emailNumber, $structure, Email $email)
     {
-        try {
-            if (!isset($structure->parts) || !is_array($structure->parts)) {
-                return;
+        if (!isset($structure->parts)) {
+            $this->line("No attachments found for email #{$emailNumber}");
+            return 0;
+        }
+
+        $attachmentCount = 0;
+
+        foreach ($structure->parts as $i => $part) {
+            if ($part->type == 0) continue; // Skip text parts
+
+            $filename = $this->getAttachmentFilename($part);
+            if (!$filename) {
+                $this->line("No filename found for part " . ($i + 1));
+                continue;
             }
 
-            foreach ($structure->parts as $partNumber => $part) {
-                $partNumber++; // Part numbers start from 1
-
-                try {
-                    if (!isset($part->ifdparameters) && !isset($part->ifparameters)) {
-                        continue;
-                    }
-
-                    $filename = null;
-
-                    // Get filename from parameters
-                    if (isset($part->ifdparameters) && $part->ifdparameters && isset($part->dparameters)) {
-                        foreach ($part->dparameters as $param) {
-                            if (
-                                isset($param->attribute) && isset($param->value) &&
-                                strtolower($param->attribute) == 'filename'
-                            ) {
-                                $filename = $param->value;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!$filename && isset($part->ifparameters) && $part->ifparameters && isset($part->parameters)) {
-                        foreach ($part->parameters as $param) {
-                            if (
-                                isset($param->attribute) && isset($param->value) &&
-                                strtolower($param->attribute) == 'name'
-                            ) {
-                                $filename = $param->value;
-                                break;
-                            }
-                        }
-                    }
-
-                    if ($filename && isset($part->type) && $part->type != 0) { // Not text content
-                        $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber);
-
-                        if ($content === false) {
-                            continue;
-                        }
-
-                        // Decode content
-                        if (isset($part->encoding)) {
-                            if ($part->encoding == 3) {
-                                $content = imap_base64($content);
-                            } elseif ($part->encoding == 4) {
-                                $content = imap_qprint($content);
-                            }
-                        }
-
-                        // Sanitize filename
-                        $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
-                        $storagePath = 'attachments/' . $email->id . '/' . uniqid() . '_' . $filename;
-
-                        // Store attachment
-                        if (Storage::put($storagePath, $content)) {
-                            EmailAttachment::create([
-                                'email_id' => $email->id,
-                                'original_name' => $filename,
-                                'storage_name' => basename($storagePath),
-                                'mime_type' => $this->getMimeType($part),
-                                'size' => strlen($content),
-                                'storage_path' => $storagePath,
-                                'content_id' => $part->id ?? null,
-                                'is_inline' => isset($part->disposition) && $part->disposition == 'inline',
-                            ]);
-                        }
-                    }
-                } catch (\Exception $e) {
-                    Log::warning('Attachment processing error', [
-                        'email_id' => $email->id,
-                        'part_number' => $partNumber,
-                        'error' => $e->getMessage()
-                    ]);
+            $this->line("Processing attachment: {$filename}");
+            try {
+                $content = @imap_fetchbody($this->imapConnection, $emailNumber, $i + 1);
+                if (!$content) {
+                    $this->warn("Failed to fetch attachment content: {$filename}");
                     continue;
                 }
+
+                if ($part->encoding == 3) {
+                    $this->line("Decoding base64 attachment: {$filename}");
+                    $content = imap_base64($content);
+                }
+                if ($part->encoding == 4) {
+                    $this->line("Decoding quoted-printable attachment: {$filename}");
+                    $content = imap_qprint($content);
+                }
+
+                // Determine MIME type
+                $mimeType = $this->getAttachmentMimeType($part, $filename);
+
+                $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+                $storagePath = "attachments/{$email->id}/" . uniqid() . "_{$filename}";
+
+                $this->line("Saving attachment to: {$storagePath}");
+                if (Storage::put($storagePath, $content)) {
+                    EmailAttachment::create([
+                        'email_id' => $email->id,
+                        'original_name' => $filename,
+                        'storage_name' => basename($storagePath),
+                        'size' => strlen($content),
+                        'storage_path' => $storagePath,
+                        'mime_type' => $mimeType, // Add MIME type
+                    ]);
+
+                    $attachmentCount++;
+                    $this->comment("Attachment saved: {$filename} (size: " . strlen($content) . " bytes, MIME type: {$mimeType})");
+                    Log::debug("Attachment processed", [
+                        'email_id' => $email->id,
+                        'filename' => $filename,
+                        'size' => strlen($content),
+                        'mime_type' => $mimeType
+                    ]);
+                }
+            } catch (\Exception $e) {
+                $this->error("Attachment processing failed for {$filename}: {$e->getMessage()}");
+                Log::warning("Attachment processing failed", [
+                    'email_id' => $email->id,
+                    'filename' => $filename,
+                    'error' => $e->getMessage()
+                ]);
             }
-        } catch (\Exception $e) {
-            Log::error('Attachments processing error', [
+        }
+
+        if ($attachmentCount > 0) {
+            Log::info("Attachments processed", [
                 'email_id' => $email->id,
-                'error' => $e->getMessage()
+                'attachment_count' => $attachmentCount
             ]);
+            $this->comment("Processed {$attachmentCount} attachments for email #{$emailNumber}");
         }
+
+        return $attachmentCount;
     }
 
-    private function getMimeType($part)
+    private function getAttachmentFilename($part)
     {
-        try {
-            $typeMap = [
-                0 => 'text/plain',
-                1 => 'text/multipart',
-                2 => 'message/rfc822',
-                3 => 'application/octet-stream',
-                4 => 'application/octet-stream',
-                5 => 'application/octet-stream',
-            ];
-
-            return $typeMap[$part->type ?? 3] ?? 'application/octet-stream';
-        } catch (\Exception $e) {
-            return 'application/octet-stream';
-        }
-    }
-
-    private function determineEmailType($headers, UserPseudoRecord $account): string
-    {
-        try {
-            if (!isset($headers->from) || !is_array($headers->from) || empty($headers->from)) {
-                return 'incoming';
-            }
-
-            $fromEmail = $headers->from[0]->mailbox . '@' . $headers->from[0]->host;
-
-            if ($fromEmail === $account->pseudo_email) {
-                return 'outgoing';
-            }
-
-            return 'incoming';
-        } catch (\Exception $e) {
-            return 'incoming';
-        }
-    }
-
-    private function determineEmailFolder(string $imapFolder): string
-    {
-        try {
-            $folderMap = [
-                'INBOX' => 'inbox',
-                'Sent' => 'sent',
-                'Sent Items' => 'sent',
-                'Drafts' => 'drafts',
-                'Spam' => 'spam',
-                'Junk' => 'spam',
-                'Trash' => 'trash',
-                'Deleted' => 'trash',
-                'Deleted Items' => 'trash',
-                'Archive' => 'archive',
-            ];
-
-            $folderName = basename($imapFolder);
-            return $folderMap[$folderName] ?? 'inbox';
-        } catch (\Exception $e) {
-            return 'inbox';
-        }
-    }
-
-    private function generateThreadId($headers): string
-    {
-        try {
-            if (isset($headers->in_reply_to) && $headers->in_reply_to) {
-                return md5($headers->in_reply_to);
-            }
-
-            if (isset($headers->references) && $headers->references) {
-                $refs = explode(' ', $headers->references);
-                if (!empty($refs)) {
-                    return md5($refs[0]);
+        if (isset($part->dparameters)) {
+            foreach ($part->dparameters as $param) {
+                if (strtolower($param->attribute) == 'filename') {
+                    return $param->value;
                 }
             }
-
-            $subject = isset($headers->subject) ? $headers->subject : 'No Subject';
-            $from = '';
-
-            if (isset($headers->from) && is_array($headers->from) && !empty($headers->from)) {
-                $from = $headers->from[0]->mailbox . '@' . $headers->from[0]->host;
-            }
-
-            return md5($subject . $from . time());
-        } catch (\Exception $e) {
-            return md5('default_thread_' . time() . rand(1000, 9999));
         }
-    }
 
-    private function parseAddresses($addresses): ?array
-    {
-        try {
-            if (!$addresses || !is_array($addresses)) {
-                return null;
-            }
-
-            $result = [];
-            foreach ($addresses as $address) {
-                if (isset($address->mailbox) && isset($address->host)) {
-                    $result[] = [
-                        'email' => $address->mailbox . '@' . $address->host,
-                        'name' => $address->personal ?? null
-                    ];
+        if (isset($part->parameters)) {
+            foreach ($part->parameters as $param) {
+                if (strtolower($param->attribute) == 'name') {
+                    return $param->value;
                 }
             }
+        }
 
-            return empty($result) ? null : $result;
-        } catch (\Exception $e) {
-            Log::warning('Address parsing error', ['error' => $e->getMessage()]);
+        return null;
+    }
+
+    private function parseDate($date)
+    {
+        $this->line("Parsing date: {$date}");
+        return $date && ($timestamp = strtotime($date)) ? date('Y-m-d H:i:s', $timestamp) : now();
+    }
+
+    private function generateThreadId($headers)
+    {
+        if (isset($headers->in_reply_to)) {
+            // $this->line("Generating thread ID from in_reply_to");
+            return md5($headers->in_reply_to);
+        }
+        if (isset($headers->references)) {
+            // $this->line("Generating thread ID from references");
+            return md5(explode(' ', $headers->references)[0] ?? '');
+        }
+
+        $from = $headers->from[0]->mailbox . '@' . $headers->from[0]->host;
+        $this->line("Generating thread ID from subject and sender");
+        return md5(($headers->subject ?? '') . $from . time());
+    }
+
+    private function parseAddresses($addresses)
+    {
+        if (!$addresses) {
+            // $this->line("No addresses to parse");
             return null;
         }
+
+        // $this->line("Parsing email addresses");
+        return array_map(fn($addr) => [
+            'email' => $addr->mailbox . '@' . $addr->host,
+            'name' => $addr->personal ?? null
+        ], $addresses);
     }
 
-    private function getImapFlags($overview): array
+    private function getEmailType($headers, $account)
     {
-        try {
-            return [
-                'seen' => isset($overview->seen) && $overview->seen,
-                'answered' => isset($overview->answered) && $overview->answered,
-                'flagged' => isset($overview->flagged) && $overview->flagged,
-                'deleted' => isset($overview->deleted) && $overview->deleted,
-                'draft' => isset($overview->draft) && $overview->draft,
-            ];
-        } catch (\Exception $e) {
-            return [
-                'seen' => false,
-                'answered' => false,
-                'flagged' => false,
-                'deleted' => false,
-                'draft' => false,
-            ];
+        $from = $headers->from[0]->mailbox . '@' . $headers->from[0]->host;
+        $type = $from === $account->pseudo_email ? 'outgoing' : 'incoming';
+        // $this->line("Determined email type: {$type}");
+        return $type;
+    }
+
+    private function mapFolder($folder)
+    {
+        $map = [
+            'INBOX' => 'inbox',
+            'Sent' => 'sent',
+            'Sent Items' => 'sent',
+            'Drafts' => 'drafts',
+            'Spam' => 'spam',
+            'Junk' => 'spam',
+            'Trash' => 'trash',
+            'Deleted' => 'trash',
+            'Deleted Items' => 'trash'
+        ];
+
+        $mapped = $map[basename($folder)] ?? 'inbox';
+        $this->line("Mapped folder {$folder} to {$mapped}");
+        return $mapped;
+    }
+    private function getAttachmentMimeType($part, string $filename): string
+    {
+        // Check if the part has a MIME type
+        if (isset($part->subtype)) {
+            $mimeType = strtolower("{$part->type}/{$part->subtype}");
+            $this->line("Detected MIME type from IMAP structure: {$mimeType}");
+            return $mimeType;
         }
-    }
 
-    public function __destruct()
+        // Fallback to guessing MIME type based on file extension
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $this->line("No MIME type in IMAP structure, guessing based on extension: {$extension}");
+
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'zip' => 'application/zip',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'txt' => 'text/plain',
+        ];
+
+        $mimeType = $mimeTypes[strtolower($extension)] ?? 'application/octet-stream';
+        $this->line("Assigned MIME type: {$mimeType}");
+        return $mimeType;
+    }
+    private function closeConnection()
     {
-        try {
-            if ($this->imapConnection && is_resource($this->imapConnection)) {
-                imap_close($this->imapConnection);
-                $this->imapConnection = null;
-            }
-        } catch (\Exception $e) {
-            // Silently handle cleanup errors
+        if ($this->imapConnection && is_resource($this->imapConnection)) {
+            $this->line('Closing IMAP connection...');
+            @imap_close($this->imapConnection);
+            $this->comment('IMAP connection closed.');
         }
     }
 }
