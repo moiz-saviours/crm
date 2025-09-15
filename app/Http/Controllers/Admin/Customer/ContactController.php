@@ -130,27 +130,8 @@ class ContactController extends Controller
      */
 public function edit(CustomerContact $customer_contact)
 {
-    $imapConfig = [
-        'host'          => env('IMAP_HOST'),
-        'port'          => env('IMAP_PORT', 993),
-        'protocol'      => env('IMAP_PROTOCOL', 'imap'),
-        'encryption'    => env('IMAP_ENCRYPTION', 'ssl'),
-        'validate_cert' => env('IMAP_VALIDATE_CERT', false),
-        'username'      => env('IMAP_USERNAME'),
-        'password'      => env('IMAP_PASSWORD'),
-    ];
-
-    $emails = [];
-    $folders = [];
-    $imapError = null;
-
-    $folder = request()->get('folder', 'INBOX');
-    $page   = (int) request()->get('page', 1);
-    $limit  = 5;
-    $offset = ($page - 1) * $limit;
-
     if (!$customer_contact->id) {
-        return response()->json(['error' => 'Oops! Customer contact not found!']);
+        return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
     }
 
     $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
@@ -195,42 +176,13 @@ public function edit(CustomerContact $customer_contact)
         ->unique('email')
         ->values();
 
-    try {
-        if (request()->get('refresh') || !session()->has('dev_emails')) {
-            if (!$this->imapService->connect($imapConfig)) {
-                throw new \Exception(
-                    'Something went wrong while trying to fetch your emails. Please try again later.'
-                );
-            }
-
-            $folders = $this->imapService->getFolders();
-            $emails  = $this->imapService->getEmails($folder, $limit, $offset);
-
-            $this->imapService->disconnect();
-
-            session()->put('dev_emails', [
-                'emails'  => $emails,
-                'folders' => $folders,
-                'folder'  => $folder,
-                'page'    => $page,
-                'limit'   => $limit,
-                'total'   => count($emails),
-            ]);
-        } else {
-            $sessionData = session('dev_emails');
-            $emails  = $sessionData['emails'];
-            $folders = $sessionData['folders'];
-            $folder  = $sessionData['folder'];
-            $page    = $sessionData['page'];
-            $limit   = $sessionData['limit'];
-        }
-    } catch (\Exception $e) {
-        // Log technical details for debugging
-        \Log::error('IMAP connection error: ' . imap_last_error());
-
-        // Set user-friendly error
-        $imapError = 'We couldn’t connect to your mailbox at the moment. Please try again later.';
-    }
+    // Initialize empty email data for the view (to be populated by AJAX)
+    $emails = [];
+    $folders = [];
+    $folder = request()->get('folder', 'inbox');
+    $page = (int) request()->get('page', 1);
+    $limit = 5;
+    $imapError = null;
 
     return view('admin.customers.contacts.edit', compact(
         'customer_contact',

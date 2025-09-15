@@ -143,9 +143,9 @@ public function connect(array $imapConfig): bool
 
         $from = $this->parseAddress($header->from ?? []);
         $fromEmail = strtolower($from[0]['email'] ?? '');
+        $toEmail = strtolower($from[0]['to'] ?? '');
 
-        // ✅ Only allow developer@pivotbookwriting.com
-        if ($fromEmail !== 'developer@pivotbookwriting.com') {
+        if ($fromEmail != 'hasnat.khan@stellers.org' && $toEmail != 'hasnat.khan@stellers.org') {
             continue;
         }
 
@@ -199,7 +199,6 @@ public function connect(array $imapConfig): bool
     public function getEmail(string $uid, string $folder = 'INBOX'): ?array
     {
         $this->selectFolder($folder);
-
         $messageNum = imap_msgno($this->connection, $uid);
         if (!$messageNum) {
             return null;
@@ -207,8 +206,8 @@ public function connect(array $imapConfig): bool
 
         $header = imap_headerinfo($this->connection, $messageNum);
         $structure = imap_fetchstructure($this->connection, $messageNum);
-
         $body = $this->getMessageBody($messageNum, $structure);
+
         $attachments = $this->getAttachments($messageNum, $structure);
 
         return [
@@ -414,13 +413,12 @@ public function connect(array $imapConfig): bool
     private function getAttachments(int $messageNum, $structure): array
     {
         $attachments = [];
-
         if (isset($structure->parts)) {
             foreach ($structure->parts as $partNum => $part) {
+
                 $this->extractAttachment($messageNum, $part, $partNum + 1, $attachments);
             }
         }
-
         return $attachments;
     }
 
@@ -449,7 +447,6 @@ private function extractAttachment(int $messageNum, $part, string $partNum, arra
 
             // Get the attachment content
             $attachmentData = imap_fetchbody($this->connection, $messageNum, $partNum);
-            
             // Decode based on encoding
             if (isset($part->encoding)) {
                 switch ($part->encoding) {
