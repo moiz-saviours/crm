@@ -43,6 +43,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js/dist/js/shepherd.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
 <script src="{{asset ('assets/js/intro-tour.js')}}"></script>
 <script src="{{asset ('assets/js/tour.js')}}"></script>
 
@@ -851,6 +854,7 @@
         $('.second-field-inputs').prop('required', false);
         $('.image-div').css('display', 'none');
         $('.extra-dynamic-fields').empty();
+        $('.unique-select-2').val('').trigger('change');
         let placeholderMsg = $('.extra-dynamic-fields-to-show')?.html()?.trim();
         if (placeholderMsg) {
             $('.extra-dynamic-fields').html(placeholderMsg);

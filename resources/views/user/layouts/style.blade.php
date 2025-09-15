@@ -14,6 +14,9 @@
 {{--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/4.3.0/introjs.min.css">--}}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js/dist/css/shepherd.css" />
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
 <style type="text/css">
@@ -736,5 +739,19 @@ Detailed information and more samples can be found in the documentation.
     .mn--min .header__brand .brand-img img.logo {
         max-width: 70px;
         margin-left: 20px;
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        color: var(--nf-sidebar-color) !important;
+
+    }
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible{
+        color: var(--nf-sidebar-color) !important;
+        border: none !important;
+
+    }
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--bs-primary);
+    !important;
     }
 </style>
