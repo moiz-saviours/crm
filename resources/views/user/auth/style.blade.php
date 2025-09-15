@@ -149,7 +149,7 @@
 
 
     :root {
-        --bs-primary: #5e72e4b0;
+        --bs-primary: #2d3e50;
     }
 
     .main-logo-heading {

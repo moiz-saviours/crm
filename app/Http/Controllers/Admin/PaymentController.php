@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\PaymentMerchant;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -368,6 +369,63 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while updating the record', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    // PaymentController.php
+    public function filterByBrandTeam(Request $request)
+    {
+        try {
+            $teamKey = $request->input('team_key', 'all');
+            $brandKey = $request->input('brand_key', 'all');
+            $dateRange = $request->input('date_range');
+
+            $query = Payment::with([
+                'team',
+                'brand',
+                'agent',
+                'customer_contact',
+                'invoice',
+                'payment_gateway'
+            ]);
+
+            // Team filter
+            if ($teamKey !== 'all') {
+                $query->whereHas('team', function($q) use ($teamKey) {
+                    $q->where('team_key', $teamKey);
+                });
+            }
+
+            // Brand filter
+            if ($brandKey !== 'all') {
+                $query->whereHas('brand', function($q) use ($brandKey) {
+                    $q->where('brand_key', $brandKey);
+                });
+            }
+
+            // Date filter
+            if (!empty($dateRange)) {
+                [$start, $end] = explode(' - ', $dateRange);
+                $query->whereBetween('payment_date', [
+                    Carbon::parse($start),
+                    Carbon::parse($end)
+                ]);
+            }
+
+
+            $payments = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $payments,
+                'count' => $payments->count()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }

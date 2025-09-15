@@ -301,6 +301,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::post('/store', [AdminPaymentController::class, 'store'])->name('store');
         Route::get('/edit/{payment?}', [AdminPaymentController::class, 'edit'])->name('edit');
         Route::post('/update/{payment?}', [AdminPaymentController::class, 'update'])->name('update');
+        Route::get('payment-filter', [AdminPaymentController::class, 'filterByBrandTeam'])->name('filter');
     });
     /** Payment Transaction Logs Route */
     Route::get('payment-transaction-logs', [AdminPaymentTransactionLogController::class, 'getLogs'])->name('payment-transaction-logs');
