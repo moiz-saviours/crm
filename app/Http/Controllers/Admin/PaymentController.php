@@ -375,50 +375,46 @@ class PaymentController extends Controller
     // PaymentController.php
     public function filterByBrandTeam(Request $request)
     {
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'team_key' => 'sometimes|string',
+            'brand_key' => 'sometimes|string'
+        ]);
+
         try {
-            $teamKey = $request->input('team_key', 'all');
-            $brandKey = $request->input('brand_key', 'all');
-            $dateRange = $request->input('date_range');
 
-            $query = Payment::with([
-                'team',
-                'brand',
-                'agent',
-                'customer_contact',
-                'invoice',
-                'payment_gateway'
-            ]);
+            $startDate = Carbon::parse($validated['start_date']);
+            $endDate = Carbon::parse($validated['end_date']);
+            $teamKey = $validated['team_key'] ?? 'all';
+            $brandKey = $validated['brand_key'] ?? 'all';
 
-            // Team filter
-            if ($teamKey !== 'all') {
-                $query->whereHas('team', function($q) use ($teamKey) {
-                    $q->where('team_key', $teamKey);
-                });
-            }
+            $query = Payment::select(['id', 'invoice_key', 'brand_key', 'team_key', 'cus_contact_key', 'agent_id', 'merchant_id', 'transaction_id', 'amount', 'status', 'payment_date', 'created_at'])
+                ->with([
+                    'team:id,name,team_key',
+                    'brand:id,name,brand_key',
+                    'agent:id,name',
+                    'customer_contact:id,name,special_key',
+                    'invoice:invoice_key,invoice_number',
+                    'payment_gateway:id,name'
+                ])
+                ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+                ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey));
 
-            // Brand filter
-            if ($brandKey !== 'all') {
-                $query->whereHas('brand', function($q) use ($brandKey) {
-                    $q->where('brand_key', $brandKey);
-                });
-            }
 
-            // Date filter
             if (!empty($dateRange)) {
-                [$start, $end] = explode(' - ', $dateRange);
                 $query->whereBetween('payment_date', [
-                    Carbon::parse($start),
-                    Carbon::parse($end)
+                    Carbon::parse($startDate),
+                    Carbon::parse($endDate)
                 ]);
             }
-
 
             $payments = $query->get();
 
             return response()->json([
                 'success' => true,
                 'data' => $payments,
-                'count' => $payments->count()
+                'count' => $payments->count(),
             ]);
 
         } catch (\Exception $e) {
@@ -428,4 +424,6 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+
 }

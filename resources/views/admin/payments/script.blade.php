@@ -59,17 +59,17 @@
                 format: {body: formatBody(type)}
             }
         }));
+        var dataTables = [];
 
         /** Initializing Datatable */
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
-                initializeDatatable($(this), index)
+                dataTables[index] = initializeDatatable($(this), index)
             })
         }
-        var table;
 
         function initializeDatatable(table_div, index) {
-            table = table_div.DataTable({
+            let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
                     "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
@@ -98,7 +98,9 @@
                     end: 0
                 },
             });
-            table.buttons().container().appendTo(`#right-icon-${index}`);
+            datatable.buttons().container().appendTo(`#right-icon-${index}`);
+            return datatable;
+
         }
 
         /** Edit */
@@ -157,6 +159,7 @@
             $('#manage-form').attr('action', `{{route('admin.payment.update')}}/` + payment.id);
             $('#formContainer').addClass('open')
         }
+
         const decodeHtml = (html) => {
             const txt = document.createElement("textarea");
             txt.innerHTML = html;
@@ -168,7 +171,7 @@
             e.preventDefault();
             var dataId = $('#manage-form').data('id');
             var formData = new FormData(this);
-
+            let table = dataTables[0];
             if (!dataId) {
                 // Add New Record
                 AjaxRequestPromise(`{{ route("admin.payment.store") }}`, formData, 'POST', {useToastr: true})
@@ -407,6 +410,7 @@
                     ' GMT+5';
             }
         }
+
         function formatDate2(dateString) {
             const date = new Date(dateString);
             const today = new Date();
@@ -423,5 +427,112 @@
             }
         }
 
+        $('#dateRangePicker').daterangepicker({
+            timePicker: true,
+            timePicker24Hour: false,
+            timePickerIncrement: 1,
+            locale: {
+                format: 'YYYY-MM-DD h:mm:ss A',
+            },
+            startDate: moment().startOf('month').startOf('day'),    // First moment of first day of month
+            endDate: moment().endOf('month').endOf('day'),         // Last moment of last day of month
+            ranges: {
+                'Today': [
+                    moment().startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().endOf('day').set({hour: 23, minute: 59, second: 59})  // 11:59:59 PM
+                ],
+                'Yesterday': [
+                    moment().subtract(1, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().subtract(1, 'days').endOf('day').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                ],
+                'Last 7 Days': [
+                    moment().subtract(6, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().endOf('day').set({hour: 23, minute: 59, second: 59})                       // 11:59:59 PM
+                ],
+                'Last 30 Days': [
+                    moment().subtract(29, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().endOf('day').set({hour: 23, minute: 59, second: 59})                        // 11:59:59 PM
+                ],
+                'This Month': [
+                    moment().startOf('month').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().endOf('month').set({hour: 23, minute: 59, second: 59})  // 11:59:59 PM
+                ],
+                'Last Month': [
+                    moment().subtract(1, 'month').startOf('month').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().subtract(1, 'month').endOf('month').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                ],
+                'Current Quarter': [
+                    moment().startOf('quarter').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().endOf('quarter').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                ],
+                'Last Quarter': [
+                    moment().subtract(1, 'quarter').startOf('quarter').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().subtract(1, 'quarter').endOf('quarter').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                ],
+                'This Year': [
+                    moment().startOf('year').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().endOf('day').set({hour: 23, minute: 59, second: 59})    // 11:59:59 PM
+                ],
+                'Last Year': [
+                    moment().subtract(1, 'year').startOf('year').set({hour: 0, minute: 0}), // 12:00 AM
+                    moment().subtract(1, 'year').endOf('year').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
+                ],
+            }
+        });
+        $('#teamSelect, #brandSelect').change(function () {
+            filterPayments();
+        });
+        $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
+            filterPayments();
+        });
+
+        function filterPayments() {
+            var teamKey = $('#teamSelect').val();
+            var brandKey = $('#brandSelect').val();
+            var dates = $('#dateRangePicker').data('daterangepicker');
+            let table = dataTables[0];
+            table.processing(true);
+            AjaxRequestPromise(`{{ route("admin.payment.filter") }}`, {
+                team_key: teamKey,
+                brand_key: brandKey,
+                start_date: dates.startDate.format('YYYY-MM-DD h:mm:ss A'),
+                end_date: dates.endDate.format('YYYY-MM-DD h:mm:ss A'),
+            }, 'GET', {useToastr: true})
+                .then(response => {
+                    table.clear();
+                    if (response && response.success && response.data) {
+                        response.data.forEach(function (payment, index) {
+                            table.row.add([
+                                '',
+                                index + 1,
+                                payment.invoice ?
+                                    `<span class="invoice-number">${payment.invoice.invoice_number || '---'}</span><br>
+                             <span class="invoice-key">${payment.invoice.invoice_key || '---'}</span>`
+                                    : '---',
+                                payment.payment_gateway ? payment.payment_gateway.name :
+                                    payment.payment_method ? payment.payment_method.charAt(0).toUpperCase() +
+                                        payment.payment_method.slice(1) : '---',
+                                payment.payment_gateway?.descriptor || '---',
+                                payment.transaction_id || '---',
+                                payment.brand?.name || '---',
+                                payment.team?.name || '---',
+                                payment.agent?.name || '---',
+                                payment.customer_contact?.name || '---',
+                                '$' + (payment.amount || '0.00'),
+                                getStatusBadge(payment.status),
+                                payment.payment_date || '---',
+                                payment.created_at || '---'
+                            ]);
+                        });
+                    } else {
+                        table.row.add([
+                            'No payments found', '', '', '', '', '', '', '', '', '', '', '', ''
+                        ]);
+                    }
+                    table.draw();
+                })
+                .catch(error => console.error('An error occurred while updating the record.', error))
+                .finally(() => table.processing(false));
+        }
     });
 </script>
