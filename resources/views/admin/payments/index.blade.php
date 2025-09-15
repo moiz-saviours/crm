@@ -22,7 +22,7 @@
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
 
-                            <div class="form-group col-md-2">
+                            <div class="form-group ">
                                 <label for="teamSelect">Select Team:</label>
                                 <select id="teamSelect" name="teamSelect" class="form-control">
                                     <option value="all">All Teams</option>
@@ -31,7 +31,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group col-md-2">
+                            <div class="form-group ">
                                 <label for="brandSelect">Select Brand:</label>
                                 <select id="brandSelect" name="brandSelect" class="form-control">
                                     <option value="all">All Brands</option>
@@ -40,7 +40,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group col-md-3">
+                            <div class="form-group ">
                                 <label for="dateRangePicker">Select Date Range:</label>
                                 <input type="text" id="dateRangePicker" name="dateRangePicker"
                                        class="form-control dateRangePicker"/>
@@ -194,156 +194,7 @@
 
         <script>
             $(document).ready(function () {
-                $('#dateRangePicker').daterangepicker({
-                    timePicker: true,
-                    timePicker24Hour: false,
-                    timePickerIncrement: 1,
-                    locale: {
-                        format: 'YYYY-MM-DD h:mm:ss A',
-                    },
-                    startDate: moment().startOf('month').startOf('day'),    // First moment of first day of month
-                    endDate: moment().endOf('month').endOf('day'),         // Last moment of last day of month
-                    ranges: {
-                        'Today': [
-                            moment().startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})  // 11:59:59 PM
-                        ],
-                        'Yesterday': [
-                            moment().subtract(1, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().subtract(1, 'days').endOf('day').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
-                        ],
-                        'Last 7 Days': [
-                            moment().subtract(6, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})                       // 11:59:59 PM
-                        ],
-                        'Last 30 Days': [
-                            moment().subtract(29, 'days').startOf('day').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})                        // 11:59:59 PM
-                        ],
-                        'This Month': [
-                            moment().startOf('month').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().endOf('month').set({hour: 23, minute: 59, second: 59})  // 11:59:59 PM
-                        ],
-                        'Last Month': [
-                            moment().subtract(1, 'month').startOf('month').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().subtract(1, 'month').endOf('month').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
-                        ],
-                        'Current Quarter': [
-                            moment().startOf('quarter').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().endOf('quarter').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
-                        ],
-                        'Last Quarter': [
-                            moment().subtract(1, 'quarter').startOf('quarter').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().subtract(1, 'quarter').endOf('quarter').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
-                        ],
-                        'This Year': [
-                            moment().startOf('year').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().endOf('day').set({hour: 23, minute: 59, second: 59})    // 11:59:59 PM
-                        ],
-                        'Last Year': [
-                            moment().subtract(1, 'year').startOf('year').set({hour: 0, minute: 0}), // 12:00 AM
-                            moment().subtract(1, 'year').endOf('year').set({hour: 23, minute: 59, second: 59})   // 11:59:59 PM
-                        ],
-                    }
-                });
 
-                var paymentsTable = $.fn.DataTable.isDataTable('#allPaymentsTable')
-                    ? $('#allPaymentsTable').DataTable()
-                    : $('#allPaymentsTable').DataTable({
-                        dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                            "<'row'<'col-sm-12'tr>>" +
-                            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-                        responsive: true,
-                        scrollX: true,
-                        processing: true,
-                        initComplete: function() {
-                            // Hide the table initially if needed
-                            $('#allPaymentsTable').show();
-                        }
-                    });
-
-                // 2. Filter change handler
-                $('#teamSelect, #brandSelect').change(function() {
-                    filterPayments();
-                });
-                $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
-                    filterPayments();
-                });
-
-                // 3. Main filter function
-                function filterPayments() {
-                    var teamKey = $('#teamSelect').val();
-                    var brandKey = $('#brandSelect').val();
-                    var dateRange = $('#dateRangePicker').val();
-
-
-                    paymentsTable.processing(true);
-
-                    $.ajax({
-                        url: '{{ route("admin.payment.filter") }}',
-                        type: 'GET',
-                        data: {
-                            team_key: teamKey,
-                            brand_key: brandKey,
-                            date_range: dateRange
-                        },
-                        success: function(response) {
-                            paymentsTable.clear();
-
-                            if (response && response.success && response.data) {
-                                response.data.forEach(function(payment, index) {
-                                    paymentsTable.row.add([
-                                        '',
-                                        index + 1,
-                                        payment.invoice ?
-                                            `<span class="invoice-number">${payment.invoice.invoice_number || '---'}</span><br>
-                             <span class="invoice-key">${payment.invoice.invoice_key || '---'}</span>`
-                                            : '---',
-                                        payment.payment_gateway ? payment.payment_gateway.name :
-                                            payment.payment_method ? payment.payment_method.charAt(0).toUpperCase() +
-                                                payment.payment_method.slice(1) : '---',
-                                        payment.payment_gateway?.descriptor || '---',
-                                        payment.transaction_id || '---',
-                                        payment.brand?.name || '---',
-                                        payment.team?.name || '---',
-                                        payment.agent?.name || '---',
-                                        payment.customer_contact?.name || '---',
-                                        '$' + (payment.amount || '0.00'),
-                                        getStatusBadge(payment.status),
-                                        payment.payment_date || '---',
-                                        payment.created_at || '---'
-                                    ]);
-                                });
-                            } else {
-                                paymentsTable.row.add([
-                                    'No payments found', '', '', '', '', '', '', '', '', '', '', '', ''
-                                ]);
-                            }
-
-                            paymentsTable.draw();
-                        },
-                        error: function(xhr) {
-                            console.error('Error:', xhr.responseText);
-
-                        },
-                        complete: function() {
-                            paymentsTable.processing(false);
-                        }
-                    });
-                }
-
-                // Helper function
-                function getStatusBadge(status) {
-                    switch(status) {
-                        case 0: return '<span class="badge bg-warning text-dark">Due</span>';
-                        case 1: return '<span class="badge bg-success">Paid</span>';
-                        case 2: return '<span class="badge bg-danger">Refund</span>';
-                        default: return '<span class="badge bg-secondary">Unknown</span>';
-                    }
-                }
-
-                // Initial load
-                filterPayments();
             });
 
         </script>
