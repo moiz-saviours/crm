@@ -1,11 +1,11 @@
 <!-- Add the email section with loader, refresh button, and fetch emails button -->
 <div id="email-section">
-    <div style="margin-bottom: 15px;">
-        <button id="refresh-emails" class="btn btn-primary" style="padding: 8px 16px; font-size: 14px; margin-right: 10px;">
-            <i class="fa fa-refresh" aria-hidden="true"></i> Refresh Emails
+    <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+        <button id="refresh-emails" class="btn btn-primary" style="padding: 8px; font-size: 14px; margin-right: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
         </button>
-        <button id="fetch-emails" class="btn btn-success" style="padding: 8px 16px; font-size: 14px;">
-            <i class="fa fa-download" aria-hidden="true"></i> Fetch Emails
+        <button id="fetch-emails" class="btn btn-success" style="padding: 8px; font-size: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa fa-download" aria-hidden="true"></i>
         </button>
     </div>
     <div id="email-loader" style="display: none; text-align: center; padding: 20px;">
