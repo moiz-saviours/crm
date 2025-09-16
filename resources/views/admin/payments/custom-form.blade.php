@@ -253,7 +253,7 @@
                 {{--                </div>--}}
                 <div class="form-group mb-3">
                     <label for="payment_date" class="form-label">Payment Date</label>
-                    <input type="date" class="form-control tour-paymentdate" id="payment_date" name="payment_date"
+                    <input type="datetime-local" class="form-control tour-paymentdate" id="payment_date" name="payment_date"
                            value="{{ old('payment_date') }}" max="{{now('GMT+5')->toDateString()}}" required>
                     @error('payment_date')
                     <span class="text-danger">{{ $message }}</span>
