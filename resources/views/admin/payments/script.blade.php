@@ -190,14 +190,12 @@
                                 currency,
                                 amount,
                                 status,
-                                payment_date,
-                                created_at
+                                payment_date_formatted,
+                                created_at_formatted
                             } = response.data;
 
                             const index = table.rows().count() + 1;
                             const statusBadge = getStatusBadge(status); // Function to get status HTML
-                            const formattedDate = formatDate(created_at); // Function to format the date
-                            const formattedPaymentDate = formatDate2(payment_date); // Function to format the date
 
                             const columns = `
                         <td class="align-middle text-center text-nowrap"></td>
@@ -215,8 +213,8 @@
                         <td class="align-middle text-center text-nowrap">${customer_contact?.name ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">${currency} ${parseFloat(amount ?? "0.00").toFixed(2)}</td>
                         <td class="align-middle text-center text-nowrap">${statusBadge}</td>
-                        <td class="align-middle text-center text-nowrap">${formattedPaymentDate}</td>
-                        <td class="align-middle text-center text-nowrap">${formattedDate}</td>
+                        <td class="align-middle text-center text-nowrap">${payment_date_formatted}</td>
+                        <td class="align-middle text-center text-nowrap">${created_at_formatted}</td>
                         `;
 
                             // <td class="align-middle text-center table-actions">
@@ -252,15 +250,13 @@
                                 currency,
                                 amount,
                                 status,
-                                payment_date,
-                                created_at
+                                payment_date_formatted,
+                                created_at_formatted
                             } = response.data;
 
                             const index = table.row($(`#tr-${id}`)).index();
                             const rowData = table.row(index).data();
                             const statusBadge = getStatusBadge(status);
-                            const formattedDate = formatDate(created_at);
-                            const formattedPaymentDate = formatDate2(payment_date); // Function to format the date
 
                             // Column 3: Invoice Number & Invoice Key
                             if (decodeHtml(rowData[2]) !== `${invoice?.invoice_number}<br>${invoice?.invoice_key}`) {
@@ -315,13 +311,13 @@
                             }
 
                             // Column 13: Created At
-                            if (decodeHtml(rowData[12]) !== formattedPaymentDate) {
-                                table.cell(index, 12).data(formattedPaymentDate).draw();
+                            if (decodeHtml(rowData[12]) !== payment_date_formatted) {
+                                table.cell(index, 12).data(payment_date_formatted).draw();
                             }
 
                             // Column 13: Created At
-                            if (decodeHtml(rowData[13]) !== formattedDate) {
-                                table.cell(index, 13).data(formattedDate).draw();
+                            if (decodeHtml(rowData[13]) !== created_at_formatted) {
+                                table.cell(index, 13).data(created_at_formatted).draw();
                             }
 
                             $('#manage-form')[0].reset();
@@ -392,41 +388,6 @@
             return '<span class="badge bg-secondary">Unknown</span>';
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const today = new Date();
-            if (
-                date.toDateString() === today.toDateString()
-            ) {
-                return `Today at ${date.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                })} GMT+5`;
-            } else {
-                return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) +
-                    ' ' +
-                    date.toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true}) +
-                    ' GMT+5';
-            }
-        }
-
-        function formatDate2(dateString) {
-            const date = new Date(dateString);
-            const today = new Date();
-            if (
-                date.toDateString() === today.toDateString()
-            ) {
-                return `Today at ${date.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                })} GMT+5`;
-            } else {
-                return date.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
-            }
-        }
-
         $('#dateRangePicker').daterangepicker({
             timePicker: true,
             timePicker24Hour: false,
@@ -479,7 +440,7 @@
                 ],
             }
         });
-        $('#teamSelect, #brandSelect').change(function () {
+        $('#teamSelect, #brandSelect,#dateTypeSelect').change(function () {
             filterPayments();
         });
         $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
@@ -487,9 +448,10 @@
         });
 
         function filterPayments() {
-            var teamKey = $('#teamSelect').val();
-            var brandKey = $('#brandSelect').val();
-            var dates = $('#dateRangePicker').data('daterangepicker');
+            const teamKey = $('#teamSelect').val();
+            const brandKey = $('#brandSelect').val();
+            const dateTypeSelect = $('#dateTypeSelect').val();
+            const dates = $('#dateRangePicker').data('daterangepicker');
             let table = dataTables[0];
             table.processing(true);
             AjaxRequestPromise(`{{ route("admin.payment.filter") }}`, {
@@ -497,32 +459,50 @@
                 brand_key: brandKey,
                 start_date: dates.startDate.format('YYYY-MM-DD h:mm:ss A'),
                 end_date: dates.endDate.format('YYYY-MM-DD h:mm:ss A'),
-            }, 'GET', {useToastr: true})
+                date_type: dateTypeSelect,
+            }, 'GET', {useToastr: false})
                 .then(response => {
                     table.clear();
                     if (response && response.success && response.data) {
                         response.data.forEach(function (payment, index) {
-                            table.row.add([
-                                '',
-                                index + 1,
-                                payment.invoice ?
-                                    `<span class="invoice-number">${payment.invoice.invoice_number || '---'}</span><br>
-                             <span class="invoice-key">${payment.invoice.invoice_key || '---'}</span>`
-                                    : '---',
-                                payment.payment_gateway ? payment.payment_gateway.name :
-                                    payment.payment_method ? payment.payment_method.charAt(0).toUpperCase() +
-                                        payment.payment_method.slice(1) : '---',
-                                payment.payment_gateway?.descriptor || '---',
-                                payment.transaction_id || '---',
-                                payment.brand?.name || '---',
-                                payment.team?.name || '---',
-                                payment.agent?.name || '---',
-                                payment.customer_contact?.name || '---',
-                                '$' + (payment.amount || '0.00'),
-                                getStatusBadge(payment.status),
-                                payment.payment_date || '---',
-                                payment.created_at || '---'
-                            ]);
+                            const {
+                                id,
+                                invoice,
+                                payment_gateway,
+                                payment_method,
+                                transaction_id,
+                                brand,
+                                team,
+                                agent,
+                                customer_contact,
+                                currency,
+                                amount,
+                                status,
+                                payment_date_formatted,
+                                created_at_formatted
+                            } = payment;
+                            index++;
+                            const statusBadge = getStatusBadge(status); // Function to get status HTML
+                            const columns = `
+                                <td class="align-middle text-center text-nowrap"></td>
+                                <td class="align-middle text-center text-nowrap">${index}</td>
+                                <td class="align-middle text-center text-nowrap">
+                                    <span class="invoice-number">${invoice?.invoice_number ?? "---"}</span><br>
+                                    <span class="invoice-key">${invoice?.invoice_key ?? "---"}</span>
+                                </td>
+                                <td class="align-middle text-center text-nowrap">${payment_gateway?.name ?? ucwords(payment_method)}</td>
+                                <td class="align-middle text-center text-nowrap">${payment_gateway?.descriptor ?? "---"}</td>
+                                <td class="align-middle text-center text-nowrap">${transaction_id ?? "---"}</td>
+                                <td class="align-middle text-center text-nowrap">${brand?.name ?? "---"}</td>
+                                <td class="align-middle text-center text-nowrap">${team?.name ?? "---"}</td>
+                                <td class="align-middle text-center text-nowrap">${agent?.name ?? "---"}</td>
+                                <td class="align-middle text-center text-nowrap">${customer_contact?.name ?? "---"}</td>
+                                <td class="align-middle text-center text-nowrap">${currency} ${parseFloat(amount ?? "0.00").toFixed(2)}</td>
+                                <td class="align-middle text-center text-nowrap">${statusBadge}</td>
+                                <td class="align-middle text-center text-nowrap">${payment_date_formatted}</td>
+                                <td class="align-middle text-center text-nowrap">${created_at_formatted}</td>
+                            `;
+                            table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
                         });
                     } else {
                         table.row.add([
@@ -534,5 +514,15 @@
                 .catch(error => console.error('An error occurred while updating the record.', error))
                 .finally(() => table.processing(false));
         }
+
+        $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(
+                picker.startDate.format('YYYY-MM-DD h:mm:ss A') + ' - ' +
+                picker.endDate.format('YYYY-MM-DD h:mm:ss A')
+            );
+        });
+        $('#dateRangePicker').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
     });
 </script>
