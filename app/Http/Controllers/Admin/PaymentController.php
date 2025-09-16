@@ -27,8 +27,13 @@ class PaymentController extends Controller
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $agents = User::where('status', 1)->orderBy('name')->get();
-//        $all_payments = Payment::where('status', 1)->get();
-        $payments = Payment::with(['brand', 'team', 'agent'])->orderBy('payment_date')->get();
+        $payments = Payment::with(['team:id,name,team_key',
+            'brand:id,name,brand_key',
+            'agent:id,name',
+            'customer_contact:id,name,special_key',
+            'invoice:invoice_key,invoice_number',
+            'payment_gateway:id,name,descriptor'])
+            ->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(),])->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $client_contacts = ClientContact::select('id', 'special_key', 'name')
             ->with([
@@ -200,7 +205,7 @@ class PaymentController extends Controller
                 'payment_type' => $request->input('type'),
                 'merchant_id' => $account->id,
                 'payment_method' => $account->payment_method,
-                'payment_date' => $request->input('payment_date'),
+                'payment_date' => carbon::parse($request->input('payment_date'))
             ];
             if ($request->has('agent_id')) {
                 $paymentData['agent_id'] = $request->input('agent_id');
@@ -209,7 +214,6 @@ class PaymentController extends Controller
             $payment = Payment::create($paymentData);
             DB::commit();
             $payment = Payment::select('id', 'invoice_key', 'brand_key', 'team_key', 'agent_id', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'currency', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number', 'brand:brand_key,name', 'team:team_key,name', 'agent:id,name', 'customer_contact:special_key,name', 'payment_gateway:id,name,payment_method,descriptor'])->findOrFail($payment->id);
-            $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             $unpaid_invoices = Invoice::select(['invoice_key', 'invoice_number', 'brand_key', 'team_key', 'agent_id', 'cus_contact_key', 'currency', 'total_amount', 'created_at',])->with(['customer_contact:special_key,name'])->where('status', 0)->orderBy('created_at', 'desc')->get()->map(function ($invoice) {
                 $invoice->formatted_date = $invoice->created_at->format('jS F Y');
                 return $invoice;
@@ -378,39 +382,41 @@ class PaymentController extends Controller
         $validated = $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'team_key' => 'sometimes|string',
-            'brand_key' => 'sometimes|string'
+            'team_key' => 'required|string',
+            'brand_key' => 'required|string',
+            'date_type' => 'required|in:0,1'
+        ], [
+            'start_date.required' => 'The start date is required.',
+            'start_date.date' => 'The start date must be a valid date.',
+            'end_date.required' => 'The end date is required.',
+            'end_date.date' => 'The end date must be a valid date.',
+            'end_date.after_or_equal' => 'The end date must be a valid date.',
+            'team_key.required' => 'The team key is required.',
+            'team_key.string' => 'The team key must be a valid string.',
+            'brand_key.required' => 'The brand key is required.',
+            'brand_key.string' => 'The brand key must be a valid string.',
+            'date_type.required' => 'The date type is required.',
+            'date_type.in' => 'The date type must be a created date or payment date.',
         ]);
-
         try {
 
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
             $teamKey = $validated['team_key'] ?? 'all';
             $brandKey = $validated['brand_key'] ?? 'all';
-
-            $query = Payment::select(['id', 'invoice_key', 'brand_key', 'team_key', 'cus_contact_key', 'agent_id', 'merchant_id', 'transaction_id', 'amount', 'status', 'payment_date', 'created_at'])
+            $payments = Payment::select(['id', 'invoice_key', 'brand_key', 'team_key', 'cus_contact_key', 'agent_id', 'merchant_id', 'transaction_id', 'amount', 'currency', 'status', DB::raw("CONVERT_TZ(payment_date, '+00:00', '+00:00') as payment_date"), 'created_at'])
+                ->whereBetween($request->date_type == 0 ? 'created_at' : 'payment_date', [Carbon::parse($startDate), Carbon::parse($endDate)])
+                ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+                ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
                 ->with([
                     'team:id,name,team_key',
                     'brand:id,name,brand_key',
                     'agent:id,name',
                     'customer_contact:id,name,special_key',
                     'invoice:invoice_key,invoice_number',
-                    'payment_gateway:id,name'
+                    'payment_gateway:id,name,descriptor'
                 ])
-                ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
-                ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey));
-
-
-            if (!empty($dateRange)) {
-                $query->whereBetween('payment_date', [
-                    Carbon::parse($startDate),
-                    Carbon::parse($endDate)
-                ]);
-            }
-
-            $payments = $query->get();
-
+                ->get();
             return response()->json([
                 'success' => true,
                 'data' => $payments,
@@ -424,6 +430,4 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-
-
 }

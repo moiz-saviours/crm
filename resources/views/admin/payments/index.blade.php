@@ -41,6 +41,13 @@
                                 </select>
                             </div>
                             <div class="form-group ">
+                                <label for="dateTypeSelect">Select Date Type:</label>
+                                <select id="dateTypeSelect" name="dateTypeSelect" class="form-control">
+                                    <option value="0">Created at</option>
+                                    <option value="1">Payment Date</option>
+                                </select>
+                            </div>
+                            <div class="form-group ">
                                 <label for="dateRangePicker">Select Date Range:</label>
                                 <input type="text" id="dateRangePicker" name="dateRangePicker"
                                        class="form-control dateRangePicker"/>
@@ -153,17 +160,13 @@
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    {{\carbon\carbon::parse($payment->payment_date)->timezone('GMT+5')->format('M d, Y g:i A')}}
-                                                    GMT+5
+                                                    @if($payment->payment_date)
+                                                        {{ $payment->payment_date_formatted }}
+                                                    @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    @if ($payment->created_at->isToday())
-                                                        Today
-                                                        at {{ $payment->created_at->timezone('GMT+5')->format('g:i A') }}
-                                                        GMT+5
-                                                    @else
-                                                        {{ $payment->created_at->timezone('GMT+5')->format('M d, Y g:i A') }}
-                                                        GMT+5
+                                                    @if($payment->created_at)
+                                                        {{ $payment->created_at_formatted }}
                                                     @endif
                                                 </td>
                                                 {{--                                                <td class="align-middle text-center table-actions">--}}
@@ -187,16 +190,8 @@
     </section>
     <!-- Modal -->
     @push('script')
-        @include('admin.payments.script')
-        <!-- Date Range Picker -->
         <script src="{{asset('assets/js/moment.min.js')}}"></script>
         <script src="{{asset('assets/js/plugins/daterangepicker/daterangepicker.min.js')}}"></script>
-
-        <script>
-            $(document).ready(function () {
-
-            });
-
-        </script>
+        @include('admin.payments.script')
     @endpush
 @endsection

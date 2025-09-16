@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\ActivityLoggable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
@@ -50,7 +51,7 @@ class Payment extends Model
         'payment_environment',
     ];
     protected $casts = [
-        'payment_date' => 'date:Y-m-d',
+        'payment_date' => 'datetime',
     ];
     protected $hidden = [
         'card_name',
@@ -59,6 +60,38 @@ class Payment extends Model
         'card_cvv',
         'card_month_expiry',
         'card_year_expiry',];
+
+    protected $appends = ['payment_date_formatted', 'created_at_formatted'];
+
+    public function getPaymentDateFormattedAttribute()
+    {
+        return $this->payment_date
+            ? $this->formatForDisplay($this->payment_date)
+            : null;
+    }
+
+    public function getCreatedAtFormattedAttribute()
+    {
+        return $this->created_at
+            ? $this->formatForDisplay($this->created_at, 'GMT+5',true)
+            : null;
+    }
+    function formatForDisplay($date, string $timezone = 'GMT+5',$isTimezone = false): ?string
+    {
+        if (!$date) {
+            return null;
+        }
+        $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+        if ($isTimezone){
+            $date = $date->copy()->timezone($timezone);
+        }else{
+            $date = $date->copy();
+        }
+        if ($date->isToday()) {
+            return 'Today at ' . $date->format('g:i A') . ' ' . $timezone;
+        }
+        return $date->format('M d, Y g:i A') . ' ' . $timezone;
+    }
 
     public function invoice(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
