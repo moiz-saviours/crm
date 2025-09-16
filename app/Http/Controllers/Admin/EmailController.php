@@ -10,23 +10,24 @@ use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Illuminate\Support\Facades\Artisan;
+
 class EmailController extends Controller
 {
-public function fetch(Request $request)
+    public function fetch(Request $request)
     {
         try {
             $customerEmail = $request->query('customer_email');
             $folder = $request->query('folder', 'inbox');
-            $page = (int) $request->query('page', 1);
-            $limit = (int) $request->query('limit', 100);
+            $page = (int)$request->query('page', 1);
+            $limit = (int)$request->query('limit', 100);
             $offset = ($page - 1) * $limit;
-
             // Log the request parameters for debugging
             Log::info('Fetching emails from database', [
                 'customer_email' => $customerEmail,
@@ -34,38 +35,25 @@ public function fetch(Request $request)
                 'page' => $page,
                 'limit' => $limit,
             ]);
-
             if (!$customerEmail) {
                 return response()->json(['error' => 'Customer email is required'], 400);
             }
-
-            // Fetch emails from the database
             $query = Email::where(function ($q) use ($customerEmail, $folder) {
-                // Include sent emails (outgoing) where customerEmail is the sender for 'sent' or 'all' folders
-                if ($folder === 'sent' || $folder === 'all') {
+                if ($folder === 'sent') {
                     $q->orWhere(function ($subQ) use ($customerEmail) {
-                        $subQ->where('from_email', $customerEmail)
-                             ->where('type', 'outgoing');
+                        $subQ->orWhereJsonContains('to', [['email' => $customerEmail]])->where('type', 'outgoing');
                     });
                 }
-                // Include received emails where customerEmail is in to, cc, or bcc
-                $q->orWhereJsonContains('to', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
+                $q->orWhere('from_email', $customerEmail)->orWhereJsonContains('cc', [['email' => $customerEmail]])->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
             });
-
             // Filter by folder if specified
             // if ($folder !== 'all') {
             //     $query->where('folder', $folder);
             // }
-            
             // Apply pagination
-            $emails = $query->orderBy('message_date', 'desc')
-                ->skip($offset)
-                ->take($limit)
-                ->with(['attachments' => function ($q) {
-                    $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
-                }])
+            $emails = $query->orderBy('message_date', 'desc')->skip($offset)->take($limit)->with(['attachments' => function ($q) {
+                $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
+            }])
                 ->get()
                 ->map(function ($email) {
                     // Format email data to match the expected structure for the view
@@ -94,13 +82,11 @@ public function fetch(Request $request)
                         })->toArray(),
                     ];
                 });
-
-            // Get available folders from the database
             $folders = Email::where(function ($q) use ($customerEmail) {
                 $q->where('from_email', $customerEmail)
-                  ->orWhereJsonContains('to', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
+                    ->orWhereJsonContains('to', [['email' => $customerEmail]])
+                    ->orWhereJsonContains('cc', [['email' => $customerEmail]])
+                    ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
             })
                 ->distinct()
                 ->pluck('folder')
@@ -131,41 +117,41 @@ public function fetch(Request $request)
             if (!$customerEmail) {
                 return response()->json(['error' => 'Customer email is required'], 400);
             }
-            // Get current user's pseudo emails
-            $pseudoEmails = UserPseudoRecord::where('morph_id', auth()->id())
+            $user = Auth::guard('admin')->user();
+            $pseudoEmails = UserPseudoRecord::where('morph_id', $user->id)
+                ->where('morph_type', get_class($user))
                 ->where('imap_type', 'imap')
                 ->pluck('pseudo_email')
                 ->toArray();
-
             if (empty($pseudoEmails)) {
                 return response()->json(['error' => 'No IMAP accounts found for the current user'], 400);
             }
-
-            // Build the Artisan command
             $command = ['emails:fetch', '--address=' . $customerEmail];
             foreach ($pseudoEmails as $email) {
                 $command[] = '--account=' . $email;
             }
-
-            // Run the Artisan command
             $exitCode = Artisan::call(implode(' ', $command));
-
-            if ($exitCode !== 0) {
+            if ($exitCode !== 1) {
                 Log::error('Failed to run emails:fetch command', [
                     'customer_email' => $customerEmail,
                     'pseudo_emails' => $pseudoEmails,
                     'exit_code' => $exitCode,
+                    'file' => __FILE__,
+                    'line' => __LINE__,
+                    'error' => isset($e) ? $e->getMessage() : null,
                 ]);
                 return response()->json(['error' => 'Failed to fetch new emails'], 500);
             }
-
             return response()->json(['success' => true, 'message' => 'New emails fetched successfully']);
         } catch (\Exception $e) {
             Log::error('Error fetching new emails', [
                 'customer_email' => $customerEmail,
                 'error' => $e->getMessage(),
             ]);
-            return response()->json(['error' => 'Failed to fetch new emails. Please try again later.'], 500);
+            return response()->json(['error' => 'Failed to fetch new emails. Please try again later.',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ], 500);
         }
     }
 
@@ -180,7 +166,6 @@ public function fetch(Request $request)
             'bcc' => 'sometimes|string|nullable',
             'attachments.*' => 'sometimes|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240', // 10MB max per file
         ]);
-
         try {
             $sender = $this->findSender($request->from);
             if (!$sender) {
@@ -189,7 +174,6 @@ public function fetch(Request $request)
                     'message' => 'Sender not authorized or not found'
                 ], 403);
             }
-
             // Check if sender is UserPseudoRecord and has SMTP credentials
             if (!$sender instanceof UserPseudoRecord || empty($sender->server_password) || empty($sender->server_host)) {
                 return response()->json([
@@ -197,26 +181,21 @@ public function fetch(Request $request)
                     'message' => 'Invalid or missing SMTP credentials for sender'
                 ], 403);
             }
-
             $toEmails = $this->parseEmailList($request->to);
             $ccEmails = $this->parseEmailList($request->cc);
             $bccEmails = $this->parseEmailList($request->bcc);
-
             if (empty($toEmails)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No valid recipients specified'
                 ], 400);
             }
-
             $fromEmail = $request->from;
             $fromName = $this->getSenderName($sender, $fromEmail);
-
             // Parse addresses for storage
             $parsedTo = $this->parseEmailListForStorage($toEmails);
             $parsedCc = $this->parseEmailListForStorage($ccEmails);
             $parsedBcc = $this->parseEmailListForStorage($bccEmails);
-
             // Handle attachments
             $attachments = null;
             $storedAttachments = [];
@@ -239,7 +218,6 @@ public function fetch(Request $request)
                 }
                 $attachments = $storedAttachments;
             }
-
             // Store email in database as outgoing
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
@@ -261,7 +239,6 @@ public function fetch(Request $request)
                 'message_date' => now(),
                 'received_at' => now(),
             ]);
-
             // Store attachments if any
             if (!empty($storedAttachments)) {
                 foreach ($storedAttachments as $att) {
@@ -275,7 +252,6 @@ public function fetch(Request $request)
                     ]);
                 }
             }
-
             // Send the email using PHPMailer with SMTP credentials
             $this->sendMail(
                 $validated,
@@ -287,13 +263,11 @@ public function fetch(Request $request)
                 $attachments,
                 $sender
             );
-
             Log::info('Email sent and stored successfully', [
                 'email_id' => $email->id,
                 'from' => $fromEmail,
                 'to' => $toEmails,
             ]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Email sent successfully',
@@ -317,29 +291,27 @@ public function fetch(Request $request)
     }
 
     private function sendMail(
-        array $validated,
-        array $toEmails,
-        string $fromEmail,
-        string $fromName,
-        array $ccEmails,
-        array $bccEmails,
-        ?array $attachments = null,
+        array            $validated,
+        array            $toEmails,
+        string           $fromEmail,
+        string           $fromName,
+        array            $ccEmails,
+        array            $bccEmails,
+        ?array           $attachments = null,
         UserPseudoRecord $sender
-    ): void {
+    ): void
+    {
         // Look for SMTP-specific credentials if available
         $smtpRecord = $sender->imap_type === 'smtp'
             ? $sender
             : UserPseudoRecord::where('pseudo_email', $sender->pseudo_email)
                 ->where('imap_type', 'smtp')
                 ->first();
-
         $smtpCredentials = $smtpRecord ?? $sender;
-
         // Validate SMTP credentials
         if (empty($smtpCredentials->server_host) || empty($smtpCredentials->server_password)) {
             throw new Exception('Missing SMTP host or password');
         }
-
         // Initialize PHPMailer
         $mailer = new PHPMailer(true);
         try {
@@ -351,24 +323,19 @@ public function fetch(Request $request)
             $mailer->SMTPAuth = true;
             $mailer->Username = $smtpCredentials->server_username ?? $smtpCredentials->pseudo_email;
             $mailer->Password = $smtpCredentials->server_password;
-
             // Sender and recipients
             $mailer->setFrom($fromEmail, $fromName);
             $mailer->addReplyTo($fromEmail, $fromName);
             $mailer->addCustomHeader('Return-Path', $fromEmail);
-
             foreach ($toEmails as $toEmail) {
                 $mailer->addAddress($toEmail);
             }
-
             foreach ($ccEmails as $ccEmail) {
                 $mailer->addCC($ccEmail);
             }
-
             foreach ($bccEmails as $bccEmail) {
                 $mailer->addBCC($bccEmail);
             }
-
             // Attachments
             if ($attachments) {
                 foreach ($attachments as $attachment) {
@@ -380,13 +347,11 @@ public function fetch(Request $request)
                     );
                 }
             }
-
             // Content
             $mailer->isHTML(true);
             $mailer->Subject = $validated['subject'];
             $mailer->Body = $validated['email_content'];
             $mailer->AltBody = strip_tags($validated['email_content']);
-
             // Send the email
             $mailer->send();
 
@@ -400,7 +365,6 @@ public function fetch(Request $request)
         if (empty($emails)) {
             return null;
         }
-
         $parsed = [];
         foreach ($emails as $emailStr) {
             if (preg_match('/^(.*?)[\s<]?(.*?@[\w\.-]+)[\s>]?$/', trim($emailStr), $matches)) {
@@ -417,7 +381,6 @@ public function fetch(Request $request)
                 ];
             }
         }
-
         return $parsed;
     }
 
