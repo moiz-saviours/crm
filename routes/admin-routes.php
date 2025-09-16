@@ -251,8 +251,9 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 });
                 Route::get('/change-status/{customer_contact?}', [AdminCustomerContactController::class, 'change_status'])->name('change.status');
                 Route::delete('/delete/{customer_contact?}', [AdminCustomerContactController::class, 'delete'])->name('delete');
-                Route::post('/send-email', [AdminCustomerContactController::class, 'sendEmail'])->name('send.email');
+                Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
                 Route::get('/emails/fetch', [EmailController::class, 'fetch'])->name('emails.fetch');
+                Route::get('/emails/fetch-new', [EmailController::class, 'fetchNewEmails'])->name('emails.fetch-new');
             });
         });
         /** Companies Routes */
