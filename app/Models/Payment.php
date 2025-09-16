@@ -66,7 +66,7 @@ class Payment extends Model
     public function getPaymentDateFormattedAttribute()
     {
         return $this->payment_date
-            ? $this->formatForDisplay($this->payment_date)
+            ? $this->formatForDisplay($this->payment_date, 'GMT+5',true)
             : null;
     }
 

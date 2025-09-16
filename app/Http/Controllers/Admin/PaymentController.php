@@ -33,7 +33,7 @@ class PaymentController extends Controller
             'customer_contact:id,name,special_key',
             'invoice:invoice_key,invoice_number',
             'payment_gateway:id,name,descriptor'])
-            ->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth(),])->get();
+            ->whereBetween('created_at', [Carbon::now('GMT+5')->startOfMonth(), Carbon::now('GMT+5')->endOfMonth(),])->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $client_contacts = ClientContact::select('id', 'special_key', 'name')
             ->with([
@@ -205,7 +205,7 @@ class PaymentController extends Controller
                 'payment_type' => $request->input('type'),
                 'merchant_id' => $account->id,
                 'payment_method' => $account->payment_method,
-                'payment_date' => carbon::parse($request->input('payment_date'))
+                'payment_date' => Carbon::parse( $request->input('payment_date'), 'GMT+5')->setTimezone('UTC'),
             ];
             if ($request->has('agent_id')) {
                 $paymentData['agent_id'] = $request->input('agent_id');
@@ -399,13 +399,12 @@ class PaymentController extends Controller
             'date_type.in' => 'The date type must be a created date or payment date.',
         ]);
         try {
-
-            $startDate = Carbon::parse($validated['start_date']);
-            $endDate = Carbon::parse($validated['end_date']);
+            $startDate = Carbon::createFromFormat('Y-m-d h:i:s A', $validated['start_date'], 'GMT+5')->setTimezone('UTC');
+            $endDate = Carbon::createFromFormat('Y-m-d h:i:s A', $validated['end_date'], 'GMT+5')->setTimezone('UTC');
             $teamKey = $validated['team_key'] ?? 'all';
             $brandKey = $validated['brand_key'] ?? 'all';
             $payments = Payment::select(['id', 'invoice_key', 'brand_key', 'team_key', 'cus_contact_key', 'agent_id', 'merchant_id', 'transaction_id', 'amount', 'currency', 'status', DB::raw("CONVERT_TZ(payment_date, '+00:00', '+00:00') as payment_date"), 'created_at'])
-                ->whereBetween($request->date_type == 0 ? 'created_at' : 'payment_date', [Carbon::parse($startDate), Carbon::parse($endDate)])
+                ->whereBetween($request->date_type == 0 ? 'created_at' : 'payment_date', [$startDate, $endDate])
                 ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
                 ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
                 ->with([
