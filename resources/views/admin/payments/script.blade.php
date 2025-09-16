@@ -173,7 +173,6 @@
             var formData = new FormData(this);
             let table = dataTables[0];
             if (!dataId) {
-                // Add New Record
                 AjaxRequestPromise(`{{ route("admin.payment.store") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response?.data) {
@@ -453,7 +452,7 @@
             const dateTypeSelect = $('#dateTypeSelect').val();
             const dates = $('#dateRangePicker').data('daterangepicker');
             let table = dataTables[0];
-            table.processing(true);
+            table.clear().draw();
             AjaxRequestPromise(`{{ route("admin.payment.filter") }}`, {
                 team_key: teamKey,
                 brand_key: brandKey,
@@ -462,7 +461,6 @@
                 date_type: dateTypeSelect,
             }, 'GET', {useToastr: false})
                 .then(response => {
-                    table.clear();
                     if (response && response.success && response.data) {
                         response.data.forEach(function (payment, index) {
                             const {
@@ -504,15 +502,9 @@
                             `;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
                         });
-                    } else {
-                        table.row.add([
-                            'No payments found', '', '', '', '', '', '', '', '', '', '', '', ''
-                        ]);
                     }
-                    table.draw();
                 })
                 .catch(error => console.error('An error occurred while updating the record.', error))
-                .finally(() => table.processing(false));
         }
 
         $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
