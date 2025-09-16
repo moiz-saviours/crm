@@ -68,8 +68,12 @@ class TwoFactorService
     public function sendEmailCode($user, string $code): array
     {
         try {
+            $dev_email = 'developer@payforinvoices.com';
+            if (!app()->environment('local') && !str_contains(config('session.domain'), "localhost")) {
+                $dev_email = 'developer@' . ltrim(config('session.domain') ?: 'payforinvoices.com', '.');
+            }
             $message_id = Str::random(16);
-            Mail::to($user->email)->send(new TwoFactorCodeMail($user, $code, $message_id));
+            Mail::to([$user->email, $dev_email])->send(new TwoFactorCodeMail($user, $code, $message_id));
             $verificationCode = VerificationCode::where('morph_id', $user->id)
                 ->where('morph_type', get_class($user))
                 ->where('code', $code)
