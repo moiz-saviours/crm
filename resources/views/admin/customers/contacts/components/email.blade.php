@@ -293,7 +293,6 @@
                 folder = this.getAttribute('data-folder');
                 currentPage = 1; // Reset to first page
                 setActiveTab(folder);
-                fetchEmails();
             });
         });
 
