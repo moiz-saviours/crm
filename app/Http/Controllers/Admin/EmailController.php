@@ -25,46 +25,28 @@ class EmailController extends Controller
         try {
             $customerEmail = $request->query('customer_email');
             $folder = $request->query('folder', 'all');
-            $page = (int) $request->query('page', 1);
-            $limit = (int) $request->query('limit', 100);
-            $offset = ($page - 1) * $limit;
-            // Log the request parameters for debugging
-            Log::info('Fetching emails from database', [
-                'customer_email' => $customerEmail,
-                'folder' => $folder,
-                'page' => $page,
-                'limit' => $limit,
-            ]);
+
             if (!$customerEmail) {
                 return response()->json(['error' => 'Customer email is required'], 400);
             }
-            $query = Email::where(function ($q) use ($customerEmail, $folder) {
-                // Include sent emails (outgoing) where customerEmail is the sender for 'sent' or 'all' folders
 
-                if ($folder === 'sent' || $folder === 'all') {
-                    $q->orWhere(function ($subQ) use ($customerEmail) {
-                        //todo
-                        $subQ->where('from_email', $customerEmail)
-                            ->where('type', 'outgoing');
-                    });
-                }
-                // Include received emails where customerEmail is in to, cc, or bcc
-                $q->orWhereJsonContains('to', [['email' => $customerEmail]])
-                    ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                    ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
+            $query = Email::where(function ($q) use ($customerEmail) {
+                $q->where('from_email', $customerEmail)
+                  ->orWhereJsonContains('to', [['email' => $customerEmail]])
+                  ->orWhereJsonContains('cc', [['email' => $customerEmail]])
+                  ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
             });
-            // Filter by folder if specified
+
             if ($folder !== 'all') {
                 $query->where('folder', $folder);
             }
 
-            // Apply pagination
-            $emails = $query->orderBy('message_date', 'desc')->skip($offset)->take($limit)->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
-            }])
+            $emails = $query->orderBy('message_date', 'desc')
+                ->with(['attachments' => function ($q) {
+                    $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
+                }])
                 ->get()
                 ->map(function ($email) {
-                    // Format email data to match the expected structure for the view
                     return [
                         'uuid' => 'email-' . $email->id,
                         'from' => [
@@ -90,30 +72,25 @@ class EmailController extends Controller
                         })->toArray(),
                     ];
                 });
+
             $folders = Email::where(function ($q) use ($customerEmail) {
                 $q->where('from_email', $customerEmail)
-                    ->orWhereJsonContains('to', [['email' => $customerEmail]])
-                    ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                    ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
+                  ->orWhereJsonContains('to', [['email' => $customerEmail]])
+                  ->orWhereJsonContains('cc', [['email' => $customerEmail]])
+                  ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
             })
                 ->distinct()
                 ->pluck('folder')
                 ->filter()
                 ->values()
                 ->toArray();
+
             return response()->json([
                 'emails' => $emails,
                 'folders' => $folders,
                 'folder' => $folder,
-                'page' => $page,
-                'limit' => $limit,
             ]);
         } catch (\Exception $e) {
-            Log::error('Something went wrong please try again', [
-                'error' => $e->getMessage(),
-                'customer_email' => $customerEmail,
-                'folder' => $folder,
-            ]);
             return response()->json(['error' => 'Failed to fetch emails. Please try again later.'], 500);
         }
     }
