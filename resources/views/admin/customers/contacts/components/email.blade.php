@@ -1,28 +1,80 @@
 <!-- Add the email section with loader, refresh button, and fetch emails button -->
-<div id="email-section">
-    <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
-        <button id="refresh-emails" class="btn btn-primary" style="padding: 8px; font-size: 14px; margin-right: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-            <i class="fa fa-refresh" aria-hidden="true"></i>
-        </button>
-        <button id="fetch-emails" class="btn btn-success" style="padding: 8px; font-size: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-            <i class="fa fa-download" aria-hidden="true"></i>
-        </button>
-    </div>
-    <div id="email-loader" style="display: none; text-align: center; padding: 20px;">
-        <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading emails...
-    </div>
-    <div id="email-content">
-    </div>
-</div>
+<div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
 
+
+    <div class="email-threading-row" style="margin-bottom: 15px;">
+        <p class="activities-seprater d-none"> Thread email replies </p>
+        <div style="margin-right: 10px; display: flex; justify-content: flex-end;">
+
+            <button id="refresh-emails" class="btn btn-primary"
+                style="padding: 8px; font-size: 14px; margin-right: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+            </button>
+            <button id="fetch-emails" class="btn btn-success"
+                style="padding: 8px; font-size: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa fa-download" aria-hidden="true"></i>
+            </button>
+
+        </div>
+        <button class="threading-email-btn-one">
+            Log Email
+        </button>
+        <button class="threading-email-btn-two open-email-form">
+            Create Email
+        </button>
+    </div>
+
+
+
+    <div>
+
+        <div class="recent-activities">
+            <div id="email-section">
+                <ul class="nav nav-tabs" id="email-folders" style="margin-bottom: 15px;">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-folder="all">All</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-folder="inbox">Inbox</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-folder="sent">Sent</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-folder="drafts">Drafts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-folder="spam">Spam</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-folder="trash">Trash</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-folder="archive">Archive</a>
+                    </li>
+                </ul>
+
+                <p class="date-by-order">{{ now()->format('F Y') }}</p>
+
+                <div id="email-loader" style="display: none; text-align: center; padding: 20px;">
+                    <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading emails...
+                </div>
+                <div id="email-content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const emailSection = document.getElementById('email-content');
         const emailLoader = document.getElementById('email-loader');
         const refreshButton = document.getElementById('refresh-emails');
         const fetchButton = document.getElementById('fetch-emails');
         const customerEmail = "{{ $customer_contact->email }}";
-        let folder = "{{ $folder }}"; // Make folder mutable for dynamic updates
+        let folder = 'all'; // Default to 'all' tab
         let currentPage = {{ $page }}; // Make page mutable for pagination
         const limit = 100;
 
@@ -33,76 +85,81 @@
             emailSection.innerHTML = ''; // Clear existing content
 
             // Make AJAX request to fetch emails
-            fetch('/admin/customer/contact/emails/fetch?customer_email=' + encodeURIComponent(customerEmail) + '&folder=' + encodeURIComponent(folder) + '&page=' + currentPage + '&limit=' + limit, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Hide loader
-                emailLoader.style.display = 'none';
+            fetch('/admin/customer/contact/emails/fetch?customer_email=' + encodeURIComponent(customerEmail) +
+                    '&folder=' + encodeURIComponent(folder) + '&page=' + currentPage + '&limit=' + limit, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loader
+                    emailLoader.style.display = 'none';
 
-                if (data.error) {
-                    emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
-                    return;
-                }
+                    if (data.error) {
+                        emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
+                        return;
+                    }
 
-                // Update email content
-                emailSection.innerHTML = renderEmails(data.emails);
+                    // Update email content
+                    emailSection.innerHTML = renderEmails(data.emails);
 
-                // Re-attach toggle event listeners
-                attachToggleListeners();
-            })
-            .catch(error => {
-                // Hide loader
-                emailLoader.style.display = 'none';
-                emailSection.innerHTML = '<p class="text-muted">Failed to load emails. Please try again later.</p>';
-                console.error('Error fetching emails:', error);
-            });
+                    // Re-attach toggle event listeners
+                    attachToggleListeners();
+                })
+                .catch(error => {
+                    // Hide loader
+                    emailLoader.style.display = 'none';
+                    emailSection.innerHTML =
+                        '<p class="text-muted">Failed to load emails. Please try again later.</p>';
+                    console.error('Error fetching emails:', error);
+                });
         }
 
         // Initial fetch
         fetchEmails();
 
         // Refresh button click
-        refreshButton.addEventListener('click', function () {
+        refreshButton.addEventListener('click', function() {
             fetchEmails();
         });
 
         // Fetch emails button click
-        fetchButton.addEventListener('click', function () {
+        fetchButton.addEventListener('click', function() {
             // Show loader
             emailLoader.style.display = 'block';
             emailSection.innerHTML = ''; // Clear existing content
 
             // Make AJAX request to run Artisan command
-            fetch('/admin/customer/contact/emails/fetch-new?customer_email=' + encodeURIComponent(customerEmail), {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    emailLoader.style.display = 'none';
-                    emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
-                    return;
-                }
+            fetch('/admin/customer/contact/emails/fetch-new?customer_email=' + encodeURIComponent(
+                    customerEmail), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        emailLoader.style.display = 'none';
+                        emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error +
+                            '</p>';
+                        return;
+                    }
 
-                // After fetching new emails, refresh the email list
-                fetchEmails();
-            })
-            .catch(error => {
-                // Hide loader
-                emailLoader.style.display = 'none';
-                emailSection.innerHTML = '<p class="text-muted">Failed to fetch new emails. Please try again later.</p>';
-                console.error('Error fetching new emails:', error);
-            });
+                    // After fetching new emails, refresh the email list
+                    fetchEmails();
+                })
+                .catch(error => {
+                    // Hide loader
+                    emailLoader.style.display = 'none';
+                    emailSection.innerHTML =
+                        '<p class="text-muted">Failed to fetch new emails. Please try again later.</p>';
+                    console.error('Error fetching new emails:', error);
+                });
         });
 
         // Function to render emails
@@ -195,25 +252,52 @@
             if (fileType.includes('powerpoint')) return 'fa-file-powerpoint-o';
             if (fileType.includes('image')) return 'fa-file-image-o';
             if (fileType.includes('text')) return 'fa-file-text-o';
-            if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('7z')) return 'fa-file-archive-o';
+            if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('7z'))
+                return 'fa-file-archive-o';
             return 'fa-file-o';
         }
 
         // Function to attach toggle listeners
         function attachToggleListeners() {
             document.querySelectorAll('.toggle-btnss').forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const targetId = this.getAttribute('data-target');
                     const content = document.querySelector(targetId);
                     if (content.style.display === 'none') {
                         content.style.display = 'block';
-                        this.querySelector('i.fa').classList.replace('fa-caret-right', 'fa-caret-down');
+                        this.querySelector('i.fa').classList.replace('fa-caret-right',
+                            'fa-caret-down');
                     } else {
                         content.style.display = 'none';
-                        this.querySelector('i.fa').classList.replace('fa-caret-down', 'fa-caret-right');
+                        this.querySelector('i.fa').classList.replace('fa-caret-down',
+                            'fa-caret-right');
                     }
                 });
             });
         }
+
+        // Function to set active tab
+        function setActiveTab(folder) {
+            document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-folder') === folder) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+
+        // Attach tab click event listeners
+        document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                folder = this.getAttribute('data-folder');
+                currentPage = 1; // Reset to first page
+                setActiveTab(folder);
+                fetchEmails();
+            });
+        });
+
+        // Set initial active tab
+        setActiveTab(folder);
     });
 </script>
