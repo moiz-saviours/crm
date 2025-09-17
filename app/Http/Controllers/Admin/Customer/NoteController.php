@@ -25,6 +25,8 @@ class NoteController extends Controller
         CustomerNote::create([
             'cus_contact_key' => $request->cus_contact_key,
             'note' => $request->note,
+            'creator_id' => auth()->id(),
+            'creator_type' => get_class(auth()->user()),
         ]);
 
         return redirect()->back()->with('success', 'Note added successfully!');
