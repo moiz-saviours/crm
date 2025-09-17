@@ -2257,34 +2257,11 @@
                                                 </div>
 
 
-                                                <div class="tab-pane fade" id="email" role="tabpanel"
-                                                     aria-labelledby="email-tab">
-
-
-                                                    <div class="email-threading-row">
-                                                        <p class="activities-seprater"> Thread email replies </p>
-                                                        <button class="threading-email-btn-one">
-                                                            Log Email
-                                                        </button>
-                                                        <button class="threading-email-btn-two open-email-form">
-                                                            Create Email
-                                                        </button>
-                                                    </div>
-
-
-
-                                                    <div>
-                                                        <p class="date-by-order">{{ now()->format('F Y') }}</p>
-
-                                                        <div class="recent-activities">
+                             
                                                             <!-- Keep your existing HTML for other parts of the edit page -->
                                                             @include('admin.customers.contacts.components.email')
 
-                                                        </div>
-                                                    </div>
-
-
-                                                </div>
+                        
 
                                                 {{-- <div class="tab-pane fade" id="call" role="tabpanel" --}}
                                                 {{--                                                     aria-labelledby="call-tab"> --}}
