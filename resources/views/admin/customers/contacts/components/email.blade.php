@@ -78,45 +78,51 @@
         let currentPage = {{ $page }}; // Make page mutable for pagination
         const limit = 100;
 
-        // Function to fetch emails
-        function fetchEmails() {
-            // Show loader
-            emailLoader.style.display = 'block';
-            emailSection.innerHTML = ''; // Clear existing content
+     // Function to fetch emails
+async function fetchEmails() {
+    // Show loader
+    emailLoader.style.display = 'block';
+    emailSection.innerHTML = ''; // Clear existing content
 
-            // Make AJAX request to fetch emails
-            fetch('/admin/customer/contact/emails/fetch?customer_email=' + encodeURIComponent(customerEmail) +
-                    '&folder=' + encodeURIComponent(folder) + '&page=' + currentPage + '&limit=' + limit, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    })
-                .then(response => response.json())
-                .then(data => {
-                    // Hide loader
-                    emailLoader.style.display = 'none';
+    try {
+        const response = await fetch(
+            '/admin/customer/contact/emails/fetch?customer_email=' + encodeURIComponent(customerEmail) +
+            '&folder=' + encodeURIComponent(folder) +
+            '&page=' + currentPage +
+            '&limit=' + limit,
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            }
+        );
 
-                    if (data.error) {
-                        emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
-                        return;
-                    }
+        const data = await response.json();
 
-                    // Update email content
-                    emailSection.innerHTML = renderEmails(data.emails);
+        // Hide loader
+        emailLoader.style.display = 'none';
 
-                    // Re-attach toggle event listeners
-                    attachToggleListeners();
-                })
-                .catch(error => {
-                    // Hide loader
-                    emailLoader.style.display = 'none';
-                    emailSection.innerHTML =
-                        '<p class="text-muted">Failed to load emails. Please try again later.</p>';
-                    console.error('Error fetching emails:', error);
-                });
+        if (data.error) {
+            emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
+            return;
         }
+
+        // Update email content
+        emailSection.innerHTML = renderEmails(data.emails);
+
+        // Re-attach toggle event listeners
+        attachToggleListeners();
+
+    } catch (error) {
+        // Hide loader
+        emailLoader.style.display = 'none';
+        emailSection.innerHTML = '<p class="text-muted">Failed to load emails. Please try again later.</p>';
+        console.error('Error fetching emails:', error);
+    }
+}
+
 
         // Initial fetch
         fetchEmails();
@@ -286,16 +292,25 @@
             });
         }
 
-        // Attach tab click event listeners
-        document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
-            tab.addEventListener('click', function(e) {
-                e.preventDefault();
-                folder = this.getAttribute('data-folder');
-                currentPage = 1; // Reset to first page
-                setActiveTab(folder);
+    let isFetching = false;
+
+    // Attach tab click event listeners
+    document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (isFetching) return; // prevent multiple clicks
+
+            folder = this.getAttribute('data-folder');
+            currentPage = 1; // Reset to first page
+            setActiveTab(folder);
+
+            isFetching = true;
+            fetchEmails().finally(() => {
+                isFetching = false;
             });
         });
-
+    });
         // Set initial active tab
         setActiveTab(folder);
     });
