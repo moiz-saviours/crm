@@ -138,14 +138,12 @@
                                 currency,
                                 amount,
                                 status,
-                                payment_date,
-                                created_at
+                                payment_date_formatted,
+                                created_at_formatted
                             } = response.data;
 
                             const index = table.rows().count() + 1;
                             const statusBadge = getStatusBadge(status); // Function to get status HTML
-                            const formattedDate = formatDate(created_at); // Function to format the date
-                            const formattedPaymentDate = formatDate2(payment_date); // Function to format the date
 
                             const columns = `
                         <td class="align-middle text-center text-nowrap"></td>
@@ -160,8 +158,8 @@
                         <td class="align-middle text-center text-nowrap">${customer_contact?.name ?? "---"}</td>
                         <td class="align-middle text-center text-nowrap">${currency} ${parseFloat(amount ?? "0.00").toFixed(2)}</td>
                         <td class="align-middle text-center text-nowrap">${statusBadge}</td>
-                        <td class="align-middle text-center text-nowrap">${formattedPaymentDate}</td>
-                        <td class="align-middle text-center text-nowrap">${formattedDate}</td>
+                        <td class="align-middle text-center text-nowrap">${payment_date_formatted}</td>
+                        <td class="align-middle text-center text-nowrap">${created_at_formatted}</td>
                         `;
 
                             // <td class="align-middle text-center table-actions">
@@ -240,40 +238,5 @@
             if (status == 2) return '<span class="badge bg-danger">Refund</span>';
             return '<span class="badge bg-secondary">Unknown</span>';
         }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const today = new Date();
-            if (
-                date.toDateString() === today.toDateString()
-            ) {
-                return `Today at ${date.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                })} GMT+5`;
-            } else {
-                return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) +
-                    ' ' +
-                    date.toLocaleTimeString('en-US', {hour: 'numeric', minute: 'numeric', hour12: true}) +
-                    ' GMT+5';
-            }
-        }
-        function formatDate2(dateString) {
-            const date = new Date(dateString);
-            const today = new Date();
-            if (
-                date.toDateString() === today.toDateString()
-            ) {
-                return `Today at ${date.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                })} GMT+5`;
-            } else {
-                return date.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
-            }
-        }
-
     });
 </script>
