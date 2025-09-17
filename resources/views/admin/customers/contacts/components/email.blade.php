@@ -127,7 +127,7 @@ const response = await fetch(
 
 
         // Initial fetch
-        fetchEmails();
+        // fetchEmails();
 
         // Refresh button click
         refreshButton.addEventListener('click', function() {
@@ -231,9 +231,9 @@ const response = await fetch(
                                                 </div>
                                                 <div class="attachment-actions">
                                                     ${attachment.download_url ? `
-                                                        <a href="${attachment.download_url}" 
-                                                           download="${attachment.filename || 'attachment'}" 
-                                                           class="btn btn-sm btn-outline-primary" 
+                                                        <a href="${attachment.download_url}"
+                                                           download="${attachment.filename || 'attachment'}"
+                                                           class="btn btn-sm btn-outline-primary"
                                                            style="text-decoration: none; padding: 4px 8px; border: 1px solid #007bff; color: #007bff; border-radius: 3px; font-size: 12px;">
                                                             <i class="fa fa-download" aria-hidden="true"></i> Download
                                                         </a>
