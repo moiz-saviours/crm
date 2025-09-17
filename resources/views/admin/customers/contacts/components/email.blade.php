@@ -85,19 +85,21 @@ async function fetchEmails() {
     emailSection.innerHTML = ''; // Clear existing content
 
     try {
-        const response = await fetch(
-            '/admin/customer/contact/emails/fetch?customer_email=' + encodeURIComponent(customerEmail) +
-            '&folder=' + encodeURIComponent(folder) +
-            '&page=' + currentPage +
-            '&limit=' + limit,
-            {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            }
-        );
+const response = await fetch(
+    "{{ route('admin.customer.contact.emails.fetch') }}" +
+    "?customer_email=" + encodeURIComponent(customerEmail) +
+    "&folder=" + encodeURIComponent(folder) +
+    "&page=" + currentPage +
+    "&limit=" + limit,
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    }
+);
+
 
         const data = await response.json();
 
@@ -139,14 +141,18 @@ async function fetchEmails() {
             emailSection.innerHTML = ''; // Clear existing content
 
             // Make AJAX request to run Artisan command
-            fetch('/admin/customer/contact/emails/fetch-new?customer_email=' + encodeURIComponent(
-                    customerEmail), {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
+ fetch(
+    "{{ route('admin.customer.contact.emails.fetch-new') }}" +
+    "?customer_email=" + encodeURIComponent(customerEmail),
+    {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    }
+)
+
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
