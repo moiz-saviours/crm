@@ -24,9 +24,9 @@ class EmailController extends Controller
     {
         try {
             $customerEmail = $request->query('customer_email');
-            $folder = $request->query('folder', 'inbox');
-            $page = (int)$request->query('page', 1);
-            $limit = (int)$request->query('limit', 100);
+            $folder = $request->query('folder', 'all');
+            $page = (int) $request->query('page', 1);
+            $limit = (int) $request->query('limit', 100);
             $offset = ($page - 1) * $limit;
             // Log the request parameters for debugging
             Log::info('Fetching emails from database', [
@@ -39,17 +39,25 @@ class EmailController extends Controller
                 return response()->json(['error' => 'Customer email is required'], 400);
             }
             $query = Email::where(function ($q) use ($customerEmail, $folder) {
-                if ($folder === 'sent') {
+                // Include sent emails (outgoing) where customerEmail is the sender for 'sent' or 'all' folders
+
+                if ($folder === 'sent' || $folder === 'all') {
                     $q->orWhere(function ($subQ) use ($customerEmail) {
-                        $subQ->orWhereJsonContains('to', [['email' => $customerEmail]])->where('type', 'outgoing');
+                        //todo
+                        $subQ->where('from_email', $customerEmail)
+                            ->where('type', 'outgoing');
                     });
                 }
-                $q->orWhere('from_email', $customerEmail)->orWhereJsonContains('cc', [['email' => $customerEmail]])->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
+                // Include received emails where customerEmail is in to, cc, or bcc
+                $q->orWhereJsonContains('to', [['email' => $customerEmail]])
+                    ->orWhereJsonContains('cc', [['email' => $customerEmail]])
+                    ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
             });
             // Filter by folder if specified
-            // if ($folder !== 'all') {
-            //     $query->where('folder', $folder);
-            // }
+            if ($folder !== 'all') {
+                $query->where('folder', $folder);
+            }
+
             // Apply pagination
             $emails = $query->orderBy('message_date', 'desc')->skip($offset)->take($limit)->with(['attachments' => function ($q) {
                 $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
@@ -305,8 +313,9 @@ class EmailController extends Controller
         $smtpRecord = $sender->imap_type === 'smtp'
             ? $sender
             : UserPseudoRecord::where('pseudo_email', $sender->pseudo_email)
-                ->where('imap_type', 'smtp')
-                ->first();
+            ->where('imap_type', 'smtp')
+            ->first();
+
         $smtpCredentials = $smtpRecord ?? $sender;
         // Validate SMTP credentials
         if (empty($smtpCredentials->server_host) || empty($smtpCredentials->server_password)) {
@@ -354,7 +363,6 @@ class EmailController extends Controller
             $mailer->AltBody = strip_tags($validated['email_content']);
             // Send the email
             $mailer->send();
-
         } catch (Exception $e) {
             throw new Exception('PHPMailer error: ' . $mailer->ErrorInfo);
         }
@@ -386,15 +394,9 @@ class EmailController extends Controller
 
     private function findSender(string $email): ?object
     {
-        return Admin::where('email', $email)
-            ->orWhere('pseudo_email', $email)
-            ->first()
-            ?? User::where('email', $email)
-            ->orWhere('pseudo_email', $email)
-            ->first()
-            ?? UserPseudoRecord::where('pseudo_email', $email)
-                ->where('imap_type', 'imap')
-                ->first();
+        return UserPseudoRecord::where('pseudo_email', $email)
+            ->where('imap_type', 'imap')
+            ->first();
     }
 
     private function getSenderName($sender, string $defaultEmail): string
