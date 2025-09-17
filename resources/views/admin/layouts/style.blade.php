@@ -726,7 +726,8 @@ Detailed information and more samples can be found in the documentation.
     }
     .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible{
         color: var(--nf-sidebar-color) !important;
-        border: none !important;
+        border-radius: 5px !important;
+        outline: none !important;
 
     }
     .select2-container--default .select2-results__option--highlighted[aria-selected] {

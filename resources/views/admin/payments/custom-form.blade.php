@@ -72,7 +72,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="agent_id" class="form-label ">Agent</label>
-                    <select class="form-control tour-paymentagent" id="agent_id" name="agent_id" required>
+                    <select class="form-control tour-paymentagent unique-select-2" id="agent_id" name="agent_id" required>
                         <option value="">Select Agent</option>
                         @foreach($agents as $agent)
                             <option value="{{ $agent->id }}" {{ old('agent_id') == $agent->id ? 'selected' : '' }}>
@@ -130,7 +130,7 @@
                 </div>
                 <div id="upsale-customer-contact-fields" class="form-group mb-3 first-fields">
                     <label for="cus_contact_key" class="form-label">Select Customer Contact</label>
-                    <select class="form-control first-field-inputs tour-paymentcuscontact" id="cus_contact_key" name="cus_contact_key">
+                    <select class="form-control first-field-inputs tour-paymentcuscontact unique-select-2" id="cus_contact_key" name="cus_contact_key">
                         <option value="">Select Customer Contact</option>
                         @foreach($customer_contacts as $customer_contact)
                             <option
@@ -349,5 +349,6 @@
         });
 
     </script>
-    <!------- CUSTOM FORM -------->
+
+        <!------- CUSTOM FORM -------->
 @endpush

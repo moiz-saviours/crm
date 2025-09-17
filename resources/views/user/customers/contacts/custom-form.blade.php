@@ -12,7 +12,7 @@
             <div class="form-body">
                 <div class="form-group mb-3">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control searchable tour-usercontactbrand" id="brand_key" name="brand_key"
+                    <select class="form-control searchable tour-usercontactbrand unique-select-2" id="brand_key" name="brand_key"
                             title="Please select a brand" required>
                         <option value="" disabled>Please select brand</option>
                         @foreach($brands as $brand)
@@ -28,7 +28,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Team</label>
-                    <select class="form-control searchable tour-usercontactteam" id="team_key" name="team_key"
+                    <select class="form-control searchable tour-usercontactteam unique-select-2" id="team_key" name="team_key"
                             title="Please select a team">
                         <option value="" disabled>Please select team</option>
                         @foreach($teams as $team)

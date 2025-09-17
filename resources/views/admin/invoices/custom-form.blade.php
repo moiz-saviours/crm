@@ -363,21 +363,7 @@
                 }
             });
         </script>
-        <script>
-            $(document).ready(function() {
-                $('#cus_contact_key').select2({
-                    placeholder: "Select Customer Contact",
-                    allowClear: true,
-                    width: '100%' // bootstrap form-control ki width maintain karne ke liye
-                });
 
-                $('#agent_id').select2({
-                    placeholder: "Select Agent",
-                    allowClear: true,
-                    width: '100%'
-                });
-            });
-        </script>
         <!------- CUSTOM FORM -------->
     @endpush
 </div>

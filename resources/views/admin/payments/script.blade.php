@@ -139,13 +139,13 @@
 
             $('#brand_key').val(payment.brand_key);
             $('#team_key').val(payment.team_key);
-            $('#agent_id').val(payment.agent_id);
+            $('#agent_id').val(payment.agent_id).trigger('change');
             $('#payment_type').val(payment.payment_type).trigger('change');
             $('#address').val(payment.address);
             $('#customer_contact_name').val(payment.customer_contact?.name);
             $('#customer_contact_email').val(payment.customer_contact?.email);
             $('#customer_contact_phone').val(payment.customer_contact?.phone);
-            $('#cus_contact_key').val(payment.customer_contact?.special_key);
+            $('#cus_contact_key').val(payment.customer_contact?.special_key).trigger('change');
             $('#currency').val(payment.currency);
             $('#amount').val(payment.amount);
             $('#description').val(payment.description);
