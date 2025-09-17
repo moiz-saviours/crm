@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\PaymentMerchant;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,13 +23,13 @@ class PaymentController extends Controller
     {
         $query = Payment::query();
         if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'Accounts') {
-            $query->with(['customer_contact']);
+            $query->with(['customer_contact:id,name,special_key']);
         } else if (Auth::user()->department->name === 'Sales') {
             $query->whereIn('brand_key', Auth::user()->teams()->with(['brands' => function ($query) {
                 $query->where('status', 1);
             }])->get()->pluck('brands.*.brand_key')->flatten())
                 ->whereIn('team_key', Auth::user()->teams()->pluck('teams.team_key')->flatten()->unique())
-                ->with(['customer_contact']);
+                ->with(['customer_contact:id,name,special_key']);
         } else {
             $query->whereNull('id');
         }
@@ -202,7 +203,7 @@ class PaymentController extends Controller
                 'payment_type' => $request->input('type'),
                 'merchant_id' => $account->id,
                 'payment_method' => $account->payment_method,
-                'payment_date' => $request->input('payment_date'),
+                'payment_date' => Carbon::parse( $request->input('payment_date'), 'GMT+5')->setTimezone('UTC'),
             ];
             if ($request->has('agent_id')) {
                 $paymentData['agent_id'] = $request->input('agent_id');
@@ -211,7 +212,6 @@ class PaymentController extends Controller
             $payment = Payment::create($paymentData);
             DB::commit();
             $payment = Payment::select('id', 'invoice_key', 'merchant_id', 'cus_contact_key', 'transaction_id', 'payment_method', 'amount', 'status', 'payment_date', 'created_at')->with(['invoice:invoice_key,invoice_number','customer_contact:special_key,name','payment_gateway:id,name,payment_method,descriptor'])->findOrFail($payment->id);
-            $payment->date = "Today at " . $payment->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
             $unpaid_invoices = Invoice::select(['invoice_key', 'invoice_number', 'brand_key', 'team_key', 'agent_id', 'cus_contact_key', 'currency', 'total_amount', 'created_at',])->with(['customer_contact:special_key,name'])->where('status', 0)->orderBy('created_at', 'desc')->get()->map(function ($invoice) {
                 $invoice->formatted_date = $invoice->created_at->format('jS F Y');
                 return $invoice;
