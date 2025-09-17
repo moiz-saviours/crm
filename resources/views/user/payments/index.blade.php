@@ -21,13 +21,15 @@
                             {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
-                                    data-tour="paymentcreate"><i class="fas fa-exclamation-circle custom-dot"></i>
-                            </button>
-                            <button id="createBtn"
-                                    class="create-contact open-form-btn tour-createpayment {{Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'Accounts' ? "" : "void"}}">
-                                Create New
-                            </button>
+                            @if(Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'Accounts')
+                                <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                                        data-tour="paymentcreate"><i class="fas fa-exclamation-circle custom-dot"></i>
+                                </button>
+                                <button id="createBtn"
+                                        class="create-contact open-form-btn tour-createpayment {{Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'Accounts' ? "" : "void"}}">
+                                    Create New
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </header>
@@ -139,17 +141,13 @@
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    {{\carbon\carbon::parse($payment->payment_date)->timezone('GMT+5')->format('M d, Y g:i A')}}
-                                                    GMT+5
+                                                    @if($payment->payment_date)
+                                                        {{ $payment->payment_date_formatted }}
+                                                    @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">
-                                                    @if ($payment->created_at->isToday())
-                                                        Today
-                                                        at {{ $payment->created_at->timezone('GMT+5')->format('g:i A') }}
-                                                        GMT+5
-                                                    @else
-                                                        {{ $payment->created_at->timezone('GMT+5')->format('M d, Y g:i A') }}
-                                                        GMT+5
+                                                    @if($payment->created_at)
+                                                        {{ $payment->created_at_formatted }}
                                                     @endif
                                                 </td>
 
