@@ -147,7 +147,7 @@
             $('#descriptor').val(client_account.descriptor);
             $('#vendor_name').val(client_account.vendor_name);
             $('#email').val(client_account.email);
-            $('#payment_method').val(client_account.payment_method);
+            $('#payment_method').val(client_account.payment_method).trigger('change');
             $('#limit').val(client_account.limit);
             $('#capacity').val(client_account.capacity);
             $('#environment').val(client_account.environment);
