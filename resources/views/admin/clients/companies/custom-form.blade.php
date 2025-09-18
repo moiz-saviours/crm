@@ -64,7 +64,7 @@
 
                 <div class="form-group mb-3">
                     <label for="c_contact_key" class="form-label">Contact</label>
-                    <select class="form-control searchable tour-clientcompanycontact" id="c_contact_key" name="c_contact_key"
+                    <select class="form-control searchable tour-clientcompanycontact unique-select-2" id="c_contact_key" name="c_contact_key"
                             title="Please select a brand" required>
                         <option value="" disabled>Please select Contact</option>
                         @foreach($client_contacts as $client_contact)

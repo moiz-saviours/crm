@@ -135,12 +135,12 @@
             let lead = data?.lead;
             $('#manage-form').data('id', lead.id);
 
-            $('#brand_key').val(lead.brand_key);
-            $('#team_key').val(lead.team_key);
+            $('#brand_key').val(lead.brand_key).trigger('change');
+            $('#team_key').val(lead.team_key).trigger('change');
             $('#name').val(lead.name)
             $('#email').val(lead.email);
             $('#phone').val(lead.phone);
-            $('#lead_status_id').val(lead.lead_status_id);
+            $('#lead_status_id').val(lead.lead_status_id).trigger('change');
             $('#note').val(lead.note);
             $('#status').val(lead.status);
 

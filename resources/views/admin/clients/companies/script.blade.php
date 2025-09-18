@@ -166,7 +166,7 @@
                 $('#select-all-label').text('Select All');
             }
 
-            $('#c_contact_key').val(client_company.c_contact_key);
+            $('#c_contact_key').val(client_company.c_contact_key).trigger('change');
             $('#name').val(client_company.name);
             $('#email').val(client_company.email);
             $('#url').val(client_company.url);

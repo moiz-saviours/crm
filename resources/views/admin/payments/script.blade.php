@@ -137,8 +137,8 @@
             let payment = data.payment;
             $('#manage-form').data('id', payment.id);
 
-            $('#brand_key').val(payment.brand_key);
-            $('#team_key').val(payment.team_key);
+            $('#brand_key').val(payment.brand_key).trigger('change');
+            $('#team_key').val(payment.team_key).trigger('change');
             $('#agent_id').val(payment.agent_id).trigger('change');
             $('#payment_type').val(payment.payment_type).trigger('change');
             $('#address').val(payment.address);
