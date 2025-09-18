@@ -20,80 +20,86 @@ use Illuminate\Support\Facades\Artisan;
 
 class EmailController extends Controller
 {
-    public function fetch(Request $request)
-    {
-        try {
-            $customerEmail = $request->query('customer_email');
-            $folder = $request->query('folder', 'all');
+    public function getEmails($customerEmail, $folder = "all")
+{
+    $query = Email::where(function ($q) use ($customerEmail) {
+        $q->where('from_email', $customerEmail)
+          ->orWhereJsonContains('to', ['email' => $customerEmail])
+          ->orWhereJsonContains('cc', ['email' => $customerEmail])
+          ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+    });
 
-            if (!$customerEmail) {
-                return response()->json(['error' => 'Customer email is required'], 400);
-            }
-
-            $query = Email::where(function ($q) use ($customerEmail) {
-                $q->where('from_email', $customerEmail)
-                  ->orWhereJsonContains('to', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
-            });
-
-            if ($folder !== 'all') {
-                $query->where('folder', $folder);
-            }
-
-            $emails = $query->orderBy('message_date', 'desc')
-                ->with(['attachments' => function ($q) {
-                    $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
-                }])
-                ->get()
-                ->map(function ($email) {
-                    return [
-                        'uuid' => 'email-' . $email->id,
-                        'from' => [
-                            [
-                                'name' => $email->from_name,
-                                'email' => $email->from_email,
-                            ],
-                        ],
-                        'to' => $email->to ?? [],
-                        'subject' => $email->subject,
-                        'date' => $email->message_date,
-                        'body' => [
-                            'html' => $email->body_html,
-                            'text' => $email->body_text,
-                        ],
-                        'attachments' => $email->attachments->map(function ($attachment) {
-                            return [
-                                'filename' => $attachment->filename,
-                                'type' => $attachment->type,
-                                'size' => $attachment->size,
-                                'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                            ];
-                        })->toArray(),
-                    ];
-                });
-
-            $folders = Email::where(function ($q) use ($customerEmail) {
-                $q->where('from_email', $customerEmail)
-                  ->orWhereJsonContains('to', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                  ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
-            })
-                ->distinct()
-                ->pluck('folder')
-                ->filter()
-                ->values()
-                ->toArray();
-
-            return response()->json([
-                'emails' => $emails,
-                'folders' => $folders,
-                'folder' => $folder,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to fetch emails. Please try again later.'], 500);
-        }
+    if ($folder !== 'all') {
+        $query->where('folder', $folder);
     }
+
+    $emails = $query->orderBy('message_date', 'desc')
+        ->with(['attachments' => function ($q) {
+            $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
+        }])
+        ->get()
+        ->map(function ($email) {
+            return [
+                'uuid' => 'email-' . $email->id,
+                'from' => [[
+                    'name'  => $email->from_name,
+                    'email' => $email->from_email,
+                ]],
+                'to' => $email->to ?? [],
+                'subject' => $email->subject,
+                'date' => $email->message_date,
+                'body' => [
+                    'html' => $email->body_html,
+                    'text' => $email->body_text,
+                ],
+                'attachments' => $email->attachments->map(function ($attachment) {
+                    return [
+                        'filename' => $attachment->original_name,
+                        'type'     => $attachment->mime_type,
+                        'size'     => $attachment->size,
+                        'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                    ];
+                })->toArray(),
+            ];
+        })
+        ->values()
+        ->toArray();
+
+    $folders = Email::where(function ($q) use ($customerEmail) {
+            $q->where('from_email', $customerEmail)
+              ->orWhereJsonContains('to', ['email' => $customerEmail])
+              ->orWhereJsonContains('cc', ['email' => $customerEmail])
+              ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+        })
+        ->distinct()
+        ->pluck('folder')
+        ->filter()
+        ->values()
+        ->toArray();
+
+    return ['emails' => $emails, 'folders' => $folders, 'folder' => $folder];
+}
+
+public function fetch(Request $request)
+{
+    try {
+        $customerEmail = $request->query('customer_email');
+        $folder = $request->query('folder', 'all');
+
+        if (!$customerEmail) {
+            return response()->json(['error' => 'Customer email is required'], 400);
+        }
+
+        return response()->json($this->getEmails($customerEmail, $folder));
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to fetch emails. Please try again later.',
+            'details' => $e->getMessage() // optional for debugging
+        ], 500);
+    }
+}
+
 
     public function fetchNewEmails(Request $request)
     {
@@ -133,7 +139,8 @@ class EmailController extends Controller
                 'customer_email' => $customerEmail,
                 'error' => $e->getMessage(),
             ]);
-            return response()->json(['error' => 'Failed to fetch new emails. Please try again later.',
+            return response()->json([
+                'error' => 'Failed to fetch new emails. Please try again later.',
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
             ], 500);
@@ -284,8 +291,7 @@ class EmailController extends Controller
         array            $bccEmails,
         ?array           $attachments = null,
         UserPseudoRecord $sender
-    ): void
-    {
+    ): void {
         // Look for SMTP-specific credentials if available
         $smtpRecord = $sender->imap_type === 'smtp'
             ? $sender

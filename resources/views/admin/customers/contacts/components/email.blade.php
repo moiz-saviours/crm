@@ -14,7 +14,6 @@
                 style="padding: 8px; font-size: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
                 <i class="fa fa-download" aria-hidden="true"></i>
             </button>
-
         </div>
         <button class="threading-email-btn-one">
             Log Email
@@ -60,6 +59,7 @@
                     <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading emails...
                 </div>
                 <div id="email-content">
+                    @include('admin.customers.contacts.partials.emails-list')
                 </div>
             </div>
         </div>
@@ -78,52 +78,52 @@
         let currentPage = {{ $page }}; // Make page mutable for pagination
         const limit = 100;
 
-     // Function to fetch emails
-async function fetchEmails() {
-    // Show loader
-    emailLoader.style.display = 'block';
-    emailSection.innerHTML = ''; // Clear existing content
+        // Function to fetch emails
+        async function fetchEmails() {
+            // Show loader
+            emailLoader.style.display = 'block';
+            emailSection.innerHTML = ''; // Clear existing content
 
-    try {
-const response = await fetch(
-    "{{ route('admin.customer.contact.emails.fetch') }}" +
-    "?customer_email=" + encodeURIComponent(customerEmail) +
-    "&folder=" + encodeURIComponent(folder) +
-    "&page=" + currentPage +
-    "&limit=" + limit,
-    {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            try {
+                const response = await fetch(
+                    "{{ route('admin.customer.contact.emails.fetch') }}" +
+                    "?customer_email=" + encodeURIComponent(customerEmail) +
+                    "&folder=" + encodeURIComponent(folder) +
+                    "&page=" + currentPage +
+                    "&limit=" + limit, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    }
+                );
+
+
+                const data = await response.json();
+
+                // Hide loader
+                emailLoader.style.display = 'none';
+
+                if (data.error) {
+                    emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
+                    return;
+                }
+
+                // Update email content
+                emailSection.innerHTML = renderEmails(data.emails);
+
+                // Re-attach toggle event listeners
+                attachToggleListeners();
+
+            } catch (error) {
+                // Hide loader
+                emailLoader.style.display = 'none';
+                emailSection.innerHTML =
+                    '<p class="text-muted">Failed to load emails. Please try again later.</p>';
+                console.error('Error fetching emails:', error);
+            }
         }
-    }
-);
-
-
-        const data = await response.json();
-
-        // Hide loader
-        emailLoader.style.display = 'none';
-
-        if (data.error) {
-            emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
-            return;
-        }
-
-        // Update email content
-        emailSection.innerHTML = renderEmails(data.emails);
-
-        // Re-attach toggle event listeners
-        attachToggleListeners();
-
-    } catch (error) {
-        // Hide loader
-        emailLoader.style.display = 'none';
-        emailSection.innerHTML = '<p class="text-muted">Failed to load emails. Please try again later.</p>';
-        console.error('Error fetching emails:', error);
-    }
-}
 
 
         // Initial fetch
@@ -141,17 +141,16 @@ const response = await fetch(
             emailSection.innerHTML = ''; // Clear existing content
 
             // Make AJAX request to run Artisan command
- fetch(
-    "{{ route('admin.customer.contact.emails.fetch-new') }}" +
-    "?customer_email=" + encodeURIComponent(customerEmail),
-    {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    }
-)
+            fetch(
+                    "{{ route('admin.customer.contact.emails.fetch-new') }}" +
+                    "?customer_email=" + encodeURIComponent(customerEmail), {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    }
+                )
 
                 .then(response => response.json())
                 .then(data => {
@@ -182,7 +181,7 @@ const response = await fetch(
 
             return emails.map(email => `
                 <div class="email-box-container" style="margin: 0; border-radius: 0; margin-top: 15px;">
-                    <div class="toggle-btnss" data-target="#${email.uuid}">
+                    <div class="toggle-btnss" data-target=".${email.uuid}">
                         <div class="activ_head">
                             <div class="email-child-wrapper">
                                 <i class="fa fa-caret-right" aria-hidden="true"></i>
@@ -203,7 +202,7 @@ const response = await fetch(
                             </div>
                         </div>
                     </div>
-                    <div id="${email.uuid}" class="contentdisplaytwo" style="display: none;">
+                    <div  class="contentdisplaytwo ${email.uuid}" style="display: none;">
                         <div class="user_cont user-email-template">
                             <div class="email-preview">
                                 ${email.body.html || (email.body.text ? email.body.text.replace(/\n/g, '<br>') : '')}
@@ -270,23 +269,25 @@ const response = await fetch(
         }
 
         // Function to attach toggle listeners
-        function attachToggleListeners() {
-            document.querySelectorAll('.toggle-btnss').forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const content = document.querySelector(targetId);
-                    if (content.style.display === 'none') {
-                        content.style.display = 'block';
-                        this.querySelector('i.fa').classList.replace('fa-caret-right',
-                            'fa-caret-down');
-                    } else {
-                        content.style.display = 'none';
-                        this.querySelector('i.fa').classList.replace('fa-caret-down',
-                            'fa-caret-right');
-                    }
-                });
-            });
-        }
+function attachToggleListeners() {
+    document.querySelectorAll('.toggle-btnss').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetClass = this.getAttribute('data-target'); // e.g. ".content"
+            
+            // ✅ only find the closest .content after this toggle-btnss
+            const content = this.parentElement.querySelector(targetClass);
+
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                this.querySelector('i.fa').classList.replace('fa-caret-right', 'fa-caret-down');
+            } else {
+                content.style.display = 'none';
+                this.querySelector('i.fa').classList.replace('fa-caret-down', 'fa-caret-right');
+            }
+        });
+    });
+}
+
 
         // Function to set active tab
         function setActiveTab(folder) {
@@ -298,25 +299,25 @@ const response = await fetch(
             });
         }
 
-    let isFetching = false;
+        let isFetching = false;
 
-    // Attach tab click event listeners
-    document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
-        tab.addEventListener('click', function(e) {
-            e.preventDefault();
+        // Attach tab click event listeners
+        document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
 
-            if (isFetching) return; // prevent multiple clicks
+                if (isFetching) return; // prevent multiple clicks
 
-            folder = this.getAttribute('data-folder');
-            currentPage = 1; // Reset to first page
-            setActiveTab(folder);
+                folder = this.getAttribute('data-folder');
+                currentPage = 1; // Reset to first page
+                setActiveTab(folder);
 
-            isFetching = true;
-            fetchEmails().finally(() => {
-                isFetching = false;
+                isFetching = true;
+                fetchEmails().finally(() => {
+                    isFetching = false;
+                });
             });
         });
-    });
         // Set initial active tab
         setActiveTab(folder);
     });
