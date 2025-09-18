@@ -11,7 +11,6 @@ class CustomerNote extends Model
     use SoftDeletes, ActivityLoggable;
 
     protected $table = 'customer_notes';
-
     protected $fillable = [
         'cus_contact_key',
         'note',
@@ -20,5 +19,10 @@ class CustomerNote extends Model
     public function customer_contact()
     {
         return $this->belongsTo(CustomerContact::class, 'cus_contact_key', 'special_key');
+    }
+
+    public function creator()
+    {
+        return $this->morphTo('creator');
     }
 }
