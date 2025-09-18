@@ -18,87 +18,90 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Illuminate\Support\Facades\Artisan;
 
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Config;
+use App\Mail\OutgoingEmail;
+
 class EmailController extends Controller
 {
     public function getEmails($customerEmail, $folder = "all")
-{
-    $query = Email::where(function ($q) use ($customerEmail) {
-        $q->where('from_email', $customerEmail)
-          ->orWhereJsonContains('to', ['email' => $customerEmail])
-          ->orWhereJsonContains('cc', ['email' => $customerEmail])
-          ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-    });
-
-    if ($folder !== 'all') {
-        $query->where('folder', $folder);
-    }
-
-    $emails = $query->orderBy('message_date', 'desc')
-        ->with(['attachments' => function ($q) {
-            $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
-        }])
-        ->get()
-        ->map(function ($email) {
-            return [
-                'uuid' => 'email-' . $email->id,
-                'from' => [[
-                    'name'  => $email->from_name,
-                    'email' => $email->from_email,
-                ]],
-                'to' => $email->to ?? [],
-                'subject' => $email->subject,
-                'date' => $email->message_date,
-                'body' => [
-                    'html' => $email->body_html,
-                    'text' => $email->body_text,
-                ],
-                'attachments' => $email->attachments->map(function ($attachment) {
-                    return [
-                        'filename' => $attachment->original_name,
-                        'type'     => $attachment->mime_type,
-                        'size'     => $attachment->size,
-                        'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                    ];
-                })->toArray(),
-            ];
-        })
-        ->values()
-        ->toArray();
-
-    $folders = Email::where(function ($q) use ($customerEmail) {
+    {
+        $query = Email::where(function ($q) use ($customerEmail) {
             $q->where('from_email', $customerEmail)
-              ->orWhereJsonContains('to', ['email' => $customerEmail])
-              ->orWhereJsonContains('cc', ['email' => $customerEmail])
-              ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-        })
-        ->distinct()
-        ->pluck('folder')
-        ->filter()
-        ->values()
-        ->toArray();
+                ->orWhereJsonContains('to', ['email' => $customerEmail])
+                ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+        });
 
-    return ['emails' => $emails, 'folders' => $folders, 'folder' => $folder];
-}
-
-public function fetch(Request $request)
-{
-    try {
-        $customerEmail = $request->query('customer_email');
-        $folder = $request->query('folder', 'all');
-
-        if (!$customerEmail) {
-            return response()->json(['error' => 'Customer email is required'], 400);
+        if ($folder !== 'all') {
+            $query->where('folder', $folder);
         }
 
-        return response()->json($this->getEmails($customerEmail, $folder));
+        $emails = $query->orderBy('message_date', 'desc')
+            ->with(['attachments' => function ($q) {
+                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
+            }])
+            ->get()
+            ->map(function ($email) {
+                return [
+                    'uuid' => 'email-' . $email->id,
+                    'from' => [[
+                        'name'  => $email->from_name,
+                        'email' => $email->from_email,
+                    ]],
+                    'to' => $email->to ?? [],
+                    'subject' => $email->subject,
+                    'date' => $email->message_date,
+                    'body' => [
+                        'html' => $email->body_html,
+                        'text' => $email->body_text,
+                    ],
+                    'attachments' => $email->attachments->map(function ($attachment) {
+                        return [
+                            'filename' => $attachment->original_name,
+                            'type'     => $attachment->mime_type,
+                            'size'     => $attachment->size,
+                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                        ];
+                    })->toArray(),
+                ];
+            })
+            ->values()
+            ->toArray();
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Failed to fetch emails. Please try again later.',
-            'details' => $e->getMessage() // optional for debugging
-        ], 500);
+        $folders = Email::where(function ($q) use ($customerEmail) {
+            $q->where('from_email', $customerEmail)
+                ->orWhereJsonContains('to', ['email' => $customerEmail])
+                ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+        })
+            ->distinct()
+            ->pluck('folder')
+            ->filter()
+            ->values()
+            ->toArray();
+
+        return ['emails' => $emails, 'folders' => $folders, 'folder' => $folder];
     }
-}
+
+    public function fetch(Request $request)
+    {
+        try {
+            $customerEmail = $request->query('customer_email');
+            $folder = $request->query('folder', 'all');
+
+            if (!$customerEmail) {
+                return response()->json(['error' => 'Customer email is required'], 400);
+            }
+
+            return response()->json($this->getEmails($customerEmail, $folder));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch emails. Please try again later.',
+                'details' => $e->getMessage() // optional for debugging
+            ], 500);
+        }
+    }
 
 
     public function fetchNewEmails(Request $request)
@@ -147,82 +150,65 @@ public function fetch(Request $request)
         }
     }
 
-    public function sendEmail(Request $request): JsonResponse
+public function sendEmail(Request $request): JsonResponse
     {
+        // Validate request data
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
             'email_content' => 'required|string',
             'to' => 'required|string',
             'from' => 'required|email',
-            'cc' => 'sometimes|string|nullable',
-            'bcc' => 'sometimes|string|nullable',
-            'attachments.*' => 'sometimes|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240', // 10MB max per file
+            'cc' => 'nullable|string',
+            'bcc' => 'nullable|string',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240',
         ]);
+
         try {
-            $sender = $this->findSender($request->from);
+            // Find sender (UserPseudoRecord)
+            $sender = $this->findSender($validated['from']);
             if (!$sender) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Sender not authorized or not found'
+                    'message' => 'Sender not authorized or not found',
                 ], 403);
             }
-            // Check if sender is UserPseudoRecord and has SMTP credentials
+
+            // Validate SMTP credentials
             if (!$sender instanceof UserPseudoRecord || empty($sender->server_password) || empty($sender->server_host)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid or missing SMTP credentials for sender'
+                    'message' => 'Invalid or missing SMTP credentials for sender',
                 ], 403);
             }
-            $toEmails = $this->parseEmailList($request->to);
-            $ccEmails = $this->parseEmailList($request->cc);
-            $bccEmails = $this->parseEmailList($request->bcc);
+
+            // Parse email lists, with fallback for missing cc/bcc
+            $toEmails = $this->parseEmailList($validated['to']);
+            $ccEmails = $this->parseEmailList($validated['cc'] ?? '');
+            $bccEmails = $this->parseEmailList($validated['bcc'] ?? '');
+
             if (empty($toEmails)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No valid recipients specified'
+                    'message' => 'No valid recipients specified',
                 ], 400);
             }
-            $fromEmail = $request->from;
+
+            $fromEmail = $validated['from'];
             $fromName = $this->getSenderName($sender, $fromEmail);
-            // Parse addresses for storage
-            $parsedTo = $this->parseEmailListForStorage($toEmails);
-            $parsedCc = $this->parseEmailListForStorage($ccEmails);
-            $parsedBcc = $this->parseEmailListForStorage($bccEmails);
-            // Handle attachments
-            $attachments = null;
-            $storedAttachments = [];
-            if ($request->hasFile('attachments')) {
-                $attachmentsDir = 'attachments/outgoing/' . uniqid();
-                foreach ($request->file('attachments') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $storageName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
-                    $storagePath = $attachmentsDir . '/' . $storageName;
-                    if (Storage::put($storagePath, file_get_contents($file->getRealPath()))) {
-                        $mimeType = $file->getMimeType();
-                        $storedAttachments[] = [
-                            'original_name' => $originalName,
-                            'storage_name' => $storageName,
-                            'storage_path' => $storagePath,
-                            'size' => $file->getSize(),
-                            'mime_type' => $mimeType,
-                        ];
-                    }
-                }
-                $attachments = $storedAttachments;
-            }
-            // Store email in database as outgoing
+
+            // Store email record
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
                 'thread_id' => md5($validated['subject'] . $fromEmail . time()),
                 'message_id' => null,
                 'from_email' => $fromEmail,
                 'from_name' => $fromName,
-                'to' => $parsedTo,
-                'cc' => $parsedCc,
-                'bcc' => $parsedBcc,
+                'to' => json_encode($toEmails),
+                'cc' => json_encode($ccEmails),
+                'bcc' => json_encode($bccEmails),
                 'subject' => $validated['subject'],
-                'body_html' => $validated['email_content'],
-                'body_text' => strip_tags($validated['email_content']),
+                'body_html' => null,
+                'body_text' => null,
                 'imap_uid' => null,
                 'imap_folder' => 'Sent',
                 'type' => 'outgoing',
@@ -231,123 +217,124 @@ public function fetch(Request $request)
                 'message_date' => now(),
                 'received_at' => now(),
             ]);
-            // Store attachments if any
-            if (!empty($storedAttachments)) {
-                foreach ($storedAttachments as $att) {
+
+            // Store attachments
+            $storedAttachments = [];
+            if ($request->hasFile('attachments')) {
+                $attachmentsDir = 'attachments/outgoing/' . uniqid();
+                foreach ($request->file('attachments') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $storageName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
+                    $storagePath = $file->storeAs($attachmentsDir, $storageName, 'public');
+
+                    $storedAttachments[] = [
+                        'original_name' => $originalName,
+                        'storage_name' => $storageName,
+                        'storage_path' => $storagePath,
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                    ];
+
+                    // Store attachment record
                     EmailAttachment::create([
                         'email_id' => $email->id,
-                        'original_name' => $att['original_name'],
-                        'storage_name' => $att['storage_name'],
-                        'size' => $att['size'],
-                        'storage_path' => $att['storage_path'],
-                        'mime_type' => $att['mime_type'],
+                        'original_name' => $originalName,
+                        'storage_name' => $storageName,
+                        'storage_path' => $storagePath,
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
                     ]);
                 }
             }
-            // Send the email using PHPMailer with SMTP credentials
-            $this->sendMail(
-                $validated,
-                $toEmails,
-                $fromEmail,
-                $fromName,
-                $ccEmails,
-                $bccEmails,
-                $attachments,
-                $sender
+
+            // Configure SMTP
+            $smtpRecord = $sender->imap_type === 'smtp'
+                ? $sender
+                : UserPseudoRecord::where('pseudo_email', $sender->pseudo_email)
+                    ->where('imap_type', 'smtp')
+                    ->first();
+            $smtpCredentials = $smtpRecord ?? $sender;
+
+            if (empty($smtpCredentials->server_host) || empty($smtpCredentials->server_password)) {
+                throw new \Exception('Missing SMTP host or password');
+            }
+
+            Config::set('mail.mailers.smtp', [
+                'transport' => 'smtp',
+                'host' => $smtpCredentials->server_host,
+                'port' => $smtpCredentials->server_port ?? 465,
+                'encryption' => $smtpCredentials->server_encryption ?? 'ssl',
+                'username' => $smtpCredentials->server_username ?? $smtpCredentials->pseudo_email,
+                'password' => $smtpCredentials->server_password,
+                'timeout' => null,
+                'auth_mode' => null,
+            ]);
+            Config::set('mail.default', 'smtp');
+            Config::set('mail.from', ['address' => $fromEmail, 'name' => $fromName]);
+
+            // Create Mailable instance
+            $mailable = new OutgoingEmail(
+                subject: $validated['subject'],
+                content: $validated['email_content'],
+                toEmails: $toEmails,
+                ccEmails: $ccEmails,
+                bccEmails: $bccEmails,
+                fromEmail: $fromEmail,
+                fromName: $fromName,
+                attachments: $storedAttachments,
+                emailId: $email->id
             );
-            Log::info('Email sent and stored successfully', [
+
+            // Render content for storage
+            try {
+                $mailable->build(); // Ensure content is rendered
+                $email->update([
+                    'body_html' => $mailable->renderedHtml,
+                    'body_text' => $mailable->renderedText,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to render email content', [
+                    'error' => $e->getMessage(),
+                    'email_id' => $email->id,
+                    'subject' => $validated['subject'],
+                ]);
+                throw new \Exception('Failed to render email template: ' . $e->getMessage());
+            }
+
+            // Queue the email
+            Mail::queue($mailable);
+
+            Log::info('Email queued for sending', [
                 'email_id' => $email->id,
                 'from' => $fromEmail,
                 'to' => $toEmails,
+                'subject' => $validated['subject'],
             ]);
+
             return response()->json([
                 'success' => true,
-                'message' => 'Email sent successfully',
+                'message' => 'Email queued for sending',
                 'email_id' => $email->id,
             ]);
         } catch (ValidationException $e) {
-            throw $e;
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             Log::error('Email sending failed', [
                 'error' => $e->getMessage(),
-                'from' => $request->from ?? null,
-                'to' => $request->to ?? null,
+                'from' => $validated['from'] ?? null,
+                'to' => $validated['to'] ?? null,
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send email. Please try again.'
+                'message' => 'Failed to queue email. Please try again.',
             ], 500);
-        }
-    }
-
-    private function sendMail(
-        array            $validated,
-        array            $toEmails,
-        string           $fromEmail,
-        string           $fromName,
-        array            $ccEmails,
-        array            $bccEmails,
-        ?array           $attachments = null,
-        UserPseudoRecord $sender
-    ): void {
-        // Look for SMTP-specific credentials if available
-        $smtpRecord = $sender->imap_type === 'smtp'
-            ? $sender
-            : UserPseudoRecord::where('pseudo_email', $sender->pseudo_email)
-            ->where('imap_type', 'smtp')
-            ->first();
-
-        $smtpCredentials = $smtpRecord ?? $sender;
-        // Validate SMTP credentials
-        if (empty($smtpCredentials->server_host) || empty($smtpCredentials->server_password)) {
-            throw new Exception('Missing SMTP host or password');
-        }
-        // Initialize PHPMailer
-        $mailer = new PHPMailer(true);
-        try {
-            // Server settings
-            $mailer->isSMTP();
-            $mailer->Host = $smtpCredentials->server_host;
-            $mailer->Port = 465;
-            $mailer->SMTPSecure = 'ssl';
-            $mailer->SMTPAuth = true;
-            $mailer->Username = $smtpCredentials->server_username ?? $smtpCredentials->pseudo_email;
-            $mailer->Password = $smtpCredentials->server_password;
-            // Sender and recipients
-            $mailer->setFrom($fromEmail, $fromName);
-            $mailer->addReplyTo($fromEmail, $fromName);
-            $mailer->addCustomHeader('Return-Path', $fromEmail);
-            foreach ($toEmails as $toEmail) {
-                $mailer->addAddress($toEmail);
-            }
-            foreach ($ccEmails as $ccEmail) {
-                $mailer->addCC($ccEmail);
-            }
-            foreach ($bccEmails as $bccEmail) {
-                $mailer->addBCC($bccEmail);
-            }
-            // Attachments
-            if ($attachments) {
-                foreach ($attachments as $attachment) {
-                    $mailer->addAttachment(
-                        Storage::path($attachment['storage_path']),
-                        $attachment['original_name'],
-                        'base64',
-                        $attachment['mime_type']
-                    );
-                }
-            }
-            // Content
-            $mailer->isHTML(true);
-            $mailer->Subject = $validated['subject'];
-            $mailer->Body = $validated['email_content'];
-            $mailer->AltBody = strip_tags($validated['email_content']);
-            // Send the email
-            $mailer->send();
-        } catch (Exception $e) {
-            throw new Exception('PHPMailer error: ' . $mailer->ErrorInfo);
         }
     }
 
@@ -393,6 +380,9 @@ public function fetch(Request $request)
             return [];
         }
         $parsed = json_decode($emails, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ValidationException('Invalid email list format');
+        }
         return is_array($parsed) ? array_filter($parsed) : [];
     }
 }
