@@ -2033,62 +2033,14 @@
                                                             </p>
                                                         </div>
                                                         <p class="date-by-order"> May 2021</p>
-                                                        @if($customer_contact->notes->count() > 0)
-                                                            @foreach($customer_contact->notes->sortByDesc('created_at') as $noteKey => $note)
-                                                                <div class="data-highlights">
-                                                                    <div class="cstm_note">
-                                                                        <div class="row">
-                                                                            <div class="col-md-12">
-                                                                                <div class="data-top-heading-header">
-                                                                                    <h2>Note By {{ucwords($note->creator?->name)}}</h2>
-                                                                                    <p>
-                                                                                        {{ $note->created_at
-                                                                                            ? \Carbon\Carbon::parse($note->created_at)->timezone('Asia/Karachi')->format('M j, Y \a\t g:i A \G\M\TP')
-                                                                                            : '---' }}
-                                                                                    </p>
+                @include('admin.customers.contacts.partials.notes-list')
+                                                   <div class="recent-activities">
+                                                        <div id="email-section">
+                                                            @include('admin.customers.contacts.partials.emails-list')
+                                                        </div>
+                                                    </div>
 
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <!-- Edit & Delete Icons -->
-                                                                    <div class="cstm_note_2">
-                                                                        <div class="row">
-                                                                            <div class="col-md-12 cstm_note_cont">
-                                                                                <p class="user_cont"
-                                                                                   id="note-text-{{$note->id}}">
-                                                                                    {{ $note->note ?? "No Note Available" }}
-                                                                                </p>
-                                                                                <div class="cstm_right_icon">
-                                                                                    <!-- Edit Icon -->
-                                                                                    <button class="p-0 border-0 cstm_btn">
-                                                                                        <i class="fas fa-edit me-2 editNoteModal"
-                                                                                           style="cursor: pointer;"
-                                                                                           data-bs-toggle="modal"
-                                                                                           data-bs-target="#editNoteModal"
-                                                                                           data-id="{{$note->id}}"
-                                                                                           data-note="{{$note->note}}"></i>
-                                                                                    </button>
-                                                                                    <!-- Delete Form -->
-                                                                                    <form
-                                                                                        action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
-                                                                                        method="POST"
-                                                                                        class="deleteNoteForm">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="submit"
-                                                                                                class="p-0 border-0 cstm_btn">
-                                                                                            <i class="fas fa-trash"></i>
-                                                                                        </button>
-                                                                                    </form>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
+                                                        
                                                         <div class="data-highlights">
                                                             <div class="data-top-heading-header">
                                                                 <h2>Life Cycle</h2>
@@ -2246,7 +2198,7 @@
                                                     </div>
                                                     <p class="date-by-order">{{ \Carbon\Carbon::now()->format('F Y') }}</p>
 
-                                                    @if($customer_contact->notes->count() > 0)
+                                                    {{-- @if($customer_contact->notes->count() > 0)
                                                         @foreach($customer_contact->notes as $noteKey => $note)
                                                             <div class="data-highlights">
                                                                 <div class="cstm_note">
@@ -2307,7 +2259,10 @@
                                                             info.
                                                             You can even @mention a teammate if you need to.
                                                         </p>
-                                                    @endif
+                                                    @endif --}}
+                @include('admin.customers.contacts.partials.notes-list')
+
+                                                    
                                                 </div>
 
 
