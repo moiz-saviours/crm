@@ -322,14 +322,6 @@
             attributes: true
         });
 
-        // Select 2
-        $(document).ready(function() {
-            $('#lead_id').select2({
-                placeholder: "Select Team Lead",
-                allowClear: true,
-                width: '100%',
-            });
-        });
     </script>
 
 @endpush

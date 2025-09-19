@@ -153,8 +153,8 @@
             const invoice = data?.invoice;
 
             $('#manage-form').data('id', invoice.id);
-            $('#brand_key').val(invoice.brand_key);
-            $('#team_key').val(invoice.team_key);
+            $('#brand_key').val(invoice.brand_key).trigger('change.select2');
+            $('#team_key').val(invoice.team_key).trigger('change');
             $('#type').val(invoice.type).trigger('change');
 
             $('#customer_contact_name').val(invoice.customer_contact?.name).prop('readonly', true);

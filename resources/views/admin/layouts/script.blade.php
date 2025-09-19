@@ -1013,4 +1013,12 @@
     !function () {
         document.currentScript?.remove()
     }();
+
+        $(document).ready(function() {
+        $('.unique-select-2').select2({
+            placeholder: "Select an option",
+            allowClear: true,
+            width: '100%'
+        });
+    });
 </script>

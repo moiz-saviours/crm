@@ -20,7 +20,7 @@
             <div class="form-body">
                 <div class="form-group mb-3">
                     <label for="payment_method" class="form-label">Payment Method</label>
-                    <select class="form-control" id="payment_method" name="payment_method" required>
+                    <select class="form-control unique-select-2" id="payment_method" name="payment_method" required>
                         <option value="" disabled>Select Payment Method</option>
                         <option value="authorize" {{ old('payment_method') == 'authorize' ? 'selected' : '' }}>
                             Authorize
@@ -41,7 +41,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="client_contact" class="form-label">Client Contact</label>
-                    <select class="form-control" id="client_contact" name="c_contact_key" required>
+                    <select class="form-control unique-select-2" id="client_contact" name="c_contact_key" required>
                         <option value="" selected>Select Client Contact</option>
                         @foreach($client_contacts as $client_contact)
                             <option
@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="client_company" class="form-label">Client Company</label>
-                    <select class="form-control" id="client_company" name="c_company_key" required>
+                    <select class="form-control unique-select-2" id="client_company" name="c_company_key" required>
                         <option value="" disabled selected>Select Client Company</option>
                     </select>
                     @error('c_company_key')

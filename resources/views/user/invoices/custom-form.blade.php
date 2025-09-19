@@ -40,11 +40,11 @@
             <div class="form-body">
                 <div class="form-group mb-3">
                     <label for="brand_key" class="form-label">Brand</label>
-                    <select class="form-control searchable tour-userinvoicecreatebrand" id="brand_key" name="brand_key"
-                            title="Please select a brand" required autocomplete="off">
-                        <option value="" selected disabled>Please select brand</option>
+                    <select class="form-control searchable tour-userinvoicecreatebrand unique-select-2" id="brand_key" name="brand_key"
+                            title="Please select a brand" required>
+                        <option value="" selected>Please select brand</option>
                         @foreach($brands as $brand)
-                            <option value="{{ $brand->brand_key }}">{{ $brand->name }}</option>
+                            <option value="{{ $brand->brand_key }}"{{old('brand_key') == $brand->brand_key ? 'selected' : '' }}>{{ $brand->name }}</option>
                         @endforeach
                     </select>
                     @error('brand_key')
@@ -53,7 +53,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Team</label>
-                    <select class="form-control searchable tour-userinvoicecreateteam" id="team_key" name="team_key"
+                    <select class="form-control searchable tour-userinvoicecreateteam unique-select-2" id="team_key" name="team_key"
                             title="Please select a team">
                         <option value="" disabled>Please select team</option>
                         @foreach($teams as $team)
@@ -359,21 +359,7 @@
                 }
             });
         </script>
-        <script>
-            $(document).ready(function() {
-                $('#cus_contact_key').select2({
-                    placeholder: "Select Customer Contact",
-                    allowClear: true,
-                    width: '100%' // bootstrap form-control ki width maintain karne ke liye
-                });
 
-                $('#agent_id').select2({
-                    placeholder: "Select Agent",
-                    allowClear: true,
-                    width: '100%'
-                });
-            });
-        </script>
         <!------- CUSTOM FORM -------->
     @endpush
 </div>
