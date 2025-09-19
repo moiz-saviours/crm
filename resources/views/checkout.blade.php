@@ -1474,12 +1474,15 @@ if (!empty($non_bank_methods)) {
         @if(isset($invoiceDetails['invoice']['payment_methods']) && count($invoiceDetails['invoice']['payment_methods']) > 0)
             <!-- Payment methods are available -->
         @else
-            <div class="d-flex justify-content-center mt-2">
-                <div class="text-center">
-                    <p>Please reach out to our sales support team for assistance, as no payment gateway is currently
-                        available.</p>
+            @if($status != 1)
+                <div class="d-flex justify-content-center mt-2">
+                    <div class="text-center">
+                        <p>Please reach out to our sales support team for assistance, as no payment gateway is currently
+                            available.</p>
+                    </div>
                 </div>
-            </div>
+            @endif
+
         @endif
     </div>
 </section>
