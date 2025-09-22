@@ -81,6 +81,6 @@ class Email extends Model
 
     public function events()
     {
-        return $this->hasMany(EmailEvent::class);
+        return $this->hasMany(EmailEvent::class,'email_id','id');
     }
 }
