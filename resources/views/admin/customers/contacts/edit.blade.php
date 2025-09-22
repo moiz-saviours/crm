@@ -70,7 +70,8 @@
             .nav-tabs .nav-link.main-tabs-view {
                 border-radius: 0px;
                 font-weight: 400;
-                font-size: var(--nf-profile-para-size);;
+                font-size: var(--nf-profile-para-size);
+                ;
                 /*font-size: 0.813rem;*/
                 padding: 12px 28px;
                 color: rgb(51, 71, 91);
@@ -188,9 +189,9 @@
             }
 
             /* .avatar-img-box {
-                            width: 53px;
-                            height: 43px;
-                        } */
+                                    width: 53px;
+                                    height: 43px;
+                                } */
 
             .avatar-img {
                 border-radius: 50%;
@@ -412,8 +413,7 @@
                 margin: 5px 0px;
             }
 
-            .custom-right-detail-column {
-            }
+            .custom-right-detail-column {}
 
             .contact-card-details-para {
                 font-weight: 500;
@@ -598,11 +598,11 @@
             }
 
             /* .email-child-wrapper {
-                            color: #007bff;
-                            padding: 10px 15px;
+                                    color: #007bff;
+                                    padding: 10px 15px;
 
-                            font-size: 14px;
-                        } */
+                                    font-size: 14px;
+                                } */
 
             .comment-box {
                 margin-top: 10px;
@@ -699,7 +699,7 @@
             .data-highlights h2 {
                 text-align: left;
                 /* padding-left: 15px;
-                            padding-bottom: 15px; */
+                                    padding-bottom: 15px; */
                 font-size: var(--nf-profile-heading-size);
                 color: var(--bs-primary);
             }
@@ -823,8 +823,7 @@
                 border: 1px solid #ddd;
             }
 
-            .your-comment-btn {
-            }
+            .your-comment-btn {}
 
             .toolbar {
                 background-color: #dddddda6;
@@ -1246,9 +1245,9 @@
             }
 
             /* .doc-attachment:hover {
-                        transform: scale(1.05);
-                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-                        } */
+                                transform: scale(1.05);
+                                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                                } */
 
             .icon-doc {
                 font-size: 24px;
@@ -1382,8 +1381,7 @@
 
             }
 
-            .showhide:hover {
-            }
+            .showhide:hover {}
 
 
             .show_btn:hover {
@@ -1402,7 +1400,6 @@
                 font-size: var(--nf-profile-para-size);
                 color: grey;
             }
-
         </style>
     @endpush
     <div class="new-class-hide-scroll">
@@ -1411,7 +1408,7 @@
             <div class="container-fluid p-0 ">
 
                 <div class="">
-                    @if($imapError)
+                    @if ($imapError)
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             {{ $imapError }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -1424,8 +1421,7 @@
 
                             <div class="sidebarr">
                                 <div class="main-left-sidebar-actions">
-                                    <a href="{{ route('admin.customer.contact.index') }}"
-                                       class="view-subscription-link">
+                                    <a href="{{ route('admin.customer.contact.index') }}" class="view-subscription-link">
                                         <span><i class="fa fa-angle-left " aria-hidden="true"></i>
                                             contacts</span>
                                     </a>
@@ -1439,7 +1435,7 @@
                                         <div class="avatar-img-box" style="padding-inline-end: 10px;">
                                             @if (file_exists(public_path('assets/images/user1.png')))
                                                 <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
-                                                     src="{{ asset('assets/images/user1.png') }}">
+                                                    src="{{ asset('assets/images/user1.png') }}">
                                             @else
                                                 @php
                                                     $words = explode(
@@ -1450,8 +1446,7 @@
                                                         $words[0][0] . (count($words) > 1 ? $words[1][0] : ''),
                                                     );
                                                 @endphp
-                                                <div
-                                                    class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                                <div class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
                                                     style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
                                                     {{ $initials }}
                                                 </div>
@@ -1469,8 +1464,8 @@
                                             <div class="email_sec">
                                                 <p id="customerEmail">{{ $customer_contact->email }}</p>
                                                 <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
-                                                   data-bs-toggle="tooltip" data-bs-placement="top"
-                                                   title="Copy email to clipboard"></i>
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="Copy email to clipboard"></i>
                                             </div>
                                         </div>
                                         <div>
@@ -1558,11 +1553,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplecontact"
-                                                        aria-expanded="true" aria-controls="collapseExamplecontact">
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplecontact"
+                                                    aria-expanded="true" aria-controls="collapseExamplecontact">
                                                     <i class="fa fa-chevron-down toggle-icon" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
+                                                        style="padding-right: 5px;"></i>
                                                     About this contact
                                                 </button>
                                             </div>
@@ -1685,11 +1679,9 @@
                                     {{--                                        </button> --}}
                                     {{--                                    </li> --}}
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link main-tabs-view active" id="profile-tab"
-                                                data-bs-toggle="tab"
-                                                data-bs-target="#profile" type="button" role="tab"
-                                                aria-controls="profile"
-                                                aria-selected="true">Activities
+                                        <button class="nav-link main-tabs-view active" id="profile-tab" data-bs-toggle="tab"
+                                            data-bs-target="#profile" type="button" role="tab" aria-controls="profile"
+                                            aria-selected="true">Activities
                                         </button>
                                     </li>
                                 </ul>
@@ -1932,7 +1924,7 @@
 
 
                                     <div class="tab-pane fade active show" id="profile" role="tabpanel"
-                                         aria-labelledby="profile-tab">
+                                        aria-labelledby="profile-tab">
 
                                         <div class="activ_head mt-3">
 
@@ -1940,7 +1932,7 @@
                                             <div class="search-containers">
                                                 <form id="search-form" style="margin:0;">
                                                     <input type="text" class="search-inputs"
-                                                           placeholder="Search activities" name="query">
+                                                        placeholder="Search activities" name="query">
                                                     <button class="search-btns">
                                                         <i class="fa fa-search" aria-hidden="true"></i>
                                                     </button>
@@ -1970,27 +1962,27 @@
                                             <ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize active" id="act-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                            role="tab" aria-controls="act" aria-selected="true">Activity
+                                                        data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                        role="tab" aria-controls="act" aria-selected="true">Activity
                                                     </button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize" id="notes-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#notes" type="button"
-                                                            role="tab" aria-controls="notes" aria-selected="true">Notes
+                                                        data-bs-toggle="tab" data-bs-target="#notes" type="button"
+                                                        role="tab" aria-controls="notes" aria-selected="true">Notes
                                                     </button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize" id="emails-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#email" type="button"
-                                                            role="tab" aria-controls="emails" aria-selected="true">
+                                                        data-bs-toggle="tab" data-bs-target="#email" type="button"
+                                                        role="tab" aria-controls="emails" aria-selected="true">
                                                         Emails
                                                     </button>
                                                 </li>
                                                 <li class="nav-item" role="presentation">
                                                     <button class="nav-link customize disabled" id="calls-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                            role="tab" aria-controls="calls" aria-selected="true">Calls
+                                                        data-bs-toggle="tab" data-bs-target="#act" type="button"
+                                                        role="tab" aria-controls="calls" aria-selected="true">Calls
                                                     </button>
                                                 </li>
                                                 {{--                                                <li class="nav-item" role="presentation"> --}}
@@ -2024,24 +2016,23 @@
                                             </ul>
                                             <div class="tab-content" id="myTabContent">
                                                 <div class="tab-pane fade show active" id="act" role="tabpanel"
-                                                     aria-labelledby="act-tab">
+                                                    aria-labelledby="act-tab">
                                                     <div>
                                                         <div>
                                                             <p class="recent-filters"> Filter by:
                                                                 <span class="activities-seprater">7
-                                                                                                                                                                        activities</span>
+                                                                    activities</span>
                                                             </p>
                                                         </div>
                                                         <p class="date-by-order"> May 2021</p>
-                @include('admin.customers.contacts.partials.notes-list')
-                                                   <div class="recent-activities">
-                                                        <div id="email-section">
-                                                            @include('admin.customers.contacts.partials.emails-list')
+                                                        <div class="recent-activities">
+                                                            <div id="email-section">
+                                                                @include('admin.customers.contacts.components.activity')
+                                                            </div>
                                                         </div>
-                                                    </div>
 
-                                                        
-                                                        <div class="data-highlights">
+
+                                                        {{-- <div class="data-highlights">
                                                             <div class="data-top-heading-header">
                                                                 <h2>Life Cycle</h2>
                                                                 <p>12/03/2024 4:48 PM GMT+5</p>
@@ -2050,13 +2041,12 @@
                                                                 type
                                                                 exist or you don't have permission to view them.
                                                                 <span class="activities-seprater"> View detail
-                                                                                                                                                                        <i class="fa fa-external-link"
-                                                                                                                                                                           aria-hidden="true"></i>
-                                                                                                                                                                    </span>
+                                                                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                                                                </span>
                                                             </p>
-                                                        </div>
+                                                        </div> --}}
 
-                                                        <div class="recent-activities">
+                                                        {{-- <div class="recent-activities">
 
 
                                                             <div class="email-box-container ">
@@ -2064,14 +2054,14 @@
                                                                     <div class="activ_head ">
                                                                         <div class="email-child-wrapper">
                                                                             <i class="fa fa-caret-right"
-                                                                               aria-hidden="true"></i>
+                                                                                aria-hidden="true"></i>
                                                                             <di>
                                                                                 <h2>
                                                                                     Email - #Professional Image
                                                                                     Editing
                                                                                     <span class="user_cont">from
-                                                                                                                                                                                                                                                                            Harry
-                                                                                                                                                                                                                                                                            Brown</span>
+                                                                                        Harry
+                                                                                        Brown</span>
                                                                                 </h2>
                                                                                 <p class="user_cont">from Harry
                                                                                     Brown</p>
@@ -2084,8 +2074,8 @@
 
                                                                 <div>
                                                                     <!-- <div class="contact-us-text">
-                                                                    --
-                                                                </div> -->
+                                                                        --
+                                                                    </div> -->
                                                                     <div class="contentdisplay ">
 
                                                                         <div class="new-profile-parent-wrapper">
@@ -2102,8 +2092,7 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <div
-                                                                                class="new-profile-email-wrapper open-email-form"
+                                                                            <div class="new-profile-email-wrapper open-email-form"
                                                                                 style="position: relative">
                                                                                 <div class="activities-seprater ">
                                                                                     Reply
@@ -2121,23 +2110,23 @@
                                                                         </div>
                                                                     </div>
                                                                     <!-- <div class="user_profile-hidden activ_head "
-                                                                    id="toggledContent01">
-                                                                    <div class="">
-                                                                        <div class="user_profile_img">
-                                                                            <div class="avatarr">MM</div>
+                                                                        id="toggledContent01">
+                                                                        <div class="">
+                                                                            <div class="user_profile_img">
+                                                                                <div class="avatarr">MM</div>
+                                                                            </div>
+                                                                            <div class="user_profile_text">
+                                                                                <p>Mike Stewar mikestewar1932@outlook.com
+                                                                                </p>
+                                                                                <p style="font-weight: 500">--
+                                                                                </p>
+                                                                            </div>
                                                                         </div>
-                                                                        <div class="user_profile_text">
-                                                                            <p>Mike Stewar mikestewar1932@outlook.com
-                                                                            </p>
-                                                                            <p style="font-weight: 500">--
-                                                                            </p>
+                                                                        <div>
+                                                                            <i class="fa fa-plus companies-add-forms open-form-btn"
+                                                                                aria-hidden="true"> Add</i>
                                                                         </div>
-                                                                    </div>
-                                                                    <div>
-                                                                        <i class="fa fa-plus companies-add-forms open-form-btn"
-                                                                            aria-hidden="true"> Add</i>
-                                                                    </div>
-                                                                </div> -->
+                                                                    </div> -->
                                                                 </div>
                                                                 <div class="user_cont user-email-template">
                                                                     <p>
@@ -2156,14 +2145,14 @@
                                                                     </p>
                                                                 </div>
                                                                 <!-- <div class="user_cont-toggler">
-                                                                <p>
-                                                                    Hi, <br> I hope you're doing well. I specialize in
-                                                                    online reputation management and can help boost your
-                                                                    business's presence by generating positive reviews
-                                                                    and
-                                                                    addressing any negative feedback.
-                                                                </p>
-                                                            </div> -->
+                                                                    <p>
+                                                                        Hi, <br> I hope you're doing well. I specialize in
+                                                                        online reputation management and can help boost your
+                                                                        business's presence by generating positive reviews
+                                                                        and
+                                                                        addressing any negative feedback.
+                                                                    </p>
+                                                                </div> -->
 
 
                                                             </div>
@@ -2179,27 +2168,27 @@
                                                                     exist or you don't have permission to view
                                                                     them.
                                                                     <span class="activities-seprater"> View
-                                                                                                                                                                            detail
-                                                                                                                                                                            <i class="fa fa-external-link"
-                                                                                                                                                                               aria-hidden="true"></i>
-                                                                                                                                                                        </span>
+                                                                        detail
+                                                                        <i class="fa fa-external-link"
+                                                                            aria-hidden="true"></i>
+                                                                    </span>
                                                                 </p>
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="notes" role="tabpanel"
-                                                     aria-labelledby="notes-tab">
+                                                    aria-labelledby="notes-tab">
                                                     <div class="email-threading-row">
                                                         <button class="threading-email-btn-two" data-bs-toggle="modal"
-                                                                data-bs-target="#addNoteModal">
+                                                            data-bs-target="#addNoteModal">
                                                             Create Notes
                                                         </button>
                                                     </div>
                                                     <p class="date-by-order">{{ \Carbon\Carbon::now()->format('F Y') }}</p>
 
-                                                    {{-- @if($customer_contact->notes->count() > 0)
-                                                        @foreach($customer_contact->notes as $noteKey => $note)
+                                                    {{-- @if ($customer_contact->notes->count() > 0)
+                                                        @foreach ($customer_contact->notes as $noteKey => $note)
                                                             <div class="data-highlights">
                                                                 <div class="cstm_note">
                                                                     <div class="row">
@@ -2260,9 +2249,9 @@
                                                             You can even @mention a teammate if you need to.
                                                         </p>
                                                     @endif --}}
-                @include('admin.customers.contacts.partials.notes-list')
+                                                    @include('admin.customers.contacts.components.note')
 
-                                                    
+
                                                 </div>
 
 
@@ -2366,11 +2355,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample"
-                                                        aria-expanded="true" aria-controls="collapseExample">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                                                    aria-expanded="true" aria-controls="collapseExample">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Company
                                                     <span> ( {{ $customer_contact->companies->count() }} )</span>
                                                 </button>
@@ -2394,7 +2382,7 @@
                                                     <span> Domain :
                                                         @if (!empty($customer_contact->company->domain))
                                                             <a href="https://{{ $customer_contact->company->domain }}"
-                                                               target="_blank">
+                                                                target="_blank">
                                                                 {{ $customer_contact->company->domain }}
                                                             </a>
                                                         @else
@@ -2416,12 +2404,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplepayment"
-                                                        aria-expanded="true" aria-controls="collapseExamplepayment">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplepayment"
+                                                    aria-expanded="true" aria-controls="collapseExamplepayment">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Payments <span> ( {{ $customer_contact->payments->count() ?? '---' }} )
                                                     </span>
                                                 </button>
@@ -2458,8 +2444,7 @@
                                                                 @elseif($payment->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($payment->status == 2)
-                                                                    <span
-                                                                        class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($payment->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -2498,12 +2483,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExampleinvoice"
-                                                        aria-expanded="true" aria-controls="collapseExampleinvoice">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleinvoice"
+                                                    aria-expanded="true" aria-controls="collapseExampleinvoice">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Invoices <span> ({{ $customer_contact->invoices->count() }}) </span>
                                                 </button>
                                             </div>
@@ -2532,8 +2515,7 @@
                                                                 @elseif($invoice->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($invoice->status == 2)
-                                                                    <span
-                                                                        class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($invoice->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -2634,8 +2616,8 @@
 
         {{--        MY SCRIPT --}}
         <script>
-            $(document).ready(function () {
-                $('.showhide-payment, .showhide-invoice').click(function () {
+            $(document).ready(function() {
+                $('.showhide-payment, .showhide-invoice').click(function() {
                     // Determine which type: "payment" or "invoice"
                     let type = $(this).hasClass('showhide-payment') ? 'payment' : 'invoice';
 
@@ -2654,20 +2636,20 @@
         </script>
 
         <script>
-            $(document).ready(function () {
-                $('.toggle-collapse').each(function () {
+            $(document).ready(function() {
+                $('.toggle-collapse').each(function() {
                     var $button = $(this);
                     var target = $button.data('bs-target'); // Get target id from data-bs-target
                     var $collapse = $(target);
 
                     // On show event
-                    $collapse.on('show.bs.collapse', function () {
+                    $collapse.on('show.bs.collapse', function() {
                         $button.find('.toggle-icon').removeClass('fa-chevron-right').addClass(
                             'fa-chevron-down');
                     });
 
                     // On hide event
-                    $collapse.on('hide.bs.collapse', function () {
+                    $collapse.on('hide.bs.collapse', function() {
                         $button.find('.toggle-icon').removeClass('fa-chevron-down').addClass(
                             'fa-chevron-right');
                     });
@@ -2687,8 +2669,8 @@
             }
 
             // Second comment function
-            $(document).ready(function () {
-                $('#toggleButton').click(function () {
+            $(document).ready(function() {
+                $('#toggleButton').click(function() {
                     const contents = $('#contents');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2700,21 +2682,21 @@
                 });
             });
             // select to function
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Toggle dropdown visibility
-                $(".dropdown-toggle").on("click", function () {
+                $(".dropdown-toggle").on("click", function() {
                     $(".dropdown-content").toggle();
                 });
                 // Filter list based on search input
-                $(".search-input").on("input", function () {
+                $(".search-input").on("input", function() {
                     const filter = $(this).val().toLowerCase();
-                    $(".checkbox-item").each(function () {
+                    $(".checkbox-item").each(function() {
                         const label = $(this).find("label").text().toLowerCase();
                         $(this).toggle(label.includes(filter));
                     });
                 });
                 // Close dropdown if clicked outside
-                $(document).on("click", function (e) {
+                $(document).on("click", function(e) {
                     if (!$(e.target).closest(".dropdown").length) {
                         $(".dropdown-content").hide();
                     }
@@ -2722,15 +2704,15 @@
             });
             // $('select>option:eq(3)').attr('selected', true);
             // Searching Input function
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Expand and collapse the search bar
-                $(".search-btns").on("click", function (e) {
+                $(".search-btns").on("click", function(e) {
                     e.preventDefault(); // Prevent form submission on button click
                     $(".search-containers").toggleClass("expanded");
                     $(".search-inputs").focus();
                 });
                 // Handle form submission for search
-                $("#search-form").on("submit", function (e) {
+                $("#search-form").on("submit", function(e) {
                     e.preventDefault(); // Prevent default form submission
                     const query = $(".search-inputs").val().trim();
                     if (query) {
@@ -2743,7 +2725,7 @@
                     }
                 });
                 // Collapse the search bar when clicking outside
-                $(document).on("click", function (e) {
+                $(document).on("click", function(e) {
                     if (!$(e.target).closest(".search-containers").length) {
                         $(".search-containers").removeClass("expanded");
                     }
@@ -2752,8 +2734,8 @@
 
             // NEw
             // Function hide and show
-            $(document).ready(function () {
-                $(".toggle-btnss").click(function () {
+            $(document).ready(function() {
+                $(".toggle-btnss").click(function() {
                     let targetId = $(this).data("target");
                     $(targetId).slideToggle(); // Only toggle this email's content
 
@@ -2765,24 +2747,24 @@
             //new
 
             // EMAIL TEMPLATE OPEN AND CLOSE
-            $(document).ready(function () {
+            $(document).ready(function() {
                 const emailTemplate = $('#emailTemplate');
 
                 // Open form
-                $('.open-email-form').click(function () {
+                $('.open-email-form').click(function() {
                     emailTemplate.addClass('open');
 
                 });
 
                 // Close form
-                $('.close-btn').click(function () {
+                $('.close-btn').click(function() {
                     emailTemplate.removeClass('open');
 
                 });
             });
             // view threads function
-            $(document).ready(function () {
-                $('#toggleButtonThread').click(function () {
+            $(document).ready(function() {
+                $('#toggleButtonThread').click(function() {
                     const contents = $('#thread');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2796,7 +2778,7 @@
                 });
             });
             // read more text function
-            $('.moreless-button').click(function () {
+            $('.moreless-button').click(function() {
                 $('.moretext').slideToggle();
                 if ($('.moreless-button').text() == "See more") {
                     $(this).text("See less")
@@ -2807,11 +2789,11 @@
 
             // Copy Clipboard Email
 
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Initialize Bootstrap tooltips
                 $('[data-bs-toggle="tooltip"]').tooltip();
 
-                $(document).on('click', '.copyEmail', async function () {
+                $(document).on('click', '.copyEmail', async function() {
                     try {
                         let emailText = $("#customerEmail").text().trim();
                         await navigator.clipboard.writeText(emailText);
