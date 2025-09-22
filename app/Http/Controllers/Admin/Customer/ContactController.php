@@ -129,82 +129,105 @@ class ContactController extends Controller
      * Show the form for editing the specified resource.
      */
     
-    public function edit(Request $request, CustomerContact $customer_contact)
-    {
-        if (!$customer_contact->id) {
-            return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
-        }
-
-        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
-
-        $teams = Team::where('status', 1)->orderBy('name')->get();
-        $countries = config('countries');
-        $brands = Brand::pluck('name', 'url');
-
-        $resolveCompany = function ($email) use ($brands) {
-            $domain = substr(strrchr($email, "@"), 1);
-            $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
-            return $brand ?? $domain;
-        };
-
-        $auth_pseudo_emails = [];
-        if (auth()->user()->pseudo_email) {
-            $auth_pseudo_emails[] = [
-                'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
-                'email' => auth()->user()->pseudo_email,
-                'company' => $resolveCompany(auth()->user()->pseudo_email),
-            ];
-        }
-
-        $userPseudoEmails = User::whereNotNull('pseudo_email')
-            ->get(['id', 'pseudo_name', 'pseudo_email'])
-            ->map(fn($user) => [
-                'name' => $user->pseudo_name ?? 'Unknown Sender',
-                'email' => $user->pseudo_email,
-                'company' => $resolveCompany($user->pseudo_email),
-            ]);
-
-        $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
-            ->map(fn($pseudo) => [
-                'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
-                'email' => $pseudo->pseudo_email,
-                'company' => $resolveCompany($pseudo->pseudo_email),
-            ]);
-
-        $pseudo_emails = collect($auth_pseudo_emails)
-            ->merge($userPseudoEmails)
-            ->merge($extraPseudoEmails)
-            ->unique('email')
-            ->values();
-
-        // Initialize empty email data for the view (to be populated by AJAX)
-        $emails = [];
-        $folders = [];
-        $folder = request()->get('folder', 'inbox');
-        $page = (int) request()->get('page', 1);
-        $limit = 5;
-        $imapError = null;
-
-            $emails = app(\App\Http\Controllers\Admin\EmailController::class)
-        ->getEmails($customer_contact->email);
-        
-
-
-
-        return view('admin.customers.contacts.edit', compact(
-            'customer_contact',
-            'brands',
-            'teams',
-            'pseudo_emails',
-            'countries',
-            'emails',
-            'folders',
-            'folder',
-            'page',
-            'limit',
-            'imapError'
-        ));
+public function edit(Request $request, CustomerContact $customer_contact)
+{
+    if (!$customer_contact->id) {
+        return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
     }
+
+    $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
+
+    $teams = Team::where('status', 1)->orderBy('name')->get();
+    $countries = config('countries');
+    $brands = Brand::pluck('name', 'url');
+
+    $resolveCompany = function ($email) use ($brands) {
+        $domain = substr(strrchr($email, "@"), 1);
+        $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
+        return $brand ?? $domain;
+    };
+
+    // pseudo emails
+    $auth_pseudo_emails = [];
+    if (auth()->user()->pseudo_email) {
+        $auth_pseudo_emails[] = [
+            'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+            'email' => auth()->user()->pseudo_email,
+            'company' => $resolveCompany(auth()->user()->pseudo_email),
+        ];
+    }
+
+    $userPseudoEmails = User::whereNotNull('pseudo_email')
+        ->get(['id', 'pseudo_name', 'pseudo_email'])
+        ->map(fn($user) => [
+            'name' => $user->pseudo_name ?? 'Unknown Sender',
+            'email' => $user->pseudo_email,
+            'company' => $resolveCompany($user->pseudo_email),
+        ]);
+
+    $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+        ->map(fn($pseudo) => [
+            'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+            'email' => $pseudo->pseudo_email,
+            'company' => $resolveCompany($pseudo->pseudo_email),
+        ]);
+
+    $pseudo_emails = collect($auth_pseudo_emails)
+        ->merge($userPseudoEmails)
+        ->merge($extraPseudoEmails)
+        ->unique('email')
+        ->values();
+
+    // Emails
+    $emailsResponse = app(\App\Http\Controllers\Admin\EmailController::class)
+        ->getEmails($customer_contact->email);
+
+    $emails = $emailsResponse['emails'] ?? [];
+    $folders = $emailsResponse['folders'] ?? [];
+    $folder = $emailsResponse['folder'] ?? request()->get('folder', 'inbox');
+    $page = (int) request()->get('page', 1);
+    $limit = 5;
+    $imapError = null;
+
+    // Build timeline dataset (emails + notes)
+    $timeline = [];
+
+    foreach ($emails as $email) {
+        $timeline[] = [
+            'type' => 'email',
+            'date' => $email['date'],
+            'data' => $email,
+        ];
+    }
+
+    foreach ($customer_contact->notes as $note) {
+        $timeline[] = [
+            'type' => 'note',
+            'date' => $note->created_at,
+            'data' => $note,
+        ];
+    }
+
+    // Sort newest first
+    usort($timeline, function ($a, $b) {
+        return strtotime($b['date']) - strtotime($a['date']);
+    });
+    return view('admin.customers.contacts.edit', compact(
+        'customer_contact',
+        'brands',
+        'teams',
+        'pseudo_emails',
+        'countries',
+        'emails',
+        'folders',
+        'folder',
+        'page',
+        'limit',
+        'imapError',
+        'timeline' // 👈 pass to view
+    ));
+}
+
 
 
 
