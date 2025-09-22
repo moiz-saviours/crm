@@ -72,35 +72,63 @@ class FetchEmails extends Command
         }
         return $accounts;
     }
+    //GET ALL FOLDERS
+    // private function fetchAccountEmails(UserPseudoRecord $account)
+    // {
+    //     $startTime = microtime(true);
+    //     $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
+
+    //     try {
+    //         $this->connectImap($account);
+
+    //         $this->line('Fetching available folders...');
+    //         $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
+    //         $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
+
+    //         foreach ($folders as $folder) {
+    //             $this->line("Processing folder: {$folder}");
+    //             $this->fetchFolderEmails($account, $folder);
+    //         }
+
+    //         $endTime = microtime(true);
+    //         $accountTime = round($endTime - $startTime, 2);
+    //         $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
+    //     } catch (\Exception $e) {
+    //         $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
+    //         Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
+    //         $endTime = microtime(true);
+    //         $accountTime = round($endTime - $startTime, 2);
+    //         $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
+    //     }
+    // }
+
+    //GET INBOX ONLY
 
     private function fetchAccountEmails(UserPseudoRecord $account)
-    {
-        $startTime = microtime(true);
-        $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
+{
+    $startTime = microtime(true);
+    $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
 
-        try {
-            $this->connectImap($account);
+    try {
+        $this->connectImap($account);
 
-            $this->line('Fetching available folders...');
-            $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
-            $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
+        // Only fetch INBOX
+        $inbox = $this->baseMailboxString . 'INBOX';
+        $this->line("Processing folder: {$inbox}");
+        $this->fetchFolderEmails($account, $inbox);
 
-            foreach ($folders as $folder) {
-                $this->line("Processing folder: {$folder}");
-                $this->fetchFolderEmails($account, $folder);
-            }
-
-            $endTime = microtime(true);
-            $accountTime = round($endTime - $startTime, 2);
-            $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
-        } catch (\Exception $e) {
-            $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
-            Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
-            $endTime = microtime(true);
-            $accountTime = round($endTime - $startTime, 2);
-            $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
-        }
+        $endTime = microtime(true);
+        $accountTime = round($endTime - $startTime, 2);
+        $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
+    } catch (\Exception $e) {
+        $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
+        Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
+        $endTime = microtime(true);
+        $accountTime = round($endTime - $startTime, 2);
+        $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
     }
+}
+
 
     private function connectImap(UserPseudoRecord $account)
     {
@@ -468,11 +496,19 @@ class FetchEmails extends Command
         return null;
     }
 
-    private function parseDate($date)
-    {
-        $this->line("Parsing date: {$date}");
-        return $date && ($timestamp = strtotime($date)) ? date('Y-m-d H:i:s', $timestamp) : now();
+private function parseDate($date)
+{
+    if (empty($date)) {
+        return null;
     }
+
+    $this->line("Parsing date: {$date}");
+
+    $timestamp = strtotime($date);
+
+    return $timestamp ? date('Y-m-d H:i:s', $timestamp) : null;
+}
+
 
     private function generateThreadId($headers)
     {

@@ -26,12 +26,70 @@ class EmailController extends Controller
 {
     public function getEmails($customerEmail, $folder = "all")
     {
-        $query = Email::where(function ($q) use ($customerEmail) {
-            $q->where('from_email', $customerEmail)
-                ->orWhereJsonContains('to', ['email' => $customerEmail])
-                ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-        });
+
+        $user = Auth::guard('admin')->user();
+
+        $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
+            ->where('morph_type', get_class($user))
+            ->where('imap_type', 'imap')
+            ->pluck('pseudo_email')
+            ->toArray();
+
+        $query = Email::query();
+
+        if ($folder == 'inbox') {
+
+            // Inbox → received emails (customer sent to me)
+            $query->where('from_email', $customerEmail)
+                ->where(function ($q) use ($auth_pseudo_emails) {
+                    foreach ($auth_pseudo_emails as $email) {
+                        $q->orWhereJsonContains('to',  ['email' => $email])
+                            ->orWhereJsonContains('cc',  ['email' => $email])
+                            ->orWhereJsonContains('bcc', ['email' => $email]);
+                    }
+                });
+        } elseif ($folder == 'sent') {
+            // Sent → from me to customer
+            $query->whereIn('from_email', $auth_pseudo_emails);
+
+        } elseif ($folder == 'drafts') {
+            $query->where('folder', 'drafts')
+                ->whereIn('from_email', $auth_pseudo_emails);
+        } elseif ($folder == 'spam') {
+            $query->where('folder', 'spam')
+                ->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+                    $q->where('from_email', $customerEmail)
+                        ->orWhereIn('from_email', $auth_pseudo_emails);
+                });
+        } elseif ($folder == 'trash') {
+            $query->where('folder', 'trash');
+        } elseif ($folder == 'archive') {
+            $query->where('folder', 'archive');
+        } else {
+
+            // All → customer + me anywhere
+            $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+                // From customer to me
+                $q->where('from_email', $customerEmail)
+                    ->where(function ($qq) use ($auth_pseudo_emails) {
+                        foreach ($auth_pseudo_emails as $email) {
+                            $qq->orWhereJsonContains('to',  ['email' => $email])
+                                ->orWhereJsonContains('cc',  ['email' => $email])
+                                ->orWhereJsonContains('bcc', ['email' => $email]);
+                        }
+                    })
+                    ->orWhere(function ($qq) use ($auth_pseudo_emails, $customerEmail) {
+                        // From me to customer
+                        $qq->whereIn('from_email', $auth_pseudo_emails)
+                            ->where(function ($qqq) use ($customerEmail) {
+                                $qqq->orWhereJsonContains('to',  ['email' => $customerEmail])
+                                    ->orWhereJsonContains('cc',  ['email' => $customerEmail])
+                                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+                            });
+                    });
+            });
+        }
+
         if ($folder !== 'all') {
             $query->where('folder', $folder);
         }
@@ -83,23 +141,23 @@ class EmailController extends Controller
         return ['emails' => $emails, 'folders' => $folders, 'folder' => $folder];
     }
 
-public function fetch(Request $request)
-{
-    try {
-        $customerEmail = urldecode(trim($request->query('customer_email')));
-        $folder = $request->query('folder', 'all');
-        if (empty($customerEmail)) {
-            return response()->json(['error' => 'Customer email is required'], 400);
-        }
+    public function fetch(Request $request)
+    {
+        try {
+            $customerEmail = urldecode(trim($request->query('customer_email')));
+            $folder = $request->query('folder', 'all');
+            if (empty($customerEmail)) {
+                return response()->json(['error' => 'Customer email is required'], 400);
+            }
 
-        return response()->json($this->getEmails($customerEmail, $folder));
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Failed to fetch emails. Please try again later.',
-            'details' => $e->getMessage(), // optional for debugging
-        ], 500);
+            return response()->json($this->getEmails($customerEmail, $folder));
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch emails. Please try again later.',
+                'details' => $e->getMessage(), // optional for debugging
+            ], 500);
+        }
     }
-}
 
 
 
@@ -341,29 +399,29 @@ public function fetch(Request $request)
         }
     }
 
-protected function wrapUrlsForTracking(string $content, ?int $emailId): string
-{
-    if (!$emailId) {
-        return $content;
-    }
-
-    $doc = new DOMDocument();
-    @$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
-    $links = $doc->getElementsByTagName('a');
-    foreach ($links as $link) {
-        if ($link->hasAttribute('href')) {
-            $originalUrl = $link->getAttribute('href');
-            if (!preg_match('/^https?:\/\//i', $originalUrl)) {
-                continue;
-            }
-            $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . urlencode($originalUrl);
-            $link->setAttribute('href', $trackingUrl);
+    protected function wrapUrlsForTracking(string $content, ?int $emailId): string
+    {
+        if (!$emailId) {
+            return $content;
         }
-    }
 
-    return $doc->saveHTML();
-}
+        $doc = new DOMDocument();
+        @$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $links = $doc->getElementsByTagName('a');
+        foreach ($links as $link) {
+            if ($link->hasAttribute('href')) {
+                $originalUrl = $link->getAttribute('href');
+                if (!preg_match('/^https?:\/\//i', $originalUrl)) {
+                    continue;
+                }
+                $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . urlencode($originalUrl);
+                $link->setAttribute('href', $trackingUrl);
+            }
+        }
+
+        return $doc->saveHTML();
+    }
 
     private function parseEmailListForStorage(array $emails): ?array
     {
