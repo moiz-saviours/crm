@@ -36,6 +36,15 @@ public function trackClick($id, Request $request)
 }
 public function trackOpen($id, Request $request)
 {
+  
+    $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+
+    $requestHost = $request->getHost();
+
+    if ($appHost === $requestHost) {
+        return response()->file(public_path('assets/images/pixel.png'));
+    }
+
     Log::info('trackOpen Hit');
     Log::info("➡ Entering trackOpen()", [
         'email_id' => $id,
