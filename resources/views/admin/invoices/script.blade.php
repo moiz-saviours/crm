@@ -66,19 +66,26 @@
         }));
 
         /** Initializing Datatable */
+        // if ($('.initTable').length) {
+        //     $('.initTable').each(function (index) {
+        //         initializeDatatable($(this), index)
+        //     })
+        // }
+        // var table;
+
+        var dataTables = [];
+
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
-                initializeDatatable($(this), index)
-            })
+                dataTables[index] = initializeDatatable($(this), index);
+            });
         }
-        var table;
-
         function initializeDatatable(table_div, index) {
             console.log(`Initializing table: ${table_div.attr('id')} - Instance: ${index}`);
-            if ($.fn.DataTable.isDataTable(table_div)) {
-                table_div.DataTable().destroy();
-            }
-            table = table_div.DataTable({
+            // if ($.fn.DataTable.isDataTable(table_div)) {
+            //     table_div.DataTable().destroy();
+            // }
+            let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
                     "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
@@ -107,7 +114,8 @@
                     end: 1
                 },
             });
-            table.buttons().container().appendTo(`#right-icon-${index}`);
+            datatable.buttons().container().appendTo(`#right-icon-${index}`);
+            return datatable;
         }
 
         /** Edit */
@@ -199,6 +207,7 @@
             e.preventDefault();
             var dataId = $('#manage-form').data('id');
             var formData = new FormData(this);
+            let table = dataTables[0];
             @php
                 $baseUrl = '';
                 if (app()->environment('production')) {
@@ -794,5 +803,146 @@
                     return 'fas fa-question-circle';
             }
         }
+
+        $('#dateRangePicker').daterangepicker({
+            timePicker: true,
+            timePicker24Hour: false,
+            timePickerIncrement: 1,
+            locale: {
+                format: 'YYYY-MM-DD h:mm:ss A',
+            },
+            startDate: moment().startOf('month').startOf('day'),
+            endDate: moment().endOf('month').endOf('day'),
+            ranges: {
+                'Today': [moment().startOf('day'), moment().endOf('day')],
+                'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+                'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+                'Last 30 Days': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment().endOf('day')],
+                'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
+            }
+        });
+
+        $('#teamSelect, #brandSelect').change(function () {
+            filterInvoices();
+        });
+        $('#dateRangePicker').on('apply.daterangepicker', function () {
+            filterInvoices();
+        });
+
+        function filterInvoices() {
+            const teamKey = $('#teamSelect').val();
+            const brandKey = $('#brandSelect').val();
+            const dates = $('#dateRangePicker').data('daterangepicker');
+
+            let table = dataTables[0];
+            table.clear().draw(); // Clear existing rows
+
+            @php
+                $baseUrl = '';
+                if (app()->environment('production')) {
+                    $baseUrl = url('');
+                } elseif (app()->environment('development')) {
+                    $baseUrl = url('');
+                } else {
+                    $baseUrl = url('');
+                }
+            @endphp
+            let basePath = `{{$baseUrl}}`;
+
+            AjaxRequestPromise(`{{ route("admin.invoice.filter") }}`, {
+                team_key: teamKey,
+                brand_key: brandKey,
+                start_date: dates.startDate.format('YYYY-MM-DD h:mm:ss A'),
+                end_date: dates.endDate.format('YYYY-MM-DD h:mm:ss A'),
+            }, 'GET', {useToastr: false})
+                .then(response => {
+                    if (response && response.success && response.data) {
+                        response.data.forEach(function (invoice, index) {
+                            const {
+                                id,
+                                invoice_number,
+                                invoice_key,
+                                brand,
+                                team,
+                                customer_contact,
+                                agent,
+                                amount, tax_type, tax_value,
+                                tax_amount, total_amount,
+                                currency,
+                                status,
+                                due_date,
+                                date
+                            } = invoice;
+                            index++;
+                            const columns = `
+                        <td class="align-middle text-center text-nowrap"></td>
+                        <td class="align-middle text-center text-nowrap">${index}</td>
+                        <td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                            <span class="invoice-number">${invoice_number}</span><br>
+                            <span class="invoice-key view-transactions text-primary"
+                                                          title="Show transaction logs"
+                                                          style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
+                        </td>
+                        <td class="align-middle text-center text-nowrap">
+                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}
+                        </td>
+                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}</td>
+                        <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
+                        <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">
+                            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                <span style="width: 120px;">Amount:</span>
+                                <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                <span style="width: 120px;">Tax:</span>
+                                <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                <span style="width: 120px;">Tax Amount:</span>
+                                <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                <span style="width: 120px;">Total Amount:</span>
+                                <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
+                            </div>
+                        </td>
+                        <td class="align-middle text-center text-nowrap">
+                            ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
+                        </td>
+                        <td class="align-middle text-center text-nowrap">${due_date}</td>
+                        <td class="align-middle text-center text-nowrap">${date}</td>
+                        <td class="align-middle text-center table-actions">
+                        <button type="button" class="btn btn-sm btn-primary copyBtn"
+                                                            data-id="${id}"
+                                                            data-invoice-key="${invoice_key}"
+                                                            data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
+                                                            title="Copy Invoice Url"><i
+                                                            class="fas fa-copy"></i></button>
+                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
+                                '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
+                                : ''}
+                        </td>`;
+                            table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                        })
+                    }
+                })
+
+                .catch(error => console.error('An error occurred while updating the record.', error))
+        }
+
+
+        $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(
+                picker.startDate.format('YYYY-MM-DD h:mm:ss A') + ' - ' +
+                picker.endDate.format('YYYY-MM-DD h:mm:ss A')
+            );
+        });
+        $('#dateRangePicker').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
     });
 </script>
