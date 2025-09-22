@@ -12,7 +12,7 @@ class EmailEvent extends Model
         'email_id', 'event_type', 'ip_address', 'user_agent', 'url', 'created_at'
     ];
 
-    public function email()
+public function email()
     {
         return $this->belongsTo(Email::class);
     }

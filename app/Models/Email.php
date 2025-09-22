@@ -78,4 +78,9 @@ class Email extends Model
         return $this->belongsToMany(EmailLabel::class, EmailLabelPivot::class, 'email_id', 'label_id', 'id', 'id')
             ->withTimestamps();
     }
+
+    public function events()
+    {
+        return $this->hasMany(EmailEvent::class);
+    }
 }

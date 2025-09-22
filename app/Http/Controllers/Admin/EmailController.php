@@ -17,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Illuminate\Support\Facades\Artisan;
-
+use DOMDocument;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
 use App\Mail\OutgoingEmail;
@@ -32,7 +32,6 @@ class EmailController extends Controller
                 ->orWhereJsonContains('cc', ['email' => $customerEmail])
                 ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
         });
-
         if ($folder !== 'all') {
             $query->where('folder', $folder);
         }
@@ -84,24 +83,24 @@ class EmailController extends Controller
         return ['emails' => $emails, 'folders' => $folders, 'folder' => $folder];
     }
 
-    public function fetch(Request $request)
-    {
-        try {
-            $customerEmail = $request->query('customer_email');
-            $folder = $request->query('folder', 'all');
-
-            if (!$customerEmail) {
-                return response()->json(['error' => 'Customer email is required'], 400);
-            }
-
-            return response()->json($this->getEmails($customerEmail, $folder));
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to fetch emails. Please try again later.',
-                'details' => $e->getMessage() // optional for debugging
-            ], 500);
+public function fetch(Request $request)
+{
+    try {
+        $customerEmail = urldecode(trim($request->query('customer_email')));
+        $folder = $request->query('folder', 'all');
+        if (empty($customerEmail)) {
+            return response()->json(['error' => 'Customer email is required'], 400);
         }
+
+        return response()->json($this->getEmails($customerEmail, $folder));
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Failed to fetch emails. Please try again later.',
+            'details' => $e->getMessage(), // optional for debugging
+        ], 500);
     }
+}
+
 
 
     public function fetchNewEmails(Request $request)
@@ -150,7 +149,7 @@ class EmailController extends Controller
         }
     }
 
-public function sendEmail(Request $request): JsonResponse
+    public function sendEmail(Request $request): JsonResponse
     {
         // Validate request data
         $validated = $request->validate([
@@ -181,7 +180,7 @@ public function sendEmail(Request $request): JsonResponse
                 ], 403);
             }
 
-            // Parse email lists, with fallback for missing cc/bcc
+            // Parse email lists
             $toEmails = $this->parseEmailList($validated['to']);
             $ccEmails = $this->parseEmailList($validated['cc'] ?? '');
             $bccEmails = $this->parseEmailList($validated['bcc'] ?? '');
@@ -247,64 +246,68 @@ public function sendEmail(Request $request): JsonResponse
                 }
             }
 
-            // Configure SMTP
-            $smtpRecord = $sender->imap_type === 'smtp'
-                ? $sender
-                : UserPseudoRecord::where('pseudo_email', $sender->pseudo_email)
-                    ->where('imap_type', 'smtp')
-                    ->first();
-            $smtpCredentials = $smtpRecord ?? $sender;
+            // Wrap URLs for tracking
+            $content = $this->wrapUrlsForTracking($validated['email_content'], $email->id);
+            $textContent = strip_tags($content);
 
-            if (empty($smtpCredentials->server_host) || empty($smtpCredentials->server_password)) {
-                throw new \Exception('Missing SMTP host or password');
-            }
-
-            Config::set('mail.mailers.smtp', [
-                'transport' => 'smtp',
-                'host' => $smtpCredentials->server_host,
-                'port' => $smtpCredentials->server_port ?? 465,
-                'encryption' => $smtpCredentials->server_encryption ?? 'ssl',
-                'username' => $smtpCredentials->server_username ?? $smtpCredentials->pseudo_email,
-                'password' => $smtpCredentials->server_password,
-                'timeout' => null,
-                'auth_mode' => null,
+            // Store rendered content
+            $email->update([
+                'body_html' => $content,
+                'body_text' => $textContent,
             ]);
-            Config::set('mail.default', 'smtp');
-            Config::set('mail.from', ['address' => $fromEmail, 'name' => $fromName]);
 
-            // Create Mailable instance
-            $mailable = new OutgoingEmail(
-                subject: $validated['subject'],
-                content: $validated['email_content'],
-                toEmails: $toEmails,
-                ccEmails: $ccEmails,
-                bccEmails: $bccEmails,
-                fromEmail: $fromEmail,
-                fromName: $fromName,
-                attachments: $storedAttachments,
-                emailId: $email->id
-            );
+            // Configure PHPMailer
+            $mailer = new PHPMailer(true);
+            $mailer->isSMTP();
+            $mailer->Host = $sender->server_host;
+            $mailer->Port = 465;
+            $mailer->SMTPSecure = 'ssl';
+            $mailer->SMTPAuth = true;
+            $mailer->Username = $sender->server_username ?? $sender->pseudo_email;
+            $mailer->Password = $sender->server_password;
+            $mailer->setFrom($fromEmail, $fromName);
+            $mailer->Subject = $validated['subject'];
+            $mailer->isHTML(true);
+            $mailer->Body = $content;
+            $mailer->AltBody = $textContent;
 
-            // Render content for storage
-            try {
-                $mailable->build(); // Ensure content is rendered
-                $email->update([
-                    'body_html' => $mailable->renderedHtml,
-                    'body_text' => $mailable->renderedText,
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to render email content', [
-                    'error' => $e->getMessage(),
-                    'email_id' => $email->id,
-                    'subject' => $validated['subject'],
-                ]);
-                throw new \Exception('Failed to render email template: ' . $e->getMessage());
+            // Add tracking pixel
+            $trackingPixel = '<img src="' . route('emails.track.open', ['id' => $email->id]) . '" width="1" height="1" alt="" />';
+            $mailer->Body .= $trackingPixel;
+
+            // Add recipients
+            foreach ($toEmails as $toEmail) {
+                $mailer->addAddress($toEmail);
+            }
+            foreach ($ccEmails as $ccEmail) {
+                $mailer->addCC($ccEmail);
+            }
+            foreach ($bccEmails as $bccEmail) {
+                $mailer->addBCC($bccEmail);
             }
 
-            // Queue the email
-            Mail::queue($mailable);
+            // Add attachments
+            foreach ($storedAttachments as $attachment) {
+                $filePath = storage_path('app/public/' . $attachment['storage_path']);
+                if (file_exists($filePath)) {
+                    $mailer->addAttachment(
+                        $filePath,
+                        $attachment['original_name'],
+                        'base64',
+                        $attachment['mime_type']
+                    );
+                } else {
+                    Log::warning('Attachment file not found', [
+                        'path' => $filePath,
+                        'original_name' => $attachment['original_name'],
+                    ]);
+                }
+            }
 
-            Log::info('Email queued for sending', [
+            // Send email
+            $mailer->send();
+
+            Log::info('Email sent successfully', [
                 'email_id' => $email->id,
                 'from' => $fromEmail,
                 'to' => $toEmails,
@@ -313,7 +316,7 @@ public function sendEmail(Request $request): JsonResponse
 
             return response()->json([
                 'success' => true,
-                'message' => 'Email queued for sending',
+                'message' => 'Email sent successfully',
                 'email_id' => $email->id,
             ]);
         } catch (ValidationException $e) {
@@ -322,7 +325,7 @@ public function sendEmail(Request $request): JsonResponse
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
             ], 422);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Email sending failed', [
                 'error' => $e->getMessage(),
                 'from' => $validated['from'] ?? null,
@@ -333,10 +336,34 @@ public function sendEmail(Request $request): JsonResponse
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to queue email. Please try again.',
+                'message' => 'Failed to send email. Please try again.',
             ], 500);
         }
     }
+
+protected function wrapUrlsForTracking(string $content, ?int $emailId): string
+{
+    if (!$emailId) {
+        return $content;
+    }
+
+    $doc = new DOMDocument();
+    @$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+    $links = $doc->getElementsByTagName('a');
+    foreach ($links as $link) {
+        if ($link->hasAttribute('href')) {
+            $originalUrl = $link->getAttribute('href');
+            if (!preg_match('/^https?:\/\//i', $originalUrl)) {
+                continue;
+            }
+            $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . urlencode($originalUrl);
+            $link->setAttribute('href', $trackingUrl);
+        }
+    }
+
+    return $doc->saveHTML();
+}
 
     private function parseEmailListForStorage(array $emails): ?array
     {
