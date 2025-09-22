@@ -223,6 +223,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::post('/update/{invoice?}', [AdminInvoiceController::class, 'update'])->name('update');
             Route::delete('/delete/{invoice?}', [AdminInvoiceController::class, 'delete'])->name('delete');
             Route::get('/payment-proofs', [AdminInvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
+            Route::get('invoice-filter', [AdminInvoiceController::class, 'filterInvoice'])->name('filter');
         });
     });
     /** Sales Routes */
