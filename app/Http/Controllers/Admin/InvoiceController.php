@@ -24,7 +24,7 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::all();
+            $invoices = Invoice::whereBetween('created_at', [Carbon::now('GMT+5')->startOfMonth(), Carbon::now('GMT+5')->endOfMonth(),])->get();
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $groupedMerchants = [];
         foreach ($brands as $brand) {
@@ -534,4 +534,74 @@ class InvoiceController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
+
+
+    public function filterInvoice(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'team_key' => 'required|string',
+            'brand_key' => 'required|string',
+        ], [
+            [
+                'start_date.required' => 'The start date is required.',
+                'start_date.date' => 'The start date must be a valid date.',
+                'end_date.required' => 'The end date is required.',
+                'end_date.date' => 'The end date must be a valid date.',
+                'end_date.after_or_equal' => 'The end date must be a valid date.',
+                'team_key.required' => 'The team key is required.',
+                'team_key.string' => 'The team key must be a valid string.',
+                'brand_key.required' => 'The brand key is required.',
+                'brand_key.string' => 'The brand key must be a valid string.',
+            ]
+        ]);
+
+        try {
+            $startDate = Carbon::createFromFormat('Y-m-d h:i:s A', $validated['start_date'], 'GMT+5')->setTimezone('UTC');
+            $endDate = Carbon::createFromFormat('Y-m-d h:i:s A', $validated['end_date'], 'GMT+5')->setTimezone('UTC');
+            $teamKey = $validated['team_key'] ?? 'all';
+            $brandKey = $validated['brand_key'] ?? 'all';
+
+            $invoices = Invoice::select([
+                'id','invoice_number','invoice_key','brand_key','team_key','cus_contact_key','agent_type','agent_id',
+                'amount','tax_type','tax_value','tax_amount','total_amount','status','currency','due_date','created_at'
+            ])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+                ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
+                ->with([
+                    'team:id,name,team_key',
+                    'brand:id,name,brand_key',
+                    'agent:id,name',
+                    'customer_contact:id,name,special_key',
+                ])
+                ->get();
+
+            // Format created_at into readable date
+            $invoices->each(function($invoice) {
+                if ($invoice->created_at->isToday()) {
+                    $invoice->date = "Today at " . $invoice->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
+                } else {
+                    $invoice->date = $invoice->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $invoices,
+                'count' => $invoices->count(),
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+
 }

@@ -53,6 +53,7 @@
         background-color: #ff5722;
         color: #fff;
         border: none;
+        margin-top: 20px;
     }
 
     .search-bar input {
