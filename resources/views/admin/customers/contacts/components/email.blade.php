@@ -1,4 +1,51 @@
 <!-- Add the email section with loader, refresh button, and fetch emails button -->
+<style>
+    .contentdisplaytwo {
+        background-color: #fff !important;
+        border: none !important;
+    }
+
+    .timeline-content {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .activity-section {
+        background-color: #fff
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 20px;
+        margin-top: 10px;
+        border-left: 2px solid #97a5b3;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1rem;
+        padding-left: 15px;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -26px;
+        top: 3px;
+        width: 12px;
+        height: 12px;
+        background-color: #0d6;
+        border-radius: 50%;
+    }
+
+    .timeline-content {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        padding: 8px 12px;
+        border-radius: .5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        margin: -11px -3px -15px -28px
+    }
+</style>
 <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
 
 
@@ -24,46 +71,167 @@
     </div>
 
 
-
     <div>
-
         <div class="recent-activities">
             <div id="email-section">
+                <!-- Folders Tabs -->
                 <ul class="nav nav-tabs" id="email-folders" style="margin-bottom: 15px;">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#" data-folder="all">All</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-folder="inbox">Inbox</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-folder="sent">Sent</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-folder="drafts">Drafts</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-folder="spam">Spam</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-folder="trash">Trash</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-folder="archive">Archive</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link active" href="#" data-folder="all">All</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-folder="inbox">Inbox</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-folder="sent">Sent</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-folder="drafts">Drafts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-folder="spam">Spam</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-folder="trash">Trash</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-folder="archive">Archive</a></li>
                 </ul>
 
                 <p class="date-by-order">{{ now()->format('F Y') }}</p>
 
+                <!-- Loader -->
                 <div id="email-loader" style="display: none; text-align: center; padding: 20px;">
                     <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading emails...
                 </div>
+
+                <!-- Email Content -->
                 <div id="email-content">
-                    @include('admin.customers.contacts.partials.emails-list')
+                    @if (empty($emails) || count($emails) === 0)
+                        <p class="text-muted">No emails found.</p>
+                    @else
+                        @foreach ($emails as $email)
+                            <!-- Email Box -->
+                            <div class="email-box-container mb-4 border rounded bg-white p-3">
+                                <!-- Header -->
+                                <div class="toggle-btnss" data-target=".{{ $email['uuid'] }}" style="cursor: pointer;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <!-- Sender + Subject -->
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-caret-right me-2 text-primary"></i>
+                                            <div>
+                                                <h2 class="mb-0 fs-6 fw-semibold text-dark">
+                                                    {{ $email['from'][0]['name'] ?? 'Unknown Sender' }} -
+                                                    {{ $email['subject'] ?? '(No Subject)' }}
+                                                </h2>
+                                                <p class="mb-1 text-muted small">
+                                                    from: {{ $email['from'][0]['email'] ?? 'Unknown' }}
+                                                </p>
+                                                <p class="mb-0 text-muted small">
+                                                    to: {{ $email['to'][0]['email'] ?? 'Unknown' }}
+                                                </p>
+                                                <p class="mb-0 text-primary small">
+                                                    Opens: {{ $email['open_count'] ?? 0 }} |
+                                                    Clicks: {{ $email['click_count'] ?? 0 }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Date + Attachments -->
+                                        <div class="text-end" style="min-width: 160px;">
+                                            <p class="mb-1 text-muted small">
+                                                {{ !empty($email['date']) ? \Carbon\Carbon::parse($email['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
+                                            </p>
+                                            @if (!empty($email['attachments']) && count($email['attachments']) > 0)
+                                                <p class="mt-1 mb-0 text-muted small">
+                                                    <i class="fa fa-paperclip"></i>
+                                                    {{ count($email['attachments']) }}
+                                                    attachment{{ count($email['attachments']) > 1 ? 's' : '' }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Collapsible Content -->
+                                <div class="contentdisplaytwo {{ $email['uuid'] }} mt-3 p-3 rounded border bg-light"
+                                    style="display: none;">
+                                    <!-- Activity -->
+                                    <div class="activity-section">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-semibold text-dark mb-0">
+                                                <i class="fa fa-clock-o"></i> Activity
+                                            </h6>
+                                            <button class="btn btn-sm btn-link toggle-activity"
+                                                data-target="#timeline-{{ $email['uuid'] }}">
+                                                Minimize
+                                            </button>
+                                        </div>
+                                        <div id="timeline-{{ $email['uuid'] }}" class="timeline">
+                                            @forelse ($email['events'] ?? [] as $event)
+                                                <div class="timeline-item">
+                                                    <div class="timeline-dot"></div>
+                                                    <div class="timeline-content">
+                                                        <p class="mb-0 small">
+                                                            <i class="fa {{ $event['icon'] }}"></i>
+                                                            {{ ucfirst($event['type']) }}
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            {{ \Carbon\Carbon::parse($event['timestamp'])->format('M d, Y h:i A') }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            @empty
+                                                <div class="timeline-item">
+                                                    <div class="timeline-dot"></div>
+                                                    <div class="timeline-content">
+                                                        <p class="mb-0 small"><i class="fa fa-info-circle"></i> No
+                                                            activity recorded</p>
+                                                        <small class="text-muted">N/A</small>
+                                                    </div>
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+
+                                    <!-- Email Body -->
+                                    <div class="email-preview mb-4 text-dark small">
+                                        {!! $email['body']['html'] ?? nl2br($email['body']['text'] ?? 'No body content available.') !!}
+                                    </div>
+
+                                    <!-- Attachments -->
+                                    @if (!empty($email['attachments']) && count($email['attachments']) > 0)
+                                        <div class="attachments-section mb-4">
+                                            <h6 class="fw-semibold text-dark mb-2">
+                                                <i class="fa fa-paperclip"></i> Attachments
+                                                ({{ count($email['attachments']) }})
+                                            </h6>
+                                            <div class="attachments-list">
+                                                @foreach ($email['attachments'] as $attachment)
+                                                    <div
+                                                        class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
+                                                        <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-medium">
+                                                                {{ $attachment['filename'] ?? 'Unknown File' }}</div>
+                                                            <div class="text-muted small">
+                                                                Type:
+                                                                {{ strtoupper($attachment['type'] ?? 'unknown') }}
+                                                                @if (!empty($attachment['size']))
+                                                                    | Size:
+                                                                    {{ number_format($attachment['size'] / 1024, 1) }}
+                                                                    KB
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <a href="{{ $attachment['download_url'] ?? '#' }}"
+                                                                class="btn btn-sm btn-outline-primary">
+                                                                <i class="fa fa-download"></i> Download
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+
 
 </div>
 <script>
@@ -78,14 +246,17 @@
         const limit = 100;
 
         // Function to fetch emails
-        function fetchEmails() {
-            const folder = document.querySelector('#folder-select')?.value || 'inbox';
-            const page = new URLSearchParams(window.location.search).get('page') || 1;
-            const customerEmail = encodeURIComponent("{{ $customer_contact->email }}");
-            console.log("{{$customer_contact->email}}");
-            console.log(customerEmail);
-    let url = "{{ route('admin.customer.contact.emails.fetch') }}" 
-                + `?customer_email=${encodeURIComponent(customerEmail)}&folder=${folder}&page=${page}`;
+      function fetchEmails() {
+    console.log("🔄 Fetching emails...");
+    console.log("📂 Folder:", folder, "📧 Customer Email:", customerEmail);
+
+    let url = "{{ route('admin.customer.contact.emails.fetch') }}" +
+        `?customer_email=${encodeURIComponent(customerEmail)}&folder=${folder}&page=${currentPage}`;
+
+    console.log("➡️ API URL:", url);
+
+    emailLoader.style.display = 'block';
+    emailSection.innerHTML = '';
 
     fetch(url, {
         method: "GET",
@@ -93,23 +264,31 @@
             "Accept": "application/json",
             "X-Requested-With": "XMLHttpRequest"
         },
-        credentials: "same-origin" // 👈 ensures session cookie is sent
+        credentials: "same-origin"
     })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);  
-                    emailLoader.style.display = 'none';
-                    emailSection.innerHTML = renderEmails(data.emails);
-                    attachToggleListeners();
-                    attachActivityToggleListeners();
-                })
-                .catch(error => {
-                    emailLoader.style.display = 'none';
-                    emailSection.innerHTML =
-                        '<p class="text-muted">Failed to load emails. Please try again later.</p>';
-                    console.error('Error fetching emails:', error);
-                });
+    .then(response => response.json())
+    .then(data => {
+        console.log("✅ Emails fetched:", data);
+
+        emailLoader.style.display = 'none';
+
+        if (!data.emails) {
+            console.warn("⚠️ No 'emails' key in response:", data);
+            emailSection.innerHTML = '<p class="text-muted">No emails key found in response</p>';
+            return;
         }
+
+        emailSection.innerHTML = renderEmails(data.emails);
+        attachToggleListeners();
+        attachActivityToggleListeners();
+    })
+    .catch(error => {
+        emailLoader.style.display = 'none';
+        emailSection.innerHTML = '<p class="text-muted">Failed to load emails. Please try again later.</p>';
+        console.error("❌ Error fetching emails:", error);
+    });
+}
+
 
 
         // Initial fetch
@@ -121,175 +300,171 @@
         });
 
         // Fetch emails button click
-        fetchButton.addEventListener('click', function() {
-            // Show loader
-            emailLoader.style.display = 'block';
-            emailSection.innerHTML = ''; // Clear existing content
+      fetchButton.addEventListener('click', function() {
+    console.log("📩 Fetching NEW emails for:", customerEmail);
 
-            // Make AJAX request to run Artisan command
-            fetch(
-                    "{{ route('admin.customer.contact.emails.fetch-new') }}" +
-                    "?customer_email=" + encodeURIComponent(customerEmail), {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    }
-                )
+    emailLoader.style.display = 'block';
+    emailSection.innerHTML = '';
 
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        emailLoader.style.display = 'none';
-                        emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error +
-                            '</p>';
-                        return;
-                    }
+    fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
+        "?customer_email=" + encodeURIComponent(customerEmail), {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("✅ Fetch-new response:", data);
 
-                    // After fetching new emails, refresh the email list
-                    fetchEmails();
-                })
-                .catch(error => {
-                    // Hide loader
-                    emailLoader.style.display = 'none';
-                    emailSection.innerHTML =
-                        '<p class="text-muted">Failed to fetch new emails. Please try again later.</p>';
-                    console.error('Error fetching new emails:', error);
-                });
+        if (data.error) {
+            emailLoader.style.display = 'none';
+            emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
+            return;
+        }
+
+        fetchEmails(); // refresh emails
+    })
+    .catch(error => {
+        emailLoader.style.display = 'none';
+        console.error("❌ Error fetching new emails:", error);
+        emailSection.innerHTML = '<p class="text-muted">Failed to fetch new emails. Please try again later.</p>';
+    });
+});
+
+
+function renderEmails(emails) {
+    console.log("🖼 Rendering emails:", emails);
+
+    if (!emails || emails.length === 0) {
+        return '<p class="text-muted">No emails found.</p>';
+    }
+
+    // helper for date formatting
+    const formatDate = (dateStr) => {
+        if (!dateStr) return 'Unknown Date';
+        return new Date(dateStr).toLocaleString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
         });
+    };
 
-        // Function to render emails
-        function renderEmails(emails) {
-            if (!emails || emails.length === 0) {
-                return '<p class="text-muted">No emails found.</p>';
-            }
-
-            return emails.map(email => `
-        <div class="email-box-container" style="margin: 0; border-radius: 0; margin-top: 15px; border: 1px solid #dee2e6; background: #fff; padding: 15px;">
+    return emails.map(email => `
+        <!-- Email Box -->
+        <div class="email-box-container mb-4 border rounded bg-white p-3">
+            <!-- Header -->
             <div class="toggle-btnss" data-target=".${email.uuid}" style="cursor: pointer;">
-                <div class="activ_head" style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="email-child-wrapper" style="display: flex; align-items: center;">
-                        <i class="fa fa-caret-right" aria-hidden="true" style="margin-right: 10px; color: #007bff;"></i>
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Sender + Subject -->
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-caret-right me-2 text-primary"></i>
                         <div>
-                            <h2 style="margin: 0; font-size: 16px; font-weight: 600; color: #212529;">
-                                ${email.from[0].name || 'Unknown Sender'} - ${email.subject || '(No Subject)'}
+                            <h2 class="mb-0 fs-6 fw-semibold text-dark">
+                                ${(email.from?.[0]?.name) || 'Unknown Sender'} - ${(email.subject) || '(No Subject)'}
                             </h2>
-                            <p class="user_cont" style="margin: 2px 0; color: #6c757d; font-size: 12px;">
-                                from: ${email.from[0].email || 'Unknown'}
-                            </p>
-                            <p class="user_cont" style="margin: 2px 0; color: #6c757d; font-size: 12px;">
-                                to: ${email.to[0]?.email || 'Unknown'}
-                            </p>
-                            <p style="margin: 2px 0; color: #007bff; font-size: 12px;">
-                                Opens: ${email.open_count || 0} | Clicks: ${email.click_count || 0}
+                            <p class="mb-1 text-muted small">from: ${(email.from?.[0]?.email) || 'Unknown'}</p>
+                            <p class="mb-0 text-muted small">to: ${(email.to?.[0]?.email) || 'Unknown'}</p>
+                            <p class="mb-0 text-primary small">
+                                Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
                             </p>
                         </div>
                     </div>
-                    <div style="text-align: right; min-width: 160px;">
-                        <p style="margin: 2px 0; color: #6c757d; font-size: 12px;">
-                            ${email.date ? new Date(email.date).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) : 'Unknown Date'}
+
+                    <!-- Date + Attachments -->
+                    <div class="text-end" style="min-width: 160px;">
+                        <p class="mb-1 text-muted small">
+                            ${formatDate(email.date)}
                         </p>
                         ${email.attachments && email.attachments.length > 0 ? `
-                            <p class="attachment-count" style="font-size: 12px; color: #6c757d; margin: 2px 0;">
-                                <i class="fa fa-paperclip" aria-hidden="true"></i>
-                                ${email.attachments.length} attachment${email.attachments.length > 1 ? 's' : ''}
-                            </p>
-                        ` : ''}
+                            <p class="mt-1 mb-0 text-muted small">
+                                <i class="fa fa-paperclip"></i> ${email.attachments.length} 
+                                attachment${email.attachments.length > 1 ? 's' : ''}
+                            </p>` : ''}
                     </div>
                 </div>
             </div>
-            <div class="contentdisplaytwo ${email.uuid}" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #eee; border-radius: 4px;">
-                <!-- Activity Timeline -->
-                <div class="activity-section" style="margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h6 style="font-weight: 600; color: #212529; margin: 0;">
-                            <i class="fa fa-clock-o" aria-hidden="true"></i> Activity
+
+            <!-- Collapsible Content -->
+            <div class="contentdisplaytwo ${email.uuid} mt-3 p-3 rounded border bg-light" style="display: none;">
+                <!-- Activity -->
+                <div class="activity-section">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-semibold text-dark mb-0">
+                            <i class="fa fa-clock-o"></i> Activity
                         </h6>
-                        <button class="btn btn-sm btn-link toggle-activity" data-target="#timeline-${email.uuid}" style="text-decoration: none; color: #007bff; font-size: 12px;">
+                        <button class="btn btn-sm btn-link toggle-activity" data-target="#timeline-${email.uuid}">
                             Minimize
                         </button>
                     </div>
-                    <div id="timeline-${email.uuid}" class="timeline" style="position: relative; padding-left: 15px; border-left: 2px solid #dee2e6;">
-                        ${email.events && email.events.length > 0 ? email.events.map(event => `
-                            <div class="timeline-item" style="position: relative; margin-bottom: 15px;">
-                                <div class="timeline-dot" style="position: absolute; left: -10px; top: 3px; width: 10px; height: 10px; background: #007bff; border-radius: 50%;"></div>
-                                <div class="timeline-content" style="margin-left: 10px;">
-                                    <p style="margin: 0; font-size: 12px; color: #212529;">
-                                        <i class="fa ${event.icon}" aria-hidden="true"></i>
-                                        ${event.type.charAt(0).toUpperCase() + event.type.slice(1)}
-                                    </p>
-                                    <small style="color: #6c757d; font-size: 11px;">
-                                        ${new Date(event.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}
-                                    </small>
-                                </div>
-                            </div>
-                        `).join('') : `
-                            <div class="timeline-item" style="position: relative; margin-bottom: 15px;">
-                                <div class="timeline-dot" style="position: absolute; left: -10px; top: 3px; width: 10px; height: 10px; background: #007bff; border-radius: 50%;"></div>
-                                <div class="timeline-content" style="margin-left: 10px;">
-                                    <p style="margin: 0; font-size: 12px; color: #212529;">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                        No activity recorded
-                                    </p>
-                                    <small style="color: #6c757d; font-size: 11px;">N/A</small>
-                                </div>
-                            </div>
-                        `}
+                    <div id="timeline-${email.uuid}" class="timeline">
+                        ${(email.events && email.events.length > 0)
+                            ? email.events.map(event => `
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <p class="mb-0 small">
+                                            <i class="fa ${event.icon}"></i> ${event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                                        </p>
+                                        <small class="text-muted">
+                                            ${formatDate(event.timestamp)}
+                                        </small>
+                                    </div>
+                                </div>`).join('')
+                            : `
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded</p>
+                                        <small class="text-muted">N/A</small>
+                                    </div>
+                                </div>`
+                        }
                     </div>
                 </div>
+
                 <!-- Email Body -->
-                <div class="user_cont user-email-template" style="margin-bottom: 20px;">
-                    <div class="email-preview" style="color: #212529; font-size: 14px;">
-                        ${email.body.html || (email.body.text ? email.body.text.replace(/\n/g, '<br>') : 'No body content available.')}
-                    </div>
+                <div class="email-preview mb-4 text-dark small">
+                    ${email.body?.html || (email.body?.text ? email.body.text.replace(/\n/g, '<br>') : 'No body content available.')}
                 </div>
+
                 <!-- Attachments -->
                 ${email.attachments && email.attachments.length > 0 ? `
-                    <div class="attachments-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <h4 style="margin-bottom: 10px; color: #333; font-size: 16px; font-weight: 600;">
-                            <i class="fa fa-paperclip" aria-hidden="true"></i>
-                            Attachments (${email.attachments.length})
-                        </h4>
+                    <div class="attachments-section mb-4">
+                        <h6 class="fw-semibold text-dark mb-2">
+                            <i class="fa fa-paperclip"></i> Attachments (${email.attachments.length})
+                        </h6>
                         <div class="attachments-list">
                             ${email.attachments.map(attachment => `
-                                <div class="attachment-item" style="display: flex; align-items: center; padding: 8px 12px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 8px;">
-                                    <div class="attachment-icon" style="margin-right: 10px; font-size: 16px; color: #6c757d;">
-                                        <i class="fa ${getAttachmentIcon(attachment.type)}" aria-hidden="true"></i>
-                                    </div>
-                                    <div class="attachment-info" style="flex: 1;">
-                                        <div class="attachment-name" style="font-weight: 500; color: #212529;">
-                                            ${attachment.filename || 'Unknown File'}
-                                        </div>
-                                        <div class="attachment-details" style="font-size: 12px; color: #6c757d;">
-                                            Type: ${attachment.type.toUpperCase() || 'unknown'}
+                                <div class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
+                                    <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i></div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium">${attachment.filename || 'Unknown File'}</div>
+                                        <div class="text-muted small">
+                                            Type: ${(attachment.type || 'unknown').toUpperCase()}
                                             ${attachment.size ? ` | Size: ${(attachment.size / 1024).toFixed(1)} KB` : ''}
                                         </div>
                                     </div>
-                                    <div class="attachment-actions">
-                                        ${attachment.download_url ? `
-                                            <a href="${attachment.download_url}"
-                                               download="${attachment.filename || 'attachment'}"
-                                               class="btn btn-sm btn-outline-primary"
-                                               style="text-decoration: none; padding: 4px 8px; border: 1px solid #007bff; color: #007bff; border-radius: 3px; font-size: 12px;">
-                                                <i class="fa fa-download" aria-hidden="true"></i> Download
-                                            </a>
-                                        ` : `
-                                            <span class="text-muted" style="font-size: 12px;">
-                                                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                                                No download link
-                                            </span>
-                                        `}
+                                    <div>
+                                        <a href="${attachment.download_url || '#'}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
-                    </div>
-                ` : ''}
+                    </div>` : ''}
             </div>
         </div>
     `).join('');
-        }
+}
+
+
+
 
         // Function to determine attachment icon based on MIME type
         function getAttachmentIcon(type) {
@@ -362,10 +537,28 @@
                 currentPage = 1; // Reset to first page
                 setActiveTab(folder);
 
-         fetchEmails();
+                fetchEmails();
             });
         });
         // Set initial active tab
         setActiveTab(folder);
+    });
+</script>
+<!-- Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Toggle activity minimize/maximize
+        document.querySelectorAll(".toggle-activity").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const target = document.querySelector(this.dataset.target);
+                if (target.style.display === "none") {
+                    target.style.display = "block";
+                    this.textContent = "Minimize";
+                } else {
+                    target.style.display = "none";
+                    this.textContent = "Maximize";
+                }
+            });
+        });
     });
 </script>
