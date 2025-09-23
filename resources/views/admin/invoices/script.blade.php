@@ -526,9 +526,9 @@
                             });
                             let responseMessage = '';
                             if (log.status === 'success') {
-                                responseMessage = log.response_message || '';
+                                responseMessage = log.response_message || '---';
                             } else {
-                                responseMessage = log.error_message || '';
+                                responseMessage = log.error_message || '---';
                             }
                             let paymentStatus = log.status === 'success' ?
                                 '<span class="badge bg-success">Paid</span>' :
@@ -536,15 +536,15 @@
                             rows += `
                         <tr>
                             <td class="align-middle">${index + 1}</td>
-                            <td class="align-middle">${log.merchant ?? ""}</td>
-                            <td class="align-middle">${log.last_4 ?? ""}</td>
+                            <td class="align-middle">${log.merchant ?? "---"}</td>
+                            <td class="align-middle">${log.last_4 ?? "---"}</td>
                             <td class="align-middle">${log.transaction_id ?? ""}</td>
                             <td class="align-middle">$${parseFloat(log.amount || 0).toFixed(2)}</td>
                             <td class="align-middle">${responseMessage}</td>
-                            <td class="align-middle">${log.response_code_message || ""}</td>
-                            <td class="align-middle">${log.avs_message || ""}</td>
-                            <td class="align-middle">${log.cvv_message || ""}</td>
-                            <td class="align-middle">${log.cavv_message || ""}</td>
+                            <td class="align-middle">${log.response_code_message || "---"}</td>
+                            <td class="align-middle">${log.avs_message || "---"}</td>
+                            <td class="align-middle">${log.cvv_message || "---"}</td>
+                            <td class="align-middle">${log.cavv_message || "---"}</td>
                             <td class="align-middle">${paymentStatus}</td>
                             <td class="align-middle">${formattedDate}</td>
                         </tr>`;
