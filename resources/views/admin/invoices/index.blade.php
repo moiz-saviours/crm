@@ -45,7 +45,9 @@
                                 <input type="text" id="dateRangePicker" name="dateRangePicker"
                                        class="form-control dateRangePicker"/>
                             </div>
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="invoicecreate"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                                    data-tour="invoicecreate"><i class="fas fa-exclamation-circle custom-dot"></i>
+                            </button>
                             <button class="create-contact open-form-btn tour-createinvoice">Create New</button>
                         </div>
                     </div>
@@ -59,7 +61,11 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Invoices
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-invoicetitle" data-toggle="tooltip" title="Take a Tour" data-tour="invoices"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px">
+                                <button class="my-btn start-tour-btn tour-invoicetitle" data-toggle="tooltip"
+                                        title="Take a Tour" data-tour="invoices"><i
+                                        class="fas fa-exclamation-circle custom-dot"></i></button>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -100,6 +106,7 @@
                                         <tr>
                                             <th></th>
                                             <th class="align-middle text-center text-nowrap">SNO.</th>
+                                            <th class="align-middle text-center text-nowrap">ATTEMPT</th>
                                             <th class="align-middle text-center text-nowrap">INVOICE #</th>
                                             <th class="align-middle text-center text-nowrap">BRAND</th>
                                             <th class="align-middle text-center text-nowrap">TEAM</th>
@@ -109,14 +116,37 @@
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
                                             <th class="align-middle text-center text-nowrap">DUE DATE</th>
                                             <th class="align-middle text-center text-nowrap">CREATE DATE</th>
-                                            <th class="align-middle text-center text-nowrap tour-invoiceaction">ACTION</th>
+                                            <th class="align-middle text-center text-nowrap tour-invoiceaction">ACTION
+                                            </th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         @foreach($invoices as $invoice)
                                             <tr id="tr-{{$invoice->id}}">
                                                 <td class="align-middle text-center text-nowrap"></td>
-                                                <td class="align-middle text-center text-nowrap">{{$loop->iteration}}</td>
+                                                <td class="align-middle text-center text-nowrap"
+                                                    data-order="{{$loop->iteration}}">{{$loop->iteration}}</td>
+                                                <td class="align-middle space-between text-nowrap" style="text-align: left;">
+                                                    @php
+                                                        $m=$invoice->invoice_merchants->pluck('merchant_type')->map(fn($t)=>strtolower($t))->toArray();
+                                                        $s=['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];$f=['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];
+                                                        if($invoice->payment_transaction_logs){foreach($invoice->payment_transaction_logs as $l){$g=strtolower($l->gateway);$st=strtolower($l->status);if($g=='edp')$st=='success'?$s['edp']++:$f['edp']++;if(in_array($g,['authorize.net','authorize']))$st=='success'?$s['authorize']++:$f['authorize']++;if($g=='stripe')$st=='success'?$s['stripe']++:$f['stripe']++;if($g=='paypal')$st=='success'?$s['paypal']++:$f['paypal']++;}}
+                                                        if($invoice->status == 1 && $invoice->payment && array_sum($s) == 0){$pm=strtolower($invoice->payment->payment_method??'');if($pm=='edp')$s['edp']=1;if(in_array($pm,['authorize.net','authorize']))$s['authorize']=1;if($pm=='stripe')$s['stripe']=1;if($pm=='paypal')$s['paypal']=1;}
+                                                        $show=false;foreach(['authorize','edp','stripe','paypal'] as $t){if(in_array($t,$m)||$s[$t]>0||$f[$t]>0){$show=true;break;}}
+                                                    @endphp
+                                                    @if($show)
+                                                        @foreach(['authorize','edp','stripe','paypal'] as $t)
+                                                            @if(in_array($t,$m)||$s[$t]>0||$f[$t]>0)
+                                                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                                                    <span>{{ucfirst($t)}} : </span>
+                                                                    <span><span>{{$s[$t]}}</span>-<span class="text-danger">{{$f[$t]}}</span></span>
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                    @else
+                                                        <div class="text-muted">No Gateway Found</div>
+                                                    @endif
+                                                </td>
                                                 <td class="align-middle text-center text-nowrap text-sm invoice-cell">
                                                     <span
                                                         class="invoice-number">{{ $invoice->invoice_number }}</span><br>
@@ -224,24 +254,28 @@
                                                                 class="fas fa-copy"></i></button>
                                                     @endif
                                                     @if(isset($invoice->payment_attachments) && count($invoice->payment_attachments) > 0)
-                                                            @php
-                                                                $allAttachments = $invoice->payment_attachments->flatMap(function($payment) {
-                                                                    return json_decode($payment->attachments, true) ?? [];
-                                                                });
-                                                                $attachmentCount = $allAttachments->count();
-                                                            @endphp
+                                                        @php
+                                                            $allAttachments = $invoice->payment_attachments->flatMap(function($payment) {
+                                                                return json_decode($payment->attachments, true) ?? [];
+                                                            });
+                                                            $attachmentCount = $allAttachments->count();
+                                                        @endphp
                                                         <button type="button"
                                                                 class="btn btn-sm btn-primary view-payment-proofs"
-                                                                data-invoice-key="{{ $invoice->invoice_key }}" title="View Payment Proofs"><i
+                                                                data-invoice-key="{{ $invoice->invoice_key }}"
+                                                                title="View Payment Proofs"><i
                                                                 class="fas fa-paperclip"></i>
-                                                             {{ $attachmentCount }}
+                                                            {{ $attachmentCount }}
                                                         </button>
                                                     @endif
                                                     @if($invoice->status != 1)
-                                                        <br><button type="button" class="btn btn-sm btn-primary editBtn mt-2"
+                                                        <br>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-primary editBtn mt-2"
                                                                 data-id="{{ $invoice->id }}" title="Edit"><i
                                                                 class="fas fa-edit"></i></button>
-                                                        <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2"
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-danger deleteBtn mt-2"
                                                                 data-id="{{ $invoice->id }}" title="Delete"><i
                                                                 class="fas fa-trash"></i></button>
                                                     @endif
@@ -263,7 +297,7 @@
     </section>
     <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="transactionModalLabel">Payment Transaction Logs</h5>
@@ -273,14 +307,18 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th class="align-middle text-center text-nowrap">Attempt #</th>
-                            <th class="align-middle text-center text-nowrap">Gateway</th>
-                            <th class="align-middle text-center text-nowrap">Last 4</th>
-                            <th class="align-middle text-center text-nowrap">Transaction Id</th>
-                            <th class="align-middle text-center text-nowrap">Amount</th>
-                            <th class="align-middle text-center text-nowrap">Message</th>
-                            <th class="align-middle text-center text-nowrap">Payment Status</th>
-                            <th class="align-middle text-center text-nowrap">Date</th>
+                            <th class="align-top">Attempt #</th>
+                            <th class="align-top">Gateway</th>
+                            <th class="align-top">Last 4</th>
+                            <th class="align-top">Transaction Id</th>
+                            <th class="align-top">Amount</th>
+                            <th class="align-top">Message</th>
+                            <th class="align-top">Response Code Message</th>
+                            <th class="align-top">Avs Message</th>
+                            <th class="align-top">Cvv Message</th>
+                            <th class="align-top">Cavv Message</th>
+                            <th class="align-top">Payment Status</th>
+                            <th class="align-top">Date</th>
                         </tr>
                         </thead>
                         <tbody id="transactionLogs"></tbody>
