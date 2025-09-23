@@ -35,11 +35,9 @@ class EmailController extends Controller
             ->pluck('pseudo_email')
             ->toArray();
 
-        $query = Email::query();
+        $query = Email::with('events'); // eager load events
 
         if ($folder == 'inbox') {
-
-            // Inbox → received emails (customer sent to me)
             $query->where('from_email', $customerEmail)
                 ->where(function ($q) use ($auth_pseudo_emails) {
                     foreach ($auth_pseudo_emails as $email) {
@@ -49,9 +47,7 @@ class EmailController extends Controller
                     }
                 });
         } elseif ($folder == 'sent') {
-            // Sent → from me to customer
             $query->whereIn('from_email', $auth_pseudo_emails);
-
         } elseif ($folder == 'drafts') {
             $query->where('folder', 'drafts')
                 ->whereIn('from_email', $auth_pseudo_emails);
@@ -66,10 +62,7 @@ class EmailController extends Controller
         } elseif ($folder == 'archive') {
             $query->where('folder', 'archive');
         } else {
-
-            // All → customer + me anywhere
             $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                // From customer to me
                 $q->where('from_email', $customerEmail)
                     ->where(function ($qq) use ($auth_pseudo_emails) {
                         foreach ($auth_pseudo_emails as $email) {
@@ -79,7 +72,6 @@ class EmailController extends Controller
                         }
                     })
                     ->orWhere(function ($qq) use ($auth_pseudo_emails, $customerEmail) {
-                        // From me to customer
                         $qq->whereIn('from_email', $auth_pseudo_emails)
                             ->where(function ($qqq) use ($customerEmail) {
                                 $qqq->orWhereJsonContains('to',  ['email' => $customerEmail])
@@ -99,46 +91,58 @@ class EmailController extends Controller
                 $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
             }])
             ->get()
-            ->map(function ($email) {
-                return [
-                    'uuid' => 'email-' . $email->id,
-                    'from' => [[
-                        'name'  => $email->from_name,
-                        'email' => $email->from_email,
-                    ]],
-                    'to' => $email->to ?? [],
-                    'subject' => $email->subject,
-                    'date' => $email->message_date,
-                    'body' => [
-                        'html' => $email->body_html,
-                        'text' => $email->body_text,
-                    ],
-                    'attachments' => $email->attachments->map(function ($attachment) {
-                        return [
-                            'filename' => $attachment->original_name,
-                            'type'     => $attachment->mime_type,
-                            'size'     => $attachment->size,
-                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                        ];
-                    })->toArray(),
-                ];
-            })
+           ->map(function ($email) {
+    return [
+        'uuid' => 'email-' . $email->id,
+        'from' => [[
+            'name'  => $email->from_name,
+            'email' => $email->from_email,
+        ]],
+        'to' => $email->to ?? [],
+        'subject' => $email->subject,
+        'folder' => $email->folder,
+        'date' => $email->message_date,
+        'body' => [
+            'html' => $email->body_html,
+            'text' => $email->body_text,
+        ],
+        'attachments' => $email->attachments->map(function ($attachment) {
+            return [
+                'filename' => $attachment->original_name,
+                'type'     => $attachment->mime_type,
+                'size'     => $attachment->size,
+                'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+            ];
+        })->toArray(),
+
+        // counters
+        'open_count'   => $email->events->where('event_type', 'open')->count(),
+        'click_count'  => $email->events->where('event_type', 'click')->count(),
+        'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
+        'spam_count'   => $email->events->where('event_type', 'spam')->count(),
+
+        // normalized events
+        'events' => $email->events->map(function ($event) {
+            $icons = [
+                'open'   => 'fa-envelope-open',
+                'click'  => 'fa-mouse-pointer',
+                'bounce' => 'fa-exclamation-triangle',
+                'spam'   => 'fa-ban',
+            ];
+            return [
+                'id'         => $event->id,
+                'event_type' => $event->event_type,
+                'created_at' => $event->created_at,
+                'icon'       => $icons[$event->event_type] ?? 'fa-info-circle',
+            ];
+        })->values()->toArray(),
+    ];
+})
+
+            
             ->values()
             ->toArray();
-
-        $folders = Email::where(function ($q) use ($customerEmail) {
-            $q->where('from_email', $customerEmail)
-                ->orWhereJsonContains('to', ['email' => $customerEmail])
-                ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-        })
-            ->distinct()
-            ->pluck('folder')
-            ->filter()
-            ->values()
-            ->toArray();
-
-        return ['emails' => $emails, 'folders' => $folders, 'folder' => $folder];
+        return ['emails' => $emails];
     }
 
     public function fetch(Request $request)

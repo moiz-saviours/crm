@@ -183,8 +183,6 @@ public function edit(Request $request, CustomerContact $customer_contact)
         ->getEmails($customer_contact->email);
 
     $emails = $emailsResponse['emails'] ?? [];
-    $folders = $emailsResponse['folders'] ?? [];
-    $folder = $emailsResponse['folder'] ?? request()->get('folder', 'inbox');
     $page = (int) request()->get('page', 1);
     $limit = 5;
     $imapError = null;
@@ -219,12 +217,10 @@ public function edit(Request $request, CustomerContact $customer_contact)
         'pseudo_emails',
         'countries',
         'emails',
-        'folders',
-        'folder',
         'page',
         'limit',
         'imapError',
-        'timeline' // 👈 pass to view
+        'timeline'
     ));
 }
 

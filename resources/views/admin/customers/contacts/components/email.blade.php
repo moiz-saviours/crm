@@ -94,7 +94,7 @@
 
                 <!-- Email Content -->
                 <div id="email-content">
-                    @if (empty($emails) || count($emails) === 0)
+                    @if (empty($emails) || count($emails) == 0)
                         <p class="text-muted">No emails found.</p>
                     @else
                         @foreach ($emails as $email)
@@ -117,10 +117,13 @@
                                                 <p class="mb-0 text-muted small">
                                                     to: {{ $email['to'][0]['email'] ?? 'Unknown' }}
                                                 </p>
-                                                <p class="mb-0 text-primary small">
-                                                    Opens: {{ $email['open_count'] ?? 0 }} |
-                                                    Clicks: {{ $email['click_count'] ?? 0 }}
-                                                </p>
+                                                @if ($email['folder'] == 'sent')
+                                                    <p class="mb-0 text-primary small">
+                                                        Opens: {{ $email['open_count'] ?? 0 }} |
+                                                        Clicks: {{ $email['click_count'] ?? 0 }}
+                                                    </p>
+                                                @endif
+
                                             </div>
                                         </div>
 
@@ -161,10 +164,10 @@
                                                     <div class="timeline-content">
                                                         <p class="mb-0 small">
                                                             <i class="fa {{ $event['icon'] }}"></i>
-                                                            {{ ucfirst($event['type']) }}
+                                                            {{ ucfirst($event['event_type']) }}
                                                         </p>
                                                         <small class="text-muted">
-                                                            {{ \Carbon\Carbon::parse($event['timestamp'])->format('M d, Y h:i A') }}
+                                                            {{ \Carbon\Carbon::parse($event['created_at'])->format('M d, Y h:i A') }}
                                                         </small>
                                                     </div>
                                                 </div>
@@ -246,48 +249,50 @@
         const limit = 100;
 
         // Function to fetch emails
-      function fetchEmails() {
-    console.log("🔄 Fetching emails...");
-    console.log("📂 Folder:", folder, "📧 Customer Email:", customerEmail);
+        function fetchEmails() {
+            console.log("🔄 Fetching emails...");
+            console.log("📂 Folder:", folder, "📧 Customer Email:", customerEmail);
 
-    let url = "{{ route('admin.customer.contact.emails.fetch') }}" +
-        `?customer_email=${encodeURIComponent(customerEmail)}&folder=${folder}&page=${currentPage}`;
+            let url = "{{ route('admin.customer.contact.emails.fetch') }}" +
+                `?customer_email=${encodeURIComponent(customerEmail)}&folder=${folder}&page=${currentPage}`;
 
-    console.log("➡️ API URL:", url);
+            console.log("➡️ API URL:", url);
 
-    emailLoader.style.display = 'block';
-    emailSection.innerHTML = '';
+            emailLoader.style.display = 'block';
+            emailSection.innerHTML = '';
 
-    fetch(url, {
-        method: "GET",
-        headers: {
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        credentials: "same-origin"
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("✅ Emails fetched:", data);
+            fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    credentials: "same-origin"
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("✅ Emails fetched:", data);
 
-        emailLoader.style.display = 'none';
+                    emailLoader.style.display = 'none';
 
-        if (!data.emails) {
-            console.warn("⚠️ No 'emails' key in response:", data);
-            emailSection.innerHTML = '<p class="text-muted">No emails key found in response</p>';
-            return;
+                    if (!data.emails) {
+                        console.warn("⚠️ No 'emails' key in response:", data);
+                        emailSection.innerHTML =
+                        '<p class="text-muted">No emails key found in response</p>';
+                        return;
+                    }
+
+                    emailSection.innerHTML = renderEmails(data.emails);
+                    attachToggleListeners();
+                    attachActivityToggleListeners();
+                })
+                .catch(error => {
+                    emailLoader.style.display = 'none';
+                    emailSection.innerHTML =
+                        '<p class="text-muted">Failed to load emails. Please try again later.</p>';
+                    console.error("❌ Error fetching emails:", error);
+                });
         }
-
-        emailSection.innerHTML = renderEmails(data.emails);
-        attachToggleListeners();
-        attachActivityToggleListeners();
-    })
-    .catch(error => {
-        emailLoader.style.display = 'none';
-        emailSection.innerHTML = '<p class="text-muted">Failed to load emails. Please try again later.</p>';
-        console.error("❌ Error fetching emails:", error);
-    });
-}
 
 
 
@@ -300,61 +305,63 @@
         });
 
         // Fetch emails button click
-      fetchButton.addEventListener('click', function() {
-    console.log("📩 Fetching NEW emails for:", customerEmail);
+        fetchButton.addEventListener('click', function() {
+            console.log("📩 Fetching NEW emails for:", customerEmail);
 
-    emailLoader.style.display = 'block';
-    emailSection.innerHTML = '';
+            emailLoader.style.display = 'block';
+            emailSection.innerHTML = '';
 
-    fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
-        "?customer_email=" + encodeURIComponent(customerEmail), {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("✅ Fetch-new response:", data);
+            fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
+                    "?customer_email=" + encodeURIComponent(customerEmail), {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("✅ Fetch-new response:", data);
 
-        if (data.error) {
-            emailLoader.style.display = 'none';
-            emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error + '</p>';
-            return;
-        }
+                    if (data.error) {
+                        emailLoader.style.display = 'none';
+                        emailSection.innerHTML = '<p class="text-muted">Error: ' + data.error +
+                            '</p>';
+                        return;
+                    }
 
-        fetchEmails(); // refresh emails
-    })
-    .catch(error => {
-        emailLoader.style.display = 'none';
-        console.error("❌ Error fetching new emails:", error);
-        emailSection.innerHTML = '<p class="text-muted">Failed to fetch new emails. Please try again later.</p>';
-    });
-});
-
-
-function renderEmails(emails) {
-    console.log("🖼 Rendering emails:", emails);
-
-    if (!emails || emails.length === 0) {
-        return '<p class="text-muted">No emails found.</p>';
-    }
-
-    // helper for date formatting
-    const formatDate = (dateStr) => {
-        if (!dateStr) return 'Unknown Date';
-        return new Date(dateStr).toLocaleString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
+                    fetchEmails(); // refresh emails
+                })
+                .catch(error => {
+                    emailLoader.style.display = 'none';
+                    console.error("❌ Error fetching new emails:", error);
+                    emailSection.innerHTML =
+                        '<p class="text-muted">Failed to fetch new emails. Please try again later.</p>';
+                });
         });
-    };
 
-    return emails.map(email => `
+
+        function renderEmails(emails) {
+            console.log("🖼 Rendering emails:", emails);
+
+            if (!emails || emails.length == 0) {
+                return '<p class="text-muted">No emails found.</p>';
+            }
+
+            // helper for date formatting
+            const formatDate = (dateStr) => {
+                if (!dateStr) return 'Unknown Date';
+                return new Date(dateStr).toLocaleString('en-US', {
+                    month: 'short',
+                    day: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            };
+
+            return emails.map(email => `
         <!-- Email Box -->
         <div class="email-box-container mb-4 border rounded bg-white p-3">
             <!-- Header -->
@@ -369,9 +376,12 @@ function renderEmails(emails) {
                             </h2>
                             <p class="mb-1 text-muted small">from: ${(email.from?.[0]?.email) || 'Unknown'}</p>
                             <p class="mb-0 text-muted small">to: ${(email.to?.[0]?.email) || 'Unknown'}</p>
-                            <p class="mb-0 text-primary small">
-                                Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
-                            </p>
+${folder == 'sent' ? `
+   <p class="mb-0 text-primary small">
+      Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
+   </p>` : ''}
+
+
                         </div>
                     </div>
 
@@ -408,10 +418,10 @@ function renderEmails(emails) {
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <p class="mb-0 small">
-                                            <i class="fa ${event.icon}"></i> ${event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                                            <i class="fa ${event.icon}"></i> ${event.event_type.charAt(0).toUpperCase() + event.event_type.slice(1)}
                                         </p>
                                         <small class="text-muted">
-                                            ${formatDate(event.timestamp)}
+                                            ${formatDate(event.created_at)}
                                         </small>
                                     </div>
                                 </div>`).join('')
@@ -461,7 +471,7 @@ function renderEmails(emails) {
             </div>
         </div>
     `).join('');
-}
+        }
 
 
 
@@ -486,7 +496,7 @@ function renderEmails(emails) {
             document.querySelectorAll('.toggle-activity').forEach(button => {
                 button.addEventListener('click', function() {
                     const target = document.querySelector(this.dataset.target);
-                    if (target.style.display === 'none' || target.style.display === '') {
+                    if (target.style.display == 'none' || target.style.display == '') {
                         target.style.display = 'block';
                         this.textContent = 'Minimize';
                     } else {
@@ -503,7 +513,7 @@ function renderEmails(emails) {
                 button.addEventListener('click', function() {
                     const targetClass = this.getAttribute('data-target');
                     const content = this.parentElement.querySelector(targetClass);
-                    if (content.style.display === 'none' || content.style.display === '') {
+                    if (content.style.display == 'none' || content.style.display == '') {
                         content.style.display = 'block';
                         this.querySelector('i.fa').classList.replace('fa-caret-right',
                             'fa-caret-down');
@@ -520,7 +530,7 @@ function renderEmails(emails) {
         function setActiveTab(folder) {
             document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
                 tab.classList.remove('active');
-                if (tab.getAttribute('data-folder') === folder) {
+                if (tab.getAttribute('data-folder') == folder) {
                     tab.classList.add('active');
                 }
             });
@@ -551,7 +561,7 @@ function renderEmails(emails) {
         document.querySelectorAll(".toggle-activity").forEach(btn => {
             btn.addEventListener("click", function() {
                 const target = document.querySelector(this.dataset.target);
-                if (target.style.display === "none") {
+                if (target.style.display == "none") {
                     target.style.display = "block";
                     this.textContent = "Minimize";
                 } else {

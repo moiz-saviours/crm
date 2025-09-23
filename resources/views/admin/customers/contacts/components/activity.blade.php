@@ -61,10 +61,12 @@
                                 <p class="mb-0 text-muted small">
                                     to: {{ $item['data']['to'][0]['email'] ?? 'Unknown' }}
                                 </p>
+                                @if($item['data']['folder'] == 'sent')
                                 <p class="mb-0 text-primary small">
                                     Opens: {{ $item['data']['open_count'] ?? 0 }} |
                                     Clicks: {{ $item['data']['click_count'] ?? 0 }}
                                 </p>
+                                @endif
                             </div>
                         </div>
                         <div class="text-end" style="min-width: 160px;">
