@@ -538,7 +538,7 @@
                             <td class="align-middle">${index + 1}</td>
                             <td class="align-middle">${log.merchant ?? "---"}</td>
                             <td class="align-middle">${log.last_4 ?? "---"}</td>
-                            <td class="align-middle">${log.transaction_id ?? ""}</td>
+                            <td class="align-middle">${log.transaction_id ?? "---"}</td>
                             <td class="align-middle">$${parseFloat(log.amount || 0).toFixed(2)}</td>
                             <td class="align-middle">${responseMessage}</td>
                             <td class="align-middle">${log.response_code_message || "---"}</td>
