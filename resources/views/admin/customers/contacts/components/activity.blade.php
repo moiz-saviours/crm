@@ -54,14 +54,17 @@
                             <i class="fa fa-caret-right me-2 text-primary"></i>
                             <div>
                                 <h2 class="mb-0 fs-6 fw-semibold text-dark">
-                                    {{ $item['data']['from'][0]['name'] ?? $item['data']['from'][0]['email'] }} -
+                                    {{ $item['data']['from']['name'] ?? $item['data']['from']['email'] }} -
                                     {{ $item['data']['subject'] ?? '(No Subject)' }}
                                 </h2>
                                 <p class="mb-1 text-muted small">
-                                    from: {{ $item['data']['from'][0]['email'] ?? 'Unknown' }}
+                                    from: {{ $item['data']['from']['email'] ?? 'Unknown' }}
                                 </p>
                                 <p class="mb-0 text-muted small">
-                                    to: {{ $item['data']['to'][0]['email'] ?? 'Unknown' }}
+                                    to:
+                                    <span class="truncate-recipients" title="{{ collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', ') }}">
+                                        {{ Str::limit(collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', '), 50) }}
+                                    </span>
                                 </p>
                                 @if(
     !empty($item['data']['open_count']) &&
