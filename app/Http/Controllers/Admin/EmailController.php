@@ -62,25 +62,31 @@ class EmailController extends Controller
         } elseif ($folder == 'archive') {
             $query->where('folder', 'archive');
         } else {
-            $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                $q->where('from_email', $customerEmail)
-                    ->where(function ($qq) use ($auth_pseudo_emails) {
-                        foreach ($auth_pseudo_emails as $email) {
-                            $qq->orWhereJsonContains('to',  ['email' => $email])
-                                ->orWhereJsonContains('cc',  ['email' => $email])
-                                ->orWhereJsonContains('bcc', ['email' => $email]);
-                        }
-                    })
-                    ->orWhere(function ($qq) use ($auth_pseudo_emails, $customerEmail) {
-                        $qq->whereIn('from_email', $auth_pseudo_emails)
-                            ->where(function ($qqq) use ($customerEmail) {
-                                $qqq->orWhereJsonContains('to',  ['email' => $customerEmail])
-                                    ->orWhereJsonContains('cc',  ['email' => $customerEmail])
-                                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-                            });
-                    });
+    // ALL: return emails that involve the customer OR involve any of my pseudo emails
+    $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+        // 1) any email where the customer is the sender OR in recipients
+        $q->where('from_email', $customerEmail)
+          ->orWhereJsonContains('to',  ['email' => $customerEmail])
+          ->orWhereJsonContains('cc',  ['email' => $customerEmail])
+          ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+
+        // 2) OR any email where one of my pseudo addresses is sender OR appears in recipients
+        if (!empty($auth_pseudo_emails)) {
+            $q->orWhere(function ($sub) use ($auth_pseudo_emails) {
+                // sender is one of my addresses
+                $sub->whereIn('from_email', $auth_pseudo_emails);
+
+                // OR recipient contains one of my addresses
+                foreach ($auth_pseudo_emails as $addr) {
+                    $sub->orWhereJsonContains('to',  ['email' => $addr])
+                        ->orWhereJsonContains('cc',  ['email' => $addr])
+                        ->orWhereJsonContains('bcc', ['email' => $addr]);
+                }
             });
         }
+    });
+}
+
 
         if ($folder !== 'all') {
             $query->where('folder', $folder);
@@ -101,6 +107,7 @@ class EmailController extends Controller
         'to' => $email->to ?? [],
         'subject' => $email->subject,
         'folder' => $email->folder,
+        'type' => $email->type,
         'date' => $email->message_date,
         'body' => [
             'html' => $email->body_html,
