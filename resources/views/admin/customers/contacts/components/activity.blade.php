@@ -54,7 +54,7 @@
                             <i class="fa fa-caret-right me-2 text-primary"></i>
                             <div>
                                 <h2 class="mb-0 fs-6 fw-semibold text-dark">
-                                    {{ $item['data']['from'][0]['name'] ?? 'Unknown Sender' }} -
+                                    {{ $item['data']['from'][0]['name'] ?? $item['data']['from'][0]['email'] }} -
                                     {{ $item['data']['subject'] ?? '(No Subject)' }}
                                 </h2>
                                 <p class="mb-1 text-muted small">
@@ -63,7 +63,13 @@
                                 <p class="mb-0 text-muted small">
                                     to: {{ $item['data']['to'][0]['email'] ?? 'Unknown' }}
                                 </p>
-                                @if($item['data']['type'] == 'outgoing' && $item['data']['folder'] == 'sent')
+                                @if(
+    !empty($item['data']['open_count']) &&
+    $item['data']['open_count'] > 0 &&
+    $item['data']['type'] === 'outgoing' &&
+    $item['data']['folder'] === 'sent'
+)
+
                                 <p class="mb-0 text-primary small">
                                     Opens: {{ $item['data']['open_count'] ?? 0 }} |
                                     Clicks: {{ $item['data']['click_count'] ?? 0 }}
@@ -89,7 +95,13 @@
                 <div class="contentdisplaytwo {{ $item['data']['uuid'] }} mt-3 p-3 rounded border bg-light"
                     style="display: none;">
                     {{-- Activity Timeline --}}
-                    @if($item['data']['type'] == 'outgoing' && $item['data']['folder'] == 'sent')
+                    @if(
+    !empty($item['data']['open_count']) &&
+    $item['data']['open_count'] > 0 &&
+    $item['data']['type'] === 'outgoing' &&
+    $item['data']['folder'] === 'sent'
+)
+
                         <div class="activity-section">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="fw-semibold text-dark mb-0">

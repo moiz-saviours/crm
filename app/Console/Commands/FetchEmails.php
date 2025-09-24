@@ -56,78 +56,85 @@ class FetchEmails extends Command
     private function getAccounts()
     {
         $this->line('Retrieving active IMAP accounts...');
-        $query = UserPseudoRecord::where('imap_type', 'imap')
-            ->where('status', 1)
-            ->where('is_verified', 1)
-            ->whereNotNull(['server_host', 'server_username', 'server_password']);
 
-        if ($accountEmails = $this->option('account')) {
-            $this->line("Filtering for specific account emails: " . implode(', ', $accountEmails));
-            $query->whereIn('pseudo_email', $accountEmails);
+        // Require --account option, otherwise return nothing
+        $accountEmails = (array) $this->option('account');
+        if (empty($accountEmails)) {
+            $this->warn("No account emails provided via --account option.");
+            return collect();
         }
 
-        $accounts = $query->get();
+        $accounts = UserPseudoRecord::where('imap_type', 'imap')
+            ->where('status', 1)
+            ->where('is_verified', 1)
+            ->whereNotNull(['server_host', 'server_username', 'server_password'])
+            ->whereIn('pseudo_email', $accountEmails)
+            ->get();
+
         if ($accounts->isEmpty()) {
             $this->warn("No matching accounts found for the provided criteria.");
         }
+
         return $accounts;
     }
+
+    
     //GET ALL FOLDERS
-    // private function fetchAccountEmails(UserPseudoRecord $account)
-    // {
-    //     $startTime = microtime(true);
-    //     $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
+    private function fetchAccountEmails(UserPseudoRecord $account)
+    {
+        $startTime = microtime(true);
+        $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
 
-    //     try {
-    //         $this->connectImap($account);
+        try {
+            $this->connectImap($account);
 
-    //         $this->line('Fetching available folders...');
-    //         $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
-    //         $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
+            $this->line('Fetching available folders...');
+            $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
+            $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
 
-    //         foreach ($folders as $folder) {
-    //             $this->line("Processing folder: {$folder}");
-    //             $this->fetchFolderEmails($account, $folder);
-    //         }
+            foreach ($folders as $folder) {
+                $this->line("Processing folder: {$folder}");
+                $this->fetchFolderEmails($account, $folder);
+            }
 
-    //         $endTime = microtime(true);
-    //         $accountTime = round($endTime - $startTime, 2);
-    //         $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
-    //     } catch (\Exception $e) {
-    //         $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
-    //         Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
-    //         $endTime = microtime(true);
-    //         $accountTime = round($endTime - $startTime, 2);
-    //         $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
-    //     }
-    // }
+            $endTime = microtime(true);
+            $accountTime = round($endTime - $startTime, 2);
+            $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
+        } catch (\Exception $e) {
+            $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
+            Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
+            $endTime = microtime(true);
+            $accountTime = round($endTime - $startTime, 2);
+            $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
+        }
+    }
 
     //GET INBOX ONLY
 
-    private function fetchAccountEmails(UserPseudoRecord $account)
-{
-    $startTime = microtime(true);
-    $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
+//     private function fetchAccountEmails(UserPseudoRecord $account)
+// {
+//     $startTime = microtime(true);
+//     $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
 
-    try {
-        $this->connectImap($account);
+//     try {
+//         $this->connectImap($account);
 
-        // Only fetch INBOX
-        $inbox = $this->baseMailboxString . 'INBOX';
-        $this->line("Processing folder: {$inbox}");
-        $this->fetchFolderEmails($account, $inbox);
+//         // Only fetch INBOX
+//         $inbox = $this->baseMailboxString . 'INBOX';
+//         $this->line("Processing folder: {$inbox}");
+//         $this->fetchFolderEmails($account, $inbox);
 
-        $endTime = microtime(true);
-        $accountTime = round($endTime - $startTime, 2);
-        $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
-    } catch (\Exception $e) {
-        $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
-        Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
-        $endTime = microtime(true);
-        $accountTime = round($endTime - $startTime, 2);
-        $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
-    }
-}
+//         $endTime = microtime(true);
+//         $accountTime = round($endTime - $startTime, 2);
+//         $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
+//     } catch (\Exception $e) {
+//         $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
+//         Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
+//         $endTime = microtime(true);
+//         $accountTime = round($endTime - $startTime, 2);
+//         $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
+//     }
+// }
 
 
     private function connectImap(UserPseudoRecord $account)
