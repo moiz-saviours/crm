@@ -1400,6 +1400,15 @@
                 font-size: var(--nf-profile-para-size);
                 color: grey;
             }
+
+            .truncate-recipients {
+                display: inline-block;
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                vertical-align: bottom;
+            }
         </style>
     @endpush
     <div class="new-class-hide-scroll">
@@ -2020,8 +2029,7 @@
                                                     <div>
                                                         <div>
                                                             <p class="recent-filters"> Filter by:
-                                                                <span class="activities-seprater">7
-                                                                    activities</span>
+                                                                <span class="activities-seprater">Filter activity ({{!empty($timeline) && count($timeline) > 0 ? count($timeline) : 0}}/{{!empty($timeline) && count($timeline) > 0 ? count($timeline) : 0}})</span>
                                                             </p>
                                                         </div>
                                                         <p class="date-by-order"> May 2021</p>
