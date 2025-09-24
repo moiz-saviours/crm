@@ -24,7 +24,7 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-            $invoices = Invoice::whereBetween('created_at', [Carbon::now('GMT+5')->startOfMonth(), Carbon::now('GMT+5')->endOfMonth(),])->get();
+        $invoices = Invoice::whereBetween('created_at', [Carbon::now('GMT+5')->startOfMonth(), Carbon::now('GMT+5')->endOfMonth(),])->with('payment_transaction_logs')->get();
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $groupedMerchants = [];
         foreach ($brands as $brand) {
@@ -500,13 +500,41 @@ class InvoiceController extends Controller
                 $message .= " However, the following merchants were excluded due to insufficient limits: " . implode(', ', $merchantExcluded);
             }
             $invoice->load('payment_attachments');
+            $invoice->gateway_counts = $this->getGatewayCounts($invoice);
             return response()->json(['data' => $invoice, 'success' => $message]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while updating the record', 'message' => $e->getMessage()], 500);
         }
     }
+// Add this method to your controller
+    private function getGatewayCounts($invoice)
+    {
+        $m = $invoice->invoice_merchants->pluck('merchant_type')->map(fn($t) => strtolower($t))->toArray();
+        $s = ['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];
+        $f = ['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];
 
+        if($invoice->payment_transaction_logs){
+            foreach($invoice->payment_transaction_logs as $l){
+                $g = strtolower($l->gateway);
+                $st = strtolower($l->status);
+                if($g=='edp') $st=='success'?$s['edp']++:$f['edp']++;
+                if(in_array($g,['authorize.net','authorize'])) $st=='success'?$s['authorize']++:$f['authorize']++;
+                if($g=='stripe') $st=='success'?$s['stripe']++:$f['stripe']++;
+                if($g=='paypal') $st=='success'?$s['paypal']++:$f['paypal']++;
+            }
+        }
+
+        if($invoice->status == 1 && $invoice->payment && array_sum($s) == 0){
+            $pm = strtolower($invoice->payment->payment_method??'');
+            if($pm=='edp') $s['edp']=1;
+            if(in_array($pm,['authorize.net','authorize'])) $s['authorize']=1;
+            if($pm=='stripe') $s['stripe']=1;
+            if($pm=='paypal') $s['paypal']=1;
+        }
+
+        return compact('s', 'f', 'm');
+    }
     /**
      * Remove the specified resource from storage.
      */

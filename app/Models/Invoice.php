@@ -127,4 +127,8 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceMerchant::class, 'invoice_key', 'invoice_key');
     }
+    public function payment_transaction_logs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PaymentTransactionLog::class, 'invoice_key', 'invoice_key');
+    }
 }

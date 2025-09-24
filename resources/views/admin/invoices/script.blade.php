@@ -239,12 +239,30 @@
                                 currency,
                                 status,
                                 due_date,
-                                date
+                                date,
                             } = response.data;
                             const index = table.rows().count() + 1;
                             const columns = `
                         <td class="align-middle text-center text-nowrap"></td>
                         <td class="align-middle text-center text-nowrap">${index}</td>
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">
+                            <div style="display:flex;justify-content:space-between;gap:10px;">
+                                <span>Authorize : </span>
+                                <span>0-0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;gap:10px;">
+                                <span>Edp : </span>
+                                <span>0-0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;gap:10px;">
+                                <span>Stripe : </span>
+                                <span>0-0</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;gap:10px;">
+                                <span>Paypal : </span>
+                                <span>0-0</span>
+                            </div>
+                        </td>
                         <td class="align-middle text-center text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
@@ -316,7 +334,8 @@
                                 status,
                                 due_date,
                                 date,
-                                payment_attachments
+                                payment_attachments,
+                                gateway_counts,
                             } = response.data;
                             const index = table.row($('#tr-' + id)).index();
                             const rowData = table.row(index).data();
@@ -331,10 +350,35 @@
                                     }
                                 }, 0);
                             }
+                            const gatewayCountsHtml = `
+                                ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Authorize : </span>
+                                    <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
+                                </div>` : ''}
+                                ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Edp : </span>
+                                    <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
+                                </div>` : ''}
+                                ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Stripe : </span>
+                                    <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
+                                </div>` : ''}
+                                ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Paypal : </span>
+                                    <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
+                                </div>` : ''}
+                            `;
+                            if (decodeHtml(rowData[2]) !== gatewayCountsHtml) {
+                                table.cell(index, 2).data(gatewayCountsHtml).draw();
+                            }
                             // Update columns in the table dynamically
                             // Column 3: Invoice Number & Invoice Key
-                            if (decodeHtml(rowData[2]) !== `${invoice_number}<br>${invoice_key}`) {
-                                table.cell(index, 2).data(`
+                            if (decodeHtml(rowData[3]) !== `${invoice_number}<br>${invoice_key}`) {
+                                table.cell(index, 3).data(`
                                     <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
@@ -343,22 +387,22 @@
                             }
 
                             // Column 4: Brand
-                            if (decodeHtml(rowData[3]) !== `${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`) {
-                                table.cell(index, 3).data(`${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[4]) !== `${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`) {
+                                table.cell(index, 4).data(`${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`).draw();
                             }
 
                             // Column 5: Team
-                            if (decodeHtml(rowData[4]) !== `${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`) {
-                                table.cell(index, 4).data(`${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[5]) !== `${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`) {
+                                table.cell(index, 5).data(`${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`).draw();
                             }
 
                             // Column 6: Customer Contact
-                            if (decodeHtml(rowData[5]) !== `${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`) {
-                                table.cell(index, 5).data(`${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`).draw();
+                            if (decodeHtml(rowData[6]) !== `${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`) {
+                                table.cell(index, 6).data(`${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`).draw();
                             }
                             // Column 7: Agent
-                            if (decodeHtml(rowData[6]) !== `${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`) {
-                                table.cell(index, 6).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
+                            if (decodeHtml(rowData[7]) !== `${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`) {
+                                table.cell(index, 7).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
                             }
 
                             const newContent = `
@@ -379,24 +423,24 @@
                                     <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                                 </div>`;
                             // Column 8: Amount
-                            if (decodeHtml(rowData[7]) !== newContent) {
-                                table.cell(index, 7).data(newContent).draw();
+                            if (decodeHtml(rowData[8]) !== newContent) {
+                                table.cell(index, 8).data(newContent).draw();
                             }
 
                             // Column 9: Status
 
                             const statusHtml = status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : '';
-                            if (decodeHtml(rowData[8]) !== statusHtml) {
-                                table.cell(index, 8).data(statusHtml).draw();
+                            if (decodeHtml(rowData[9]) !== statusHtml) {
+                                table.cell(index, 9).data(statusHtml).draw();
                             }
 
                             // Column 10: Due Date
-                            if (decodeHtml(rowData[9]) !== due_date) {
-                                table.cell(index, 9).data(due_date).draw();
+                            if (decodeHtml(rowData[10]) !== due_date) {
+                                table.cell(index, 10).data(due_date).draw();
                             }
                             // Column 11: Date
-                            if (decodeHtml(rowData[10]) !== date) {
-                                table.cell(index, 10).data(date).draw();
+                            if (decodeHtml(rowData[11]) !== date) {
+                                table.cell(index, 11).data(date).draw();
                             }
                             // Column 12: Actions
                             let actionsHtml = '';
@@ -410,8 +454,8 @@
                                 actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
                                                 <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
                             }
-                            if (normalizeHtml(decodeHtml(rowData[11])) !== normalizeHtml(actionsHtml)) {
-                                table.cell(index, 11).data(actionsHtml).draw();
+                            if (normalizeHtml(decodeHtml(rowData[12])) !== normalizeHtml(actionsHtml)) {
+                                table.cell(index, 12).data(actionsHtml).draw();
                             }
                             $('#manage-form')[0].reset();
                             $('#formContainer').removeClass('open')
@@ -480,16 +524,29 @@
                                 second: '2-digit',
                                 hour12: true
                             });
+                            let responseMessage = '';
+                            if (log.status === 'success') {
+                                responseMessage = log.response_message || '---';
+                            } else {
+                                responseMessage = log.error_message || '---';
+                            }
+                            let paymentStatus = log.status === 'success' ?
+                                '<span class="badge bg-success">Paid</span>' :
+                                '<span class="badge bg-danger">Not Paid</span>';
                             rows += `
                         <tr>
-                            <td>${index + 1}</td>
-                            <td>${log.merchant ?? ""}</td>
-                            <td>${log.last_4 ?? ""}</td>
-                            <td>${log.transaction_id ?? ""}</td>
-                            <td>${log.amount ?? ""}</td>
-                            <td>${log.status == 'success' ? log?.response_message ?? "" : log?.error_message ?? ""}</td>
-                            <td>${log.status == 'success' ? '<span class="text-success">Paid</span>' : '<span class="text-danger">Not Paid</span>'}</td>
-                            <td>${formattedDate}</td>
+                            <td class="align-middle">${index + 1}</td>
+                            <td class="align-middle">${log.merchant ?? "---"}</td>
+                            <td class="align-middle">${log.last_4 ?? "---"}</td>
+                            <td class="align-middle">${log.transaction_id ?? "---"}</td>
+                            <td class="align-middle">$${parseFloat(log.amount || 0).toFixed(2)}</td>
+                            <td class="align-middle">${responseMessage}</td>
+                            <td class="align-middle">${log.response_code_message || "---"}</td>
+                            <td class="align-middle">${log.avs_message || "---"}</td>
+                            <td class="align-middle">${log.cvv_message || "---"}</td>
+                            <td class="align-middle">${log.cavv_message || "---"}</td>
+                            <td class="align-middle">${paymentStatus}</td>
+                            <td class="align-middle">${formattedDate}</td>
                         </tr>`;
                         });
                         $('#transactionLogs').html(rows);
@@ -934,14 +991,13 @@
                 .catch(error => console.error('An error occurred while updating the record.', error))
         }
 
-
-        $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
+        $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(
                 picker.startDate.format('YYYY-MM-DD h:mm:ss A') + ' - ' +
                 picker.endDate.format('YYYY-MM-DD h:mm:ss A')
             );
         });
-        $('#dateRangePicker').on('cancel.daterangepicker', function(ev, picker) {
+        $('#dateRangePicker').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
     });
