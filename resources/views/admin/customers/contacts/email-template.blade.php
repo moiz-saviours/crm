@@ -1262,30 +1262,12 @@
 
                 formData.append('email_content', emailContent.value);
                 formData.append('subject', document.getElementById('emailSubject').value);
+                const fields = ['to','cc','bcc'].map(n => document.querySelector(`[name="${n}"]`));
+                const extract = f => f && f.value.trim() ? JSON.parse(f.value).map(i => i.value) : [];
 
-                const toTagify = document.querySelector('[name="to"]');
-                const ccTagify = document.querySelector('[name="cc"]');
-                const bccTagify = document.querySelector('[name="bcc"]');
-
-                function extractEmails(tagifyField) {
-                    try {
-                        return JSON.parse(tagifyField.value).map(item => item.value);
-                    } catch (e) {
-                        return [];
-                    }
-                }
-
-                const toEmails = extractEmails(toTagify);
-                const ccEmails = ccTagify ? extractEmails(ccTagify) : [];
-                const bccEmails = bccTagify ? extractEmails(bccTagify) : [];
-
-                formData.append('to', JSON.stringify(toEmails));
-                if (ccEmails.length) {
-                    formData.append('cc', JSON.stringify(ccEmails));
-                }
-                if (bccEmails.length) {
-                    formData.append('bcc', JSON.stringify(bccEmails));
-                }
+                fields.forEach((f,i) => extract(f).forEach(email =>
+                    formData.append(`${['to','cc','bcc'][i]}[]`, email)
+                ));
                 formData.append('from', document.querySelector('[name="from_email"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
 
