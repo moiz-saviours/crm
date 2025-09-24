@@ -1,3 +1,4 @@
+
 @if (!empty($timeline) && count($timeline) > 0)
     @foreach ($timeline as $item)
         @if ($item['type'] === 'note')
@@ -43,6 +44,7 @@
                     </div>
                 </div>
             </div>
+
         @elseif ($item['type'] === 'email')
             {{-- ================= EMAIL ================= --}}
             <div class="email-box-container mb-4 border rounded bg-white p-3">
@@ -61,7 +63,7 @@
                                 <p class="mb-0 text-muted small">
                                     to: {{ $item['data']['to'][0]['email'] ?? 'Unknown' }}
                                 </p>
-                                @if($item['data']['folder'] == 'sent')
+                                @if($item['data']['type'] == 'outgoing' && $item['data']['folder'] == 'sent')
                                 <p class="mb-0 text-primary small">
                                     Opens: {{ $item['data']['open_count'] ?? 0 }} |
                                     Clicks: {{ $item['data']['click_count'] ?? 0 }}
@@ -83,47 +85,47 @@
                         </div>
                     </div>
                 </div>
-
                 {{-- Collapsible details --}}
                 <div class="contentdisplaytwo {{ $item['data']['uuid'] }} mt-3 p-3 rounded border bg-light"
                     style="display: none;">
                     {{-- Activity Timeline --}}
-                    <div class="activity-section">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-semibold text-dark mb-0">
-                                <i class="fa fa-clock-o"></i> Activity
-                            </h6>
-                            <button class="btn btn-sm btn-link toggle-activity"
-                                data-target="#timeline-{{ $item['data']['uuid'] }}">
-                                Minimize
-                            </button>
-                        </div>
-
-                        <div id="timeline-{{ $item['data']['uuid'] }}" class="timeline">
-                            @forelse ($item['data']['events'] ?? [] as $event)
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content">
-                                        <p class="mb-0 small">
-                                            <i class="fa {{ $event['icon'] }}"></i>
-                                            {{ ucfirst($event['type']) }}
-                                        </p>
-                                        <small class="text-muted">
-                                            {{ \Carbon\Carbon::parse($event['timestamp'])->format('M d, Y h:i A') }}
-                                        </small>
+                    @if($item['data']['type'] == 'outgoing' && $item['data']['folder'] == 'sent')
+                        <div class="activity-section">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-semibold text-dark mb-0">
+                                    <i class="fa fa-clock-o"></i> Activity
+                                </h6>
+                                <button class="btn btn-sm btn-link toggle-activity"
+                                    data-target="#timeline-{{ $item['data']['uuid'] }}">
+                                    Minimize
+                                </button>
+                            </div>
+                            <div id="timeline-{{ $item['data']['uuid'] }}" class="timeline">
+                                @forelse ($item['data']['events'] ?? [] as $event)
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-content">
+                                            <p class="mb-0 small">
+                                                <i class="fa {{ $event['icon'] }}"></i>
+                                                {{ ucfirst($event['event_type']) }}
+                                            </p>
+                                            <small class="text-muted">
+                                                {{ \Carbon\Carbon::parse($event['created_at'])->format('M d, Y h:i A') }}
+                                            </small>
+                                        </div>
                                     </div>
-                                </div>
-                            @empty
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content">
-                                        <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded</p>
-                                        <small class="text-muted">N/A</small>
+                                @empty
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-content">
+                                            <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded</p>
+                                            <small class="text-muted">N/A</small>
+                                        </div>
                                     </div>
-                                </div>
-                            @endforelse
+                                @endforelse
+                            </div>
                         </div>
-                    </div>
+                    @endif
 
                     {{-- Email Body --}}
                     <div class="email-preview mb-4 text-dark small">
