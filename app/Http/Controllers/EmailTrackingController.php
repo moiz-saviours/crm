@@ -36,12 +36,20 @@ public function trackClick($id, Request $request)
 }
 public function trackOpen($id, Request $request)
 {
-  
-    $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+    
+    
+        $userAgent = $request->userAgent();
+        Log::info($userAgent);
+    $referer   = $request->headers->get('referer');
 
-    $requestHost = $request->getHost();
+    // Suppress tracking if user is previewing inside your own app/browser
+    if ($referer && str_contains($referer, parse_url(config('app.url'), PHP_URL_HOST))) {
+        return response()->file(public_path('assets/images/pixel.png'));
+    }
 
-    if ($appHost === $requestHost) {
+    // You can also filter by known browser agents if needed
+    if ($userAgent && preg_match('/Chrome|Firefox|Safari|Edg/', $userAgent)) {
+        // Optional: skip if you only want email client opens
         return response()->file(public_path('assets/images/pixel.png'));
     }
 
@@ -68,6 +76,7 @@ public function trackOpen($id, Request $request)
 
     public function trackBounce(Request $request)
     {
+        
         Log::info('trackBounce Hit');
 
         Log::info("➡ Entering trackBounce()", [
