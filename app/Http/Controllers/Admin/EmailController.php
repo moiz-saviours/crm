@@ -26,23 +26,19 @@ class EmailController extends Controller
 {
     public function getEmails($customerEmail, $folder = "all")
     {
-
         $user = Auth::guard('admin')->user();
-
         $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
             ->where('imap_type', 'imap')
             ->pluck('pseudo_email')
             ->toArray();
-
         $query = Email::with('events'); // eager load events
-
         if ($folder == 'inbox') {
             $query->where('from_email', $customerEmail)
                 ->where(function ($q) use ($auth_pseudo_emails) {
                     foreach ($auth_pseudo_emails as $email) {
-                        $q->orWhereJsonContains('to',  ['email' => $email])
-                            ->orWhereJsonContains('cc',  ['email' => $email])
+                        $q->orWhereJsonContains('to', ['email' => $email])
+                            ->orWhereJsonContains('cc', ['email' => $email])
                             ->orWhereJsonContains('bcc', ['email' => $email]);
                     }
                 });
@@ -62,91 +58,82 @@ class EmailController extends Controller
         } elseif ($folder == 'archive') {
             $query->where('folder', 'archive');
         } else {
-    // ALL: return emails that involve the customer OR involve any of my pseudo emails
-    $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-        // 1) any email where the customer is the sender OR in recipients
-        $q->where('from_email', $customerEmail)
-          ->orWhereJsonContains('to',  ['email' => $customerEmail])
-          ->orWhereJsonContains('cc',  ['email' => $customerEmail])
-          ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-
-        // 2) OR any email where one of my pseudo addresses is sender OR appears in recipients
-        if (!empty($auth_pseudo_emails)) {
-            $q->orWhere(function ($sub) use ($auth_pseudo_emails) {
-                // sender is one of my addresses
-                $sub->whereIn('from_email', $auth_pseudo_emails);
-
-                // OR recipient contains one of my addresses
-                foreach ($auth_pseudo_emails as $addr) {
-                    $sub->orWhereJsonContains('to',  ['email' => $addr])
-                        ->orWhereJsonContains('cc',  ['email' => $addr])
-                        ->orWhereJsonContains('bcc', ['email' => $addr]);
+            // ALL: return emails that involve the customer OR involve any of my pseudo emails
+            $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+                // 1) any email where the customer is the sender OR in recipients
+                $q->where('from_email', $customerEmail)
+                    ->orWhereJsonContains('to', ['email' => $customerEmail])
+                    ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+                // 2) OR any email where one of my pseudo addresses is sender OR appears in recipients
+                if (!empty($auth_pseudo_emails)) {
+                    $q->orWhere(function ($sub) use ($auth_pseudo_emails) {
+                        // sender is one of my addresses
+                        $sub->whereIn('from_email', $auth_pseudo_emails);
+                        // OR recipient contains one of my addresses
+                        foreach ($auth_pseudo_emails as $addr) {
+                            $sub->orWhereJsonContains('to', ['email' => $addr])
+                                ->orWhereJsonContains('cc', ['email' => $addr])
+                                ->orWhereJsonContains('bcc', ['email' => $addr]);
+                        }
+                    });
                 }
             });
         }
-    });
-}
-
-
         if ($folder !== 'all') {
             $query->where('folder', $folder);
         }
-
         $emails = $query->orderBy('message_date', 'desc')
             ->with(['attachments' => function ($q) {
                 $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
             }])
             ->get()
-           ->map(function ($email) {
-    return [
-        'uuid' => 'email-' . $email->id,
-        'from' => [[
-            'name'  => $email->from_name,
-            'email' => $email->from_email,
-        ]],
-        'to' => $email->to ?? [],
-        'subject' => $email->subject,
-        'folder' => $email->folder,
-        'type' => $email->type,
-        'date' => $email->message_date,
-        'body' => [
-            'html' => $email->body_html,
-            'text' => $email->body_text,
-        ],
-        'attachments' => $email->attachments->map(function ($attachment) {
-            return [
-                'filename' => $attachment->original_name,
-                'type'     => $attachment->mime_type,
-                'size'     => $attachment->size,
-                'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-            ];
-        })->toArray(),
-
-        // counters
-        'open_count'   => $email->events->where('event_type', 'open')->count(),
-        'click_count'  => $email->events->where('event_type', 'click')->count(),
-        'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
-        'spam_count'   => $email->events->where('event_type', 'spam')->count(),
-
-        // normalized events
-        'events' => $email->events->map(function ($event) {
-            $icons = [
-                'open'   => 'fa-envelope-open',
-                'click'  => 'fa-mouse-pointer',
-                'bounce' => 'fa-exclamation-triangle',
-                'spam'   => 'fa-ban',
-            ];
-            return [
-                'id'         => $event->id,
-                'event_type' => $event->event_type,
-                'created_at' => $event->created_at,
-                'icon'       => $icons[$event->event_type] ?? 'fa-info-circle',
-            ];
-        })->values()->toArray(),
-    ];
-})
-
-            
+            ->map(function ($email) {
+                return [
+                    'uuid' => 'email-' . $email->id,
+                    'from' => [[
+                        'name' => $email->from_name,
+                        'email' => $email->from_email,
+                    ]],
+                    'to' => $email->to ?? [],
+                    'subject' => $email->subject,
+                    'folder' => $email->folder,
+                    'type' => $email->type,
+                    'date' => $email->message_date,
+                    'body' => [
+                        'html' => $email->body_html,
+                        'text' => $email->body_text,
+                    ],
+                    'attachments' => $email->attachments->map(function ($attachment) {
+                        return [
+                            'filename' => $attachment->original_name,
+                            'type' => $attachment->mime_type,
+                            'size' => $attachment->size,
+                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                        ];
+                    })->toArray(),
+                    // counters
+                    'open_count' => $email->events->where('event_type', 'open')->count(),
+                    'click_count' => $email->events->where('event_type', 'click')->count(),
+                    'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
+                    'spam_count' => $email->events->where('event_type', 'spam')->count(),
+                    // normalized events
+                    'events' => $email->events->map(function ($event) {
+                        $icons = [
+                            'open' => 'fa-envelope-open',
+                            'click' => 'fa-mouse-pointer',
+                            'bounce' => 'fa-exclamation-triangle',
+                            'spam' => 'fa-ban',
+                        ];
+                        return [
+                            'id' => $event->id,
+                            'event_type' => $event->event_type,
+                            'created_at' => $event->created_at,
+                            'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
+                        ];
+                    })->values()->toArray(),
+                ];
+            })
             ->values()
             ->toArray();
         return ['emails' => $emails];
@@ -160,7 +147,6 @@ class EmailController extends Controller
             if (empty($customerEmail)) {
                 return response()->json(['error' => 'Customer email is required'], 400);
             }
-
             return response()->json($this->getEmails($customerEmail, $folder));
         } catch (\Exception $e) {
             return response()->json([
@@ -169,8 +155,6 @@ class EmailController extends Controller
             ], 500);
         }
     }
-
-
 
     public function fetchNewEmails(Request $request)
     {
@@ -230,7 +214,6 @@ class EmailController extends Controller
             'bcc' => 'nullable|string',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240',
         ]);
-
         try {
             // Find sender (UserPseudoRecord)
             $sender = $this->findSender($validated['from']);
@@ -240,7 +223,6 @@ class EmailController extends Controller
                     'message' => 'Sender not authorized or not found',
                 ], 403);
             }
-
             // Validate SMTP credentials
             if (!$sender instanceof UserPseudoRecord || empty($sender->server_password) || empty($sender->server_host)) {
                 return response()->json([
@@ -248,22 +230,18 @@ class EmailController extends Controller
                     'message' => 'Invalid or missing SMTP credentials for sender',
                 ], 403);
             }
-
             // Parse email lists
             $toEmails = $this->parseEmailList($validated['to']);
             $ccEmails = $this->parseEmailList($validated['cc'] ?? '');
             $bccEmails = $this->parseEmailList($validated['bcc'] ?? '');
-
             if (empty($toEmails)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No valid recipients specified',
                 ], 400);
             }
-
             $fromEmail = $validated['from'];
             $fromName = $this->getSenderName($sender, $fromEmail);
-
             // Store email record
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
@@ -285,7 +263,6 @@ class EmailController extends Controller
                 'message_date' => now(),
                 'received_at' => now(),
             ]);
-
             // Store attachments
             $storedAttachments = [];
             if ($request->hasFile('attachments')) {
@@ -294,7 +271,6 @@ class EmailController extends Controller
                     $originalName = $file->getClientOriginalName();
                     $storageName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
                     $storagePath = $file->storeAs($attachmentsDir, $storageName, 'public');
-
                     $storedAttachments[] = [
                         'original_name' => $originalName,
                         'storage_name' => $storageName,
@@ -302,7 +278,6 @@ class EmailController extends Controller
                         'size' => $file->getSize(),
                         'mime_type' => $file->getMimeType(),
                     ];
-
                     // Store attachment record
                     EmailAttachment::create([
                         'email_id' => $email->id,
@@ -314,17 +289,14 @@ class EmailController extends Controller
                     ]);
                 }
             }
-
             // Wrap URLs for tracking
             $content = $this->wrapUrlsForTracking($validated['email_content'], $email->id);
             $textContent = strip_tags($content);
-
             // Store rendered content
             $email->update([
                 'body_html' => $content,
                 'body_text' => $textContent,
             ]);
-
             // Configure PHPMailer
             $mailer = new PHPMailer(true);
             $mailer->isSMTP();
@@ -339,11 +311,9 @@ class EmailController extends Controller
             $mailer->isHTML(true);
             $mailer->Body = $content;
             $mailer->AltBody = $textContent;
-
             // Add tracking pixel
             $trackingPixel = '<img src="' . route('emails.track.open', ['id' => $email->id]) . '" width="1" height="1" alt="" />';
             $mailer->Body .= $trackingPixel;
-
             // Add recipients
             foreach ($toEmails as $toEmail) {
                 $mailer->addAddress($toEmail);
@@ -354,7 +324,6 @@ class EmailController extends Controller
             foreach ($bccEmails as $bccEmail) {
                 $mailer->addBCC($bccEmail);
             }
-
             // Add attachments
             foreach ($storedAttachments as $attachment) {
                 $filePath = storage_path('app/public/' . $attachment['storage_path']);
@@ -372,17 +341,14 @@ class EmailController extends Controller
                     ]);
                 }
             }
-
             // Send email
             $mailer->send();
-
             Log::info('Email sent successfully', [
                 'email_id' => $email->id,
                 'from' => $fromEmail,
                 'to' => $toEmails,
                 'subject' => $validated['subject'],
             ]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Email sent successfully',
@@ -402,7 +368,6 @@ class EmailController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send email. Please try again.',
@@ -415,10 +380,8 @@ class EmailController extends Controller
         if (!$emailId) {
             return $content;
         }
-
         $doc = new DOMDocument();
         @$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
         $links = $doc->getElementsByTagName('a');
         foreach ($links as $link) {
             if ($link->hasAttribute('href')) {
@@ -430,7 +393,6 @@ class EmailController extends Controller
                 $link->setAttribute('href', $trackingUrl);
             }
         }
-
         return $doc->saveHTML();
     }
 
