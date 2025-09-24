@@ -243,6 +243,8 @@ class EmailController extends Controller
             $fromEmail = $validated['from'];
             $fromName = $this->getSenderName($sender, $fromEmail);
             // Store email record
+
+            //Todo Fetch customer from emails if found then add customer name In TO , CC , BCC
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
                 'thread_id' => md5($validated['subject'] . $fromEmail . time()),
@@ -315,6 +317,7 @@ class EmailController extends Controller
             $trackingPixel = '<img src="' . route('emails.track.open', ['id' => $email->id]) . '" width="1" height="1" alt="" />';
             $mailer->Body .= $trackingPixel;
             // Add recipients
+            //Todo Fetch customer from emails if found then add customer name
             foreach ($toEmails as $toEmail) {
                 $mailer->addAddress($toEmail);
             }
