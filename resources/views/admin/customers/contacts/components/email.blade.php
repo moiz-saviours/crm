@@ -54,11 +54,11 @@
         <div style="margin-right: 10px; display: flex; justify-content: flex-end;">
 
             <button id="refresh-emails" class="btn btn-primary"
-                style="padding: 8px; font-size: 14px; margin-right: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    style="padding: 8px; font-size: 14px; margin-right: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
                 <i class="fa fa-refresh" aria-hidden="true"></i>
             </button>
             <button id="fetch-emails" class="btn btn-success"
-                style="padding: 8px; font-size: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                    style="padding: 8px; font-size: 14px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
                 <i class="fa fa-download" aria-hidden="true"></i>
             </button>
         </div>
@@ -108,20 +108,38 @@
                                             <i class="fa fa-caret-right me-2 text-primary"></i>
                                             <div>
                                                 <h2 class="mb-0 fs-6 fw-semibold text-dark">
-                                                    {{ $email['from'][0]['name'] ?? $email['from'][0]['email'] }} -
+                                                    {{ $email['from']['name'] ?? $email['from']['email'] }} -
                                                     {{ $email['subject'] ?? '(No Subject)' }}
                                                 </h2>
                                                 <p class="mb-1 text-muted small">
-                                                    from: {{ $email['from'][0]['email'] ?? 'Unknown' }}
+                                                    from: {{ $email['from']['email'] ?: ($email['from']['name'] ?: 'Unknown') }}
                                                 </p>
                                                 <p class="mb-0 text-muted small">
-                                                    to: {{ $email['to'][0]['email'] ?? 'Unknown' }}
+                                                    to:
+                                                    <span class="truncate-recipients"
+                                                          title="{{ collect(is_string($email['to']) ? json_decode($email['to'], true) ?? [$email['to']] : $email['to'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', ') }}">
+                                                        {{ Str::limit(collect(is_string($email['to']) ? json_decode($email['to'], true) ?? [$email['to']] : $email['to'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', '), 50) }}
+                                                    </span>
                                                 </p>
-@if(
-    $email['open_count'] > 0 &&
-    $email['type'] == 'outgoing' &&
-    $email['folder'] == 'sent'
-)
+{{--                                                <p class="mb-0 text-muted small">--}}
+{{--                                                    cc:--}}
+{{--                                                    <span class="truncate-recipients"--}}
+{{--                                                          title="{{ collect(is_string($email['cc']) ? json_decode($email['cc'], true) ?? [$email['cc']] : $email['cc'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', ') }}">--}}
+{{--                                                        {{ Str::limit(collect(is_string($email['cc']) ? json_decode($email['cc'], true) ?? [$email['cc']] : $email['cc'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', '), 50) }}--}}
+{{--                                                    </span>--}}
+{{--                                                </p>--}}
+{{--                                                <p class="mb-0 text-muted small">--}}
+{{--                                                    bcc:--}}
+{{--                                                    <span class="truncate-recipients"--}}
+{{--                                                          title="{{ collect(is_string($email['bcc']) ? json_decode($email['bcc'], true) ?? [$email['bcc']] : $email['bcc'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', ') }}">--}}
+{{--                                                        {{ Str::limit(collect(is_string($email['bcc']) ? json_decode($email['bcc'], true) ?? [$email['bcc']] : $email['bcc'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', '), 50) }}--}}
+{{--                                                    </span>--}}
+{{--                                                </p>--}}
+                                                @if(
+                                                    $email['open_count'] > 0 &&
+                                                    $email['type'] == 'outgoing' &&
+                                                    $email['folder'] == 'sent'
+                                                )
                                                     <p class="mb-0 text-primary small">
                                                         Opens: {{ $email['open_count'] ?? 0 }} |
                                                         Clicks: {{ $email['click_count'] ?? 0 }}
@@ -149,49 +167,49 @@
 
                                 <!-- Collapsible Content -->
                                 <div class="contentdisplaytwo {{ $email['uuid'] }} mt-3 p-3 rounded border bg-light"
-                                    style="display: none;">
+                                     style="display: none;">
                                     <!-- Activity -->
-@if(
-    $email['open_count'] > 0 &&
-    $email['type'] == 'outgoing' &&
-    $email['folder'] == 'sent'
-)
-                                    <div class="activity-section">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h6 class="fw-semibold text-dark mb-0">
-                                                <i class="fa fa-clock-o"></i> Activity
-                                            </h6>
-                                            <button class="btn btn-sm btn-link toggle-activity"
-                                                data-target="#timeline-{{ $email['uuid'] }}">
-                                                Minimize
-                                            </button>
-                                        </div>
-                                        <div id="timeline-{{ $email['uuid'] }}" class="timeline">
-                                            @forelse ($email['events'] ?? [] as $event)
-                                                <div class="timeline-item">
-                                                    <div class="timeline-dot"></div>
-                                                    <div class="timeline-content">
-                                                        <p class="mb-0 small">
-                                                            <i class="fa {{ $event['icon'] }}"></i>
-                                                            {{ ucfirst($event['event_type']) }}
-                                                        </p>
-                                                        <small class="text-muted">
-                                                            {{ \Carbon\Carbon::parse($event['created_at'])->format('M d, Y h:i A') }}
-                                                        </small>
+                                    @if(
+                                        $email['open_count'] > 0 &&
+                                        $email['type'] == 'outgoing' &&
+                                        $email['folder'] == 'sent'
+                                    )
+                                        <div class="activity-section">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="fw-semibold text-dark mb-0">
+                                                    <i class="fa fa-clock-o"></i> Activity
+                                                </h6>
+                                                <button class="btn btn-sm btn-link toggle-activity"
+                                                        data-target="#timeline-{{ $email['uuid'] }}">
+                                                    Minimize
+                                                </button>
+                                            </div>
+                                            <div id="timeline-{{ $email['uuid'] }}" class="timeline">
+                                                @forelse ($email['events'] ?? [] as $event)
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-dot"></div>
+                                                        <div class="timeline-content">
+                                                            <p class="mb-0 small">
+                                                                <i class="fa {{ $event['icon'] }}"></i>
+                                                                {{ ucfirst($event['event_type']) }}
+                                                            </p>
+                                                            <small class="text-muted">
+                                                                {{ \Carbon\Carbon::parse($event['created_at'])->format('M d, Y h:i A') }}
+                                                            </small>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            @empty
-                                                <div class="timeline-item">
-                                                    <div class="timeline-dot"></div>
-                                                    <div class="timeline-content">
-                                                        <p class="mb-0 small"><i class="fa fa-info-circle"></i> No
-                                                            activity recorded</p>
-                                                        <small class="text-muted">N/A</small>
+                                                @empty
+                                                    <div class="timeline-item">
+                                                        <div class="timeline-dot"></div>
+                                                        <div class="timeline-content">
+                                                            <p class="mb-0 small"><i class="fa fa-info-circle"></i> No
+                                                                activity recorded</p>
+                                                            <small class="text-muted">N/A</small>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            @endforelse
+                                                @endforelse
+                                            </div>
                                         </div>
-                                    </div>
                                     @endif
 
                                     <!-- Email Body -->
@@ -227,7 +245,7 @@
                                                         </div>
                                                         <div>
                                                             <a href="{{ $attachment['download_url'] ?? '#' }}"
-                                                                class="btn btn-sm btn-outline-primary">
+                                                               class="btn btn-sm btn-outline-primary">
                                                                 <i class="fa fa-download"></i> Download
                                                             </a>
                                                         </div>
@@ -248,7 +266,7 @@
 
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const emailSection = document.getElementById('email-content');
         const emailLoader = document.getElementById('email-loader');
         const refreshButton = document.getElementById('refresh-emails');
@@ -272,13 +290,13 @@
             emailSection.innerHTML = '';
 
             fetch(url, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json",
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    credentials: "same-origin"
-                })
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                credentials: "same-origin"
+            })
                 .then(response => response.json())
                 .then(data => {
                     console.log("✅ Emails fetched:", data);
@@ -288,7 +306,7 @@
                     if (!data.emails) {
                         console.warn("⚠️ No 'emails' key in response:", data);
                         emailSection.innerHTML =
-                        '<p class="text-muted">No emails key found in response</p>';
+                            '<p class="text-muted">No emails key found in response</p>';
                         return;
                     }
 
@@ -304,31 +322,29 @@
                 });
         }
 
-
-
         // Initial fetch
         // fetchEmails();
 
         // Refresh button click
-        refreshButton.addEventListener('click', function() {
+        refreshButton.addEventListener('click', function () {
             fetchEmails();
         });
 
         // Fetch emails button click
-        fetchButton.addEventListener('click', function() {
+        fetchButton.addEventListener('click', function () {
             console.log("📩 Fetching NEW emails for:", customerEmail);
 
             emailLoader.style.display = 'block';
             emailSection.innerHTML = '';
 
             fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
-                    "?customer_email=" + encodeURIComponent(customerEmail), {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    })
+                "?customer_email=" + encodeURIComponent(customerEmail), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     console.log("✅ Fetch-new response:", data);
@@ -350,7 +366,6 @@
                 });
         });
 
-
         function renderEmails(emails) {
             console.log("🖼 Rendering emails:", emails);
 
@@ -370,6 +385,18 @@
                     hour12: true
                 });
             };
+                function formatRecipients(recipients) {
+                let data = recipients;
+                if (typeof data === 'string') {
+                try { data = JSON.parse(data); }
+                catch (e) { return data; }
+            }
+                if (Array.isArray(data)) {
+                return data.map(r => r.email || r.name || 'Unknown').join(', ');
+            }
+                return data || 'Unknown';
+            }
+
 
             return emails.map(email => `
         <!-- Email Box -->
@@ -382,15 +409,17 @@
                         <i class="fa fa-caret-right me-2 text-primary"></i>
                         <div>
                             <h2 class="mb-0 fs-6 fw-semibold text-dark">
-                                ${(email.from?.[0]?.name) || (email.from?.[0]?.email)} - ${(email.subject) || '(No Subject)'}
+                                ${(email.from?.name) || (email.from?.email)} - ${(email.subject) || '(No Subject)'}
                             </h2>
-                            <p class="mb-1 text-muted small">from: ${(email.from?.[0]?.email) || 'Unknown'}</p>
-                            <p class="mb-0 text-muted small">to: ${(email.to?.[0]?.email) || 'Unknown'}</p>
+                            <p class="mb-1 text-muted small">from: ${(email.from?.email) || 'Unknown'}</p>
+                            <p class="mb-0 text-muted small">
+                                to: <span title="${formatRecipients(email.to)}">${formatRecipients(email.to).length > 50 ? formatRecipients(email.to).substring(0, 50) + '...' : formatRecipients(email.to)}</span>
+                            </p>
                      ${(
-    email.open_count > 0 &&
-    folder === 'sent' &&
-    email.type === 'outgoing'
-) ? `
+                email.open_count > 0 &&
+                folder === 'sent' &&
+                email.type === 'outgoing'
+            ) ? `
                         <p class="mb-0 text-primary small">
                             Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
                         </p>` : ''}
@@ -407,7 +436,7 @@
                         </p>
                         ${email.attachments && email.attachments.length > 0 ? `
                             <p class="mt-1 mb-0 text-muted small">
-                                <i class="fa fa-paperclip"></i> ${email.attachments.length} 
+                                <i class="fa fa-paperclip"></i> ${email.attachments.length}
                                 attachment${email.attachments.length > 1 ? 's' : ''}
                             </p>` : ''}
                     </div>
@@ -416,10 +445,10 @@
             <!-- Collapsible Content -->
             <div class="contentdisplaytwo ${email.uuid} mt-3 p-3 rounded border bg-light" style="display: none;">
 ${(
-    email.open_count > 0 &&
-    folder === 'sent' &&
-    email.type === 'outgoing'
-) ? `
+                email.open_count > 0 &&
+                folder === 'sent' &&
+                email.type === 'outgoing'
+            ) ? `
     <!-- Activity -->
     <div class="activity-section">
         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -494,9 +523,6 @@ ${(
     `).join('');
         }
 
-
-
-
         // Function to determine attachment icon based on MIME type
         function getAttachmentIcon(type) {
             const fileType = type.toLowerCase();
@@ -515,7 +541,7 @@ ${(
         // Function to attach toggle listeners for activity section
         function attachActivityToggleListeners() {
             document.querySelectorAll('.toggle-activity').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const target = document.querySelector(this.dataset.target);
                     if (target.style.display == 'none' || target.style.display == '') {
                         target.style.display = 'block';
@@ -531,7 +557,7 @@ ${(
         // Existing attachToggleListeners function (unchanged)
         function attachToggleListeners() {
             document.querySelectorAll('.toggle-btnss').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const targetClass = this.getAttribute('data-target');
                     const content = this.parentElement.querySelector(targetClass);
                     if (content.style.display == 'none' || content.style.display == '') {
@@ -557,12 +583,10 @@ ${(
             });
         }
 
-
         // Attach tab click event listeners
         document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
-            tab.addEventListener('click', function(e) {
+            tab.addEventListener('click', function (e) {
                 e.preventDefault();
-
 
                 folder = this.getAttribute('data-folder');
                 currentPage = 1; // Reset to first page
@@ -577,10 +601,10 @@ ${(
 </script>
 <!-- Script -->
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         // Toggle activity minimize/maximize
         document.querySelectorAll(".toggle-activity").forEach(btn => {
-            btn.addEventListener("click", function() {
+            btn.addEventListener("click", function () {
                 const target = document.querySelector(this.dataset.target);
                 if (target.style.display == "none") {
                     target.style.display = "block";
