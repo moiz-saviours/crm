@@ -75,7 +75,7 @@
         <div class="recent-activities">
             <div id="email-section">
                 <!-- Folders Tabs -->
-                <ul class="nav nav-tabs" id="email-folders" style="margin-bottom: 15px;">
+                <ul class="nav nav-tabs d-none" id="email-folders" style="margin-bottom: 15px;">
                     <li class="nav-item"><a class="nav-link active" href="#" data-folder="all">All</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" data-folder="inbox">Inbox</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" data-folder="sent">Sent</a></li>
@@ -108,7 +108,7 @@
                                             <i class="fa fa-caret-right me-2 text-primary"></i>
                                             <div>
                                                 <h2 class="mb-0 fs-6 fw-semibold text-dark">
-                                                    {{ $email['from'][0]['name'] ?? 'Unknown Sender' }} -
+                                                    {{ $email['from'][0]['name'] ?? $email['from'][0]['email'] }} -
                                                     {{ $email['subject'] ?? '(No Subject)' }}
                                                 </h2>
                                                 <p class="mb-1 text-muted small">
@@ -117,7 +117,11 @@
                                                 <p class="mb-0 text-muted small">
                                                     to: {{ $email['to'][0]['email'] ?? 'Unknown' }}
                                                 </p>
-                                                @if($email['type'] == 'outgoing' && $email['folder'] == 'sent')
+@if(
+    $email['open_count'] > 0 &&
+    $email['type'] == 'outgoing' &&
+    $email['folder'] == 'sent'
+)
                                                     <p class="mb-0 text-primary small">
                                                         Opens: {{ $email['open_count'] ?? 0 }} |
                                                         Clicks: {{ $email['click_count'] ?? 0 }}
@@ -147,7 +151,11 @@
                                 <div class="contentdisplaytwo {{ $email['uuid'] }} mt-3 p-3 rounded border bg-light"
                                     style="display: none;">
                                     <!-- Activity -->
-                                    @if($email['type'] == 'outgoing' && $email['folder'] == 'sent')
+@if(
+    $email['open_count'] > 0 &&
+    $email['type'] == 'outgoing' &&
+    $email['folder'] == 'sent'
+)
                                     <div class="activity-section">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="fw-semibold text-dark mb-0">
@@ -374,14 +382,18 @@
                         <i class="fa fa-caret-right me-2 text-primary"></i>
                         <div>
                             <h2 class="mb-0 fs-6 fw-semibold text-dark">
-                                ${(email.from?.[0]?.name) || 'Unknown Sender'} - ${(email.subject) || '(No Subject)'}
+                                ${(email.from?.[0]?.name) || (email.from?.[0]?.email)} - ${(email.subject) || '(No Subject)'}
                             </h2>
                             <p class="mb-1 text-muted small">from: ${(email.from?.[0]?.email) || 'Unknown'}</p>
                             <p class="mb-0 text-muted small">to: ${(email.to?.[0]?.email) || 'Unknown'}</p>
-                     ${(folder == 'sent' || email.type === 'outgoing') ? `
-    <p class="mb-0 text-primary small">
-        Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
-    </p>` : ''}
+                     ${(
+    email.open_count > 0 &&
+    folder === 'sent' &&
+    email.type === 'outgoing'
+) ? `
+                        <p class="mb-0 text-primary small">
+                            Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
+                        </p>` : ''}
 
 
 
@@ -401,44 +413,50 @@
                     </div>
                 </div>
             </div>
-
             <!-- Collapsible Content -->
             <div class="contentdisplaytwo ${email.uuid} mt-3 p-3 rounded border bg-light" style="display: none;">
-                <!-- Activity -->
-                <div class="activity-section">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="fw-semibold text-dark mb-0">
-                            <i class="fa fa-clock-o"></i> Activity
-                        </h6>
-                        <button class="btn btn-sm btn-link toggle-activity" data-target="#timeline-${email.uuid}">
-                            Minimize
-                        </button>
-                    </div>
-                    <div id="timeline-${email.uuid}" class="timeline">
-                        ${(email.events && email.events.length > 0)
-                            ? email.events.map(event => `
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content">
-                                        <p class="mb-0 small">
-                                            <i class="fa ${event.icon}"></i> ${event.event_type.charAt(0).toUpperCase() + event.event_type.slice(1)}
-                                        </p>
-                                        <small class="text-muted">
-                                            ${formatDate(event.created_at)}
-                                        </small>
-                                    </div>
-                                </div>`).join('')
-                            : `
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content">
-                                        <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded</p>
-                                        <small class="text-muted">N/A</small>
-                                    </div>
-                                </div>`
-                        }
-                    </div>
-                </div>
+${(
+    email.open_count > 0 &&
+    folder === 'sent' &&
+    email.type === 'outgoing'
+) ? `
+    <!-- Activity -->
+    <div class="activity-section">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-semibold text-dark mb-0">
+                <i class="fa fa-clock-o"></i> Activity
+            </h6>
+            <button class="btn btn-sm btn-link toggle-activity" data-target="#timeline-${email.uuid}">
+                Minimize
+            </button>
+        </div>
+        <div id="timeline-${email.uuid}" class="timeline">
+            ${(email.events && email.events.length > 0)
+                ? email.events.map(event => `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <p class="mb-0 small">
+                                <i class="fa ${event.icon}"></i> ${event.event_type.charAt(0).toUpperCase() + event.event_type.slice(1)}
+                            </p>
+                            <small class="text-muted">
+                                ${formatDate(event.created_at)}
+                            </small>
+                        </div>
+                    </div>`).join('')
+                : `
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded</p>
+                            <small class="text-muted">N/A</small>
+                        </div>
+                    </div>`
+            }
+        </div>
+    </div>
+` : ''}
+
 
                 <!-- Email Body -->
                 <div class="email-preview mb-4 text-dark small">
