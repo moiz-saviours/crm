@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerContact;
 use App\Models\Email;
 use App\Models\EmailAttachment;
 use App\Models\UserPseudoRecord;
@@ -91,11 +92,13 @@ class EmailController extends Controller
             ->map(function ($email) {
                 return [
                     'uuid' => 'email-' . $email->id,
-                    'from' => [[
+                    'from' => [
                         'name' => $email->from_name,
                         'email' => $email->from_email,
-                    ]],
+                    ],
                     'to' => $email->to ?? [],
+                    'cc' => $email->cc ?? [],
+                    'bcc' => $email->bcc ?? [],
                     'subject' => $email->subject,
                     'folder' => $email->folder,
                     'type' => $email->type,
@@ -204,18 +207,22 @@ class EmailController extends Controller
 
     public function sendEmail(Request $request): JsonResponse
     {
-        // Validate request data
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
             'email_content' => 'required|string',
-            'to' => 'required|string',
+            'to' => 'required|array|min:1',
+            'to.*' => 'required|email',
             'from' => 'required|email',
-            'cc' => 'nullable|string',
-            'bcc' => 'nullable|string',
+            'cc' => 'sometimes|array',
+            'cc.*' => 'email',
+            'bcc' => 'sometimes|array',
+            'bcc.*' => 'email',
             'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240',
+        ], [
+            'to.min' => 'No valid recipients specified.',
+            'to.*.email' => 'One or more recipients are not valid email addresses.',
         ]);
         try {
-            // Find sender (UserPseudoRecord)
             $sender = $this->findSender($validated['from']);
             if (!$sender) {
                 return response()->json([
@@ -223,17 +230,15 @@ class EmailController extends Controller
                     'message' => 'Sender not authorized or not found',
                 ], 403);
             }
-            // Validate SMTP credentials
             if (!$sender instanceof UserPseudoRecord || empty($sender->server_password) || empty($sender->server_host)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid or missing SMTP credentials for sender',
                 ], 403);
             }
-            // Parse email lists
-            $toEmails = $this->parseEmailList($validated['to']);
-            $ccEmails = $this->parseEmailList($validated['cc'] ?? '');
-            $bccEmails = $this->parseEmailList($validated['bcc'] ?? '');
+            $toEmails = $validated['to'] ?? [];
+            $ccEmails = $validated['cc'] ?? [];
+            $bccEmails = $validated['bcc'] ?? [];
             if (empty($toEmails)) {
                 return response()->json([
                     'success' => false,
@@ -243,17 +248,18 @@ class EmailController extends Controller
             $fromEmail = $validated['from'];
             $fromName = $this->getSenderName($sender, $fromEmail);
             // Store email record
-
-            //Todo Fetch customer from emails if found then add customer name In TO , CC , BCC
+            $toWithNames = $this->getRecipientsWithNames($toEmails);
+            $ccWithNames = $this->getRecipientsWithNames($ccEmails, 'cc');
+            $bccWithNames = $this->getRecipientsWithNames($bccEmails, 'bcc');
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
                 'thread_id' => md5($validated['subject'] . $fromEmail . time()),
                 'message_id' => null,
                 'from_email' => $fromEmail,
                 'from_name' => $fromName,
-                'to' => json_encode($toEmails),
-                'cc' => json_encode($ccEmails),
-                'bcc' => json_encode($bccEmails),
+                'to' => $toWithNames,
+                'cc' => $ccWithNames,
+                'bcc' => $bccWithNames,
                 'subject' => $validated['subject'],
                 'body_html' => null,
                 'body_text' => null,
@@ -317,15 +323,14 @@ class EmailController extends Controller
             $trackingPixel = '<img src="' . route('emails.track.open', ['id' => $email->id]) . '" width="1" height="1" alt="" />';
             $mailer->Body .= $trackingPixel;
             // Add recipients
-            //Todo Fetch customer from emails if found then add customer name
-            foreach ($toEmails as $toEmail) {
-                $mailer->addAddress($toEmail);
+            foreach ($toWithNames as $recipient) {
+                $mailer->addAddress($recipient['email'], $recipient['name'] ?? '');
             }
-            foreach ($ccEmails as $ccEmail) {
-                $mailer->addCC($ccEmail);
+            foreach ($ccWithNames as $recipient) {
+                $mailer->addCC($recipient['email'], $recipient['name'] ?? '');
             }
-            foreach ($bccEmails as $bccEmail) {
-                $mailer->addBCC($bccEmail);
+            foreach ($bccWithNames as $recipient) {
+                $mailer->addBCC($recipient['email'], $recipient['name'] ?? '');
             }
             // Add attachments
             foreach ($storedAttachments as $attachment) {
@@ -376,6 +381,19 @@ class EmailController extends Controller
                 'message' => 'Failed to send email. Please try again.',
             ], 500);
         }
+    }
+
+    /**
+     * Fetch Recipients names for email addresses
+     */
+    private function getRecipientsWithNames(array $emails, string $type = 'to'): array
+    {
+        return array_map(function ($email) use ($type) {
+            $model = $type == 'to'
+                ? CustomerContact::where('email', $email)->whereNotNull('name')->first() ?? UserPseudoRecord::where('pseudo_email', $email)->whereNotNull('pseudo_name')->first()
+                : UserPseudoRecord::where('pseudo_email', $email)->whereNotNull('pseudo_name')->first() ?? CustomerContact::where('email', $email)->whereNotNull('name')->first();
+            return ['email' => $email, 'name' => $model instanceof UserPseudoRecord ? $model->pseudo_name : $model?->name];
+        }, $emails);
     }
 
     protected function wrapUrlsForTracking(string $content, ?int $emailId): string
@@ -433,17 +451,5 @@ class EmailController extends Controller
     private function getSenderName($sender, string $defaultEmail): string
     {
         return $sender->pseudo_name ?? explode('@', $defaultEmail)[0];
-    }
-
-    private function parseEmailList(?string $emails): array
-    {
-        if (empty($emails)) {
-            return [];
-        }
-        $parsed = json_decode($emails, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ValidationException('Invalid email list format');
-        }
-        return is_array($parsed) ? array_filter($parsed) : [];
     }
 }
