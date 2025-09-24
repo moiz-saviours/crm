@@ -117,7 +117,7 @@
                                                 <p class="mb-0 text-muted small">
                                                     to: {{ $email['to'][0]['email'] ?? 'Unknown' }}
                                                 </p>
-                                                @if ($email['folder'] == 'sent')
+                                                @if($email['type'] == 'outgoing' && $email['folder'] == 'sent')
                                                     <p class="mb-0 text-primary small">
                                                         Opens: {{ $email['open_count'] ?? 0 }} |
                                                         Clicks: {{ $email['click_count'] ?? 0 }}
@@ -147,6 +147,7 @@
                                 <div class="contentdisplaytwo {{ $email['uuid'] }} mt-3 p-3 rounded border bg-light"
                                     style="display: none;">
                                     <!-- Activity -->
+                                    @if($email['type'] == 'outgoing' && $email['folder'] == 'sent')
                                     <div class="activity-section">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="fw-semibold text-dark mb-0">
@@ -183,6 +184,7 @@
                                             @endforelse
                                         </div>
                                     </div>
+                                    @endif
 
                                     <!-- Email Body -->
                                     <div class="email-preview mb-4 text-dark small">
@@ -376,10 +378,11 @@
                             </h2>
                             <p class="mb-1 text-muted small">from: ${(email.from?.[0]?.email) || 'Unknown'}</p>
                             <p class="mb-0 text-muted small">to: ${(email.to?.[0]?.email) || 'Unknown'}</p>
-${folder == 'sent' ? `
-   <p class="mb-0 text-primary small">
-      Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
-   </p>` : ''}
+                     ${(folder == 'sent' || email.type === 'outgoing') ? `
+    <p class="mb-0 text-primary small">
+        Opens: ${email.open_count ?? 0} | Clicks: ${email.click_count ?? 0}
+    </p>` : ''}
+
 
 
                         </div>
