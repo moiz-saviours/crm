@@ -285,96 +285,51 @@ class LeadController extends Controller
         }
     }
 
-    protected function getClientIp(Request $request)
-    {
-        // Step 1: Headers se try karo
-        $headers = [
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_X_CLUSTER_CLIENT_IP',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        ];
-
-        foreach ($headers as $key) {
-            if ($request->server($key)) {
-                $ipList = explode(',', $request->server($key));
-                foreach ($ipList as $ip) {
-                    $ip = trim($ip);
-                    if (filter_var($ip, FILTER_VALIDATE_IP) && $ip !== '127.0.0.1' && $ip !== '::1') {
-                        return $ip;
-                    }
-                }
-            }
-        }
-
-        // Step 2: Localhost case
-        $ip = $request->ip();
-        if ($ip === '127.0.0.1' || $ip === '::1') {
-            try {
-                $ip = file_get_contents("https://api.ipify.org");
-            } catch (\Exception $e) {
-                $ip = '127.0.0.1'; // fallback
-            }
-        }
-
-        return $ip;
-    }
-
 
     public function storeFromScript(Request $request)
     {
         $userAgent = $request->userAgent();
 
         // Default device info
-        $deviceInfo = array_merge($request->device_info ?? [], [
-            'user_agent' => $userAgent,
+        $deviceInfo = [
+            'user_agent'   => $userAgent,
             'browser_name' => $this->getBrowserName($userAgent),
-        ]);
-
+        ];
 
         try {
-            $ip = $this->getClientIp($request);
-
-            $ipapiRes = Http::timeout(5)->get("https://ipapi.co/{$ip}/json/");
+            // Directly IP-API ko call karo
+            $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/");
             if ($ipapiRes->successful()) {
                 $location = $ipapiRes->json();
 
-                $lat = $location['latitude'] ?? null;
-                $lon = $location['longitude'] ?? null;
-
                 $deviceInfo = array_merge($deviceInfo, [
-                    'ip'       => $location['ip'] ?? $ip,
+                    'ip'       => $location['query'] ?? null,
                     'city'     => $location['city'] ?? null,
-                    'state'    => $location['region'] ?? null,
-                    'zipcode'  => $location['postal'] ?? null,
-                    'country'  => $location['country_name'] ?? null,
-                    'latitude' => $lat,
-                    'longitude'=> $lon,
+                    'state'    => $location['regionName'] ?? null,
+                    'zipcode'  => $location['zip'] ?? null,
+                    'country'  => $location['country'] ?? null,
+                    'latitude' => $location['lat'] ?? null,
+                    'longitude'=> $location['lon'] ?? null,
                 ]);
 
+                // Agar full address chahiye to OpenStreetMap se reverse geocode
+                if (!empty($location['lat']) && !empty($location['lon'])) {
+                    $url = "https://nominatim.openstreetmap.org/reverse?lat={$location['lat']}&lon={$location['lon']}&format=json&accept-language=en";
 
-                    if ($lat && $lon) {
-                        $url = "https://nominatim.openstreetmap.org/reverse?lat={$lat}&lon={$lon}&format=json&accept-language=en";
+                    $revGeo = Http::withHeaders([
+                        'User-Agent' => 'MyLaravelApp/1.0 (mydomain.com)'
+                    ])->get($url);
 
-                        $revGeo = Http::withHeaders([
-                            'User-Agent' => 'MyLaravelApp/1.0 (mydomain.com)'
-                        ])->get($url);
-
-                        if ($revGeo->successful()) {
-                            $revData = $revGeo->json();
-
-                            $deviceInfo['address'] = $revData['display_name'] ?? null;
-                        }
+                    if ($revGeo->successful()) {
+                        $revData = $revGeo->json();
+                        $deviceInfo['address'] = $revData['display_name'] ?? null;
                     }
+                }
             }
         } catch (\Exception $ex) {
             $deviceInfo['location_error'] = 'Unable to fetch location';
         }
 
-        // form data mapping
         $formData = $request->form_data;
         $fieldMapping = [
             'name' => ['fname','Name','NAME','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
