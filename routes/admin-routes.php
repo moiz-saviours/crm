@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\UserActivityController;
 use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     ChannelController as AdminChannelController,
     AccountController as AdminAccountController,
@@ -350,5 +351,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
+
+    Route::get('user-activity', [UserActivityController::class, 'index'])->name('user-activity.index');
 
 });
