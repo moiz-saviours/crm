@@ -337,7 +337,7 @@ class FetchEmails extends Command
                 'imap_uid' => @imap_uid($this->imapConnection, $emailNumber),
                 'imap_folder' => $folder,
                 'type' => $this->getEmailType($headers, $account),
-                'folder' => $this->mapFolder($folder),
+                'folder' => $this->getEmailType($headers, $account) === 'outgoing' ? 'sent' : $this->mapFolder($folder),
                 'is_read' => isset($overview->seen) && $overview->seen,
                 'message_date' => $this->parseDate($overview->date ?? null),
                 'received_at' => now(),
