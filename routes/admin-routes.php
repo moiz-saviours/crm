@@ -30,7 +30,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\EmailController;
 
 require __DIR__ . '/admin-auth.php';
-Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
 //Route::middleware(['auth:admin','2fa:admin', 'verified:admin.verification.notice', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
@@ -224,6 +224,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::delete('/delete/{invoice?}', [AdminInvoiceController::class, 'delete'])->name('delete');
             Route::get('/payment-proofs', [AdminInvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
             Route::get('invoice-filter', [AdminInvoiceController::class, 'filterInvoice'])->name('filter');
+
         });
     });
     /** Sales Routes */
@@ -350,5 +351,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
+    Route::get('login/google', [GoogleLoginController::class, 'redirectToGoogle'])->name('google.login');
+    Route::get('login/google/callback', [GoogleLoginController::class, 'handleGoogleCallback']);
 
 });
