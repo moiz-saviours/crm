@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\{
-    ApiAuthorizePaymentController,
+use App\Http\Controllers\Api\{ApiAuthorizePaymentController,
     ApiPaypalPaymentController,
     ApiSecurePaymentController,
-    ApiStripePaymentController
-};
+    ApiStripePaymentController,
+    UserActivityController};
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\ApiInvoiceController;
 use App\Http\Controllers\ApiPaymentAttachmentController;
@@ -140,4 +139,7 @@ Route::fallback(function () {
 Route::post('twilio/status-callback', [SmsServiceContoller::class, 'statusCallback'])->name('api.twilio.status.callback');
 
 Route::post('/brand-leads', [LeadController::class, 'storeFromScript']);
+
+Route::post('/track-activity', [UserActivityController::class, 'store']);
+
 
