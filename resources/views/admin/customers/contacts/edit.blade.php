@@ -133,13 +133,48 @@
             }
 
             .sidebar-icons {
+                box-sizing: border-box;
+                border: unset;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+                display: block;
+                position: relative;
+                inline-size: 42px;
+                margin-inline: 0;
+                background-color: rgba(0, 0, 0, 0);
+            }
+            .sidebar-icons i{
                 background-color: #EAF0F6;
                 border: 1px solid #CBD6E2;
                 color: #506E91;
                 padding: 12px;
                 border-radius: 31px;
-                /*font-size: 9px;*/
-                font-size: 0.9rem;
+
+                cursor: pointer;
+                transition: 150ms ease-out;
+                white-space: nowrap;
+                padding-block: 8px;
+                padding-inline: 0px;
+                font-size: 12px;
+                line-height: 14px;
+                justify-content: center;
+                text-align: center;
+                inline-size: 32px;
+                border-start-start-radius: 999999px;
+                border-start-end-radius: 999999px;
+                border-end-end-radius: 999999px;
+                border-end-start-radius: 999999px;
+            }
+            .sidebar-icons p{
+                color: rgb(51, 71, 91);
+                max-height: 36px;
+                font-size: 12px;
+                line-height: 18px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                word-break: keep-all;
             }
 
 
@@ -297,8 +332,6 @@
 
             .profile_actions p {
                 font-size: 0.75rem;
-                /*font-size: 10px;*/
-                margin: 0px 8px;
                 color: gray;
             }
 
@@ -677,15 +710,12 @@
             .profile_actions {
                 display: flex;
                 align-items: center;
-                justify-content: space-evenly;
                 border-bottom: 1px solid #ddd;
-                /* padding-bottom: 30px; */
                 padding: 20px 13px;
-                /* gap: 11px; */
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 margin: 10px 0px;
+                justify-content: space-around;
             }
-
 
             .profile_actions p {
                 text-align: center;
@@ -1537,35 +1567,35 @@
 
                                 <div>
                                     <div class="profile_actions">
-                                        <div class="text-center">
+                                        <div class="text-center sidebar-icons">
 
-                                            <i class="fa fa-pencil-square-o sidebar-icons" aria-hidden="true"></i>
+                                            <i class="fa fa-pencil-square-o " aria-hidden="true"></i>
                                             <p> Note</p>
 
                                         </div>
 
-                                        <div class="text-center">
+                                        <div class="text-center sidebar-icons">
 
-                                            <i class="fa fa-envelope sidebar-icons" aria-hidden="true"></i>
+                                            <i class="fa fa-envelope " aria-hidden="true"></i>
                                             <p> Email</p>
                                         </div>
 
-                                        <div class="text-center">
+                                        <div class="text-center sidebar-icons">
 
-                                            <i class="fa fa-phone sidebar-icons" aria-hidden="true"></i>
+                                            <i class="fa fa-phone " aria-hidden="true"></i>
                                             <p>Call</p>
                                         </div>
-                                        <div class="text-center">
-                                            <i class="fa fa-calendar sidebar-icons" aria-hidden="true"></i>
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-calendar " aria-hidden="true"></i>
                                             <p>Meeting</p>
                                         </div>
-                                        <div class="text-center">
-                                            <i class="fa fa-list sidebar-icons" aria-hidden="true"></i>
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-list " aria-hidden="true"></i>
                                             <p>Task</p>
                                         </div>
 
-                                        <div class="text-center">
-                                            <i class="fa fa-calendar-check-o sidebar-icons" aria-hidden="true"></i>
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-calendar-check-o " aria-hidden="true"></i>
                                             <p>More</p>
                                         </div>
                                     </div>
