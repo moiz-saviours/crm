@@ -1,4 +1,6 @@
 @if (!empty($timeline) && count($timeline) > 0)
+                                    @include('admin.customers.contacts.email.static-content.email')
+
     @foreach ($timeline as $item)
         @if ($item['type'] === 'note')
             {{-- ================= NOTE ================= --}}
@@ -44,7 +46,6 @@
                 </div>
             </div>
         @elseif ($item['type'] === 'email')
-                                    @include('admin.customers.contacts.email.static-content.email')
 
             {{-- ================= EMAIL ================= --}}
             <div class="email-box-container mb-4 border rounded bg-white p-3">
