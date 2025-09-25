@@ -13,7 +13,18 @@
             /*    height: 100vh;*/
             /*}*/
 
-
+            .btn {
+                background-color: var(--bs-primary);
+                border-color: var(--bs-primary);
+                color: #fff;
+                font-size: 0.813rem;
+                font-weight: 400;
+                line-height: 14px;
+                padding: 6px 14px;
+                border-radius: 3px;
+                border-style: solid;
+                border-width: 1px;
+            }
             .containerr {
                 display: flex;
                 width: 100%;
@@ -1947,7 +1958,15 @@
                                                     </button>
                                                 </form>
                                             </div>
-
+                       <!-- Text-only buttons aligned to right -->
+                                                <div class="d-flex ms-auto" style="gap: 10px;">
+                                                    <button id="refresh-emails" class="btn btn-primary">
+                                                        Refresh
+                                                    </button>
+                                                    <button id="fetch-emails" class="btn btn-primary">
+                                                        Fetch From Remote
+                                                    </button>
+                                                </div>
                                             <!-- dropdown  -->
                                             <div class="dropdown">
                                                 {{--                                                <button class="new-activity-dropdown btn-secondary dropdown-toggle" --}}
