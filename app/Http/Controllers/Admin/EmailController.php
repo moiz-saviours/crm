@@ -25,15 +25,16 @@ use App\Mail\OutgoingEmail;
 
 class EmailController extends Controller
 {
-    public function getEmails($customerEmail, $folder = "all")
+    public function getEmails($customerEmail, $folder = "all", $page = 1, $limit = 5)
     {
-        $user = Auth::guard('admin')->user();
-        $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
-            ->where('imap_type', 'imap')
-            ->pluck('pseudo_email')
-            ->toArray();
-        $query = Email::with('events'); // eager load events
+          $user = Auth::guard('admin')->user();
+    $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
+        ->where('morph_type', get_class($user))
+        ->where('imap_type', 'imap')
+        ->pluck('pseudo_email')
+        ->toArray();
+
+    $query = Email::with('events');
         if ($folder == 'inbox') {
             $query->where('from_email', $customerEmail)
                 ->where(function ($q) use ($auth_pseudo_emails) {
@@ -81,83 +82,98 @@ class EmailController extends Controller
                 }
             });
         }
-        if ($folder !== 'all') {
-            $query->where('folder', $folder);
-        }
-        $emails = $query->orderBy('message_date', 'desc')
-            ->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
-            }])
-            ->get()
-            ->map(function ($email) {
-                return [
-                    'uuid' => 'email-' . $email->id,
-                    'from' => [
-                        'name' => $email->from_name,
-                        'email' => $email->from_email,
-                    ],
-                    'to' => $email->to ?? [],
-                    'cc' => $email->cc ?? [],
-                    'bcc' => $email->bcc ?? [],
-                    'subject' => $email->subject,
-                    'folder' => $email->folder,
-                    'type' => $email->type,
-                    'date' => $email->message_date,
-                    'body' => [
-                        'html' => $email->body_html,
-                        'text' => $email->body_text,
-                    ],
-                    'attachments' => $email->attachments->map(function ($attachment) {
-                        return [
-                            'filename' => $attachment->original_name,
-                            'type' => $attachment->mime_type,
-                            'size' => $attachment->size,
-                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                        ];
-                    })->toArray(),
-                    // counters
-                    'open_count' => $email->events->where('event_type', 'open')->count(),
-                    'click_count' => $email->events->where('event_type', 'click')->count(),
-                    'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
-                    'spam_count' => $email->events->where('event_type', 'spam')->count(),
-                    // normalized events
-                    'events' => $email->events->map(function ($event) {
-                        $icons = [
-                            'open' => 'fa-envelope-open',
-                            'click' => 'fa-mouse-pointer',
-                            'bounce' => 'fa-exclamation-triangle',
-                            'spam' => 'fa-ban',
-                        ];
-                        return [
-                            'id' => $event->id,
-                            'event_type' => $event->event_type,
-                            'created_at' => $event->created_at,
-                            'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
-                        ];
-                    })->values()->toArray(),
-                ];
-            })
-            ->values()
-            ->toArray();
-        return ['emails' => $emails];
+       if ($folder !== 'all') {
+        $query->where('folder', $folder);
     }
 
-    public function fetch(Request $request)
-    {
-        try {
-            $customerEmail = urldecode(trim($request->query('customer_email')));
-            $folder = $request->query('folder', 'all');
-            if (empty($customerEmail)) {
-                return response()->json(['error' => 'Customer email is required'], 400);
-            }
-            return response()->json($this->getEmails($customerEmail, $folder));
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to fetch emails. Please try again later.',
-                'details' => $e->getMessage(), // optional for debugging
-            ], 500);
-        }
+    $offset = ($page - 1) * $limit;
+
+    $emails = $query->orderBy('message_date', 'desc')
+        ->with(['attachments' => function ($q) {
+            $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
+        }])
+        ->skip($offset)
+        ->take($limit)
+        ->get()
+        ->map(function ($email) {
+            return [
+                'uuid' => 'email-' . $email->id,
+                'from' => [
+                    'name' => $email->from_name,
+                    'email' => $email->from_email,
+                ],
+                'to' => $email->to ?? [],
+                'cc' => $email->cc ?? [],
+                'bcc' => $email->bcc ?? [],
+                'subject' => $email->subject,
+                'folder' => $email->folder,
+                'type' => $email->type,
+                'date' => $email->message_date,
+                'body' => [
+                    'html' => $email->body_html,
+                    'text' => $email->body_text,
+                ],
+                'attachments' => $email->attachments->map(function ($attachment) {
+                    return [
+                        'filename' => $attachment->original_name,
+                        'type' => $attachment->mime_type,
+                        'size' => $attachment->size,
+                        'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                    ];
+                })->toArray(),
+                'open_count' => $email->events->where('event_type', 'open')->count(),
+                'click_count' => $email->events->where('event_type', 'click')->count(),
+                'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
+                'spam_count' => $email->events->where('event_type', 'spam')->count(),
+                'events' => $email->events->map(function ($event) {
+                    $icons = [
+                        'open' => 'fa-envelope-open',
+                        'click' => 'fa-mouse-pointer',
+                        'bounce' => 'fa-exclamation-triangle',
+                        'spam' => 'fa-ban',
+                    ];
+                    return [
+                        'id' => $event->id,
+                        'event_type' => $event->event_type,
+                        'created_at' => $event->created_at,
+                        'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
+                    ];
+                })->values()->toArray(),
+            ];
+        })
+        ->values()
+        ->toArray();
+            return [
+        'emails' => $emails,
+        'page'   => $page,
+        'limit'  => $limit,
+        'count'  => count($emails),
+    ];
     }
+
+public function fetch(Request $request)
+{
+    try {
+        $customerEmail = urldecode(trim($request->query('customer_email')));
+        $folder = $request->query('folder', 'all');
+        $page   = (int) $request->query('page', 1);
+        $limit  = (int) $request->query('limit', 5);
+
+        if (empty($customerEmail)) {
+            return response()->json(['error' => 'Customer email is required'], 400);
+        }
+
+        return response()->json(
+            $this->getEmails($customerEmail, $folder, $page, $limit)
+        );
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Processing complete.',
+            'details' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 
     public function fetchNewEmails(Request $request)
     {
