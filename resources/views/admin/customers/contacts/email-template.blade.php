@@ -993,7 +993,7 @@
                         <i class="fa fa-times close-btn" aria-hidden="true" style="cursor:pointer;"></i>
                     </div>
                 </div>
-                <div class="email-child-wrapper" style="  padding: 10px 20px;">
+                <div class="email-child-wrapper" style="display:none;padding: 10px 20px;">
                     <p class="email-titles-hide">Templates</p>
                     <p class="email-titles-show">Sequence <span><i class="fa fa-lock icon-display-email-box"
                                                                    aria-hidden="true"></i></span></p>
