@@ -417,6 +417,7 @@ class InvoiceController extends Controller
                 'team_key' => $request->input('team_key'),
                 'cus_contact_key' => $customer_contact->special_key,
                 'agent_id' => $request->input('agent_id'),
+                'agent_type' => 'App\Models\User',
                 'description' => $request->input('description'),
                 'amount' => $request->input('amount'),
                 'taxable' => $taxable,
