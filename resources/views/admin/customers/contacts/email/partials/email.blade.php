@@ -46,7 +46,6 @@
         margin: -11px -3px -15px -28px
     }
 </style>
-<div class="tab-pane fade" id="emails" role="tabpanel" aria-labelledby="email-tab">
 
 
     <div class="email-threading-row" style="margin-bottom: 15px;">
@@ -87,6 +86,8 @@
                     @if (empty($emails) || count($emails) == 0)
                         <p class="text-muted">No emails found.</p>
                     @else
+                            @include('admin.customers.contacts.email.static-content.email')
+
                         @foreach ($emails as $email)
                             <!-- Email Box -->
                             <div class="email-box-container mb-4 border rounded bg-white p-3">
@@ -239,7 +240,7 @@
                                     @endif
                                 </div>
                             </div>
-                        @endforeach
+                            @endforeach
                     @endif
                 </div>
 
@@ -254,7 +255,6 @@
     </div>
 
 
-</div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const emailSection = document.getElementById('email-content');

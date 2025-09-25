@@ -1,4 +1,3 @@
-
 @if (!empty($timeline) && count($timeline) > 0)
     @foreach ($timeline as $item)
         @if ($item['type'] === 'note')
@@ -44,8 +43,9 @@
                     </div>
                 </div>
             </div>
-
         @elseif ($item['type'] === 'email')
+                                    @include('admin.customers.contacts.email.static-content.email')
+
             {{-- ================= EMAIL ================= --}}
             <div class="email-box-container mb-4 border rounded bg-white p-3">
                 <div class="toggle-btnss" data-target=".{{ $item['data']['uuid'] }}" style="cursor: pointer;">
@@ -62,21 +62,20 @@
                                 </p>
                                 <p class="mb-0 text-muted small">
                                     to:
-                                    <span class="truncate-recipients" title="{{ collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', ') }}">
-                                        {{ Str::limit(collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])->map(fn($r) => is_array($r) ? ($r['email'] ?? $r['name'] ?? 'Unknown') : $r)->implode(', '), 50) }}
+                                    <span class="truncate-recipients"
+                                        title="{{ collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}">
+                                        {{ Str::limit(collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', '),50) }}
                                     </span>
                                 </p>
-                                @if(
-    !empty($item['data']['open_count']) &&
-    $item['data']['open_count'] > 0 &&
-    $item['data']['type'] === 'outgoing' &&
-    $item['data']['folder'] === 'sent'
-)
-
-                                <p class="mb-0 text-primary small">
-                                    Opens: {{ $item['data']['open_count'] ?? 0 }} |
-                                    Clicks: {{ $item['data']['click_count'] ?? 0 }}
-                                </p>
+                                @if (
+                                    !empty($item['data']['open_count']) &&
+                                        $item['data']['open_count'] > 0 &&
+                                        $item['data']['type'] === 'outgoing' &&
+                                        $item['data']['folder'] === 'sent')
+                                    <p class="mb-0 text-primary small">
+                                        Opens: {{ $item['data']['open_count'] ?? 0 }} |
+                                        Clicks: {{ $item['data']['click_count'] ?? 0 }}
+                                    </p>
                                 @endif
                             </div>
                         </div>
@@ -98,13 +97,11 @@
                 <div class="contentdisplaytwo {{ $item['data']['uuid'] }} mt-3 p-3 rounded border bg-light"
                     style="display: none;">
                     {{-- Activity Timeline --}}
-                    @if(
-    !empty($item['data']['open_count']) &&
-    $item['data']['open_count'] > 0 &&
-    $item['data']['type'] === 'outgoing' &&
-    $item['data']['folder'] === 'sent'
-)
-
+                    @if (
+                        !empty($item['data']['open_count']) &&
+                            $item['data']['open_count'] > 0 &&
+                            $item['data']['type'] === 'outgoing' &&
+                            $item['data']['folder'] === 'sent')
                         <div class="activity-section">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="fw-semibold text-dark mb-0">
@@ -133,7 +130,8 @@
                                     <div class="timeline-item">
                                         <div class="timeline-dot"></div>
                                         <div class="timeline-content">
-                                            <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded</p>
+                                            <p class="mb-0 small"><i class="fa fa-info-circle"></i> No activity recorded
+                                            </p>
                                             <small class="text-muted">N/A</small>
                                         </div>
                                     </div>
