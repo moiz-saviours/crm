@@ -46,7 +46,7 @@
         margin: -11px -3px -15px -28px
     }
 </style>
-<div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+<div class="tab-pane fade" id="emails" role="tabpanel" aria-labelledby="email-tab">
 
 
     <div class="email-threading-row" style="margin-bottom: 15px;">
