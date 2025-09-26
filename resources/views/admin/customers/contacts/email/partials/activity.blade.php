@@ -49,7 +49,7 @@
 
             {{-- ================= EMAIL ================= --}}
             <div class="email-box-container mb-4 border rounded bg-white p-3">
-                <div class="toggle-btnss" data-target=".{{ $item['data']['uuid'] }}" style="cursor: pointer;">
+                <div class="toggle-btnss" data-target=".content-{{ $item['data']['uuid'] }}">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
                             <i class="fa fa-caret-right me-2 text-primary"></i>
@@ -95,8 +95,7 @@
                     </div>
                 </div>
                 {{-- Collapsible details --}}
-                <div class="contentdisplaytwo {{ $item['data']['uuid'] }} mt-3 p-3 rounded border bg-light"
-                    style="display: none;">
+                <div class="contentdisplay content-{{ $item['data']['uuid'] }}" style="display:none;">
                     {{-- Activity Timeline --}}
                     @if (
                         !empty($item['data']['open_count']) &&
