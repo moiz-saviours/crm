@@ -285,9 +285,9 @@
 
             .email-box-container {
                 background-color: rgb(255, 255, 255);
-                border: 1px solid rgb(223, 227, 235);
+                /*border: 1px solid rgb(223, 227, 235);*/
                 border-radius: 4px;
-                padding: 16px 17px;
+                padding: 10px 0px;
                 margin-bottom: 20px;
             }
 
@@ -609,7 +609,8 @@
             .activities-seprater {
                 color: #0091ae !important;
                 font-weight: 600;
-                font-size: var(--nf-profile-para-size);
+                /*font-size: var(--nf-profile-para-size);*/
+                font-size: 12px;
                 margin: 0px !important;
             }
 
@@ -970,7 +971,8 @@
             }
 
             .user_cont p {
-                font-size: var(--nf-profile-para-size);
+                /*font-size: var(--nf-profile-para-size);*/
+                font-size: 14px;
                 color: gray;
                 margin: 0;
             }
@@ -980,7 +982,7 @@
                 font-size: var(--nf-profile-para-size);
                 color: gray;
                 margin: 0;
-                /* padding: 16px 6px; */
+                 /*padding: 16px 6px;*/
             }
 
             .right_collab a {
@@ -2150,11 +2152,11 @@
                     $(this).find("i.fa").toggleClass("fa-caret-right fa-caret-down");
                 });
             });
-            $(document).ready(function() {
-                $(".toggle-btnss").click(function() {
-                    $(".contentdisplay, .contentdisplaytwo").slideToggle(); // Smoothly show or hide content
-                });
-            });
+            // $(document).ready(function() {
+            //     $(".toggle-btnss").click(function() {
+            //         $(".contentdisplay, .contentdisplaytwo").slideToggle(); // Smoothly show or hide content
+            //     });
+            // });
 
             //new
 
