@@ -2139,22 +2139,43 @@
                 });
             });
 
-            // NEw
-            // Function hide and show
-            $(document).ready(function() {
-                $(".toggle-btnss").click(function() {
-                    let targetId = $(this).data("target");
-                    $(targetId).slideToggle(); // Only toggle this email's content
+              
+$(document).ready(function () {
+    $(document).on('click', '.toggle-btnss', function () {
+        var targetId = $(this).data('target'); // e.g. "#content-<uuid>"
+        var $target = $(targetId);
 
-                    // Rotate caret icon
-                    $(this).find("i.fa").toggleClass("fa-caret-right fa-caret-down");
-                });
-            });
-            $(document).ready(function() {
-                $(".toggle-btnss").click(function() {
-                    $(".contentdisplay, .contentdisplaytwo").slideToggle(); // Smoothly show or hide content
-                });
-            });
+        // Close all others except the current one
+        $('.contentdisplay').not($target).slideUp();
+        $('.toggle-btnss i.fa').not($(this).find('i.fa'))
+            .removeClass('fa-caret-down')
+            .addClass('fa-caret-right');
+
+        // Toggle current one
+        if ($target.is(':visible')) {
+            $target.slideUp();
+            $(this).find('i.fa')
+                .removeClass('fa-caret-down')
+                .addClass('fa-caret-right');
+        } else {
+            $target.slideDown();
+            $(this).find('i.fa')
+                .removeClass('fa-caret-right')
+                .addClass('fa-caret-down');
+        }
+    });
+});
+
+
+
+
+
+      
+            // $(document).ready(function() {
+            //     $(".toggle-btnss").click(function() {
+            //         $(".contentdisplay, .contentdisplaytwo").slideToggle(); // Smoothly show or hide content
+            //     });
+            // });
 
             //new
 
