@@ -330,11 +330,16 @@ class LeadController extends Controller
             $deviceInfo['location_error'] = 'Unable to fetch location';
         }
 
-        $formData = $request->form_data;
+        $formData = collect($request->form_data)
+            ->mapWithKeys(function ($value, $key) {
+                return [strtolower($key) => $value];
+            })
+            ->toArray();
+
         $fieldMapping = [
-            'name' => ['fname','Name','NAME','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
-            'email' => ['email','Email','EMAIL'],
-            'phone' => ['tel','tele','Number','NUMBER','num','phone','Phone','PHONE','telephone','your-phone','phone-number','phonenumber'],
+            'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
+            'email' => ['email'],
+            'phone' => ['tel','tele','number','num','phone','telephone','your-phone','phone-number','phonenumber'],
             'note' => ['message','msg','desc','description','note'],
         ];
 
@@ -347,6 +352,7 @@ class LeadController extends Controller
                 }
             }
         }
+
 
         try {
             $brand = Brand::all()->firstWhere('script_token', $request->script_token);
