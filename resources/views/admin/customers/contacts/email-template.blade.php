@@ -951,7 +951,7 @@
         }
 
         .main-content-email-box {
-            max-width: 720px;
+            max-width: 100%;
         }
 
         .rich-email-editor {
@@ -1048,8 +1048,7 @@
                 <div class="email-template-body">
                     <div class="email-child-wrapper" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> To </p>
-                        {{--                        <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
-                        {{--                                class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
+
                         <input
                             class="email-sender-name"
                             id="toFieldInput"
@@ -1062,8 +1061,7 @@
                     </div>
                     <div class="email-child-wrapper d-none" id="ccField" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Cc </p>
-                        {{--                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
-                        {{--                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
+
                         <input
                             class="email-sender-name" id="ccFieldInput"
                             type="email"
@@ -1074,8 +1072,7 @@
                     </div>
                     <div class="email-child-wrapper d-none" id="bccField" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Bcc </p>
-                        {{--                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
-                        {{--                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
+
                         <input
                             class="email-sender-name" id="bccFieldInput"
                             name="bcc"
@@ -1103,25 +1100,7 @@
                                         from {{ $pseudo_emails->first()['company'] ?? 'Unknown' }}
                                 </span>
                             </p>
-                            {{--                            <p class="email-sender-name" style="min-width: 550px;">--}}
-                            {{--                                {{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}--}}
-                            {{--                                @php--}}
-                            {{--                                    $email = auth()->user()->pseudo_email ?? env('MAIL_USERNAME');--}}
-                            {{--                                    $domain = $email ? substr(strrchr($email, "@"), 1) : '';--}}
-                            {{--                                    $brand = $email ? App\Models\Brand::where('url', 'like', '%'.$domain.'%')->first() : null;--}}
-                            {{--                                    $company = $brand?->name ?: $domain;--}}
-                            {{--                                @endphp--}}
 
-                            {{--                                @if($company)--}}
-                            {{--                                    from {{ $company }}--}}
-                            {{--                                @endif--}}
-                            {{--                                <span class="email-sender-emailid {{ $domain ? 'has-domain' : '' }}">--}}
-                            {{--            ( {{ $email }} )--}}
-                            {{--        </span>--}}
-                            {{--                            </p>--}}
-                            {{--                            <input type="hidden" name="from_email" value="{{ $email }}">--}}
-                            {{--                            <input type="hidden" name="from_name"--}}
-                            {{--                                   value="{{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}">--}}
                         </div>
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles" onclick="toggleCcField(this)" style="padding:0 5px;">Cc</p>
@@ -1138,13 +1117,30 @@
                         <input type="text" name="subject" id="emailSubject" value="{{ $subject ?? '' }}"/>
                     </div>
                     <div class="email-divider"></div>
-                    <div class="main-content-email-box">
-                        <div class="rich-email-editor" data-placeholder="Write your message..."></div>
-                        <input type="hidden" name="email_content" id="emailContent">
-
-                        {{--                        <textarea rows="3" class="rich-email-editor"--}}
-                        {{--                                  data-placeholder="Type your email here..."></textarea>--}}
+              <div class="main-content-email-box">
+                    <!-- Editable body -->
+                    <div class="rich-email-editor"
+                        contenteditable="true"
+                        data-placeholder="Write your message..."
+                        style="min-height: 150px; padding:10px; border:1px solid #ddd; border-radius:6px; background:#fff;">
                     </div>
+
+                    <!-- Quoted history (non-editable) -->
+                    <div class="quoted-history"
+                        style="border-left:2px solid #ccc; margin-top:10px; padding-left:10px; font-size:13px; color:#555;">
+                    </div>
+
+                    <input type="hidden" name="email_content" id="emailContent">
+
+                    <!-- inside .main-content-email-box, next to #emailContent -->
+<input type="hidden" name="email_content" id="emailContent">
+<input type="hidden" name="thread_id" id="thread_id">
+<input type="hidden" name="in_reply_to" id="in_reply_to">
+<input type="hidden" name="references" id="references">
+
+
+                </div>
+
                 </div>
 
                 <div class="email-footer-div ">
@@ -1249,62 +1245,62 @@
                 });
             }
 
-            document.getElementById('sendEmailBtn').addEventListener('click', function (e) {
-                e.preventDefault();
+      document.getElementById('sendEmailBtn').addEventListener('click', function (e) {
+    e.preventDefault();
 
-                const quill = window.quillInstances['editor_0'];
-                const emailContent = document.getElementById('emailContent');
-                if (quill) {
-                    emailContent.value = quill.root.innerHTML;
+    const quill = window.quillInstances['editor_0'];
+    const emailContent = document.getElementById('emailContent');
+
+    if (quill) {
+        emailContent.value = quill.root.innerHTML;
+    }
+
+    const formData = new FormData();
+    formData.append('email_content', emailContent.value);
+    formData.append('subject', document.getElementById('emailSubject').value);
+
+    const fields = ['to','cc','bcc'].map(n => document.querySelector(`[name="${n}"]`));
+    const extract = f => f && f.value.trim() ? JSON.parse(f.value).map(i => i.value) : [];
+
+    fields.forEach((f,i) => extract(f).forEach(email =>
+        formData.append(`${['to','cc','bcc'][i]}[]`, email)
+    ));
+    console.log('thread_id: '+document.getElementById('thread_id').value);
+    console.log('in_reply_to: '+document.getElementById('in_reply_to').value);
+    console.log('references: '+document.getElementById('references').value);
+
+    formData.append('from', document.querySelector('[name="from_email"]').value);
+    formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
+    formData.append('thread_id', document.getElementById('thread_id').value || '');
+    formData.append('in_reply_to', document.getElementById('in_reply_to').value || '');
+    formData.append('references', document.getElementById('references').value || '');
+
+    AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
+        .then(response => {
+            if (response.success) {
+                toastr.success("Email sent successfully!");
+
+                // Reset subject
+                document.getElementById('emailSubject').value = "";
+
+                // Reset body
+                if (window.quillInstances && window.quillInstances['editor_0']) {
+                    window.quillInstances['editor_0'].root.innerHTML = "";
                 }
 
-                const formData = new FormData();
+                // Reset cc/bcc
+                const ccField = document.querySelector('[name="cc"]');
+                const bccField = document.querySelector('[name="bcc"]');
+                if (ccField) ccField.value = "";
+                if (bccField) bccField.value = "";
 
-                formData.append('email_content', emailContent.value);
-                formData.append('subject', document.getElementById('emailSubject').value);
-                const fields = ['to','cc','bcc'].map(n => document.querySelector(`[name="${n}"]`));
-                const extract = f => f && f.value.trim() ? JSON.parse(f.value).map(i => i.value) : [];
+                resetEmailTemplatePosition();
 
-                fields.forEach((f,i) => extract(f).forEach(email =>
-                    formData.append(`${['to','cc','bcc'][i]}[]`, email)
-                ));
-                formData.append('from', document.querySelector('[name="from_email"]').value);
-                formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
-
-                {{--AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: true})--}}
-                {{--    .then(response => {--}}
-                {{--        if (data.success) {--}}
-                {{--            console.log('Email sent successfully!');--}}
-                {{--            document.querySelector('.email-template').classList.remove('open');--}}
-                {{--        } else {--}}
-                {{--            console.log('Error sending email: ' + (data.message || 'Unknown error'));--}}
-                {{--        }--}}
-                {{--    })--}}
-                {{--    .catch(error => console.error('Error:', error));--}}
-                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
-                    .then(response => {
-                        if (response.success) {
-                            toastr.success("Email sent successfully!");
-
-                            document.getElementById('emailSubject').value = "";
-
-                            if (window.quillInstances && window.quillInstances['editor_0']) {
-                                window.quillInstances['editor_0'].root.innerHTML = "";
-                            }
-
-                            const ccField = document.querySelector('[name="cc"]');
-                            const bccField = document.querySelector('[name="bcc"]');
-
-                            if (ccField) ccField.value = "";
-                            if (bccField) bccField.value = "";
-
-                            resetEmailTemplatePosition();
-
-                        } else {
-                            toastr.error(response.message || "Failed to send email");
-                        }
-                    })
-                    .catch(error => {
+            } else {
+                toastr.error(response.message || "Failed to send email");
+            }
+        })
+                        .catch(error => {
                         console.error('Error:', error);
                         toastr.error("Something went wrong while sending email!");
                     });
