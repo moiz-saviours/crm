@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_activities', function (Blueprint $table) {
             $table->id();
+            $table->string('visitor_id')->nullable()->default(null);
             $table->string('event_type')->nullable()->default(null);
             $table->json('event_data')->nullable()->default(null);
             $table->string('ip')->nullable()->default(null);
