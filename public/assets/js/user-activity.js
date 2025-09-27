@@ -1,6 +1,20 @@
 (function () {
     const scriptEl = document.querySelector('script[src*="user-activity.js"]');
-    const apiBase = scriptEl.src.split("/assets/js/")[0];
+    if (!scriptEl) {
+        console.error("Script tag not found!");
+        return;
+    }
+
+    const url = new URL(scriptEl.src);
+
+    // Environment detection (same as wl-script)
+    let apiBaseUrl = "";
+    if (url.pathname.includes("/crm-development/")) {
+        apiBaseUrl = url.origin + "/crm-development/api"; // Development
+    } else {
+        apiBaseUrl = url.origin + "/api"; // Live
+    }
+
     const startTime = Date.now();
     let maxScroll = 0;
     let clickCount = 0;
@@ -11,18 +25,30 @@
         title: document.title,
     };
 
+    function getVisitorId() {
+        let id = localStorage.getItem("visitor_id");
+        if (!id) {
+            id = "v_" + Math.random().toString(36).substr(2, 9) + Date.now();
+            localStorage.setItem("visitor_id", id);
+        }
+        return id;
+    }
+
+    const visitor_id = getVisitorId();
+
     function sendActivity(sync = false) {
-        const url = `${apiBase}/api/track-activity`;
+        const endpoint = `${apiBaseUrl}/track-activity`;
         const data = JSON.stringify({
+            visitor_id,
             event_type: "page_view",
             event_data: activityData
         });
 
         if (sync && navigator.sendBeacon) {
             const blob = new Blob([data], { type: "application/json" });
-            navigator.sendBeacon(url, blob);
+            navigator.sendBeacon(endpoint, blob);
         } else {
-            fetch(url, {
+            fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: data
@@ -30,7 +56,7 @@
         }
     }
 
-// Tab close ya refresh hone par
+    // Tab close or refresh hone par
     window.addEventListener("beforeunload", function () {
         activityData.user_out_time = new Date().toISOString();
         activityData.total_duration = ((Date.now() - startTime) / 1000).toFixed(2);
@@ -39,7 +65,6 @@
 
         sendActivity(true);
     });
-
 
     // Track scroll depth (only update maximum)
     window.addEventListener("scroll", () => {
@@ -56,7 +81,6 @@
     window.addEventListener("click", () => {
         clickCount++;
     });
-
 
     // Form submissions
     document.addEventListener("submit", function (e) {
