@@ -22,9 +22,19 @@ document.addEventListener("DOMContentLoaded", function () {
         apiBaseUrl = url.origin + "/api"; // Live
     }
 
+    function getVisitorId() {
+        let id = localStorage.getItem("visitor_id");
+        if (!id) {
+            id = "v_" + Math.random().toString(36).substr(2, 9) + Date.now();
+            localStorage.setItem("visitor_id", id);
+        }
+        return id;
+    }
+
     const forms = document.querySelectorAll("form");
 
     forms.forEach(form => {
+        const visitor_id = getVisitorId();
         form.addEventListener("submit", function () {
             const formData = {};
             const fields = form.querySelectorAll("label, input, textarea, select");
@@ -54,12 +64,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
             fetch(`${apiBaseUrl}/brand-leads`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
+                    visitor_id,
                     script_token: token,
                     form_data: formData,
                     device_info: deviceInfo
