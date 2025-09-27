@@ -2141,23 +2141,17 @@
                 });
             });
 
-              
-$(document).ready(function () {
-    $(document).on('click', '.toggle-btnss', function () {
-        var targetId = $(this).data('target'); // e.g. "#content-<uuid>"
-        var $target = $(targetId);
+            $(document).ready(function () {
+                $(".toggle-btnss").click(function () {
+                    let container = $(this).closest(".email-box-container");
 
-                    // Rotate caret icon
-                    $(this).find("i.fa").toggleClass("fa-caret-right fa-caret-down");
+                    // Close all other content
+                    $(".contentdisplay, .contentdisplaytwo").not(container.find(".contentdisplay, .contentdisplaytwo")).slideUp();
+
+                    // Toggle only this one
+                    container.find(".contentdisplay, .contentdisplaytwo").slideToggle();
                 });
             });
-            // $(document).ready(function() {
-            //     $(".toggle-btnss").click(function() {
-            //         $(".contentdisplay, .contentdisplaytwo").slideToggle(); // Smoothly show or hide content
-            //     });
-            // });
-
-            //new
 
             // EMAIL TEMPLATE OPEN AND CLOSE
             $(document).ready(function() {
@@ -2224,5 +2218,69 @@ $(document).ready(function () {
                 });
             });
         </script>
+
+        {{-- // --}}
+        <script>
+$(document).on('click', '.reply-btn', function () {
+    let fromEmail   = $(this).data('from');
+    let subject     = $(this).data('subject');
+    let date        = $(this).data('date');
+    let body        = $(this).data('body');
+    let threadId    = $(this).data('thread-id');
+    let inReplyTo   = $(this).data('in-reply-to');
+    let references  = $(this).data('references');
+
+    // Decode body if JSON-wrapped
+    try {
+        if (typeof body === "string" && body.trim().startsWith('"')) {
+            body = JSON.parse(body);
+        }
+    } catch (e) {}
+
+    // Prefill To/Subject
+    $('#toFieldInput').val(fromEmail);
+    $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+
+    // Clear editor + set quoted history
+    $('.rich-email-editor').html('');
+    $('.quoted-history').html(`
+        <p><b>On ${date}, ${fromEmail} wrote:</b></p>
+        ${body}
+    `);
+
+    // Store metadata
+    $('#thread_id').val(threadId || '');
+    $('#in_reply_to').val(inReplyTo || '');
+    $('#references').val(references ? JSON.stringify(references) : '');
+
+    $('#emailTemplate').addClass('open');
+});
+
+// If user clicks "Forward" or "New Email", clear metadata
+$(document).on('click', '.open-email-form', function () {
+    $('#thread_id').val('');
+    $('#in_reply_to').val('');
+    $('#references').val('');
+    $('.rich-email-editor').html('');
+    $('.quoted-history').html('');
+    $('#toFieldInput').val('');
+    $('#emailSubject').val('');
+    $('#emailTemplate').addClass('open');
+});
+
+// Clean up on close
+$(document).on('click', '.close-btn', function () {
+    $('#emailTemplate').removeClass('open');
+    $('#toFieldInput').val('');
+    $('#emailSubject').val('');
+    $('.rich-email-editor').html('');
+    $('.quoted-history').html('');
+    $('#thread_id').val('');
+    $('#in_reply_to').val('');
+    $('#references').val('');
+});
+
+        </script>
+
     @endpush
 @endsection
