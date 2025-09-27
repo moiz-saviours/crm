@@ -49,15 +49,15 @@
 
 
 <div class="email-threading-row" style="margin-bottom: 15px;">
-    <p class="activities-seprater d-none"> Thread email replies </p>
+        <p class="activities-seprater d-none"> Thread email replies </p>
 
-    <button class="threading-email-btn-one d-none">
-        Log Email
-    </button>
-    <button class="threading-email-btn-two open-email-form">
-        Create Email
-    </button>
-</div>
+        <button class="threading-email-btn-one d-none">
+            Log Email
+        </button>
+        <button class="threading-email-btn-two open-email-form">
+            Create Email
+        </button>
+    </div>
 
 
 <div>
@@ -265,7 +265,7 @@
         const customerEmail = "{{ $customer_contact->email }}";
         let folder = 'all';
         let currentPage = {{ $page }};
-        const limit = 3;
+        const limit = 100;
 
         // ✅ Show More click handler
         showMoreBtn.addEventListener("click", function() {
