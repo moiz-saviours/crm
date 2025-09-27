@@ -184,7 +184,7 @@ public function edit(Request $request, CustomerContact $customer_contact)
 
     $emails = $emailsResponse['emails'] ?? [];
     $page = (int) request()->get('page', 1);
-    $limit = 5;
+    $limit = 100;
     $imapError = null;
 
     // Build timeline dataset (emails + notes)
