@@ -75,8 +75,7 @@
             .nav-tabs .nav-link.main-tabs-view {
                 border-radius: 0px;
                 font-weight: 400;
-                font-size: var(--nf-profile-para-size);
-                ;
+                font-size: var(--nf-profile-para-size);;
                 /*font-size: 0.813rem;*/
                 padding: 12px 28px;
                 color: rgb(51, 71, 91);
@@ -145,7 +144,8 @@
                 margin-inline: 0;
                 background-color: rgba(0, 0, 0, 0);
             }
-            .sidebar-icons i{
+
+            .sidebar-icons i {
                 background-color: #EAF0F6;
                 border: 1px solid #CBD6E2;
                 color: #506E91;
@@ -167,7 +167,8 @@
                 border-end-end-radius: 999999px;
                 border-end-start-radius: 999999px;
             }
-            .sidebar-icons p{
+
+            .sidebar-icons p {
                 color: rgb(51, 71, 91);
                 max-height: 36px;
                 font-size: 12px;
@@ -451,7 +452,8 @@
                 margin: 5px 0px;
             }
 
-            .custom-right-detail-column {}
+            .custom-right-detail-column {
+            }
 
             .contact-card-details-para {
                 font-weight: 500;
@@ -858,7 +860,8 @@
                 border: 1px solid #ddd;
             }
 
-            .your-comment-btn {}
+            .your-comment-btn {
+            }
 
             .toolbar {
                 background-color: #dddddda6;
@@ -965,7 +968,7 @@
             .activ_head {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 10px;
+                margin: 10px 0;
                 align-items: center;
             }
 
@@ -980,7 +983,7 @@
                 font-size: var(--nf-profile-para-size);
                 color: gray;
                 margin: 0;
-                 /*padding: 16px 6px;*/
+                /*padding: 16px 6px;*/
             }
 
             .right_collab a {
@@ -1423,7 +1426,8 @@
 
             }
 
-            .showhide:hover {}
+            .showhide:hover {
+            }
 
 
             .show_btn:hover {
@@ -1455,9 +1459,7 @@
     @endpush
     <div class="new-class-hide-scroll">
         <section id="content" class="content new-box-main-wrapper ">
-
             <div class="container-fluid p-0 ">
-
                 <div class="">
                     @if ($imapError)
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -1465,14 +1467,13 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-
-
                     <div class="row ">
                         <div class="col-lg-3">
 
                             <div class="sidebarr">
                                 <div class="main-left-sidebar-actions">
-                                    <a href="{{ route('admin.customer.contact.index') }}" class="view-subscription-link">
+                                    <a href="{{ route('admin.customer.contact.index') }}"
+                                       class="view-subscription-link">
                                         <span><i class="fa fa-angle-left " aria-hidden="true"></i>
                                             contacts</span>
                                     </a>
@@ -1486,7 +1487,7 @@
                                         <div class="avatar-img-box" style="padding-inline-end: 10px;">
                                             @if (file_exists(public_path('assets/images/user1.png')))
                                                 <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
-                                                    src="{{ asset('assets/images/user1.png') }}">
+                                                     src="{{ asset('assets/images/user1.png') }}">
                                             @else
                                                 @php
                                                     $words = explode(
@@ -1497,7 +1498,8 @@
                                                         $words[0][0] . (count($words) > 1 ? $words[1][0] : ''),
                                                     );
                                                 @endphp
-                                                <div class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                                <div
+                                                    class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
                                                     style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
                                                     {{ $initials }}
                                                 </div>
@@ -1515,16 +1517,17 @@
                                             <div class="email_sec">
                                                 <p id="customerEmail">{{ $customer_contact->email }}</p>
                                                 <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="Copy email to clipboard"></i>
+                                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   title="Copy email to clipboard"></i>
                                             </div>
                                         </div>
                                         <div>
 
                                             <button class="custom-contact-detail-dropdown" type="button"
-                                                id="dropdownMenuButtonedit" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    id="dropdownMenuButtonedit" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
                                                 <i class="fa fa-pencil prof-edit-icons edit-icons-kit"
-                                                    aria-hidden="true"></i>
+                                                   aria-hidden="true"></i>
                                             </button>
                                             <ul class="dropdown-menu custom-edit-detail-dropdown-show"
                                                 aria-labelledby="dropdownMenuButtonedit">
@@ -1600,10 +1603,11 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplecontact"
-                                                    aria-expanded="true" aria-controls="collapseExamplecontact">
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExamplecontact"
+                                                        aria-expanded="true" aria-controls="collapseExamplecontact">
                                                     <i class="fa fa-chevron-down toggle-icon" aria-hidden="true"
-                                                        style="padding-right: 5px;"></i>
+                                                       style="padding-right: 5px;"></i>
                                                     About this contact
                                                 </button>
                                             </div>
@@ -1627,13 +1631,13 @@
                                                 <div class="mb-4">
                                                     <p class="contact-card-details-head">Last contacted</p>
                                                     <input class="contact-details-input-fields " type="text"
-                                                        placeholder="">
+                                                           placeholder="">
                                                 </div>
                                                 <div class="mb-4">
                                                     <div class="">
                                                         <button class="custom-contact-detail-dropdown dropdown-toggle"
-                                                            type="button" id="dropdownMenuButtonlead"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                                type="button" id="dropdownMenuButtonlead"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
                                                             Lead
                                                         </button>
                                                         <ul class="dropdown-menu custom-contact-detail-dropdown-show"
@@ -1659,11 +1663,12 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse" type="button"
-                                                    data-bs-toggle="collapse"
-                                                    data-bs-target="#collapseExamplesubscriptions" aria-expanded="true"
-                                                    aria-controls="collapseExamplesubscriptions">
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExamplesubscriptions"
+                                                        aria-expanded="true"
+                                                        aria-controls="collapseExamplesubscriptions">
                                                     <i class="fa fa-caret-down" aria-hidden="true"
-                                                        style="padding-right: 5px;"></i>
+                                                       style="padding-right: 5px;"></i>
                                                     Communication subscriptions
                                                 </button>
                                             </div>
@@ -1688,10 +1693,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"
-                                                    aria-expanded="true" aria-controls="collapseExampleweb">
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"
+                                                        aria-expanded="true" aria-controls="collapseExampleweb">
                                                     <i class="fa fa-caret-down" aria-hidden="true"
-                                                        style="padding-right: 5px;"></i>
+                                                       style="padding-right: 5px;"></i>
                                                     Website Activity
                                                 </button>
                                             </div>
@@ -1711,64 +1716,53 @@
                             </div>
 
                         </div>
-                        <div class="col-lg-6 p-0">
 
-                            <div class="custom-tabs-row custom-tabs-row-scroll">
+                        <div class="col-lg-6 p-0">
+                            <div class="custom-tabs-row">
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link main-tabs-view" id="overview-tab" data-bs-toggle="tab"
-                                            data-bs-target="#overview" type="button" role="tab"
-                                            aria-controls="overview" aria-selected="true">Overview
+                                                data-bs-target="#overview" type="button" role="tab"
+                                                aria-controls="overview" aria-selected="true">Overview
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link main-tabs-view active" id="activity-tab"
-                                            data-bs-toggle="tab" data-bs-target="#activity" type="button"
-                                            role="tab" aria-controls="activity" aria-selected="true">Activities
+                                                data-bs-toggle="tab" data-bs-target="#activity" type="button"
+                                                role="tab" aria-controls="activity" aria-selected="true">Activities
                                         </button>
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="myTabContent">
                                     <div class="tab-pane fade" id="overview" role="tabpanel"
-                                        aria-labelledby="overview-tab">
-                                        @include('admin.customers.contacts.email.components.overview')
+                                         aria-labelledby="overview-tab">
+                                        @include('admin.customers.contacts.timeline.components.overview')
                                     </div>
                                     <div class="tab-pane fade active show" id="activity" role="tabpanel"
-                                        aria-labelledby="activity-tab">
-
-                                        @include('admin.customers.contacts.email.components.activities')
-
-
-
+                                         aria-labelledby="activity-tab">
+                                        @include('admin.customers.contacts.timeline.components.activities')
                                     </div>
-
                                 </div>
                             </div>
-
-                            <div class="main">
-                            </div>
                         </div>
-                        <div class="col-lg-3 ps-0">
 
+                        <div class="col-lg-3 ps-0">
                             <div class="right-sidebarr">
                                 <div class="collaborators ">
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
-
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExample"
-                                                    aria-expanded="true" aria-controls="collapseExample">
-                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                                                        aria-expanded="true" aria-controls="collapseExample">
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
+                                                       aria-hidden="true"></i>
                                                     Company
                                                     <span> ( {{ $customer_contact->companies->count() }} )</span>
                                                 </button>
                                             </div>
-
                                         </div>
-
                                         <div class="right_collab">
                                             <a href="{{ route('admin.customer.company.index') }}">
                                                 <i class="fa fa-plus" aria-hidden="true"> </i>
@@ -1785,7 +1779,7 @@
                                                     <span> Domain :
                                                         @if (!empty($customer_contact->company->domain))
                                                             <a href="https://{{ $customer_contact->company->domain }}"
-                                                                target="_blank">
+                                                               target="_blank">
                                                                 {{ $customer_contact->company->domain }}
                                                             </a>
                                                         @else
@@ -1798,24 +1792,22 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplepayment"
-                                                    aria-expanded="true" aria-controls="collapseExamplepayment">
-                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExamplepayment"
+                                                        aria-expanded="true" aria-controls="collapseExamplepayment">
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
+                                                       aria-hidden="true"></i>
                                                     Payments <span> ( {{ $customer_contact->payments->count() ?? '---' }} )
                                                     </span>
                                                 </button>
                                             </div>
-
                                         </div>
                                         <div class="right_collab">
                                             <a href="{{ route('admin.payment.index') }}">
@@ -1824,10 +1816,8 @@
                                             </a>
                                         </div>
                                     </div>
-
                                     <div class="collapse show" id="collapseExamplepayment">
                                         <div class="card custom-collapse-cards card-body">
-
                                             <div class="col-md-12">
                                                 @if ($customer_contact->payments->count() == 0)
                                                     <p class="para_sec">Track payments associated with this record. A
@@ -1841,15 +1831,14 @@
                                                             class=" invoice_sec {{ $index >= 2 ? 'extra-payment d-none' : '' }}">
                                                             <span
                                                                 class="invoice_num">{{ optional($payment->invoice)->invoice_number ?? '---' }}
-
-
                                                                 @if ($payment->status == 0)
                                                                     <span
                                                                         class="badge bg-warning text-dark cstm_bdge">Due</span>
                                                                 @elseif($payment->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($payment->status == 2)
-                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span
+                                                                        class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($payment->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -1880,22 +1869,20 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
-
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleinvoice"
-                                                    aria-expanded="true" aria-controls="collapseExampleinvoice">
-                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#collapseExampleinvoice"
+                                                        aria-expanded="true" aria-controls="collapseExampleinvoice">
+                                                    <i class="fa fa-chevron-down toggle-icon"
+                                                       style="padding-right: 5px;"
+                                                       aria-hidden="true"></i>
                                                     Invoices <span> ({{ $customer_contact->invoices->count() }}) </span>
                                                 </button>
                                             </div>
-
                                         </div>
                                         <div class="right_collab">
                                             <a href="{{ route('admin.invoice.index') }}">
@@ -1904,7 +1891,6 @@
                                             </a>
                                         </div>
                                     </div>
-
                                     <div class="collapse show" id="collapseExampleinvoice">
                                         <div class="card custom-collapse-cards card-body">
                                             <div class="col-md-12">
@@ -1922,7 +1908,8 @@
                                                                 @elseif($invoice->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($invoice->status == 2)
-                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span
+                                                                        class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($invoice->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -1952,7 +1939,6 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="collapse " id="collapseExamplepay">
                                         <div class="card custom-collapse-cards card-body">
                                             <p class="contact-card-subscription-para">
@@ -1965,31 +1951,24 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
-
                                                 <button class="btn custom-btn-collapse" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"
-                                                    aria-expanded="true" aria-controls="collapseExampleatt">
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"
+                                                        aria-expanded="true" aria-controls="collapseExampleatt">
                                                     <i class="fa fa-caret-down" style="padding-right: 5px;"
-                                                        aria-hidden="true"></i>
+                                                       aria-hidden="true"></i>
                                                     Attachments
                                                 </button>
                                             </div>
-
                                         </div>
-
                                         <div class="right_collab open-form-btn">
                                             <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true">
                                             </i>
                                             <span>Add</span>
                                         </div>
-
                                     </div>
                                     <div class="collapse " id="collapseExampleatt">
                                         <div class="card custom-collapse-cards card-body">
@@ -1998,9 +1977,7 @@
                                             </p>
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
                                 </div>
                             </div>
 
@@ -2011,8 +1988,6 @@
             </div>
         </section>
     </div>
-
-
     @include('admin.customers.contacts.notes-add-modal')
     @include('admin.customers.contacts.notes-edit-modal')
     @include('admin.customers.companies.custom-form')
@@ -2023,8 +1998,8 @@
 
         {{--        MY SCRIPT --}}
         <script>
-            $(document).ready(function() {
-                $('.showhide-payment, .showhide-invoice').click(function() {
+            $(document).ready(function () {
+                $('.showhide-payment, .showhide-invoice').click(function () {
                     // Determine which type: "payment" or "invoice"
                     let type = $(this).hasClass('showhide-payment') ? 'payment' : 'invoice';
 
@@ -2043,20 +2018,20 @@
         </script>
 
         <script>
-            $(document).ready(function() {
-                $('.toggle-collapse').each(function() {
+            $(document).ready(function () {
+                $('.toggle-collapse').each(function () {
                     var $button = $(this);
                     var target = $button.data('bs-target'); // Get target id from data-bs-target
                     var $collapse = $(target);
 
                     // On show event
-                    $collapse.on('show.bs.collapse', function() {
+                    $collapse.on('show.bs.collapse', function () {
                         $button.find('.toggle-icon').removeClass('fa-chevron-right').addClass(
                             'fa-chevron-down');
                     });
 
                     // On hide event
-                    $collapse.on('hide.bs.collapse', function() {
+                    $collapse.on('hide.bs.collapse', function () {
                         $button.find('.toggle-icon').removeClass('fa-chevron-down').addClass(
                             'fa-chevron-right');
                     });
@@ -2076,8 +2051,8 @@
             }
 
             // Second comment function
-            $(document).ready(function() {
-                $('#toggleButton').click(function() {
+            $(document).ready(function () {
+                $('#toggleButton').click(function () {
                     const contents = $('#contents');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2089,21 +2064,21 @@
                 });
             });
             // select to function
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Toggle dropdown visibility
-                $(".dropdown-toggle").on("click", function() {
+                $(".dropdown-toggle").on("click", function () {
                     $(".dropdown-content").toggle();
                 });
                 // Filter list based on search input
-                $(".search-input").on("input", function() {
+                $(".search-input").on("input", function () {
                     const filter = $(this).val().toLowerCase();
-                    $(".checkbox-item").each(function() {
+                    $(".checkbox-item").each(function () {
                         const label = $(this).find("label").text().toLowerCase();
                         $(this).toggle(label.includes(filter));
                     });
                 });
                 // Close dropdown if clicked outside
-                $(document).on("click", function(e) {
+                $(document).on("click", function (e) {
                     if (!$(e.target).closest(".dropdown").length) {
                         $(".dropdown-content").hide();
                     }
@@ -2111,15 +2086,15 @@
             });
             // $('select>option:eq(3)').attr('selected', true);
             // Searching Input function
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Expand and collapse the search bar
-                $(".search-btns").on("click", function(e) {
+                $(".search-btns").on("click", function (e) {
                     e.preventDefault(); // Prevent form submission on button click
                     $(".search-containers").toggleClass("expanded");
                     $(".search-inputs").focus();
                 });
                 // Handle form submission for search
-                $("#search-form").on("submit", function(e) {
+                $("#search-form").on("submit", function (e) {
                     e.preventDefault(); // Prevent default form submission
                     const query = $(".search-inputs").val().trim();
                     if (query) {
@@ -2132,7 +2107,7 @@
                     }
                 });
                 // Collapse the search bar when clicking outside
-                $(document).on("click", function(e) {
+                $(document).on("click", function (e) {
                     if (!$(e.target).closest(".search-containers").length) {
                         $(".search-containers").removeClass("expanded");
                     }
@@ -2152,24 +2127,24 @@
             });
 
             // EMAIL TEMPLATE OPEN AND CLOSE
-            $(document).ready(function() {
+            $(document).ready(function () {
                 const emailTemplate = $('#emailTemplate');
 
                 // Open form
-                $('.open-email-form').click(function() {
+                $('.open-email-form').click(function () {
                     emailTemplate.addClass('open');
 
                 });
 
                 // Close form
-                $('.close-btn').click(function() {
+                $('.close-btn').click(function () {
                     emailTemplate.removeClass('open');
 
                 });
             });
             // view threads function
-            $(document).ready(function() {
-                $('#toggleButtonThread').click(function() {
+            $(document).ready(function () {
+                $('#toggleButtonThread').click(function () {
                     const contents = $('#thread');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2183,7 +2158,7 @@
                 });
             });
             // read more text function
-            $('.moreless-button').click(function() {
+            $('.moreless-button').click(function () {
                 $('.moretext').slideToggle();
                 if ($('.moreless-button').text() == "See more") {
                     $(this).text("See less")
@@ -2194,11 +2169,11 @@
 
             // Copy Clipboard Email
 
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Initialize Bootstrap tooltips
                 $('[data-bs-toggle="tooltip"]').tooltip();
 
-                $(document).on('click', '.copyEmail', async function() {
+                $(document).on('click', '.copyEmail', async function () {
                     try {
                         let emailText = $("#customerEmail").text().trim();
                         await navigator.clipboard.writeText(emailText);
@@ -2219,64 +2194,65 @@
 
         {{-- // --}}
         <script>
-$(document).on('click', '.reply-btn', function () {
-    let fromEmail   = $(this).data('from');
-    let subject     = $(this).data('subject');
-    let date        = $(this).data('date');
-    let body        = $(this).data('body');
-    let threadId    = $(this).data('thread-id');
-    let inReplyTo   = $(this).data('in-reply-to');
-    let references  = $(this).data('references');
+            $(document).on('click', '.reply-btn', function () {
+                let fromEmail = $(this).data('from');
+                let subject = $(this).data('subject');
+                let date = $(this).data('date');
+                let body = $(this).data('body');
+                let threadId = $(this).data('thread-id');
+                let inReplyTo = $(this).data('in-reply-to');
+                let references = $(this).data('references');
 
-    // Decode body if JSON-wrapped
-    try {
-        if (typeof body === "string" && body.trim().startsWith('"')) {
-            body = JSON.parse(body);
-        }
-    } catch (e) {}
+                // Decode body if JSON-wrapped
+                try {
+                    if (typeof body === "string" && body.trim().startsWith('"')) {
+                        body = JSON.parse(body);
+                    }
+                } catch (e) {
+                }
 
-    // Prefill To/Subject
-    $('#toFieldInput').val(fromEmail);
-    $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+                // Prefill To/Subject
+                $('#toFieldInput').val(fromEmail);
+                $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
 
-    // Clear editor + set quoted history
-    $('.rich-email-editor').html('');
-    $('.quoted-history').html(`
+                // Clear editor + set quoted history
+                $('.rich-email-editor').html('');
+                $('.quoted-history').html(`
         <p><b>On ${date}, ${fromEmail} wrote:</b></p>
         ${body}
     `);
 
-    // Store metadata
-    $('#thread_id').val(threadId || '');
-    $('#in_reply_to').val(inReplyTo || '');
-    $('#references').val(references ? JSON.stringify(references) : '');
+                // Store metadata
+                $('#thread_id').val(threadId || '');
+                $('#in_reply_to').val(inReplyTo || '');
+                $('#references').val(references ? JSON.stringify(references) : '');
 
-    $('#emailTemplate').addClass('open');
-});
+                $('#emailTemplate').addClass('open');
+            });
 
-// If user clicks "Forward" or "New Email", clear metadata
-$(document).on('click', '.open-email-form', function () {
-    $('#thread_id').val('');
-    $('#in_reply_to').val('');
-    $('#references').val('');
-    $('.rich-email-editor').html('');
-    $('.quoted-history').html('');
-    $('#toFieldInput').val('');
-    $('#emailSubject').val('');
-    $('#emailTemplate').addClass('open');
-});
+            // If user clicks "Forward" or "New Email", clear metadata
+            $(document).on('click', '.open-email-form', function () {
+                $('#thread_id').val('');
+                $('#in_reply_to').val('');
+                $('#references').val('');
+                $('.rich-email-editor').html('');
+                $('.quoted-history').html('');
+                $('#toFieldInput').val('');
+                $('#emailSubject').val('');
+                $('#emailTemplate').addClass('open');
+            });
 
-// Clean up on close
-$(document).on('click', '.close-btn', function () {
-    $('#emailTemplate').removeClass('open');
-    $('#toFieldInput').val('');
-    $('#emailSubject').val('');
-    $('.rich-email-editor').html('');
-    $('.quoted-history').html('');
-    $('#thread_id').val('');
-    $('#in_reply_to').val('');
-    $('#references').val('');
-});
+            // Clean up on close
+            $(document).on('click', '.close-btn', function () {
+                $('#emailTemplate').removeClass('open');
+                $('#toFieldInput').val('');
+                $('#emailSubject').val('');
+                $('.rich-email-editor').html('');
+                $('.quoted-history').html('');
+                $('#thread_id').val('');
+                $('#in_reply_to').val('');
+                $('#references').val('');
+            });
 
         </script>
 
