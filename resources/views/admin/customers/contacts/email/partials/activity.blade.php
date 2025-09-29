@@ -82,7 +82,7 @@
                         </div>
                         <div class="text-end" style="min-width: 160px;">
                             <p class="mb-1 text-muted small">
-                                {{ !empty($item['date']) ? \Carbon\Carbon::parse($item['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
+                                {{ !empty($item['data']['date']) ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
                             </p>
                             @if (!empty($item['data']['attachments']))
                                 <p class="mt-1 mb-0 text-muted small">
@@ -140,18 +140,17 @@
                     @endif
 
                     <div class="email-box-container" style="margin: 0; border-radius: 0;">
-
                         <div>
                             <div class="new-profile-parent-wrapper">
                                 <div class="new-profile-email-wrapper">
                                     <div class="user_profile_img">
                                         <div class="avatarr">
-                                            {{ $item['data']['from']['name'] ? strtoupper(substr($item['data']['from']['name'], 0, 2)) : 'NA' }}
+                                            {{ $item['data']['from']['name'] ? strtoupper(substr($item['data']['from']['name'], 0, 2)) : strtoupper(substr($item['data']['from']['email'], 0, 2)) }}
                                         </div>
                                     </div>
                                     <div class="user_profile_text">
                                         <p style="padding: 0; margin: 0;">
-                                            {{ $item['data']['from']['name'] ?? 'Unknown' }}
+                                            {{ $item['data']['from']['name'] ?? ($item['data']['from']['email'] ?? 'Unknown') }}
                                         </p>
                                         <p style="font-weight: 500; padding-left: 0;">
                                             to
@@ -182,7 +181,11 @@
                             </div>
                         </div>
                         <div class="email-preview mb-4 text-dark small">
-                            {!! $item['data']['body']['html'] ?? nl2br($item['data']['body']['text'] ?? 'No body content available.') !!}
+                            @php
+                                $htmlContent = $item['data']['body']['html'] ?? '';
+                                $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
+                            @endphp
+                            {!! $isHtmlEmpty ? nl2br($item['data']['body']['text'] ?? 'No body content available.') : $htmlContent !!}
                         </div>
                     </div>
                     @if (!empty($item['data']['attachments']))
