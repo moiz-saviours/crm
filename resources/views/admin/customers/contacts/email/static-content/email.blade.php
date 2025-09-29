@@ -89,7 +89,7 @@
                                 +1-97-676552
                             </span>
                         </p>
-                        <img src="http://127.0.0.1:8001/assets/images/email-dummy.jpg" class="img-fluid">
+                        <img src="/assets/images/email-dummy.jpg" class="img-fluid">
                         <br>
                         <br>
 
@@ -104,7 +104,7 @@
                                 Visit our website!</a>
                         </p>
 
-                        <img src="http://127.0.0.1:8001/assets/images/logo-img.png"
+                        <img src="/assets/images/logo-img.png"
                             class="img-fluid client-email-logo">
 
                         <br>
@@ -199,7 +199,7 @@
                                         Visit our website!</a>
                                 </p>
 
-                                <img src="http://127.0.0.1:8001/assets/images/logo-img.png"
+                                <img src="/assets/images/logo-img.png"
                                     class="img-fluid client-email-logo">
 
                                 <br>
