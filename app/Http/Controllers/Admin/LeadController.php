@@ -295,9 +295,9 @@ class LeadController extends Controller
             'user_agent'   => $userAgent,
             'browser_name' => $this->getBrowserName($userAgent),
         ];
+        $deviceInfo['visitor_id'] = $request->visitor_id ?? null;
 
         try {
-            // Directly IP-API ko call karo
             $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/");
             if ($ipapiRes->successful()) {
                 $location = $ipapiRes->json();
@@ -312,7 +312,6 @@ class LeadController extends Controller
                     'longitude'=> $location['lon'] ?? null,
                 ]);
 
-                // Agar full address chahiye to OpenStreetMap se reverse geocode
                 if (!empty($location['lat']) && !empty($location['lon'])) {
                     $url = "https://nominatim.openstreetmap.org/reverse?lat={$location['lat']}&lon={$location['lon']}&format=json&accept-language=en";
 

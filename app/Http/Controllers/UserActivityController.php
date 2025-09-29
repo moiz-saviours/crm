@@ -17,17 +17,19 @@ class UserActivityController extends Controller
 
             $ip       = $activity->ip;
             $browser  = $activity->browser;
+            $visitor  = $activity->visitor_id ?? 'Unknown Visitor';
             $location = trim(($activity->city ? $activity->city . ', ' : '') . ($activity->country ?? ''), ', ');
 
             $details = $this->makeReadable($data);
 
-            return "User with IP {$ip} using {$browser}"
+            return "Visitor {$visitor} with IP {$ip} using {$browser}"
                 . ($location ? " from {$location}" : "")
                 . " {$details}";
         });
 
         return view('admin.user-activity.index', compact('activities'));
     }
+
 
     private function makeReadable($data)
     {
@@ -84,6 +86,7 @@ class UserActivityController extends Controller
         $browser = $this->getBrowser($request->userAgent());
 
         UserActivity::create([
+            'visitor_id' => $request->visitor_id,
             'event_type' => $request->event_type,
             'event_data' => json_encode($request->event_data),
             'ip'         => $geo['query'] ?? null,
@@ -104,12 +107,21 @@ class UserActivityController extends Controller
 
     private function getBrowser($userAgent)
     {
-        if (preg_match('/MSIE|Trident/', $userAgent)) return "Internet Explorer";
-        elseif (preg_match('/Edge/', $userAgent)) return "Edge";
-        elseif (preg_match('/OPR|Opera/', $userAgent)) return "Opera";
-        elseif (preg_match('/Chrome/', $userAgent)) return "Chrome";
-        elseif (preg_match('/Safari/', $userAgent)) return "Safari";
-        elseif (preg_match('/Firefox/', $userAgent)) return "Firefox";
-        else return "Unknown";
+        $browsers = [
+            'Edge' => 'Edg',
+            'Opera' => 'OPR',
+            'Vivaldi' => 'Vivaldi',
+            'Brave' => 'Brave',
+            'Chrome' => 'Chrome',
+            'Firefox' => 'Firefox',
+            'Safari' => 'Safari',
+            'Internet Explorer' => 'MSIE|Trident'
+        ];
+        foreach ($browsers as $browser => $pattern) {
+            if (preg_match("/$pattern/i", $userAgent)) {
+                return $browser;
+            }
+        }
+        return 'Unknown';
     }
 }
