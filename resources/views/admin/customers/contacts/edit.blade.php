@@ -2141,17 +2141,17 @@
                 });
             });
 
-            $(document).ready(function () {
-                $(".toggle-btnss").click(function () {
-                    let container = $(this).closest(".email-box-container");
+$(document).ready(function () {
+    $(".toggle-btnss").click(function () {
+        let container = $(this).closest(".email-box-container");
 
-                    // Close all other content
-                    $(".contentdisplay, .contentdisplaytwo").not(container.find(".contentdisplay, .contentdisplaytwo")).slideUp();
+        // Hide all other content
+        // $(".contentdisplay, .contentdisplaytwo").not(container.find(".contentdisplay, .contentdisplaytwo")).hide();
 
-                    // Toggle only this one
-                    container.find(".contentdisplay, .contentdisplaytwo").slideToggle();
-                });
-            });
+        // Toggle only this one (direct open/close)
+        container.find(".contentdisplay, .contentdisplaytwo").toggle();
+    });
+});
 
             // EMAIL TEMPLATE OPEN AND CLOSE
             $(document).ready(function() {
