@@ -1910,7 +1910,7 @@
                                     <div class="tab-pane fade active show" id="profile" role="tabpanel"
                                          aria-labelledby="profile-tab">
 
-                                        <div class="activ_head mt-3">
+                                        <div class="activ_head">
 
                                             <!-- Searchbox input -->
                                             <div class="search-containers">
