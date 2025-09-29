@@ -8,7 +8,6 @@
             </div>
             <form action="" method="POST" id="editNoteModalForm">
                 @csrf
-
                 <div class="modal-body">
                     <textarea id="note" name="note" class="form-control" rows="3" required></textarea>
                 </div>
@@ -23,6 +22,7 @@
 @push('script')
     <script>
 
+        /** Use ::::::::: AjaxRequestPromise :::::::::::::: */
         /** Edit Note */
         $(document).on('click', '.editNoteModal', function () {
             const id = $(this).data('id');
@@ -32,13 +32,11 @@
                 Swal.fire('Error!', 'Record not found.', 'error');
                 return;
             }
-
             // Reset form
             $('#editNoteModalForm')[0].reset();
 
             // Update form action URL
             $('#editNoteModalForm').attr('action', `{{route('admin.customer.contact.note.update')}}/` + id);
-
 
             $('#note').val(noteText);
         });
