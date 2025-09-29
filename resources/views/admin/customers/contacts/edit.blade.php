@@ -287,7 +287,7 @@
                 background-color: rgb(255, 255, 255);
                 /*border: 1px solid rgb(223, 227, 235);*/
                 border-radius: 4px;
-                padding: 10px 0px;
+                padding: 16px 17px;
                 margin-bottom: 20px;
             }
 
@@ -609,8 +609,7 @@
             .activities-seprater {
                 color: #0091ae !important;
                 font-weight: 600;
-                /*font-size: var(--nf-profile-para-size);*/
-                font-size: 12px;
+                font-size: var(--nf-profile-para-size);
                 margin: 0px !important;
             }
 
@@ -971,8 +970,7 @@
             }
 
             .user_cont p {
-                /*font-size: var(--nf-profile-para-size);*/
-                font-size: 14px;
+                font-size: var(--nf-profile-para-size);
                 color: gray;
                 margin: 0;
             }
