@@ -97,7 +97,15 @@
                         </div>
 
                         <div class="new-profile-email-wrapper">
-                            <div class="activities-seprater">Reply</div>
+                                                   <div class="activities-seprater reply-btn"
+                                            data-from="{{ $item['data']['from']['email'] ?? '' }}"
+                                            data-subject="{{ $item['data']['subject'] ?? '' }}"
+                                            data-date="{{ $item['data']['date']->format('M d, Y H:i') ?? '' }}"
+                                            data-body='@json($item['data']['body']['html'] ?? $item['data']['body']['text'])'
+                                            data-thread-id="{{ $item['data']['thread_id'] ?? '' }}"
+                                            data-in-reply-to="{{ $item['data']['message_id'] ?? '' }}"
+                                            data-references='@json($item['data']['references'] ?? null)'>
+                                            Reply</div>
                             <div class="activities-seprater open-form-btn">Forward</div>
                             <div class="activities-seprater open-form-btn">Delete</div>
                         </div>
