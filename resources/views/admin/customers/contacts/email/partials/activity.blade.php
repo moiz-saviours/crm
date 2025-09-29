@@ -46,7 +46,6 @@
                 </div>
             </div>
         @elseif ($item['type'] === 'email')
-            @include('admin.customers.contacts.email.static-content.email')
             {{-- ================= EMAIL ================= --}}
             <div class="email-box-container mb-4 border rounded bg-white p-3">
                 <div class="toggle-btnss" data-target=".content-{{ $item['data']['uuid'] }}">

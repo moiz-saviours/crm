@@ -1,5 +1,5 @@
           {{-- ================= STATIC EXAMPLE BELOW, REPLACE WITH DYNAMIC CONTENT ABOVE ================= --}}
-            {{-- <div class="email-box-container mb-4 border rounded bg-white p-3" style="margin: 0; border-radius: 0;">
+            <div class="email-box-container mb-4 border rounded bg-white p-3" style="margin: 0; border-radius: 0;">
                 <div class="toggle-btnss">
                     <div class="activ_head ">
                         <div class="email-child-wrapper">
@@ -305,4 +305,4 @@
                 </div>
 
 
-            </div> --}}
+            </div>
