@@ -10,6 +10,7 @@ class UserActivity extends Model
 {
     use SoftDeletes;
     protected $fillable = [
+        'visitor_id',
         'event_type', 'event_data', 'ip', 'user_agent','country',
         'state',
         'region',

@@ -1,14 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Api\{ApiAuthorizePaymentController,
     ApiPaypalPaymentController,
     ApiSecurePaymentController,
-    ApiStripePaymentController,
-    UserActivityController};
-use App\Http\Controllers\Admin\LeadController;
+    ApiStripePaymentController};
 use App\Http\Controllers\ApiInvoiceController;
 use App\Http\Controllers\ApiPaymentAttachmentController;
 use App\Http\Controllers\SmsServiceContoller;
+use App\Http\Controllers\UserActivityController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
