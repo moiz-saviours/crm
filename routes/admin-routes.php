@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\UserActivityController;
 use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     ChannelController as AdminChannelController,
     AccountController as AdminAccountController,
@@ -24,11 +23,13 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     TaskController as AdminTaskController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController,
-    SalesKpiController as AdminSalesKpiController};
+    SalesKpiController as AdminSalesKpiController,
+    EmailController as AdminEmailController
+};
+use App\Http\Controllers\UserActivityController;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\EmailController;
 
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
@@ -253,9 +254,9 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 });
                 Route::get('/change-status/{customer_contact?}', [AdminCustomerContactController::class, 'change_status'])->name('change.status');
                 Route::delete('/delete/{customer_contact?}', [AdminCustomerContactController::class, 'delete'])->name('delete');
-                Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
-                Route::get('/emails/fetch', [EmailController::class, 'fetch'])->name('emails.fetch');
-                Route::get('/emails/fetch-new', [EmailController::class, 'fetchNewEmails'])->name('emails.fetch-new');
+                Route::post('/send-email', [AdminEmailController::class, 'sendEmail'])->name('send.email');
+                Route::get('/emails/fetch', [AdminEmailController::class, 'fetch'])->name('emails.fetch');
+                Route::get('/emails/fetch-new', [AdminEmailController::class, 'fetchNewEmails'])->name('emails.fetch-new');
             });
         });
         /** Companies Routes */
@@ -351,7 +352,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
-
     Route::get('user-activity', [UserActivityController::class, 'index'])->name('user-activity.index');
 
 });
