@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\Admin\{AccountController as AdminAccountController,
+use App\Http\Controllers\Api\UserActivityController;
+use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
+    ChannelController as AdminChannelController,
+    AccountController as AdminAccountController,
     ActivityLogController as AdminActivityLogController,
     BrandController as AdminBrandController,
-    ChannelController as AdminChannelController,
     Client\CompanyController as AdminClientCompanyController,
     Client\ContactController as AdminClientContactController,
     Client\PaymentMerchantController as AdminPaymentMerchantController,
@@ -11,27 +13,26 @@ use App\Http\Controllers\Admin\{AccountController as AdminAccountController,
     Customer\ContactController as AdminCustomerContactController,
     Customer\InboxController as AdminCustomerInboxController,
     Customer\NoteController as AdminCustomerNoteController,
-    DashboardController as AdminDashboardController,
     EmployeeController as AdminEmployeeController,
     InvoiceController as AdminInvoiceController,
     LeadController as AdminLeadController,
     LeadStatusController as AdminLeadStatusController,
-    PaymentController as AdminPaymentController,
     PaymentTransactionLogController as AdminPaymentTransactionLogController,
+    PaymentController as AdminPaymentController,
     ProfileController as AdminProfileController,
-    SalesKpiController as AdminSalesKpiController,
     SettingController as AdminSettingController,
     TaskController as AdminTaskController,
     TeamController as AdminTeamController,
-    TeamTargetController as AdminTeamTargetController};
-use App\Http\Controllers\Admin\EmailController;
-use App\Http\Controllers\UserActivityController;
+    TeamTargetController as AdminTeamTargetController,
+    SalesKpiController as AdminSalesKpiController};
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\EmailController;
 
 require __DIR__ . '/admin-auth.php';
-Route::middleware(['auth:admin','2fa:admin', 'verified:admin.verification.notice', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
+//Route::middleware(['auth:admin','2fa:admin', 'verified:admin.verification.notice', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('/check-channels', function (Request $request) {
         $authUser = Auth::user();
         $tableToCheck = 'admins';
