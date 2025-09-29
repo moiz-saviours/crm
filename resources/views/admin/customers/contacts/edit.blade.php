@@ -2115,16 +2115,25 @@
             });
 
 $(document).ready(function () {
+    // Individual toggle
     $(".toggle-btnss").click(function () {
         let container = $(this).closest(".email-box-container");
-
-        // Hide all other content
-        // $(".contentdisplay, .contentdisplaytwo").not(container.find(".contentdisplay, .contentdisplaytwo")).hide();
-
-        // Toggle only this one (direct open/close)
         container.find(".contentdisplay, .contentdisplaytwo").toggle();
     });
+
+    // Collapse All
+    $(document).on("click", ".dropdown-item:contains('Collapse All')", function (e) {
+        e.preventDefault();
+        $(".contentdisplay, .contentdisplaytwo").hide();
+    });
+
+    // Expand All
+    $(document).on("click", ".dropdown-item:contains('Expand All')", function (e) {
+        e.preventDefault();
+        $(".contentdisplay, .contentdisplaytwo").show();
+    });
 });
+
 
             // EMAIL TEMPLATE OPEN AND CLOSE
             $(document).ready(function () {
