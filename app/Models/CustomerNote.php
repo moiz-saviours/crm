@@ -14,6 +14,8 @@ class CustomerNote extends Model
     protected $fillable = [
         'cus_contact_key',
         'note',
+        'creator_id',
+        'creator_type',
     ];
 
     public function customer_contact()
