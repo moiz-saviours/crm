@@ -2246,7 +2246,6 @@ $(document).ready(function () {
                 $('#references').val('');
                 $('.rich-email-editor').html('');
                 $('.quoted-history').html('');
-                $('#toFieldInput').val('');
                 $('#emailSubject').val('');
                 $('#emailTemplate').addClass('open');
             });
