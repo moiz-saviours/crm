@@ -341,7 +341,7 @@
                 display: flex;
                 gap: 8px;
                 cursor: pointer;
-                align-items: center
+                align-items: baseline
             }
 
             .comment-active_head {
@@ -943,7 +943,7 @@
 
             .contentdisplaytwo {
                 display: none;
-
+                padding: 0 20px;
             }
 
             .new-profile-email-wrapper {
@@ -969,7 +969,7 @@
                 display: flex;
                 justify-content: space-between;
                 margin: 10px 0;
-                align-items: center;
+                align-items: baseline;
             }
 
             .user_cont p {
@@ -2118,7 +2118,7 @@
                 // Individual toggle
                 $(".toggle-btnss").click(function () {
                     let container = $(this).closest(".email-box-container");
-                    container.find(".contentdisplay, .contentdisplaytwo").toggle();
+                    container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
                 });
 
                 // Collapse All
