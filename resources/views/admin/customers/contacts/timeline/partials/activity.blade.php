@@ -56,15 +56,17 @@
                                 <h2>
                                     Email - {{ $item['data']['subject'] ?? '(No Subject)' }}
                                     <span
-                                        class="user_cont">from {{ $item['data']['from']['name'] ?? $item['data']['from']['email'] ?? 'Unknown' }}</span>
+                                            class="user_cont">from {{ $item['data']['from']['name'] ?? $item['data']['from']['email'] ?? 'Unknown' }}</span>
                                 </h2>
-                                <p class="user_cont">from: {{ $item['data']['from']['email'] ?? 'Unknown' }}</p>
-                                <p class="user_cont">
-                                    to:
-                                    {{ collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])
-                                        ->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)
-                                        ->implode(', ') }}
-                                </p>
+                                <div class="user_toggle">
+                                    <p class="user_cont">from: {{ $item['data']['from']['email'] ?? 'Unknown' }}</p>
+                                    <p class="user_cont">
+                                        to:
+                                        {{ collect(is_string($item['data']['to']) ? json_decode($item['data']['to'], true) ?? [$item['data']['to']] : $item['data']['to'])
+                                            ->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)
+                                            ->implode(', ') }}
+                                    </p>
+                                </div>
                                 @if (!empty($item['data']['open_count']) && $item['data']['open_count'] > 0 && $item['data']['type'] === 'outgoing' && $item['data']['folder'] === 'sent')
                                     <p class="mb-0 text-primary small">
                                         Opens: {{ $item['data']['open_count'] ?? 0 }} |
@@ -139,7 +141,7 @@
                             <div class="attachments-list">
                                 @foreach ($item['data']['attachments'] as $attachment)
                                     <div
-                                        class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
+                                            class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
                                         <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i></div>
                                         <div class="flex-grow-1">
                                             <div class="fw-medium">{{ $attachment['filename'] ?? 'Unknown File' }}</div>
