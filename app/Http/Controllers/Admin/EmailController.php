@@ -61,28 +61,41 @@ class EmailController extends Controller
         } elseif ($folder == 'archive') {
             $query->where('folder', 'archive');
         } else {
-            // ALL: return emails that involve the customer OR involve any of my pseudo emails
             $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                // 1) any email where the customer is the sender OR in recipients
+                // 1) Client is sender or in recipients
                 $q->where('from_email', $customerEmail)
-                    ->orWhereJsonContains('to', ['email' => $customerEmail])
-                    ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-                // 2) OR any email where one of my pseudo addresses is sender OR appears in recipients
-                // if (!empty($auth_pseudo_emails)) {
-                //     $q->orWhere(function ($sub) use ($auth_pseudo_emails) {
-                //         // sender is one of my addresses
-                //         $sub->whereIn('from_email', $auth_pseudo_emails);
-                //         // OR recipient contains one of my addresses
-                //         foreach ($auth_pseudo_emails as $addr) {
-                //             $sub->orWhereJsonContains('to', ['email' => $addr])
-                //                 ->orWhereJsonContains('cc', ['email' => $addr])
-                //                 ->orWhereJsonContains('bcc', ['email' => $addr]);
-                //         }
-                //     });
-                // }
+                ->orWhereJsonContains('to', ['email' => $customerEmail])
+                ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+
+                // 2) OR Client ↔ Pseudo communication
+                if (!empty($auth_pseudo_emails)) {
+                    $q->orWhere(function ($sub) use ($customerEmail, $auth_pseudo_emails) {
+                        // Case A: Client → My pseudo
+                        $sub->where('from_email', $customerEmail)
+                            ->where(function ($nested) use ($auth_pseudo_emails) {
+                                foreach ($auth_pseudo_emails as $addr) {
+                                    $nested->orWhereJsonContains('to', ['email' => $addr])
+                                        ->orWhereJsonContains('cc', ['email' => $addr])
+                                        ->orWhereJsonContains('bcc', ['email' => $addr]);
+                                }
+                            });
+
+                        // Case B: My pseudo → Client
+                        $sub->orWhere(function ($nested) use ($customerEmail, $auth_pseudo_emails) {
+                            $nested->whereIn('from_email', $auth_pseudo_emails)
+                                ->where(function ($nn) use ($customerEmail) {
+                                    $nn->orWhereJsonContains('to', ['email' => $customerEmail])
+                                        ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                                        ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+                                });
+                        });
+                    });
+                }
             });
+
         }
+
         
         if ($folder !== 'all') {
             $query->where('folder', $folder);
