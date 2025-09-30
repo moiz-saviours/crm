@@ -2114,26 +2114,25 @@
                 });
             });
 
-$(document).ready(function () {
-    // Individual toggle
-    $(".toggle-btnss").click(function () {
-        let container = $(this).closest(".email-box-container");
-        container.find(".contentdisplay, .contentdisplaytwo").toggle();
-    });
+            $(document).ready(function () {
+                // Individual toggle
+                $(".toggle-btnss").click(function () {
+                    let container = $(this).closest(".email-box-container");
+                    container.find(".contentdisplay, .contentdisplaytwo").toggle();
+                });
 
-    // Collapse All
-    $(document).on("click", ".dropdown-item:contains('Collapse All')", function (e) {
-        e.preventDefault();
-        $(".contentdisplay, .contentdisplaytwo").hide();
-    });
+                // Collapse All
+                $(document).on("click", ".dropdown-item:contains('Collapse All')", function (e) {
+                    e.preventDefault();
+                    $(".contentdisplay, .contentdisplaytwo").hide();
+                });
 
-    // Expand All
-    $(document).on("click", ".dropdown-item:contains('Expand All')", function (e) {
-        e.preventDefault();
-        $(".contentdisplay, .contentdisplaytwo").show();
-    });
-});
-
+                // Expand All
+                $(document).on("click", ".dropdown-item:contains('Expand All')", function (e) {
+                    e.preventDefault();
+                    $(".contentdisplay, .contentdisplaytwo").show();
+                });
+            });
 
             // EMAIL TEMPLATE OPEN AND CLOSE
             $(document).ready(function () {
@@ -2202,63 +2201,59 @@ $(document).ready(function () {
         </script>
 
         {{-- // --}}
-        <script>
-            $(document).on('click', '.reply-btn', function () {
-                let fromEmail = $(this).data('from');
-                let subject = $(this).data('subject');
-                let date = $(this).data('date');
-                let body = $(this).data('body');
-                let threadId = $(this).data('thread-id');
-                let inReplyTo = $(this).data('in-reply-to');
-                let references = $(this).data('references');
+            <script>
+                $(document).on('click', '.reply-btn', function () {
+                    let fromEmail = `{{$customer_contact->email}}`;
+                    let subject = $(this).data('subject');
+                    let date = $(this).data('date');
+                    let body = $(this).data('body');
+                    let threadId = $(this).data('thread-id');
+                    let inReplyTo = $(this).data('in-reply-to');
+                    let references = $(this).data('references');
 
-                // Decode body if JSON-wrapped
-                try {
-                    if (typeof body === "string" && body.trim().startsWith('"')) {
-                        body = JSON.parse(body);
+                    try {
+                        if (typeof body === "string" && body.trim().startsWith('"')) {
+                            body = JSON.parse(body);
+                        }
+                    } catch (e) {
                     }
-                } catch (e) {
+
+                    // Prefill To/Subject
+                    $('#toFieldInput').val(fromEmail);
+                    $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+
+                    // Clear editor + set quoted history
+                    $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
+
+                    // Store metadata
+                    $('#thread_id').val(threadId || '');
+                    $('#in_reply_to').val(inReplyTo || '');
+                    $('#references').val(references ? JSON.stringify(references) : '');
+
+                    toggleQuotedHistory(true);
+                    $('#emailTemplate').addClass('open');
+                });
+
+                $(document).on('click', '.open-email-form', () => {
+                    $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
+                    toggleQuotedHistory(false);
+                    $('#emailTemplate').addClass('open');
+                });
+                $(document).on('click', '.close-btn', () => {
+                    $('#emailTemplate').removeClass('open');
+                    toggleQuotedHistory(false);
+                    $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
+                });
+                function toggleQuotedHistory(show = false) {
+                    let $wrapper = $('.quoted-history-wrapper');
+                    if (!$wrapper.length) return;
+                    if (show) {
+                        $wrapper.removeClass('d-none');
+                    } else {
+                        $wrapper.addClass('d-none');
+                    }
                 }
-
-                // Prefill To/Subject
-                $('#toFieldInput').val(`{{$customer_contact->email}}`);
-                $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
-
-                // Clear editor + set quoted history
-                $('.rich-email-editor').html('');
-                $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
-
-                // Store metadata
-                $('#thread_id').val(threadId || '');
-                $('#in_reply_to').val(inReplyTo || '');
-                $('#references').val(references ? JSON.stringify(references) : '');
-
-                $('#emailTemplate').addClass('open');
-            });
-
-            // If user clicks "Forward" or "New Email", clear metadata
-            $(document).on('click', '.open-email-form', function () {
-                $('#thread_id').val('');
-                $('#in_reply_to').val('');
-                $('#references').val('');
-                $('.rich-email-editor').html('');
-                $('.quoted-history').html('');
-                $('#emailSubject').val('');
-                $('#emailTemplate').addClass('open');
-            });
-
-            // Clean up on close
-            $(document).on('click', '.close-btn', function () {
-                $('#emailTemplate').removeClass('open');
-                $('#emailSubject').val('');
-                $('.rich-email-editor').html('');
-                $('.quoted-history').html('');
-                $('#thread_id').val('');
-                $('#in_reply_to').val('');
-                $('#references').val('');
-            });
-
-        </script>
+            </script>
 
     @endpush
 @endsection
