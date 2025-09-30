@@ -2221,15 +2221,12 @@ $(document).ready(function () {
                 }
 
                 // Prefill To/Subject
-                $('#toFieldInput').val(fromEmail);
+                $('#toFieldInput').val(`{{$customer_contact->email}}`);
                 $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
 
                 // Clear editor + set quoted history
                 $('.rich-email-editor').html('');
-                $('.quoted-history').html(`
-        <p><b>On ${date}, ${fromEmail} wrote:</b></p>
-        ${body}
-    `);
+                $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
 
                 // Store metadata
                 $('#thread_id').val(threadId || '');
@@ -2253,7 +2250,6 @@ $(document).ready(function () {
             // Clean up on close
             $(document).on('click', '.close-btn', function () {
                 $('#emailTemplate').removeClass('open');
-                $('#toFieldInput').val('');
                 $('#emailSubject').val('');
                 $('.rich-email-editor').html('');
                 $('.quoted-history').html('');
