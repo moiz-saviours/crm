@@ -62,7 +62,7 @@
 
             .custom-tabs-row-scroll {
                 padding-bottom: 50px;
-                height: 100vh;
+                height: 80vh;
                 /* Makes sure it takes up full height of the viewport */
                 overflow-y: auto;
                 /* Enables vertical scrolling */
