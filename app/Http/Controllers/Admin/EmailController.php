@@ -114,7 +114,7 @@ class EmailController extends Controller
                 return [
                     'uuid' => 'email-' . $email->id,
                     'thread_id' => $email->thread_id ?? [],
-                    'message_id' => $email->message_id ?? [],
+                    'message_id' => $email->message_id ?? '',
                     'references' => $email->references ?? [],
 
 
