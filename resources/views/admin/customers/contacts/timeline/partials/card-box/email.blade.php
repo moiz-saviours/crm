@@ -10,15 +10,17 @@
                             from {{ $email['from']['name'] ?? $email['from']['email'] ?? 'Unknown' }}
                         </span>
                     </h2>
-                    <p class="user_cont">
-                        from: {{ $email['from']['email'] ?? 'Unknown' }}
-                    </p>
-                    <p class="user_cont">
-                        to:
-                        {{ collect(is_string($email['to']) ? json_decode($email['to'], true) ?? [$email['to']] : $email['to'])
-                            ->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)
-                            ->implode(', ') }}
-                    </p>
+                    <div class="user_toggle">
+                        <p class="user_cont">
+                            from: {{ $email['from']['email'] ?? 'Unknown' }}
+                        </p>
+                        <p class="user_cont">
+                            to:
+                            {{ collect(is_string($email['to']) ? json_decode($email['to'], true) ?? [$email['to']] : $email['to'])
+                                ->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)
+                                ->implode(', ') }}
+                        </p>
+                    </div>
                     @if (!empty($email['open_count']) && $email['open_count'] > 0 && $email['type'] === 'outgoing' && $email['folder'] === 'sent')
                         <p class="mb-0 text-primary small">
                             Opens: {{ $email['open_count'] ?? 0 }} |
@@ -28,8 +30,8 @@
                 </div>
             </div>
             <p>
-                {{ !empty($email['date']) 
-                    ? \Carbon\Carbon::parse($email['date'])->format('M d, Y h:i A') 
+                {{ !empty($email['date'])
+                    ? \Carbon\Carbon::parse($email['date'])->format('M d, Y h:i A')
                     : 'Unknown Date' }}
             </p>
         </div>
@@ -41,8 +43,8 @@
             <div class="new-profile-email-wrapper">
                 <div class="user_profile_img">
                     <div class="avatarr">
-                        {{ $email['from']['name'] 
-                            ? strtoupper(substr($email['from']['name'], 0, 2)) 
+                        {{ $email['from']['name']
+                            ? strtoupper(substr($email['from']['name'], 0, 2))
                             : strtoupper(substr($email['from']['email'], 0, 2)) }}
                     </div>
                 </div>
@@ -80,8 +82,8 @@
             @php
                 $htmlContent = $email['body']['html'] ?? '';
                 $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
-                $previewContent = $isHtmlEmpty 
-                    ? ($email['body']['text'] ?? 'No body content available.') 
+                $previewContent = $isHtmlEmpty
+                    ? ($email['body']['text'] ?? 'No body content available.')
                     : strip_tags($htmlContent);
                 $previewContent = Str::limit($previewContent, 100, '...');
             @endphp
@@ -92,8 +94,8 @@
     {{-- ================= Full Body ================= --}}
     <div class="contentdisplaytwo {{ $email['uuid'] }}" style="display: none;">
         <div class="user_cont user-email-template">
-            {!! $isHtmlEmpty 
-                ? nl2br($email['body']['text'] ?? 'No body content available.') 
+            {!! $isHtmlEmpty
+                ? nl2br($email['body']['text'] ?? 'No body content available.')
                 : $htmlContent !!}
         </div>
 
@@ -116,7 +118,8 @@
                                 </div>
                             </div>
                             <div>
-                                <a href="{{ $attachment['download_url'] ?? '#' }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ $attachment['download_url'] ?? '#' }}"
+                                   class="btn btn-sm btn-outline-primary">
                                     <i class="fa fa-download"></i> Download
                                 </a>
                             </div>
