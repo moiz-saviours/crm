@@ -322,7 +322,6 @@ class EmailController extends Controller
 
             //=================
 
-
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
                 'thread_id' => $threadId,
@@ -335,8 +334,8 @@ class EmailController extends Controller
                 'cc' => $this->getRecipientsWithNames($validated['cc'] ?? [], 'cc'),
                 'bcc' => $this->getRecipientsWithNames($validated['bcc'] ?? [], 'bcc'),
                 'subject' => $validated['subject'],
-                'body_html' => null,
-                'body_text' => null,
+                'body_html' => request()->email_content,
+                'body_text' => request()->email_content,
                 'imap_folder' => 'Sent',
                 'type' => 'outgoing',
                 'folder' => 'sent',
