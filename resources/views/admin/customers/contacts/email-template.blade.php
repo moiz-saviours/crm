@@ -954,13 +954,28 @@
             max-width: 100%;
         }
 
-        .rich-email-editor {
-            min-height: 100px;
-            max-height: 400px;
-            overflow: auto;
-            border: none !important;
-            padding: 5px 10px;
-        }
+    .rich-email-editor {
+    min-height: 150px;
+    max-height: 300px;       /* ✅ limit height */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    outline: none;
+    text-align: left;
+    font-size: 14px;
+    overflow-y: auto;        /* ✅ add vertical scroll */
+    white-space: pre-wrap;   /* ✅ keep line breaks */
+    word-wrap: break-word;   /* ✅ wrap long words */
+}
+
+/* ✅ Placeholder for empty state */
+.rich-email-editor:empty:before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    pointer-events: none;
+    display: block;
+}
 
         .rich-email-editor.ql-container.ql-snow .ql-editor::before {
             padding: 0px 10px;
@@ -975,6 +990,26 @@
         .email-minimized .email-divider {
             display: none;
         }
+
+.show-quoted-btn {
+    background: #f0f0f0;       /* light highlight */
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 11px;           /* bigger size */
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    padding: 5px 15px;
+    margin-bottom: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.show-quoted-btn:hover {
+    background: #007bff;       /* blue highlight on hover */
+    color: #fff;
+    border-color: #007bff;
+}
+
 
 
     </style>
@@ -1084,7 +1119,7 @@
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles">From</p>
                             <p class="email-sender-name" style="min-width: 550px;">
-                                <select name="from_email" id="from_email" class="form-select form-control"
+                                <select name="from_email" class="form-select form-control from_email"
                                         style="width: auto; display: inline-block;border:none;">
                                     @foreach($pseudo_emails as $item)
                                         <option value="{{ $item['email'] }}"
@@ -1126,9 +1161,14 @@
                     </div>
 
                     <!-- Quoted history (non-editable) -->
-                    <div class="quoted-history"
-                        style="border-left:2px solid #ccc; margin-top:10px; padding-left:10px; font-size:13px; color:#555;">
-                    </div>
+<div class="quoted-history-wrapper" style="margin-top:10px;">
+    <button class="show-quoted-btn" type="button">...</button>
+    <div class="quoted-history" style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
+        <!-- quoted content goes here -->
+        Previous email reply or forwarded message content...
+    </div>
+</div>
+
 
                     <input type="hidden" name="email_content" id="emailContent">
 
@@ -1155,7 +1195,7 @@
 @push('script')
     <script>
         $(function () {
-            $("#from_email").on("change", function () {
+            $(".from_email").on("change", function () {
                 let selected = $(this).find(":selected");
 
                 $("#from_name").val(selected.data("name"));
@@ -1416,6 +1456,17 @@
                 });
             });
         });
+
+
+    </script>
+    <script>
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("show-quoted-btn")) {
+        let quoted = e.target.nextElementSibling;
+        quoted.style.display = quoted.style.display === "none" ? "block" : "none";
+        e.target.textContent = quoted.style.display === "block" ? "Hide quoted" : "...";
+    }
+});
 
 
     </script>
