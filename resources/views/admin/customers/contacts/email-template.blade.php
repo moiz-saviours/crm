@@ -56,7 +56,7 @@
 
         .email-child-wrapper {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             gap: 12px;
             background-color: #fff;
         }
