@@ -3,6 +3,7 @@
     .contentdisplaytwo {
         background-color: #fff !important;
         border: none !important;
+        padding: 0 20px;
     }
 
     .timeline-content {
@@ -129,7 +130,7 @@
             }
         }
 
-      
+
         //fetch emails
         function fetchEmails(append = false) {
             console.log("📩 Fetching emails page:", currentPage);
@@ -284,13 +285,15 @@
                                 ${email.subject || '(No Subject)'}
                                 <span class="user_cont">from ${email.from?.name || email.from?.email || 'Unknown'}</span>
                             </h2>
-                            <p class="user_cont mb-1">from: ${email.from?.email || 'Unknown'}</p>
-                            <p class="user_cont mb-0">to: ${formatRecipients(email.to)}</p>
-                            ${email.open_count > 0 && email.type === 'outgoing' && email.folder === 'sent' ? `
-                                <p class="mb-0 text-primary small">
-                                    Opens: ${email.open_count} | Clicks: ${email.click_count || 0}
-                                </p>
-                            ` : ''}
+                            <div class="user_toggle">
+                                <p class="user_cont mb-1">from: ${email.from?.email || 'Unknown'}</p>
+                                <p class="user_cont mb-0">to: ${formatRecipients(email.to)}</p>
+                                ${email.open_count > 0 && email.type === 'outgoing' && email.folder === 'sent' ? `
+                                    <p class="mb-0 text-primary small">
+                                        Opens: ${email.open_count} | Clicks: ${email.click_count || 0}
+                                    </p>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                     <p class="mb-0 small text-muted">${formatDate(email.date)}</p>
