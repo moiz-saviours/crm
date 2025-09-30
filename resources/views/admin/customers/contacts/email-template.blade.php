@@ -954,31 +954,28 @@
             max-width: 100%;
         }
 
-    .rich-email-editor {
-    min-height: 150px;
-    max-height: 300px;       /* ✅ limit height */
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #fff;
-    outline: none;
-    text-align: left;
-    font-size: 14px;
-    overflow-y: auto;        /* ✅ add vertical scroll */
-    white-space: pre-wrap;   /* ✅ keep line breaks */
-    word-wrap: break-word;   /* ✅ wrap long words */
-}
-
-/* ✅ Placeholder for empty state */
-.rich-email-editor:empty:before {
-    content: attr(data-placeholder);
-    color: #aaa;
-    pointer-events: none;
-    display: block;
-}
+        .rich-email-editor {
+            min-height: 100px;
+            max-height: 280px;
+            overflow: auto;
+            border: none;
+            padding: 5px 10px;
+        }
 
         .rich-email-editor.ql-container.ql-snow .ql-editor::before {
             padding: 0px 10px;
+        }
+
+        .ql-container.ql-snow {
+            border: none;
+        }
+        .ql-editor.ql-blank {
+            min-height: 100px;
+        }
+        .quoted-history-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            margin-left: 25px;
         }
 
         .email-minimized .email-template-body,
@@ -991,26 +988,18 @@
             display: none;
         }
 
-.show-quoted-btn {
-    background: #f0f0f0;       /* light highlight */
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    font-size: 11px;           /* bigger size */
-    font-weight: bold;
-    cursor: pointer;
-    color: #333;
-    padding: 5px 15px;
-    margin-bottom: 5px;
-    transition: all 0.2s ease-in-out;
-}
-
-.show-quoted-btn:hover {
-    background: #007bff;       /* blue highlight on hover */
-    color: #fff;
-    border-color: #007bff;
-}
-
-
+        .show-quoted-btn {
+            background: #f0f0f0; /* light highlight */
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 11px; /* bigger size */
+            font-weight: bold;
+            cursor: pointer;
+            color: #333;
+            padding: 5px 15px;
+            margin-bottom: 5px;
+            transition: all 0.2s ease-in-out;
+        }
 
     </style>
 @endpush
@@ -1152,34 +1141,33 @@
                         <input type="text" name="subject" id="emailSubject" value="{{ $subject ?? '' }}"/>
                     </div>
                     <div class="email-divider"></div>
-              <div class="main-content-email-box">
-                    <!-- Editable body -->
-                    <div class="rich-email-editor"
-                        contenteditable="true"
-                        data-placeholder="Write your message..."
-                        style="min-height: 150px; padding:10px; border:1px solid #ddd; border-radius:6px; background:#fff;">
+                    <div class="main-content-email-box">
+                        <!-- Editable body -->
+                        <div class="rich-email-editor"
+                             data-placeholder="Write your message...">
+                        </div>
+
+                        <!-- Quoted history (non-editable) -->
+                        <div class="quoted-history-wrapper d-none">
+                            <button class="show-quoted-btn btn btn-outline-primary" type="button">...</button>
+                            <div class="quoted-history"
+                                 style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
+                                <!-- quoted content goes here -->
+                                Previous email reply or forwarded message content...
+                            </div>
+                        </div>
+
+
+                        <input type="hidden" name="email_content" id="emailContent">
+
+                        <!-- inside .main-content-email-box, next to #emailContent -->
+                        <input type="hidden" name="email_content" id="emailContent">
+                        <input type="hidden" name="thread_id" id="thread_id">
+                        <input type="hidden" name="in_reply_to" id="in_reply_to">
+                        <input type="hidden" name="references" id="references">
+
+
                     </div>
-
-                    <!-- Quoted history (non-editable) -->
-<div class="quoted-history-wrapper" style="margin-top:10px;">
-    <button class="show-quoted-btn" type="button">...</button>
-    <div class="quoted-history" style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
-        <!-- quoted content goes here -->
-        Previous email reply or forwarded message content...
-    </div>
-</div>
-
-
-                    <input type="hidden" name="email_content" id="emailContent">
-
-                    <!-- inside .main-content-email-box, next to #emailContent -->
-<input type="hidden" name="email_content" id="emailContent">
-<input type="hidden" name="thread_id" id="thread_id">
-<input type="hidden" name="in_reply_to" id="in_reply_to">
-<input type="hidden" name="references" id="references">
-
-
-                </div>
 
                 </div>
 
@@ -1218,9 +1206,12 @@
         }
         document.addEventListener('DOMContentLoaded', () => {
             const suggestions = [
-                {value: "john@example.com", name: "John Doe"},
-                {value: "jane@example.com", name: "Jane Smith"},
-                {value: "support@company.com", name: "Support"}
+                    @foreach($pseudo_emails as $item)
+                {
+                    value: "{{ $item['email'] }}",
+                    name: "{{ $item['name'] }}",
+                }{{ !$loop->last ? ',' : '' }}
+                    @endforeach
             ];
 
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1285,62 +1276,62 @@
                 });
             }
 
-      document.getElementById('sendEmailBtn').addEventListener('click', function (e) {
-    e.preventDefault();
+            document.getElementById('sendEmailBtn').addEventListener('click', function (e) {
+                e.preventDefault();
 
-    const quill = window.quillInstances['editor_0'];
-    const emailContent = document.getElementById('emailContent');
+                const quill = window.quillInstances['editor_0'];
+                const emailContent = document.getElementById('emailContent');
 
-    if (quill) {
-        emailContent.value = quill.root.innerHTML;
-    }
-
-    const formData = new FormData();
-    formData.append('email_content', emailContent.value);
-    formData.append('subject', document.getElementById('emailSubject').value);
-
-    const fields = ['to','cc','bcc'].map(n => document.querySelector(`[name="${n}"]`));
-    const extract = f => f && f.value.trim() ? JSON.parse(f.value).map(i => i.value) : [];
-
-    fields.forEach((f,i) => extract(f).forEach(email =>
-        formData.append(`${['to','cc','bcc'][i]}[]`, email)
-    ));
-    console.log('thread_id: '+document.getElementById('thread_id').value);
-    console.log('in_reply_to: '+document.getElementById('in_reply_to').value);
-    console.log('references: '+document.getElementById('references').value);
-
-    formData.append('from', document.querySelector('[name="from_email"]').value);
-    formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
-    formData.append('thread_id', document.getElementById('thread_id').value || '');
-    formData.append('in_reply_to', document.getElementById('in_reply_to').value || '');
-    formData.append('references', document.getElementById('references').value || '');
-
-    AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
-        .then(response => {
-            if (response.success) {
-                toastr.success("Email sent successfully!");
-
-                // Reset subject
-                document.getElementById('emailSubject').value = "";
-
-                // Reset body
-                if (window.quillInstances && window.quillInstances['editor_0']) {
-                    window.quillInstances['editor_0'].root.innerHTML = "";
+                if (quill) {
+                    emailContent.value = quill.root.innerHTML;
                 }
 
-                // Reset cc/bcc
-                const ccField = document.querySelector('[name="cc"]');
-                const bccField = document.querySelector('[name="bcc"]');
-                if (ccField) ccField.value = "";
-                if (bccField) bccField.value = "";
+                const formData = new FormData();
+                formData.append('email_content', emailContent.value);
+                formData.append('subject', document.getElementById('emailSubject').value);
 
-                resetEmailTemplatePosition();
+                const fields = ['to', 'cc', 'bcc'].map(n => document.querySelector(`[name="${n}"]`));
+                const extract = f => f && f.value.trim() ? JSON.parse(f.value).map(i => i.value) : [];
 
-            } else {
-                toastr.error(response.message || "Failed to send email");
-            }
-        })
-                        .catch(error => {
+                fields.forEach((f, i) => extract(f).forEach(email =>
+                    formData.append(`${['to', 'cc', 'bcc'][i]}[]`, email)
+                ));
+                console.log('thread_id: ' + document.getElementById('thread_id').value);
+                console.log('in_reply_to: ' + document.getElementById('in_reply_to').value);
+                console.log('references: ' + document.getElementById('references').value);
+
+                formData.append('from', document.querySelector('[name="from_email"]').value);
+                formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
+                formData.append('thread_id', document.getElementById('thread_id').value || '');
+                formData.append('in_reply_to', document.getElementById('in_reply_to').value || '');
+                formData.append('references', document.getElementById('references').value || '');
+
+                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
+                    .then(response => {
+                        if (response.success) {
+                            toastr.success("Email sent successfully!");
+
+                            // Reset subject
+                            document.getElementById('emailSubject').value = "";
+
+                            // Reset body
+                            if (window.quillInstances && window.quillInstances['editor_0']) {
+                                window.quillInstances['editor_0'].root.innerHTML = "";
+                            }
+
+                            // Reset cc/bcc
+                            const ccField = document.querySelector('[name="cc"]');
+                            const bccField = document.querySelector('[name="bcc"]');
+                            if (ccField) ccField.value = "";
+                            if (bccField) bccField.value = "";
+
+                            resetEmailTemplatePosition();
+
+                        } else {
+                            toastr.error(response.message || "Failed to send email");
+                        }
+                    })
+                    .catch(error => {
                         console.error('Error:', error);
                         toastr.error("Something went wrong while sending email!");
                     });
@@ -1460,14 +1451,12 @@
 
     </script>
     <script>
-document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("show-quoted-btn")) {
-        let quoted = e.target.nextElementSibling;
-        quoted.style.display = quoted.style.display === "none" ? "block" : "none";
-        e.target.textContent = quoted.style.display === "block" ? "Hide quoted" : "...";
-    }
-});
-
-
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("show-quoted-btn")) {
+                let quoted = e.target.nextElementSibling;
+                quoted.style.display = quoted.style.display === "none" ? "block" : "none";
+                e.target.textContent = quoted.style.display === "block" ? "Hide quoted" : "...";
+            }
+        });
     </script>
 @endpush
