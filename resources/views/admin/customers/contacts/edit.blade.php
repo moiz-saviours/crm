@@ -341,7 +341,9 @@
                 display: flex;
                 gap: 8px;
                 cursor: pointer;
-                align-items: baseline
+                align-items: baseline;
+                user-select:none;
+                cursor: alias;
             }
 
             .comment-active_head {
