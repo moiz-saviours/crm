@@ -292,22 +292,26 @@ class LeadController extends Controller
 
         // Default device info
         $deviceInfo = [
-            'user_agent'   => $userAgent,
+            'user_agent' => $userAgent,
             'browser_name' => $this->getBrowserName($userAgent),
         ];
         $deviceInfo['visitor_id'] = $request->visitor_id ?? null;
 
         try {
-            $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/");
+            $userIp = $request->header('CF-Connecting-IP') ?? $request->ip();
+            if (in_array($userIp, ['127.0.0.1', '::1'])) {
+                $userIp = '116.0.40.78';
+            }
+            $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
             if ($ipapiRes->successful()) {
                 $location = $ipapiRes->json();
 
                 $deviceInfo = array_merge($deviceInfo, [
-                    'ip'       => $location['query'] ?? null,
-                    'city'     => $location['city'] ?? null,
-                    'state'    => $location['regionName'] ?? null,
-                    'zipcode'  => $location['zip'] ?? null,
-                    'country'  => $location['country'] ?? null,
+                    'ip' => $location['query'] ?? null,
+                    'city' => $location['city'] ?? null,
+                    'state' => $location['regionName'] ?? null,
+                    'zipcode' => $location['zip'] ?? null,
+                    'country' => $location['country'] ?? null,
                     'latitude' => $location['lat'] ?? null,
                     'longitude'=> $location['lon'] ?? null,
                 ]);
@@ -322,6 +326,9 @@ class LeadController extends Controller
                     if ($revGeo->successful()) {
                         $revData = $revGeo->json();
                         $deviceInfo['address'] = $revData['display_name'] ?? null;
+                        if (empty($deviceInfo['zipcode']) && isset($revData['address']['postcode'])) {
+                            $deviceInfo['zipcode'] = $revData['address']['postcode'];
+                        }
                     }
                 }
             }
@@ -373,6 +380,7 @@ class LeadController extends Controller
                 'zipcode' => $deviceInfo['zipcode'] ?? "",
                 'country' => $deviceInfo['country'] ?? "",
                 'address' => $deviceInfo['address'] ?? "",
+                'visitor_id' => $deviceInfo['visitor_id'] ?? "",
             ]);
 
             return response()->json([
@@ -407,4 +415,52 @@ class LeadController extends Controller
         }
         return 'Unknown';
     }
+
+    public function convertToCustomer(Request $request, $id)
+    {
+        try {
+            $lead = Lead::findOrFail($id);
+
+            $deviceInfo = json_decode($lead->device_info, true);
+
+            $customer_contact = new CustomerContact([
+                'brand_key' => $lead->brand_key,
+                'team_key' => null,
+                'name' => $lead->name,
+                'email' => $lead->email,
+                'phone' => $lead->phone,
+                'address' => $lead->address,
+                'city' => $lead->city,
+                'state' => $lead->state,
+                'country' => $lead->country,
+                'zipcode' => $lead->zipcode,
+                'ip_address' => $deviceInfo['ip'] ?? null,
+            ]);
+
+            $customer_contact->save();
+            $lead_status = LeadStatus::where('name', 'Converted')->first();
+            $lead_data = [
+                'cus_contact_key' => $customer_contact->special_key,
+            ];
+            if ($lead_status && $lead_status->id) {
+                $lead_data['lead_status_id'] = $lead_status->id;
+            }
+
+            $lead->update($lead_data);
+
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Lead converted to Customer successfully!',
+                'data' => $customer_contact
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 }
