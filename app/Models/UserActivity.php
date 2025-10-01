@@ -19,4 +19,9 @@ class UserActivity extends Model
         'latitude',
         'longitude',
     ];
+
+    public function lead()
+    {
+        return $this->belongsTo(Lead::class, 'visitor_id', 'visitor_id');
+    }
 }
