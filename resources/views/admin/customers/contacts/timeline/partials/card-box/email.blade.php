@@ -38,6 +38,7 @@
     </div>
 
     {{-- ================= Expanded Content ================= --}}
+    <div>
     <div class="contentdisplaytwo {{ $email['uuid'] }}" style="display: none;">
         <div class="new-profile-parent-wrapper">
             <div class="new-profile-email-wrapper">
@@ -128,5 +129,6 @@
                 </div>
             </div>
         @endif
+    </div>
     </div>
 </div>
