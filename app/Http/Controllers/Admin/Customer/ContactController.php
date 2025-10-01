@@ -132,7 +132,7 @@ class ContactController extends Controller
         if (!$customer_contact->id) {
             return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
         }
-        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
+        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes','lead.activities');
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $countries = config('countries');
         $brands = Brand::pluck('name', 'url');
@@ -190,6 +190,18 @@ class ContactController extends Controller
                 'date' => $note->created_at,
                 'data' => $note,
             ];
+        }
+        if ($customer_contact->lead && $customer_contact->lead->activities) {
+            foreach ($customer_contact->lead->activities as $activity) {
+                $decoded = json_decode($activity->event_data);
+                $activity->data = $decoded;
+
+                $timeline[] = [
+                    'type' => 'activity',
+                    'date' => $activity->created_at,
+                    'data' => $activity,
+                ];
+            }
         }
         // Sort newest first
         usort($timeline, function ($a, $b) {
