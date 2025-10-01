@@ -2416,5 +2416,23 @@
                     setActiveTab(folder);
                 });
             </script>
+
+            <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Toggle activity minimize/maximize
+        document.querySelectorAll(".toggle-activity").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const target = document.querySelector(this.dataset.target);
+                if (target.style.display == "none") {
+                    target.style.display = "block";
+                    this.textContent = "Minimize";
+                } else {
+                    target.style.display = "none";
+                    this.textContent = "Maximize";
+                }
+            });
+        });
+    });
+</script>
     @endpush
 @endsection
