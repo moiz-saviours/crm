@@ -72,7 +72,7 @@
                 </div>
                 <p class="date-by-order"> May 2021</p>
                 <div class="recent-activities">
-                    <div id="email-section">
+                    <div class="card-box">
                         @include('admin.customers.contacts.timeline.partials.activity')
                     </div>
                 </div>

@@ -2116,26 +2116,6 @@
                 });
             });
 
-            $(document).ready(function () {
-                // Individual toggle
-                $(".toggle-btnss").click(function () {
-                    let container = $(this).closest(".email-box-container");
-                    container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
-                });
-
-                // Collapse All
-                $(document).on("click", ".dropdown-item:contains('Collapse All')", function (e) {
-                    e.preventDefault();
-                    $(".contentdisplay, .contentdisplaytwo").hide();
-                });
-
-                // Expand All
-                $(document).on("click", ".dropdown-item:contains('Expand All')", function (e) {
-                    e.preventDefault();
-                    $(".contentdisplay, .contentdisplaytwo").show();
-                });
-            });
-
             // EMAIL TEMPLATE OPEN AND CLOSE
             $(document).ready(function () {
                 const emailTemplate = $('#emailTemplate');
@@ -2257,5 +2237,202 @@
                 }
             </script>
 
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const emailSection = document.getElementById('email-content');
+                    const emailLoader = document.getElementById('email-loader');
+                    const refreshButton = document.getElementById('refresh-emails');
+                    const fetchButton = document.getElementById('fetch-emails');
+                    const showMoreContainer = document.getElementById('show-more-container');
+                    const showMoreBtn = document.getElementById('show-more-btn');
+                    const customerEmail = "{{ $customer_contact->email }}";
+                    let folder = 'all';
+                    let currentPage = {{ $page }};
+                    const limit = 100;
+
+                    // jQuery event delegation for .toggle-btnss
+                    $('.card-box').on('click', '.toggle-btnss', function() {
+                        let container = $(this).closest(".email-box-container");
+                        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
+
+                        // Update caret icon
+                        const caret = $(this).find('.fa-caret-right, .fa-caret-down');
+                        if (caret.hasClass('fa-caret-right')) {
+                            caret.removeClass('fa-caret-right').addClass('fa-caret-down');
+                        } else {
+                            caret.removeClass('fa-caret-down').addClass('fa-caret-right');
+                        }
+                    });
+
+            
+
+                    // Collapse All
+                    $(document).on("click", ".dropdown-item:contains('Collapse All')", function(e) {
+                        e.preventDefault();
+                        $(".contentdisplay, .contentdisplaytwo").hide();
+                    });
+
+                    // Expand All
+                    $(document).on("click", ".dropdown-item:contains('Expand All')", function(e) {
+                        e.preventDefault();
+                        $(".contentdisplay, .contentdisplaytwo").show();
+                    });
+
+                    // Show More click handler
+                    showMoreBtn.addEventListener("click", function() {
+                        currentPage++;
+                        fetchEmails(true); // append
+                    });
+
+                    // Visibility toggle
+                    function toggleShowMoreVisibility(data) {
+                        if (!data.emails || data.emails.length < data.limit) {
+                            showMoreContainer.style.display = "none";
+                        } else {
+                            showMoreContainer.style.display = "block";
+                        }
+                    }
+
+                    // Render Emails function to use server-rendered HTML
+                    function renderEmails(emails) {
+                        if (!emails || emails.length === 0) {
+                            return '<p class="text-muted">No emails found.</p>';
+                        }
+                        return emails.join(''); // Join the array of HTML strings
+                    }
+
+                    // Fetch Emails function
+                    function fetchEmails(append = false) {
+                        console.log("📩 Fetching emails page:", currentPage);
+
+                        emailLoader.style.display = 'block';
+
+                        fetch("{{ route('admin.customer.contact.emails.fetch') }}" +
+                                "?customer_email=" + encodeURIComponent(customerEmail) +
+                                "&folder=" + encodeURIComponent(folder) +
+                                "&page=" + currentPage +
+                                "&limit=" + limit, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                            .then(response => response.json())
+                            .then(data => {
+                                emailLoader.style.display = 'none';
+
+                                if (data.error) {
+                                    emailSection.insertAdjacentHTML('beforeend',
+                                        `<p class="text-danger">${data.error}</p>`);
+                                    return;
+                                }
+
+                                if (!data.emails || data.emails.length === 0) {
+                                    if (currentPage === 1) {
+                                        emailSection.innerHTML = '<p class="text-muted">No emails found.</p>';
+                                    }
+                                    showMoreContainer.style.display = 'none';
+                                    return;
+                                }
+
+                                const html = renderEmails(data.emails);
+                                if (append) {
+                                    emailSection.insertAdjacentHTML('beforeend', html);
+                                } else {
+                                    emailSection.innerHTML = html;
+                                }
+
+                                // Control Show More visibility
+                                toggleShowMoreVisibility(data);
+                            })
+                            .catch(error => {
+                                emailLoader.style.display = 'none';
+                                console.error("❌ Error fetching emails:", error);
+                                emailSection.insertAdjacentHTML('beforeend',
+                                    '<p class="text-danger">Failed to fetch emails.</p>');
+                            });
+                    }
+
+                    // Refresh button: reset to first page & reload
+                    refreshButton.addEventListener('click', function() {
+                        currentPage = 1;
+                        fetchEmails(false); // reload first page
+                    });
+
+                    // Fetch new emails
+                    fetchButton.addEventListener('click', function() {
+                        console.log("📩 Fetching NEW emails for:", customerEmail);
+                        emailLoader.style.display = 'block';
+
+                        fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
+                                "?customer_email=" + encodeURIComponent(customerEmail), {
+                                    method: 'GET',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    }
+                                })
+                            .then(response => response.json())
+                            .then(data => {
+                                emailLoader.style.display = 'none';
+                                if (data.error) {
+                                    toastr.error(data.error);
+                                    return;
+                                }
+                                if (Array.isArray(data.emails) && data.emails.length > 0) {
+                                    const html = renderEmails(data.emails);
+                                    emailSection.insertAdjacentHTML('afterbegin', html);
+                                } else {
+                                    toastr.info('No new emails found', 'Information');
+                                }
+
+                            })
+                            .catch(error => {
+                                emailLoader.style.display = 'none';
+                                    console.log('Please try again later.');
+                            });
+                    });
+
+                    // Tabs
+                    function setActiveTab(folder) {
+                        document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+                            tab.classList.remove('active');
+                            if (tab.getAttribute('data-folder') === folder) {
+                                tab.classList.add('active');
+                            }
+                        });
+                    }
+
+                    document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+                        tab.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            folder = this.getAttribute('data-folder');
+                            currentPage = 1;
+                            setActiveTab(folder);
+                            fetchEmails();
+                        });
+                    });
+
+                    setActiveTab(folder);
+                });
+            </script>
+
+            <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Toggle activity minimize/maximize
+        document.querySelectorAll(".toggle-activity").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const target = document.querySelector(this.dataset.target);
+                if (target.style.display == "none") {
+                    target.style.display = "block";
+                    this.textContent = "Minimize";
+                } else {
+                    target.style.display = "none";
+                    this.textContent = "Maximize";
+                }
+            });
+        });
+    });
+</script>
     @endpush
 @endsection
