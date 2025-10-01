@@ -156,6 +156,15 @@
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
                                                             data-id="{{ $lead->id }}" title="Delete"><i
                                                             class="fas fa-trash"></i></button>
+                                                    @if(isset($lead->leadStatus) && $lead->leadStatus->name != 'Converted')
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-success convertBtn"
+                                                                data-id="{{ $lead->id }}"
+                                                                data-url="{{ route('admin.lead.convert', $lead->id) }}"
+                                                                title="Convert to Customer">
+                                                            <i class="fas fa-user-check"></i>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -173,5 +182,40 @@
     <!-- Modal -->
     @push('script')
         @include('admin.leads.script')
+        <script>
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            });
+
+            $(document).on('click', '.convertBtn', function(e) {
+                e.preventDefault();
+
+                const $btn   = $(this).prop('disabled', true).addClass('disabled');
+                const leadId = $btn.data('id');
+                const url    = $btn.data('url');
+
+                if (!leadId || !url) return toastr.error('Invalid lead or url.');
+
+                $.post(url)
+                    .done(res => {
+                        if (res.success) {
+                            toastr.success(res.message || 'Converted successfully.');
+                            $(`#tr-${leadId} .convertBtn`).remove();
+                            $(`#tr-${leadId} td[data-field="leadStatus"]`).text('Converted');
+                        } else {
+                            toastr.error(res.message || 'Conversion failed.');
+                            $btn.prop('disabled', false).removeClass('disabled');
+                        }
+                    })
+                    .fail(xhr => {
+                        const msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'Something went wrong!';
+                        toastr.error(msg);
+                        $btn.prop('disabled', false).removeClass('disabled');
+                    });
+            });
+
+
+
+        </script>
     @endpush
 @endsection
