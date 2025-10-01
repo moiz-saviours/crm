@@ -27,7 +27,6 @@ class ContactController extends Controller
         $this->imapService = $imapService;
     }
 
-
     /**
      * Display a listing of the resource.
      */
@@ -97,21 +96,21 @@ class ContactController extends Controller
             'team_key.exists' => 'Please select a valid team.',
         ]);
         $customer_contact = new CustomerContact($request->only([
-            'brand_key',
-            'team_key',
-            'name',
-            'email',
-            'phone',
-            'address',
-            'city',
-            'state',
-            'country',
-            'zipcode',
-            'ip_address',
-            'creator_type',
-            'creator_id',
-            'status',
-        ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
+                'brand_key',
+                'team_key',
+                'name',
+                'email',
+                'phone',
+                'address',
+                'city',
+                'state',
+                'country',
+                'zipcode',
+                'ip_address',
+                'creator_type',
+                'creator_id',
+                'status',
+            ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
         $customer_contact->save();
         $customer_contact->loadMissing('team', 'brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Created Successfully!']);
@@ -128,105 +127,87 @@ class ContactController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    
-public function edit(Request $request, CustomerContact $customer_contact)
-{
-    if (!$customer_contact->id) {
-        return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
+    public function edit(Request $request, CustomerContact $customer_contact)
+    {
+        if (!$customer_contact->id) {
+            return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
+        }
+        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
+        $teams = Team::where('status', 1)->orderBy('name')->get();
+        $countries = config('countries');
+        $brands = Brand::pluck('name', 'url');
+        $resolveCompany = function ($email) use ($brands) {
+            $domain = substr(strrchr($email, "@"), 1);
+            $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
+            return $brand ?? $domain;
+        };
+        // pseudo emails
+        $auth_pseudo_emails = [];
+        if (auth()->user()->pseudo_email) {
+            $auth_pseudo_emails[] = [
+                'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+                'email' => auth()->user()->pseudo_email,
+                'company' => $resolveCompany(auth()->user()->pseudo_email),
+            ];
+        }
+        $userPseudoEmails = User::whereNotNull('pseudo_email')
+            ->get(['id', 'pseudo_name', 'pseudo_email'])
+            ->map(fn($user) => [
+                'name' => $user->pseudo_name ?? 'Unknown Sender',
+                'email' => $user->pseudo_email,
+                'company' => $resolveCompany($user->pseudo_email),
+            ]);
+        $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+            ->map(fn($pseudo) => [
+                'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+                'email' => $pseudo->pseudo_email,
+                'company' => $resolveCompany($pseudo->pseudo_email),
+            ]);
+        $pseudo_emails = collect($auth_pseudo_emails)
+            ->merge($userPseudoEmails)
+            ->merge($extraPseudoEmails)
+            ->unique('email')
+            ->values();
+        // Emails
+        $emailsResponse = app(\App\Http\Controllers\Admin\EmailController::class)
+            ->getEmails($customer_contact->email);
+        $emails = $emailsResponse['emails'] ?? [];
+        $page = (int)request()->get('page', 1);
+        $limit = 100;
+        $imapError = null;
+        // Build timeline dataset (emails + notes)
+        $timeline = [];
+        foreach ($emails as $email) {
+            $timeline[] = [
+                'type' => 'email',
+                'date' => $email['date'],
+                'data' => $email,
+            ];
+        }
+        foreach ($customer_contact->notes as $note) {
+            $timeline[] = [
+                'type' => 'note',
+                'date' => $note->created_at,
+                'data' => $note,
+            ];
+        }
+        // Sort newest first
+        usort($timeline, function ($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+        return view('admin.customers.contacts.edit', compact(
+            'customer_contact',
+            'brands',
+            'teams',
+            'pseudo_emails',
+            'countries',
+            'emails',
+            'page',
+            'limit',
+            'imapError',
+            'timeline'
+        ));
     }
-
-    $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
-
-    $teams = Team::where('status', 1)->orderBy('name')->get();
-    $countries = config('countries');
-    $brands = Brand::pluck('name', 'url');
-
-    $resolveCompany = function ($email) use ($brands) {
-        $domain = substr(strrchr($email, "@"), 1);
-        $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
-        return $brand ?? $domain;
-    };
-
-    // pseudo emails
-    $auth_pseudo_emails = [];
-    if (auth()->user()->pseudo_email) {
-        $auth_pseudo_emails[] = [
-            'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
-            'email' => auth()->user()->pseudo_email,
-            'company' => $resolveCompany(auth()->user()->pseudo_email),
-        ];
-    }
-
-    $userPseudoEmails = User::whereNotNull('pseudo_email')
-        ->get(['id', 'pseudo_name', 'pseudo_email'])
-        ->map(fn($user) => [
-            'name' => $user->pseudo_name ?? 'Unknown Sender',
-            'email' => $user->pseudo_email,
-            'company' => $resolveCompany($user->pseudo_email),
-        ]);
-
-    $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
-        ->map(fn($pseudo) => [
-            'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
-            'email' => $pseudo->pseudo_email,
-            'company' => $resolveCompany($pseudo->pseudo_email),
-        ]);
-
-    $pseudo_emails = collect($auth_pseudo_emails)
-        ->merge($userPseudoEmails)
-        ->merge($extraPseudoEmails)
-        ->unique('email')
-        ->values();
-
-    // Emails
-    $emailsResponse = app(\App\Http\Controllers\Admin\EmailController::class)
-        ->getEmails($customer_contact->email);
-
-    $emails = $emailsResponse['emails'] ?? [];
-    $page = (int) request()->get('page', 1);
-    $limit = 100;
-    $imapError = null;
-
-    // Build timeline dataset (emails + notes)
-    $timeline = [];
-
-    foreach ($emails as $email) {
-        $timeline[] = [
-            'type' => 'email',
-            'date' => $email['date'],
-            'data' => $email,
-        ];
-    }
-
-    foreach ($customer_contact->notes as $note) {
-        $timeline[] = [
-            'type' => 'note',
-            'date' => $note->created_at,
-            'data' => $note,
-        ];
-    }
-
-    // Sort newest first
-    usort($timeline, function ($a, $b) {
-        return strtotime($b['date']) - strtotime($a['date']);
-    });
-    return view('admin.customers.contacts.edit', compact(
-        'customer_contact',
-        'brands',
-        'teams',
-        'pseudo_emails',
-        'countries',
-        'emails',
-        'page',
-        'limit',
-        'imapError',
-        'timeline'
-    ));
-}
-
-
-
-
 
     /**
      * Update the specified resource in storage.
@@ -437,7 +418,8 @@ public function edit(Request $request, CustomerContact $customer_contact)
         string $fromName,
         array  $ccEmails,
         array  $bccEmails
-    ): void {
+    ): void
+    {
         Mail::send([], [], function (Message $message) use (
             $validated,
             $toEmails,

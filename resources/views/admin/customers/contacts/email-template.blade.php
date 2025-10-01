@@ -1306,7 +1306,7 @@
                 formData.append('in_reply_to', document.getElementById('in_reply_to').value || '');
                 formData.append('references', document.getElementById('references').value || '');
 
-                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
+                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response.success) {
                             toastr.success("Email sent successfully!");
@@ -1328,12 +1328,12 @@
                             resetEmailTemplatePosition();
 
                         } else {
-                            toastr.error(response.message || "Failed to send email");
+                            // toastr.error(response.message || "Failed to send email");
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        toastr.error("Something went wrong while sending email!");
+                        // toastr.error("Something went wrong while sending email!");
                     });
 
             });
