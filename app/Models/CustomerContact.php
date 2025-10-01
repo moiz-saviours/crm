@@ -112,6 +112,11 @@ class CustomerContact extends Model
         return $this->hasMany(CustomerNote::class, 'cus_contact_key', 'special_key');
     }
 
+    public function lead()
+    {
+        return $this->hasOne(Lead::class, 'cus_contact_key', 'special_key');
+    }
+
     /** Scope */
     public function scopeActive($query)
     {
