@@ -44,9 +44,9 @@
                                         : $item['data']['to'],
                                 )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}
                             </p>
+                            <span class="folder-dot" style="color: #28a745;">&bull;</span>
+                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
                         </div>
-                        <span class="folder-dot" style="color: #28a745;">&bull;</span>
-                        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
                         @if (
                             !empty($item['data']['open_count']) &&
                                 $item['data']['open_count'] > 0 &&
@@ -68,7 +68,6 @@
             <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
                 
 
-                {{-- ✅ Events Timeline Added Here --}}
                 @if (($item['data']['open_count'] ?? 0) > 0 && $item['data']['type'] == 'outgoing' && $item['data']['folder'] == 'sent')
                     <div class="activity-section mt-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -126,6 +125,8 @@
                                         : $item['data']['to'],
                                 )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}
                             </p>
+                                                        <span class="folder-dot" style="color: #28a745;">&bull;</span>
+                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
                         </div>
                     </div>
 
