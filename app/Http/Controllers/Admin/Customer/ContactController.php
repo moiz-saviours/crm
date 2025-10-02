@@ -201,18 +201,28 @@ class ContactController extends Controller
                 'data' => $note,
             ];
         }
+
         if ($customer_contact->lead && $customer_contact->lead->activities) {
             foreach ($customer_contact->lead->activities as $activity) {
                 $decoded = json_decode($activity->event_data);
                 $activity->data = $decoded;
 
-                $timeline[] = [
-                    'type' => 'activity',
-                    'date' => $activity->created_at,
-                    'data' => $activity,
-                ];
+                if ($activity->event_type === 'conversion') {
+                    $timeline[] = [
+                        'type' => 'conversion',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                } else {
+                    $timeline[] = [
+                        'type' => 'activity',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                }
             }
         }
+
         // Sort newest first
         usort($timeline, function ($a, $b) {
             return strtotime($b['date']) - strtotime($a['date']);
