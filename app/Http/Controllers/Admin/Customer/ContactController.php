@@ -183,16 +183,6 @@ class ContactController extends Controller
                 'date' => $email['date'],
                 'data' => $email,
             ];
-            // Add thread emails to the timeline
-            if (!empty($email['thread_emails'])) {
-                foreach ($email['thread_emails'] as $threadEmail) {
-                    $timeline[] = [
-                        'type' => 'email',
-                        'date' => $threadEmail['date'],
-                        'data' => $threadEmail,
-                    ];
-                }
-            }
         }
         foreach ($customer_contact->notes as $note) {
             $timeline[] = [
