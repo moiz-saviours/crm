@@ -257,6 +257,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::post('/send-email', [AdminEmailController::class, 'sendEmail'])->name('send.email');
                 Route::get('/emails/fetch', [AdminEmailController::class, 'fetch'])->name('emails.fetch');
                 Route::get('/emails/fetch-new', [AdminEmailController::class, 'fetchNewEmails'])->name('emails.fetch-new');
+                Route::get('/attachments/{id}/download', [AdminEmailController::class, 'download'])->name('attachments.download');
             });
         });
         /** Companies Routes */

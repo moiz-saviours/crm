@@ -22,12 +22,11 @@ class EmailAttachment extends Model
     protected $fillable = [
         'email_id',
         'original_name',
-        'storage_name',
         'mime_type',
         'size',
-        'storage_path',
         'content_id',
         'is_inline',
+        'base64_content',
     ];
     /**
      * Relationships

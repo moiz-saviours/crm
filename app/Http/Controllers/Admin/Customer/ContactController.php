@@ -96,21 +96,21 @@ class ContactController extends Controller
             'team_key.exists' => 'Please select a valid team.',
         ]);
         $customer_contact = new CustomerContact($request->only([
-                'brand_key',
-                'team_key',
-                'name',
-                'email',
-                'phone',
-                'address',
-                'city',
-                'state',
-                'country',
-                'zipcode',
-                'ip_address',
-                'creator_type',
-                'creator_id',
-                'status',
-            ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
+            'brand_key',
+            'team_key',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'state',
+            'country',
+            'zipcode',
+            'ip_address',
+            'creator_type',
+            'creator_id',
+            'status',
+        ]) + ['special_key' => CustomerContact::generateSpecialKey()]);
         $customer_contact->save();
         $customer_contact->loadMissing('team', 'brand', 'company');
         return response()->json(['data' => $customer_contact, 'success' => 'Contact Created Successfully!']);
@@ -132,7 +132,7 @@ class ContactController extends Controller
         if (!$customer_contact->id) {
             return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
         }
-        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes','lead.activities');
+        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes', 'lead.activities');
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $countries = config('countries');
         $brands = Brand::pluck('name', 'url');
@@ -183,6 +183,16 @@ class ContactController extends Controller
                 'date' => $email['date'],
                 'data' => $email,
             ];
+            // Add thread emails to the timeline
+            if (!empty($email['thread_emails'])) {
+                foreach ($email['thread_emails'] as $threadEmail) {
+                    $timeline[] = [
+                        'type' => 'email',
+                        'date' => $threadEmail['date'],
+                        'data' => $threadEmail,
+                    ];
+                }
+            }
         }
         foreach ($customer_contact->notes as $note) {
             $timeline[] = [
@@ -213,7 +223,6 @@ class ContactController extends Controller
             'teams',
             'pseudo_emails',
             'countries',
-            'emails',
             'page',
             'limit',
             'imapError',
@@ -430,8 +439,7 @@ class ContactController extends Controller
         string $fromName,
         array  $ccEmails,
         array  $bccEmails
-    ): void
-    {
+    ): void {
         Mail::send([], [], function (Message $message) use (
             $validated,
             $toEmails,

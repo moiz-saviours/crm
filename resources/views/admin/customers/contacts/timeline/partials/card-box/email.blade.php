@@ -1,134 +1,219 @@
-<div class="email-box-container mb-4 border rounded bg-white p-3" style="margin: 0; border-radius: 0;">
-    <div class="toggle-btnss" data-target=".content-{{ $email['uuid'] }}">
-        <div class="activ_head">
-            <div class="email-child-wrapper">
-                <i class="fa fa-caret-right" aria-hidden="true"></i>
-                <div>
-                    <h2>
-                        Email - {{ $email['subject'] ?? '(No Subject)' }}
-                        <span class="user_cont">
-                            from {{ $email['from']['name'] ?? $email['from']['email'] ?? 'Unknown' }}
-                        </span>
-                    </h2>
-                    <div class="user_toggle">
-                        <p class="user_cont">
-                            from: {{ $email['from']['email'] ?? 'Unknown' }}
-                        </p>
-                        <p class="user_cont">
-                            to:
-                            {{ collect(is_string($email['to']) ? json_decode($email['to'], true) ?? [$email['to']] : $email['to'])
-                                ->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)
-                                ->implode(', ') }}
-                        </p>
-                    </div>
-                    @if (!empty($email['open_count']) && $email['open_count'] > 0 && $email['type'] === 'outgoing' && $email['folder'] === 'sent')
-                        <p class="mb-0 text-primary small">
-                            Opens: {{ $email['open_count'] ?? 0 }} |
-                            Clicks: {{ $email['click_count'] ?? 0 }}
-                        </p>
-                    @endif
-                </div>
-            </div>
-            <p>
-                {{ !empty($email['date'])
-                    ? \Carbon\Carbon::parse($email['date'])->format('M d, Y h:i A')
-                    : 'Unknown Date' }}
-            </p>
-        </div>
-    </div>
+     <div class="email-box-container mb-4 border rounded bg-white p-3" style="margin: 0; border-radius: 0;">
+         <div class="toggle-btnss" data-target=".content-{{ $item['data']['uuid'] }}">
+             <div class="activ_head">
+                 <div class="email-child-wrapper">
+                     <i class="fa fa-caret-right" aria-hidden="true"></i>
+                     <div>
+                         <h2>
+                             Email - {{ $item['data']['subject'] ?? '(No Subject)' }}
+                             <span class="user_cont">from
+                                 {{ $item['data']['from']['name'] ?? ($item['data']['from']['email'] ?? 'Unknown') }}</span>
+                         </h2>
+                         <span class="folder-dot" style="color: #28a745;">&bull;</span>
+                         <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+                         <div class="user_toggle">
+                             <p class="user_cont">from: {{ $item['data']['from']['email'] ?? 'Unknown' }}</p>
+                             <p class="user_cont">
+                                 to:
+                                 {{ collect(
+                                     is_string($item['data']['to'])
+                                         ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                                         : $item['data']['to'],
+                                 )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}
+                             </p>
+                         </div>
+                         @if (
+                             !empty($item['data']['open_count']) &&
+                                 $item['data']['open_count'] > 0 &&
+                                 $item['data']['type'] === 'outgoing' &&
+                                 $item['data']['folder'] === 'sent')
+                             <p class="mb-0 text-primary small">
+                                 Opens: {{ $item['data']['open_count'] ?? 0 }} |
+                                 Clicks: {{ $item['data']['click_count'] ?? 0 }}
+                             </p>
+                         @endif
+                     </div>
+                 </div>
+                 <p>{{ !empty($item['data']['date']) ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
+                 </p>
+             </div>
+         </div>
 
-    {{-- ================= Expanded Content ================= --}}
-    <div>
-    <div class="contentdisplaytwo {{ $email['uuid'] }}" style="display: none;">
-        <div class="new-profile-parent-wrapper">
-            <div class="new-profile-email-wrapper">
-                <div class="user_profile_img">
-                    <div class="avatarr">
-                        {{ $email['from']['name']
-                            ? strtoupper(substr($email['from']['name'], 0, 2))
-                            : strtoupper(substr($email['from']['email'], 0, 2)) }}
-                    </div>
-                </div>
-                <div class="user_profile_text">
-                    <p>{{ $email['from']['name'] ?? ($email['from']['email'] ?? 'Unknown') }}</p>
-                    <p style="font-weight: 500">
-                        to:
-                        {{ collect(is_string($email['to']) ? json_decode($email['to'], true) ?? [$email['to']] : $email['to'])
-                            ->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)
-                            ->implode(', ') }}
-                    </p>
-                </div>
-            </div>
+         <div>
+             <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
+                 <div class="new-profile-parent-wrapper">
+                     <div class="new-profile-email-wrapper">
+                         <div class="user_profile_img">
+                             <div class="avatarr">
+                                 {{ $item['data']['from']['name'] ? strtoupper(substr($item['data']['from']['name'], 0, 2)) : strtoupper(substr($item['data']['from']['email'], 0, 2)) }}
+                             </div>
+                         </div>
+                         <div class="user_profile_text">
+                             <p>{{ $item['data']['from']['name'] ?? ($item['data']['from']['email'] ?? 'Unknown') }}
+                             </p>
+                             <p style="font-weight: 500">
+                                 to:
+                                 {{ collect(
+                                     is_string($item['data']['to'])
+                                         ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                                         : $item['data']['to'],
+                                 )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}
+                             </p>
+                         </div>
+                     </div>
 
-            <div class="new-profile-email-wrapper">
-                <div class="activities-seprater reply-btn"
-                     data-from="{{ $email['from']['email'] ?? '' }}"
-                     data-subject="{{ $email['subject'] ?? '' }}"
-                     data-date="{{ $email['date']->format('M d, Y H:i') ?? '' }}"
-                     data-body='@json($email['body']['html'] ?? $email['body']['text'])'
-                     data-thread-id="{{ $email['thread_id'] ?? '' }}"
-                     data-in-reply-to="{{ $email['message_id'] ?? '' }}"
-                     data-references='@json($email['references'] ?? null)'>
-                    Reply
-                </div>
-                <div class="activities-seprater open-form-btn">Forward</div>
-                <div class="activities-seprater open-form-btn">Delete</div>
-            </div>
-        </div>
-    </div>
+                     <div class="new-profile-email-wrapper">
+                         <div class="activities-seprater reply-btn"
+                             data-from="{{ $item['data']['from']['email'] ?? '' }}"
+                             data-subject="{{ $item['data']['subject'] ?? '' }}"
+                             data-date="{{ $item['data']['date']->format('M d, Y H:i') ?? '' }}"
+                             data-body='@json($item['data']['body']['html'] ?? $item['data']['body']['text'])'
+                             data-thread-id="{{ $item['data']['thread_id'] ?? '' }}"
+                             data-in-reply-to="{{ $item['data']['message_id'] ?? '' }}"
+                             data-references='@json($item['data']['references'] ?? null)'>
+                             Reply
+                         </div>
+                         <div class="activities-seprater open-form-btn">Forward</div>
+                         <div class="activities-seprater open-form-btn">Delete</div>
+                     </div>
+                 </div>
+             </div>
+         </div>
 
-    {{-- ================= Preview (Hidden Short Body) ================= --}}
-    <div class="user-cont-hide">
-        <div class="user_cont user-cont-hide">
-            @php
-                $htmlContent = $email['body']['html'] ?? '';
-                $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
-                $previewContent = $isHtmlEmpty
-                    ? ($email['body']['text'] ?? 'No body content available.')
-                    : strip_tags($htmlContent);
-                $previewContent = Str::limit($previewContent, 100, '...');
-            @endphp
-            {{-- <p>{!! nl2br(e($previewContent)) !!}</p> --}}
-        </div>
-    </div>
+         <div class="user-cont-hide">
+             <div class="user_cont user-cont-hide">
+                 @php
+                     $htmlContent = $item['data']['body']['html'] ?? '';
+                     $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
+                     $previewContent = $isHtmlEmpty
+                         ? $item['data']['body']['text'] ?? 'No body content available.'
+                         : strip_tags($htmlContent);
+                     $previewContent = Str::limit($previewContent, 100, '...');
+                 @endphp
+                 {{-- <p>{!! nl2br(e($previewContent)) !!}</p> --}}
+             </div>
+         </div>
 
-    {{-- ================= Full Body ================= --}}
-    <div class="contentdisplaytwo {{ $email['uuid'] }}" style="display: none;">
-        <div class="user_cont user-email-template">
-            {!! $isHtmlEmpty
-                ? nl2br($email['body']['text'] ?? 'No body content available.')
-                : $htmlContent !!}
-        </div>
+         <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
+             <div class="user_cont user-email-template">
+                 {!! $isHtmlEmpty ? nl2br($item['data']['body']['text'] ?? 'No body content available.') : $htmlContent !!}
+             </div>
 
-        @if (!empty($email['attachments']))
-            <div class="attachments-section mb-4">
-                <h6>
-                    <i class="fa fa-paperclip"></i> Attachments ({{ count($email['attachments']) }})
-                </h6>
-                <div class="attachments-list">
-                    @foreach ($email['attachments'] as $attachment)
-                        <div class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
-                            <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-medium">{{ $attachment['filename'] ?? 'Unknown File' }}</div>
-                                <div class="text-muted small">
-                                    Type: {{ strtoupper($attachment['type'] ?? 'unknown') }}
-                                    @if (!empty($attachment['size']))
-                                        | Size: {{ number_format($attachment['size'] / 1024, 1) }} KB
-                                    @endif
-                                </div>
-                            </div>
-                            <div>
-                                <a href="{{ $attachment['download_url'] ?? '#' }}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-    </div>
-    </div>
-</div>
+             @if (!empty($item['data']['attachments']))
+                 <div class="attachments-section mb-4">
+                     <h6><i class="fa fa-paperclip"></i> Attachments ({{ count($item['data']['attachments']) }})
+                     </h6>
+                     <div class="attachments-list">
+
+                         @foreach ($item['data']['attachments'] as $attachment)
+                             <div class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
+                                 <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i></div>
+                                 <div class="flex-grow-1">
+                                     <div class="fw-medium">{{ $attachment['original_name'] ?? 'Unknown File' }}
+                                     </div>
+                                     <div class="text-muted small">
+                                         Type: {{ strtoupper($attachment['mime_type'] ?? 'unknown') }}
+                                         @if (!empty($attachment['size']))
+                                             | Size: {{ number_format($attachment['size'] / 1024, 1) }} KB
+                                         @endif
+                                     </div>
+                                 </div>
+                                 <div>
+                                     <a href="{{ route('admin.customer.contact.attachments.download', $attachment['id']) }}"
+                                         class="btn btn-sm btn-outline-primary">
+                                         <i class="fa fa-download"></i> Download
+                                     </a>
+                                 </div>
+                             </div>
+                         @endforeach
+                     </div>
+                 </div>
+             @endif
+
+             <div class="comment-active_head">
+                 <div>
+                     <div>
+                         <div class="email-child-wrapper">
+                             <span class="activities-addition-links toggle-thread-btn"
+                                 data-target="thread-{{ $item['data']['uuid'] }}">
+                                 View Thread ({{ count($item['data']['thread_emails'] ?? []) }})
+                             </span>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+             <div class="thread-emails" id="thread-{{ $item['data']['uuid'] }}" style="display: none;">
+                 @if (!empty($item['data']['thread_emails']))
+                     @foreach ($item['data']['thread_emails'] as $threadItem)
+                         <div class="thread-email-item border-top pt-3 mt-3">
+                             <div class="new-profile-email-wrapper">
+                                 <div class="user_profile_img">
+                                     <div class="avatarr">
+                                         {{ $threadItem['from']['name'] ? strtoupper(substr($threadItem['from']['name'], 0, 2)) : strtoupper(substr($threadItem['from']['email'], 0, 2)) }}
+                                     </div>
+                                 </div>
+                                 <div class="user_profile_text">
+                                     <p>{{ $threadItem['from']['name'] ?? ($threadItem['from']['email'] ?? 'Unknown') }}
+                                     </p>
+                                     <p style="font-weight: 500">
+                                         to:
+                                         {{ collect(
+                                             is_string($threadItem['to']) ? json_decode($threadItem['to'], true) ?? [$threadItem['to']] : $threadItem['to'],
+                                         )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}
+                                     </p>
+                                     <p class="text-muted small">
+                                         {{ !empty($threadItem['date']) ? \Carbon\Carbon::parse($threadItem['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
+                                     </p>
+                                 </div>
+                             </div>
+                             <div class="user_cont user-email-template">
+                                 @php
+                                     $threadHtmlContent = $threadItem['body']['html'] ?? '';
+                                     $threadIsHtmlEmpty = empty(trim(strip_tags($threadHtmlContent)));
+                                 @endphp
+                                 {!! $threadIsHtmlEmpty ? nl2br($threadItem['body']['text'] ?? 'No body content available.') : $threadHtmlContent !!}
+                             </div>
+                             @if (!empty($threadItem['attachments']))
+                                 <div class="attachments-section mb-4">
+                                     <h6><i class="fa fa-paperclip"></i> Attachments
+                                         ({{ count($threadItem['attachments']) }})
+                                     </h6>
+                                     <div class="attachments-list">
+                                         @foreach ($threadItem['attachments'] as $attachment)
+                                             <div
+                                                 class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
+                                                 <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i>
+                                                 </div>
+                                                 <div class="flex-grow-1">
+                                                     <div class="fw-medium">
+                                                         {{ $attachment['filename'] ?? 'Unknown File' }}</div>
+                                                     <div class="text-muted small">
+                                                         Type:
+                                                         {{ strtoupper($attachment['type'] ?? 'unknown') }}
+                                                         @if (!empty($attachment['size']))
+                                                             | Size:
+                                                             {{ number_format($attachment['size'] / 1024, 1) }}
+                                                             KB
+                                                         @endif
+                                                     </div>
+                                                 </div>
+                                                 <div>
+                                                     <a href="{{ $attachment['download_url'] ?? '#' }}"
+                                                         class="btn btn-sm btn-outline-primary">
+                                                         <i class="fa fa-download"></i> Download
+                                                     </a>
+                                                 </div>
+                                             </div>
+                                         @endforeach
+                                     </div>
+                                 </div>
+                             @endif
+                         </div>
+                     @endforeach
+                 @else
+                     <p class="text-muted">No thread emails available.</p>
+                 @endif
+             </div>
+         </div>
+
+     </div>

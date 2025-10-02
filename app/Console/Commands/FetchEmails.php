@@ -401,86 +401,89 @@ class FetchEmails extends Command
         return $body;
     }
 
-    private function processAttachments(int $emailNumber, $structure, Email $email)
-    {
-        if (!isset($structure->parts)) {
-            $this->line("No attachments found for email #{$emailNumber}");
-            return 0;
+private function processAttachments(int $emailNumber, $structure, Email $email)
+{
+    if (!isset($structure->parts)) {
+        $this->line("No attachments found for email #{$emailNumber}");
+        return 0;
+    }
+
+    $attachmentCount = 0;
+
+    foreach ($structure->parts as $i => $part) {
+        if ($part->type == 0) continue; // skip plain text/html body
+
+        $filename = $this->getAttachmentFilename($part);
+        if (!$filename) {
+            $this->line("No filename found for part " . ($i + 1));
+            continue;
         }
 
-        $attachmentCount = 0;
-
-        foreach ($structure->parts as $i => $part) {
-            if ($part->type == 0) continue;
-
-            $filename = $this->getAttachmentFilename($part);
-            if (!$filename) {
-                $this->line("No filename found for part " . ($i + 1));
+        $this->line("Processing attachment: {$filename}");
+        try {
+            $content = @imap_fetchbody($this->imapConnection, $emailNumber, $i + 1);
+            if (!$content) {
+                $this->warn("Failed to fetch attachment content: {$filename}");
                 continue;
             }
 
-            $this->line("Processing attachment: {$filename}");
-            try {
-                $content = @imap_fetchbody($this->imapConnection, $emailNumber, $i + 1);
-                if (!$content) {
-                    $this->warn("Failed to fetch attachment content: {$filename}");
-                    continue;
-                }
-
-                if ($part->encoding == 3) {
-                    $this->line("Decoding base64 attachment: {$filename}");
-                    $content = imap_base64($content);
-                }
-                if ($part->encoding == 4) {
-                    $this->line("Decoding quoted-printable attachment: {$filename}");
-                    $content = imap_qprint($content);
-                }
-
-                $mimeType = $this->getAttachmentMimeType($part, $filename);
-
-                $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
-                $storagePath = "attachments/{$email->id}/" . uniqid() . "_{$filename}";
-
-                $this->line("Saving attachment to: {$storagePath}");
-                if (Storage::put($storagePath, $content)) {
-                    EmailAttachment::create([
-                        'email_id' => $email->id,
-                        'original_name' => $filename,
-                        'storage_name' => basename($storagePath),
-                        'size' => strlen($content),
-                        'storage_path' => $storagePath,
-                        'mime_type' => $mimeType,
-                    ]);
-
-                    $attachmentCount++;
-                    $this->comment("Attachment saved: {$filename} (size: " . strlen($content) . " bytes, MIME type: {$mimeType})");
-                    Log::debug("Attachment processed", [
-                        'email_id' => $email->id,
-                        'filename' => $filename,
-                        'size' => strlen($content),
-                        'mime_type' => $mimeType
-                    ]);
-                }
-            } catch (\Exception $e) {
-                $this->error("Attachment processing failed for {$filename}: {$e->getMessage()}");
-                Log::warning("Attachment processing failed", [
-                    'email_id' => $email->id,
-                    'filename' => $filename,
-                    'error' => $e->getMessage()
-                ]);
+            // Decode based on encoding
+            if ($part->encoding == 3) {
+                $this->line("Decoding base64 attachment: {$filename}");
+                $content = imap_base64($content);
             }
-        }
+            if ($part->encoding == 4) {
+                $this->line("Decoding quoted-printable attachment: {$filename}");
+                $content = imap_qprint($content);
+            }
 
-        if ($attachmentCount > 0) {
-            Log::info("Attachments processed", [
-                'email_id' => $email->id,
-                'attachment_count' => $attachmentCount
+            $mimeType = $this->getAttachmentMimeType($part, $filename);
+
+            // Normalize filename
+            $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+
+            // Encode content as base64 for DB storage
+            $base64Content = base64_encode($content);
+
+            EmailAttachment::create([
+                'email_id'       => $email->id,
+                'original_name'  => $filename,
+                'mime_type'      => $mimeType,
+                'size'           => strlen($content),
+                'base64_content' => $base64Content,
+                'is_inline'      => false, // adjust if you handle inline separately
             ]);
-            $this->comment("Processed {$attachmentCount} attachments for email #{$emailNumber}");
-        }
 
-        return $attachmentCount;
+            $attachmentCount++;
+            $this->comment("Attachment saved to DB: {$filename} (size: " . strlen($content) . " bytes, MIME type: {$mimeType})");
+            Log::debug("Attachment processed", [
+                'email_id' => $email->id,
+                'filename' => $filename,
+                'size'     => strlen($content),
+                'mime_type'=> $mimeType
+            ]);
+
+        } catch (\Exception $e) {
+            $this->error("Attachment processing failed for {$filename}: {$e->getMessage()}");
+            Log::warning("Attachment processing failed", [
+                'email_id' => $email->id,
+                'filename' => $filename,
+                'error'    => $e->getMessage()
+            ]);
+        }
     }
+
+    if ($attachmentCount > 0) {
+        Log::info("Attachments processed", [
+            'email_id'          => $email->id,
+            'attachment_count'  => $attachmentCount
+        ]);
+        $this->comment("Processed {$attachmentCount} attachments for email #{$emailNumber}");
+    }
+
+    return $attachmentCount;
+}
+
 
     private function getAttachmentFilename($part)
     {

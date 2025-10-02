@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
 use App\Mail\OutgoingEmail;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Response;
 class EmailController extends Controller
 {
     public function getEmails($customerEmail, $folder = "all", $page = 1, $limit = 100)
@@ -104,12 +104,69 @@ class EmailController extends Controller
 
         $emails = $query->orderBy('message_date', 'desc')
             ->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'storage_path');
+                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
             }])
             ->skip($offset)
             ->take($limit)
             ->get()
-            ->map(function ($email) {
+            
+            ->map(function ($email) use ($query) {
+        // Fetch thread emails (excluding the current email)
+        $threadEmails = $query->where('thread_id', $email->thread_id)
+            ->where('id', '!=', $email->id)
+            ->with(['attachments' => function ($q) {
+                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
+            }])
+            ->get()
+            ->map(function ($threadEmail) {
+                return [
+                    'uuid' => 'email-' . $threadEmail->id,
+                    'thread_id' => $threadEmail->thread_id ?? [],
+                    'message_id' => $threadEmail->message_id ?? '',
+                    'references' => $threadEmail->references ?? [],
+                    'from' => [
+                        'name' => $threadEmail->from_name,
+                        'email' => $threadEmail->from_email,
+                    ],
+                    'to' => $threadEmail->to ?? [],
+                    'cc' => $threadEmail->cc ?? [],
+                    'bcc' => $threadEmail->bcc ?? [],
+                    'subject' => $threadEmail->subject,
+                    'folder' => $threadEmail->folder,
+                    'type' => $threadEmail->type,
+                    'date' => $threadEmail->message_date,
+                    'body' => [
+                        'html' => $threadEmail->body_html,
+                        'text' => $threadEmail->body_text,
+                    ],
+                    'attachments' => $threadEmail->attachments->map(function ($attachment) {
+                        return [
+                            'filename' => $attachment->original_name,
+                            'type' => $attachment->mime_type,
+                            'size' => $attachment->size,
+                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                        ];
+                    })->toArray(),
+                    'open_count' => $threadEmail->events->where('event_type', 'open')->count(),
+                    'click_count' => $threadEmail->events->where('event_type', 'click')->count(),
+                    'bounce_count' => $threadEmail->events->where('event_type', 'bounce')->count(),
+                    'spam_count' => $threadEmail->events->where('event_type', 'spam')->count(),
+                    'events' => $threadEmail->events->map(function ($event) {
+                        $icons = [
+                            'open' => 'fa-envelope-open',
+                            'click' => 'fa-mouse-pointer',
+                            'bounce' => 'fa-exclamation-triangle',
+                            'spam' => 'fa-ban',
+                        ];
+                        return [
+                            'id' => $event->id,
+                            'event_type' => $event->event_type,
+                            'created_at' => $event->created_at,
+                            'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
+                        ];
+                    })->values()->toArray(),
+                ];
+            })->toArray();
                 return [
                     'uuid' => 'email-' . $email->id,
                     'thread_id' => $email->thread_id ?? [],
@@ -134,12 +191,18 @@ class EmailController extends Controller
                     ],
                     'attachments' => $email->attachments->map(function ($attachment) {
                         return [
+                            'id' => $attachment->id,
                             'filename' => $attachment->original_name,
-                            'type' => $attachment->mime_type,
-                            'size' => $attachment->size,
-                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                            'type'     => $attachment->mime_type,
+                            'size'     => $attachment->size,
+                            'data'     => $attachment->base64_content 
+                                            ? 'data:' . $attachment->mime_type . ';base64,' . $attachment->base64_content 
+                                            : null,
                         ];
                     })->toArray(),
+
+
+                    'thread_emails' => $threadEmails, // Add thread emails
                     'open_count' => $email->events->where('event_type', 'open')->count(),
                     'click_count' => $email->events->where('event_type', 'click')->count(),
                     'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
@@ -162,6 +225,7 @@ class EmailController extends Controller
             })
             ->values()
             ->toArray();
+            
         return [
             'emails' => $emails,
             'page'   => $page,
@@ -388,32 +452,36 @@ public function fetch(Request $request)
                 'sent_at' => null, // Set after successful send
             ]);
 
-            // Store attachments
-            $storedAttachments = [];
-            if ($request->hasFile('attachments')) {
-                $attachmentsDir = 'attachments/outgoing/' . uniqid();
-                foreach ($request->file('attachments') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $storageName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
-                    $storagePath = $file->storeAs($attachmentsDir, $storageName, 'public');
-                    $storedAttachments[] = [
-                        'original_name' => $originalName,
-                        'storage_name' => $storageName,
-                        'storage_path' => $storagePath,
-                        'size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
-                    ];
-                    // Store attachment record
-                    EmailAttachment::create([
-                        'email_id' => $email->id,
-                        'original_name' => $originalName,
-                        'storage_name' => $storageName,
-                        'storage_path' => $storagePath,
-                        'size' => $file->getSize(),
-                        'mime_type' => $file->getMimeType(),
-                    ]);
-                }
-            }
+      // Store attachments as base64
+$storedAttachments = [];
+
+if ($request->hasFile('attachments')) {
+    foreach ($request->file('attachments') as $file) {
+        $originalName = $file->getClientOriginalName();
+        $mimeType     = $file->getMimeType();
+        $size         = $file->getSize();
+
+        // Read file content and encode as base64
+        $base64Data = base64_encode(file_get_contents($file->getRealPath()));
+
+        $storedAttachments[] = [
+            'original_name' => $originalName,
+            'size'          => $size,
+            'mime_type'     => $mimeType,
+            'base64'        => $base64Data,
+        ];
+
+        // Store attachment record in DB
+        EmailAttachment::create([
+            'email_id'      => $email->id,
+            'original_name' => $originalName,
+            'mime_type'     => $mimeType,
+            'size'          => $size,
+            'base64_data'   => $base64Data,  // 👈 needs `base64_data` column (LONGTEXT recommended)
+        ]);
+    }
+}
+
 
             // Wrap URLs for tracking
             $content = $this->wrapUrlsForTracking($emailContent, $email->id);
@@ -585,5 +653,17 @@ public function fetch(Request $request)
     private function getSenderName($sender, string $defaultEmail): string
     {
         return $sender->pseudo_name ?? explode('@', $defaultEmail)[0];
+    }
+
+        public function download($id)
+    {
+        $attachment = EmailAttachment::findOrFail($id);
+
+        $decoded = base64_decode($attachment->base64_data);
+
+        return Response::make($decoded, 200, [
+            'Content-Type'        => $attachment->mime_type,
+            'Content-Disposition' => 'attachment; filename="' . $attachment->original_name . '"',
+        ]);
     }
 }

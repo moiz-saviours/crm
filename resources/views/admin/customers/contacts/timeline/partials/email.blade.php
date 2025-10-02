@@ -79,27 +79,41 @@
             </div>
 
             <!-- Email Content -->
+
             <div class="card-box">
-                @if (empty($emails) || count($emails) == 0)
-                    <p class="text-muted">No emails found.</p>
+                @php
+                    $emails = collect($timeline)->where('type', 'email');
+                @endphp
+
+                @if ($emails->isEmpty())
+                    <div class="text-center py-4">
+                        <i class="fa fa-envelope-open text-muted" style="font-size: 32px;"></i>
+                        <p class="mt-2 text-muted">No emails available yet.</p>
+                        <small class="text-secondary">
+                            Once you send or receive emails, they’ll appear here.
+                        </small>
+                    </div>
                 @else
+                    {{-- Static header --}}
                     @include('admin.customers.contacts.timeline.static-content.email')
 
-                    @foreach ($emails as $email)
-                        @include('admin.customers.contacts.timeline.partials.card-box.email')
+                    {{-- Render emails with same `$item` structure --}}
+                    @foreach ($timeline as $item)
+                        @if ($item['type'] === 'email')
+                            @include('admin.customers.contacts.timeline.partials.card-box.email')
+                        @endif
                     @endforeach
+
+                    {{-- Show More Button --}}
+                    <div id="show-more-container" class="text-center mt-3">
+                        <button id="show-more-btn" class="btn btn-outline-primary btn-sm">
+                            Show More
+                        </button>
+                    </div>
                 @endif
             </div>
 
-            <!-- Show More Button -->
-            <div id="show-more-container" class="text-center mt-3">
-                <button id="show-more-btn" class="btn btn-outline-primary btn-sm">
-                    Show More
-                </button>
-            </div>
+
         </div>
     </div>
 </div>
-
-
-

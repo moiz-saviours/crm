@@ -2279,10 +2279,12 @@
                     });
 
                     // Show More click handler
-                    showMoreBtn.addEventListener("click", function() {
-                        currentPage++;
-                        fetchEmails(true); // append
-                    });
+                    if (showMoreBtn) {
+                        showMoreBtn.addEventListener("click", function () {
+                            currentPage++;
+                            fetchEmails(true); // append
+                        });
+                    }
 
                     // Visibility toggle
                     function toggleShowMoreVisibility(data) {
@@ -2429,6 +2431,23 @@
                 } else {
                     target.style.display = "none";
                     this.textContent = "Maximize";
+                }
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.toggle-thread-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const threadContainer = document.getElementById(targetId);
+                if (threadContainer) {
+                    threadContainer.style.display = threadContainer.style.display === 'none' ?
+                        'block' : 'none';
+                    this.textContent = threadContainer.style.display === 'none' ?
+                        `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
+                        `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
                 }
             });
         });
