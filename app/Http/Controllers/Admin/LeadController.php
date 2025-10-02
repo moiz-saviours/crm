@@ -8,6 +8,7 @@ use App\Models\CustomerContact;
 use App\Models\Lead;
 use App\Models\LeadStatus;
 use App\Models\Team;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -298,10 +299,11 @@ class LeadController extends Controller
         $deviceInfo['visitor_id'] = $request->visitor_id ?? null;
 
         try {
-            $userIp = $request->header('CF-Connecting-IP') ?? $request->ip();
-            if (in_array($userIp, ['127.0.0.1', '::1'])) {
-                $userIp = '116.0.40.78';
-            }
+            $userIp = $request->input('device_info.public_ip')
+                ?? $request->header('CF-Connecting-IP')
+                ?? $request->ip();
+
+
             $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
             if ($ipapiRes->successful()) {
                 $location = $ipapiRes->json();
@@ -446,8 +448,18 @@ class LeadController extends Controller
                 $lead_data['lead_status_id'] = $lead_status->id;
             }
 
-            $lead->update($lead_data);
+            UserActivity::create([
+                'event_type'  => 'conversion',
+                'visitor_id' => $lead->visitor_id,
+                'event_data'  => json_encode([
+                    'message'        => "Lead converted to customer",
+                    'customer_name'  => $customer_contact->name,
+                    'customer_email' => $customer_contact->email,
+                    'converted_by'   => auth()->user()->name ?? 'System',
+                ]),
+            ]);
 
+            $lead->update($lead_data);
 
             return response()->json([
                 'success' => true,
