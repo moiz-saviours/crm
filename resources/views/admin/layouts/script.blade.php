@@ -52,6 +52,12 @@
 {{--<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>--}}
 <!-- End Jquery UI -->
 
+{{--Sortable Js--}}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+{{--Flat Date Picker--}}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {

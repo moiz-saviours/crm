@@ -372,6 +372,10 @@
                                 <a href="{{route('admin.customer.company.index')}}"
                                    class="nav-link {{ request()->is("admin/customer/{company,companies}*") ? 'active' : '' }}">Company</a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{route('admin.customer.contact.inbox')}}"
+                                   class="nav-link {{ request()->is("admin/customer/contact/inbox*") ? 'active' : '' }}">Inbox</a>
+                            </li>
 
                         </ul>
                         <!-- END : Ui Elements submenu list -->
