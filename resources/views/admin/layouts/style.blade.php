@@ -17,6 +17,9 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
+{{--Flat Date Picker--}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
 <style type="text/css">
