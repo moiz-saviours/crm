@@ -30,9 +30,9 @@ class InvoicePolicy
             if ($invoice->status == 3) return Response::denyWithStatus(400, 'This invoice has a chargeback and cannot be modified.');
             if ($invoice->creator_type == 'App\Models\Admin') return Response::deny("You don't have permission to perform this action.");
             // Check if user is the agent (matching ID + type)
-            if ($invoice->agent && $invoice->agent->is($user)) return Response::allow();
+            if ($invoice->agent && $invoice->agent_id && $invoice->agent_type && $invoice->agent->is($user)) return Response::allow();
             // Check if user is the creator (matching ID + type)
-            if ($invoice->creator && $invoice->creator->is($user)) return Response::allow();
+            if ($invoice->creator && $invoice->creator_id && $invoice->creator_type && $invoice->creator->is($user)) return Response::allow();
             // Check if user is the team lead
             if ($invoice->team_key && Team::where('team_key', $invoice->team_key)->where('lead_id', $user->id)->exists()) return Response::allow();
             return Response::deny("You don't have permission to perform this action.");
@@ -52,9 +52,9 @@ class InvoicePolicy
     {
         if (!$invoice->id) return Response::denyWithStatus(404, 'Oops! Invoice not found.');
         // Check if user is the agent (matching ID + type)
-        if ($invoice->agent && $invoice->agent->is($user)) return Response::allow();
+        if ($invoice->agent && $invoice->agent_id && $invoice->agent_type &&  $invoice->agent->is($user)) return Response::allow();
         // Check if user is the creator (matching ID + type)
-        if ($invoice->creator && $invoice->creator->is($user)) return Response::allow();
+        if ($invoice->creator && $invoice->creator_id && $invoice->creator_type && $invoice->creator->is($user)) return Response::allow();
         // Check if user is the team lead
         if ($invoice->team_key && Team::where('team_key', $invoice->team_key)->where('lead_id', $user->id)->exists()) return Response::allow();
         return Response::deny("You don't have permission to perform this action.");
