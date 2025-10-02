@@ -35,13 +35,24 @@
     }
 
     const visitor_id = getVisitorId();
+    let publicIp = null;
+
+    fetch("https://api.ipify.org?format=json")
+        .then(res => res.json())
+        .then(data => {
+            publicIp = data.ip;
+        })
+        .catch(() => {
+            publicIp = null;
+        });
 
     function sendActivity(sync = false) {
         const endpoint = `${apiBaseUrl}/track-activity`;
         const data = JSON.stringify({
             visitor_id,
             event_type: "page_view",
-            event_data: activityData
+            event_data: activityData,
+            public_ip: publicIp
         });
 
         if (sync && navigator.sendBeacon) {
