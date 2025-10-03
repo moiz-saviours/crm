@@ -80,7 +80,7 @@
                                 Minimize
                             </button>
                         </div>
-                        <div id="timeline-{{ $item['data']['uuid'] }}" class="timeline">
+                        <div id="timeline-{{ $item['data']['uuid'] }}" class="timeline" style="display: none;">
                             @forelse ($item['data']['events'] ?? [] as $event)
                                 <div class="timeline-item">
                                     <div class="timeline-dot"></div>
