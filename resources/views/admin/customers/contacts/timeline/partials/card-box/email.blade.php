@@ -68,7 +68,8 @@
             <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
                 
 
-                @if (($item['data']['open_count'] ?? 0) > 0 && $item['data']['type'] == 'outgoing' && $item['data']['folder'] == 'sent')
+               @if (($item['data']['type'] ?? '') === 'outgoing' && ($item['data']['folder'] ?? '') === 'sent' && (($item['data']['open_count'] ?? 0) > 0 || ($item['data']['click_count'] ?? 0) > 0 ))
+
                     <div class="activity-section mt-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h6 class="fw-semibold text-dark mb-0">
@@ -79,13 +80,13 @@
                                 Minimize
                             </button>
                         </div>
-                        <div id="timeline-{{ $item['data']['uuid'] }}" class="timeline">
+                        <div id="timeline-{{ $item['data']['uuid'] }}" class="timeline" style="display: none;">
                             @forelse ($item['data']['events'] ?? [] as $event)
                                 <div class="timeline-item">
                                     <div class="timeline-dot"></div>
                                     <div class="timeline-content">
                                         <p class="mb-0 small">
-                                            <i class="fa {{ $event['icon'] }}"></i>
+                                            {{-- <i class="fa {{ $event['icon'] }}"></i> --}}
                                             {{ ucfirst($event['event_type']) }}
                                         </p>
                                         <small class="text-muted">

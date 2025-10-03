@@ -248,13 +248,18 @@ public function fetch(Request $request)
 
         $data = $this->getEmails($customerEmail, $folder, $page, $limit);
         
-        // Render Blade partial for each email
-        $htmlEmails = array_map(function ($email) {
-            return view('admin.customers.contacts.timeline.partials.card-box.email', ['email' => $email])->render();
-        }, $data['emails']);
+        
 
+        $htmlEmails = collect($data['emails'])->map(function ($email) {
+            // Each $email is already normalized from getEmails()
+            return view('admin.customers.contacts.timeline.partials.card-box.email', [
+                'item' => ['data' => $email],
+            ])->render();
+        })->implode(''); // join into one HTML string
+        
         return response()->json([
-            'emails' => $htmlEmails, // Array of rendered HTML strings
+            'emails' => $htmlEmails, 
+            'html'   => $htmlEmails,
             'page' => $data['page'],
             'limit' => $data['limit'],
             'count' => $data['count'],
@@ -267,51 +272,75 @@ public function fetch(Request $request)
     }
 }
 
-    public function fetchNewEmails(Request $request)
-    {
-        try {
-            $customerEmail = $request->query('customer_email');
-            if (!$customerEmail) {
-                return response()->json(['error' => 'Customer email is required'], 400);
-            }
-            $user = Auth::guard('admin')->user();
-            $pseudoEmails = UserPseudoRecord::where('morph_id', $user->id)
-                ->where('morph_type', get_class($user))
-                ->where('imap_type', 'imap')
-                ->pluck('pseudo_email')
-                ->toArray();
-            if (empty($pseudoEmails)) {
-                return response()->json(['error' => 'No IMAP accounts found for the current user'], 400);
-            }
-            $command = ['emails:fetch', '--address=' . $customerEmail];
-            foreach ($pseudoEmails as $email) {
-                $command[] = '--account=' . $email;
-            }
-            $exitCode = Artisan::call(implode(' ', $command));
-            if ($exitCode !== 1) {
-                Log::error('Failed to run emails:fetch command', [
-                    'customer_email' => $customerEmail,
-                    'pseudo_emails' => $pseudoEmails,
-                    'exit_code' => $exitCode,
-                    'file' => __FILE__,
-                    'line' => __LINE__,
-                    'error' => isset($e) ? $e->getMessage() : null,
-                ]);
-                return response()->json(['error' => 'Failed to fetch new emails'], 500);
-            }
-            return response()->json(['success' => true, 'message' => 'New emails fetched successfully']);
-        } catch (\Exception $e) {
-            Log::error('Error fetching new emails', [
-                'customer_email' => $customerEmail,
-                'error' => $e->getMessage(),
-            ]);
+public function fetchNewEmails(Request $request)
+{
+    try {
+        $customerEmail = $request->query('customer_email');
+        if (!$customerEmail) {
+            Log::warning('Customer email missing for fetchNewEmails');
+
             return response()->json([
-                'error' => 'Failed to fetch new emails. Please try again later.',
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-            ], 500);
+                'status' => 'warning',
+                'message' => 'No customer email provided. Please try again.'
+            ], 200);
         }
+
+        $user = Auth::guard('admin')->user();
+        $pseudoEmails = UserPseudoRecord::where('morph_id', $user->id)
+            ->where('morph_type', get_class($user))
+            ->where('imap_type', 'imap')
+            ->pluck('pseudo_email')
+            ->toArray();
+
+        if (empty($pseudoEmails)) {
+            Log::warning('No pseudo emails found for user', ['user_id' => $user->id]);
+
+            return response()->json([
+                'status' => 'warning',
+                'message' => 'No accounts found for this user. Please check settings.'
+            ], 200);
+        }
+
+        $command = ['emails:fetch', '--address=' . $customerEmail];
+        foreach ($pseudoEmails as $email) {
+            $command[] = '--account=' . $email;
+        }
+
+        $exitCode = Artisan::call(implode(' ', $command));
+
+        if ($exitCode !== 0) {
+            Log::error('Failed to run emails:fetch command', [
+                'customer_email' => $customerEmail,
+                'pseudo_emails'  => $pseudoEmails,
+                'exit_code'      => $exitCode,
+            ]);
+
+            return response()->json([
+                'status' => 'warning',
+                'message' => 'Unable to fetch new emails at the moment. Please try again later.'
+            ], status: 200);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'New emails fetched successfully.'
+        ], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Error fetching new emails', [
+            'customer_email' => $request->query('customer_email'),
+            'error'          => $e->getMessage(),
+            'line'           => $e->getLine(),
+        ]);
+
+        return response()->json([
+            'status' => 'warning',
+            'message' => 'Something went wrong while fetching emails. Please try again later.'
+        ], 200);
     }
+}
+
+
 
     public function sendEmail(Request $request): JsonResponse
     {
@@ -644,21 +673,46 @@ if ($request->hasFile('attachments')) {
         if (!$emailId) {
             return $content;
         }
-        $doc = new DOMDocument();
-        @$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $pattern = '/(https?:\/\/[^\s<]+)/i';
+        $content = preg_replace_callback($pattern, function ($matches) {
+            $url = $matches[1];
+            return "<a href=\"{$url}\">{$url}</a>";
+        }, $content);
+
+        // Load HTML safely
+        $doc = new \DOMDocument();
+        @$doc->loadHTML(
+            mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'),
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+
+        // Process links
         $links = $doc->getElementsByTagName('a');
         foreach ($links as $link) {
             if ($link->hasAttribute('href')) {
                 $originalUrl = $link->getAttribute('href');
+
                 if (!preg_match('/^https?:\/\//i', $originalUrl)) {
                     continue;
                 }
-                $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . urlencode($originalUrl);
+
+                if (strpos($originalUrl, route('emails.track.click', ['id' => $emailId])) === 0) {
+                    continue;
+                }
+
+                $encoded = urlencode(base64_encode($originalUrl));
+                $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . $encoded;
+
                 $link->setAttribute('href', $trackingUrl);
+                $link->setAttribute('target', '_blank');
+                $link->setAttribute('rel', 'noopener noreferrer');
             }
         }
-        return $doc->saveHTML();
+
+        return $doc->saveHTML() ?: $content;
     }
+
 
     private function parseEmailListForStorage(array $emails): ?array
     {

@@ -10,16 +10,12 @@ class EmailTrackingController extends Controller
 {
 public function trackClick($id, Request $request)
 {
-    Log::info('trackClick Hit');
-    Log::info("➡ Entering trackClick()", [
-        'email_id' => $id,
-        'ip'       => $request->ip(),
-    ]);
 
-    $url = $request->query('url');
+    $encodedUrl = $request->query('url');
+    $url = $encodedUrl ? base64_decode($encodedUrl) : null;
 
     EmailEvent::create([
-        'email_id'   => $id,
+        'email_id'   => (int) $id,
         'event_type' => 'click',
         'ip_address' => $request->ip(),
         'user_agent' => $request->userAgent(),
@@ -27,12 +23,9 @@ public function trackClick($id, Request $request)
         'created_at' => now(),
     ]);
 
-    Log::info("trackClick(): Recorded", [
-        'email_id' => $id,
-        'url'      => $url,
-    ]);
-
-    return redirect()->away(urldecode($url));
+    return $url
+        ? redirect()->away($url)
+        : abort(404, 'Invalid URL');
 }
 public function trackOpen($id, Request $request)
 {

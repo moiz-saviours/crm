@@ -129,7 +129,7 @@
 
             <!-- Email Content -->
 
-            <div class="card-box">
+            <div class="card-box" id="email-content-section">
                 @php
                     $emails = collect($timeline)->where('type', 'email');
                 @endphp
