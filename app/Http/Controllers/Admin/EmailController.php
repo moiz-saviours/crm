@@ -644,21 +644,45 @@ if ($request->hasFile('attachments')) {
         if (!$emailId) {
             return $content;
         }
-        $doc = new DOMDocument();
-        @$doc->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        $pattern = '/(https?:\/\/[^\s<]+)/i';
+        $content = preg_replace_callback($pattern, function ($matches) {
+            $url = $matches[1];
+            return "<a href=\"{$url}\">{$url}</a>";
+        }, $content);
+
+        // Load HTML safely
+        $doc = new \DOMDocument();
+        @$doc->loadHTML(
+            mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'),
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+
+        // Process links
         $links = $doc->getElementsByTagName('a');
         foreach ($links as $link) {
             if ($link->hasAttribute('href')) {
                 $originalUrl = $link->getAttribute('href');
+
                 if (!preg_match('/^https?:\/\//i', $originalUrl)) {
                     continue;
                 }
-                $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . urlencode($originalUrl);
+
+                if (strpos($originalUrl, route('emails.track.click', ['id' => $emailId])) === 0) {
+                    continue;
+                }
+
+                $encoded = urlencode(base64_encode($originalUrl));
+                $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . $encoded;
+
                 $link->setAttribute('href', $trackingUrl);
+                $link->setAttribute('target', '_blank');
+                $link->setAttribute('rel', 'noopener noreferrer');
             }
         }
-        return $doc->saveHTML();
+
     }
+
 
     private function parseEmailListForStorage(array $emails): ?array
     {
