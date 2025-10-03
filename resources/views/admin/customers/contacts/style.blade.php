@@ -385,4 +385,30 @@
         max-height: 100px;
     }
 
+    .form-infromation p {
+        margin: 3px;
+    }
+    .main-heading {
+        color: var(--bs-primary);
+        font-weight: 500;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 17px;
+    }
+    .name-title {
+        color: var(--nf-mainnav-bg);
+        font-weight: 500;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .name-content {
+        margin-bottom: 19px;
+    }
+    .form-infromation .name-content {
+        margin-bottom: 8px;
+    }
+    .form-infromation .main-heading {
+        margin-bottom: 8px;
+    }
+
 </style>

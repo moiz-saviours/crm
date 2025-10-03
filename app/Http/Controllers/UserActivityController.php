@@ -74,7 +74,8 @@ class UserActivityController extends Controller
     public function store(Request $request)
     {
         try {
-            $response = Http::timeout(5)->get("http://ip-api.com/json/");
+            $userIp = $request->input('public_ip') ?? $request->ip();
+            $response = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
             if ($response->ok()) {
                 $geo = $response->json();
             }

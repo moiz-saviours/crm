@@ -35,7 +35,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     forms.forEach(form => {
         const visitor_id = getVisitorId();
-        form.addEventListener("submit", function () {
+        async function getPublicIP() {
+            try {
+                const res = await fetch("https://api.ipify.org?format=json");
+                const data = await res.json();
+                return data.ip;
+            } catch (e) {
+                console.error("Unable to fetch public IP", e);
+                return null;
+            }
+        }
+        form.addEventListener("submit", async function () {
             const formData = {};
             const fields = form.querySelectorAll("label, input, textarea, select");
 
@@ -63,6 +73,10 @@ document.addEventListener("DOMContentLoaded", function () {
             };
 
 
+            const publicIP = await getPublicIP();
+            if (publicIP) {
+                deviceInfo.public_ip = publicIP;
+            }
 
 
             fetch(`${apiBaseUrl}/brand-leads`, {
