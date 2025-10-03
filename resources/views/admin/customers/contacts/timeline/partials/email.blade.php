@@ -31,7 +31,7 @@
     .timeline-dot {
      position: absolute;
     left: -27px;
-    top: 10px;
+    top: 0px;
     width: 12px;
     height: 12px;
     background-color: #506E91;

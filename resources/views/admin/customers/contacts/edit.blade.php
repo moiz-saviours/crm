@@ -2216,6 +2216,54 @@
                     $('#emailTemplate').addClass('open');
                 });
 
+                $(document).on('click', '.forward-btn', function () {
+                    let fromEmail = `{{$customer_contact->email}}`;
+                    let subject = $(this).data('subject');
+                    let date = $(this).data('date');
+                    let body = $(this).data('body');
+                    let originalMessageId = $(this).data('message-id');
+
+                    try {
+                        if (typeof body === "string" && body.trim().startsWith('"')) {
+                            body = JSON.parse(body);
+                        }
+                    } catch (e) {
+                        console.warn('Failed to parse body:', e);
+                    }
+
+                    // Clear To field (user will specify new recipients)
+                    $('#toFieldInput').val('');
+
+                    // Prepend "Fwd:" to subject if not already present
+                    $('#emailSubject').val(subject.startsWith("Fwd:") ? subject : "Fwd: " + subject);
+
+                    // Format forwarded content in quoted history
+                    $('.quoted-history').html(`
+                        <p><b>---------- Forwarded message ----------</b></p>
+                        <p><b>From:</b> ${fromEmail}<br>
+                        <b>Sent:</b> ${date}<br>
+                        <b>Subject:</b> ${subject}</p>
+                        ${body}
+                    `);
+
+                    // Set email content with new body and quoted history
+                    let newContent = $('#emailBody').val() || ''; // Assuming #emailBody is the textarea for new content
+                    $('#emailBody').val(newContent + $('.quoted-history').html());
+
+                    // Store metadata for forwarding
+                    $('#is_forward').val('true');
+                    $('#forward_id').val(originalMessageId || '');
+
+                    // Clear reply-specific fields (not needed for forward)
+                    $('#thread_id').val('');
+                    $('#in_reply_to').val('');
+                    $('#references').val('');
+
+                    // Show quoted history and open email template
+                    toggleQuotedHistory(true);
+                    $('#emailTemplate').addClass('open');
+                });
+
                 $(document).on('click', '.open-email-form', () => {
                     $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
                     toggleQuotedHistory(false);
@@ -2250,19 +2298,32 @@
                     let currentPage = {{ $page }};
                     const limit = 100;
 
-                    // jQuery event delegation for .toggle-btnss
-                    $('.card-box').on('click', '.toggle-btnss', function() {
-                        let container = $(this).closest(".email-box-container");
-                        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
+           // jQuery event delegation for .toggle-btnss
+    $('.card-box').on('click', '.toggle-btnss', function () {
+        let container = $(this).closest(".email-box-container");
 
-                        // Update caret icon
-                        const caret = $(this).find('.fa-caret-right, .fa-caret-down');
-                        if (caret.hasClass('fa-caret-right')) {
-                            caret.removeClass('fa-caret-right').addClass('fa-caret-down');
-                        } else {
-                            caret.removeClass('fa-caret-down').addClass('fa-caret-right');
-                        }
-                    });
+        // Toggle content areas
+        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
+
+        // Also minimize activity section if exists
+        container.find(".activity-section .timeline").slideToggle(200);
+        container.find(".activity-section .toggle-activity").each(function () {
+            // Update button text
+            let isVisible = $(this).closest(".activity-section").find(".timeline").is(":visible");
+            $(this).text(isVisible ? "Minimize" : "Maximize");
+        });
+
+        // Update caret icon
+        const caret = $(this).find('.fa-caret-right, .fa-caret-down');
+        caret.toggleClass('fa-caret-right fa-caret-down');
+    });
+
+    // Separate activity toggle (if clicked directly)
+    $('.card-box').on('click', '.toggle-activity', function () {
+        const target = $(this).data('target');
+        $(target).slideToggle(200);
+        $(this).text($(target).is(":visible") ? "Minimize" : "Maximize");
+    });
 
             
 
@@ -2419,39 +2480,23 @@
                 });
             </script>
 
+         
             <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Toggle activity minimize/maximize
-        document.querySelectorAll(".toggle-activity").forEach(btn => {
-            btn.addEventListener("click", function() {
-                const target = document.querySelector(this.dataset.target);
-                if (target.style.display == "none") {
-                    target.style.display = "block";
-                    this.textContent = "Minimize";
-                } else {
-                    target.style.display = "none";
-                    this.textContent = "Maximize";
-                }
-            });
-        });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.toggle-thread-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const threadContainer = document.getElementById(targetId);
-                if (threadContainer) {
-                    threadContainer.style.display = threadContainer.style.display === 'none' ?
-                        'block' : 'none';
-                    this.textContent = threadContainer.style.display === 'none' ?
-                        `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
-                        `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
-                }
-            });
-        });
-    });
-</script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.toggle-thread-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const targetId = this.getAttribute('data-target');
+                            const threadContainer = document.getElementById(targetId);
+                            if (threadContainer) {
+                                threadContainer.style.display = threadContainer.style.display === 'none' ?
+                                    'block' : 'none';
+                                this.textContent = threadContainer.style.display === 'none' ?
+                                    `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
+                                    `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
+                            }
+                        });
+                    });
+                });
+            </script>
     @endpush
 @endsection

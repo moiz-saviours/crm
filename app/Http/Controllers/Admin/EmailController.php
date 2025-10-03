@@ -429,6 +429,47 @@ public function fetch(Request $request)
                     ]);
                 }
             }
+            // Handle forward
+            $forwardIdRequest = $request->input('forward_id');
+            if (!empty($forwardIdRequest)) {
+                $originalEmail = Email::where('message_id', $forwardIdRequest)->first();
+                if ($originalEmail) {
+                    // Get the original email's body (prefer HTML if available, fallback to text)
+                    $originalBody = $originalEmail->body_html ?: $originalEmail->body_text;
+                    $originalFrom = $originalEmail->from_name ?: $originalEmail->from_email;
+                    $originalDate = $originalEmail->message_date->format('D, M d, Y \a\t H:i:s');
+
+                    // Format the original email as a quoted forward
+                    $quotedBody = "<br><br><div style='border-left: 2px solid #ccc; padding-left: 10px;'>";
+                    $quotedBody .= "<p>----- Forwarded Message -----<br>";
+                    $quotedBody .= "From: {$originalFrom}<br>";
+                    $quotedBody .= "Sent: {$originalDate}<br>";
+                    $quotedBody .= "To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "<br>";
+                    $quotedBody .= "Subject: {$originalEmail->subject}</p>";
+                    $quotedBody .= $originalBody;
+                    $quotedBody .= "</div>";
+
+                    // Concatenate new content with quoted original content
+                    $emailContent = $emailContent . $quotedBody;
+
+                    // Text version for AltBody
+                    $textQuotedBody = "\n\n----- Forwarded Message -----\n";
+                    $textQuotedBody .= "> From: {$originalFrom}\n> Sent: {$originalDate}\n> To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "\n> Subject: {$originalEmail->subject}\n\n";
+                    $textQuotedBody .= strip_tags($originalBody);
+                    $textContent = strip_tags($emailContent) . $textQuotedBody;
+
+                    // Add "Fwd:" prefix to subject if not already present
+                    if (!str_starts_with(strtolower($subject), 'fwd:')) {
+                        $subject = 'Fwd: ' . $subject;
+                    }
+                } else {
+                    // Log if original email not found
+                    Log::warning('Original email not found for forward_id', [
+                        'forward_id' => $forwardIdRequest,
+                    ]);
+                }
+            }
+
             // Store email record
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,

@@ -35,7 +35,7 @@
 
 
                         <div class="user_toggle">
-                            <p class="user_cont">from: {{ $item['data']['from']['email'] ?? 'Unknown' }}</p>
+                            {{-- <p class="user_cont">from: {{ $item['data']['from']['email'] ?? 'Unknown' }}</p> --}}
                             <p class="user_cont">
                                 to:
                                 {{ collect(
@@ -115,7 +115,7 @@
                             </div>
                         </div>
                         <div class="user_profile_text">
-                            <p>{{ $item['data']['from']['name'] ?? ($item['data']['from']['email'] ?? 'Unknown') }}
+                            <p>{{ $item['data']['from']['name'] ?? 'Unknown' }}
                             </p>
                             <p style="font-weight: 500">
                                 to:
@@ -141,8 +141,15 @@
                             data-references='@json($item['data']['references'] ?? null)'>
                             Reply
                         </div>
-                        <div class="activities-seprater open-form-btn">Forward</div>
-                        <div class="activities-seprater open-form-btn">Delete</div>
+                            <div class="activities-seprater forward-btn"
+                                data-from="{{ $item['data']['from']['email'] ?? '' }}"
+                                data-subject="{{ $item['data']['subject'] ?? '' }}"
+                                data-date="{{ $item['data']['date']->format('M d, Y H:i') ?? '' }}"
+                                data-body='@json($item['data']['body']['html'] ?? $item['data']['body']['text'])'
+                                data-message-id="{{ $item['data']['message_id'] ?? '' }}">
+                                Forward
+                            </div>
+                        {{-- <div class="activities-seprater open-form-btn">Delete</div> --}}
                     </div>
                 </div>
             </div>

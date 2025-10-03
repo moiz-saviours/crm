@@ -1166,6 +1166,9 @@
                         <input type="hidden" name="in_reply_to" id="in_reply_to">
                         <input type="hidden" name="references" id="references">
 
+                        <input type="hidden" name="is_forward" id="is_forward">
+                        <input type="hidden" name="forward_id" id="forward_id">
+
 
                     </div>
 
@@ -1296,9 +1299,7 @@
                 fields.forEach((f, i) => extract(f).forEach(email =>
                     formData.append(`${['to', 'cc', 'bcc'][i]}[]`, email)
                 ));
-                console.log('thread_id: ' + document.getElementById('thread_id').value);
-                console.log('in_reply_to: ' + document.getElementById('in_reply_to').value);
-                console.log('references: ' + document.getElementById('references').value);
+
 
                 formData.append('from', document.querySelector('[name="from_email"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
@@ -1306,11 +1307,12 @@
                 formData.append('in_reply_to', document.getElementById('in_reply_to').value || '');
                 formData.append('references', document.getElementById('references').value || '');
 
+                formData.append('is_forward', document.getElementById('is_forward').value || '');
+                formData.append('forward_id', document.getElementById('forward_id').value || '');
+
                 AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response.success) {
-                            toastr.success("Email sent successfully!");
-
                             // Reset subject
                             document.getElementById('emailSubject').value = "";
 
