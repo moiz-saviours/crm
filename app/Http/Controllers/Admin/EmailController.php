@@ -681,6 +681,7 @@ if ($request->hasFile('attachments')) {
             }
         }
 
+        return $doc->saveHTML() ?: $content;
     }
 
 
