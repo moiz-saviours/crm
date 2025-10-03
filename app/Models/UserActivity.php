@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\ActivityLoggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserActivity extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, ActivityLoggable;
     protected $fillable = [
         'visitor_id',
         'event_type', 'event_data', 'ip', 'user_agent','country',
