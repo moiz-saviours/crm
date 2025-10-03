@@ -2303,15 +2303,19 @@
         let container = $(this).closest(".email-box-container");
 
         // Toggle content areas
-        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
+        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").slideToggle(200);
 
-        // Also minimize activity section if exists
-        container.find(".activity-section .timeline").slideToggle(200);
-        container.find(".activity-section .toggle-activity").each(function () {
-            // Update button text
-            let isVisible = $(this).closest(".activity-section").find(".timeline").is(":visible");
-            $(this).text(isVisible ? "Minimize" : "Maximize");
-        });
+        // Toggle timeline as well
+        let timeline = container.find(".activity-section .timeline");
+        timeline.slideToggle(200);
+
+        // Update activity button text
+        let toggleActivityBtn = container.find(".activity-section .toggle-activity");
+        if (timeline.is(":visible")) {
+            toggleActivityBtn.text("Minimize");
+        } else {
+            toggleActivityBtn.text("Maximize");
+        }
 
         // Update caret icon
         const caret = $(this).find('.fa-caret-right, .fa-caret-down');
@@ -2320,9 +2324,14 @@
 
     // Separate activity toggle (if clicked directly)
     $('.card-box').on('click', '.toggle-activity', function () {
-        const target = $(this).data('target');
-        $(target).slideToggle(200);
-        $(this).text($(target).is(":visible") ? "Minimize" : "Maximize");
+        let container = $(this).closest(".email-box-container");
+        let target = $(this).data('target');
+        let timeline = container.find(target);
+
+        timeline.slideToggle(200);
+
+        // Update button text
+        $(this).text(timeline.is(":visible") ? "Minimize" : "Maximize");
     });
 
             
