@@ -1289,6 +1289,37 @@
                     emailContent.value = quill.root.innerHTML;
                 }
 
+                // validation
+                const subjectEl = document.getElementById('emailSubject');
+                const fromEl = document.querySelector('[name="from_email"]');
+                const toEl = document.querySelector('[name="to"]');
+
+                let valid = true;
+
+                // From validation
+                if (!fromEl.value.trim()) {
+                    toastr.error("From email is required.");
+                    valid = false;
+                }
+
+                // To validation
+                if (!toEl.value.trim() || JSON.parse(toEl.value).length === 0) {
+                    toastr.error("At least one recipient (To) is required.");
+                    valid = false;
+                }
+
+                // Subject validation
+                if (!subjectEl.value.trim()) {
+                    toastr.error("Subject is required.");
+                    valid = false;
+                }
+
+                // Stop if required fields invalid
+                if (!valid) {
+                    return;
+                }
+                //validation end
+                
                 const formData = new FormData();
                 formData.append('email_content', emailContent.value);
                 formData.append('subject', document.getElementById('emailSubject').value);
