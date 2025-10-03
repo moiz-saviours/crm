@@ -156,14 +156,16 @@
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
                                                             data-id="{{ $lead->id }}" title="Delete"><i
                                                             class="fas fa-trash"></i></button>
-                                                    @if(isset($lead->leadStatus) && $lead->leadStatus->name != 'Converted')
-                                                        <button type="button"
-                                                                class="btn btn-sm btn-success convertBtn"
-                                                                data-id="{{ $lead->id }}"
-                                                                data-url="{{ route('admin.lead.convert', $lead->id) }}"
-                                                                title="Convert to Customer">
-                                                            <i class="fas fa-user-check"></i>
-                                                        </button>
+                                                    @if(isset($lead->leadStatus)
+                                                        && $lead->leadStatus->name != 'Converted'
+                                                        && empty($lead->cus_contact_key))  
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-success convertBtn"
+                                                            data-id="{{ $lead->id }}"
+                                                            data-url="{{ route('admin.lead.convert', $lead->id) }}"
+                                                            title="Convert to Customer">
+                                                        <i class="fas fa-user-check"></i>
+                                                    </button>
                                                     @endif
                                                 </td>
                                             </tr>
