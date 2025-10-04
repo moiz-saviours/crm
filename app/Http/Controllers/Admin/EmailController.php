@@ -202,7 +202,8 @@ class EmailController extends Controller
                     })->toArray(),
 
 
-                    'thread_emails' => $threadEmails, // Add thread emails
+                    'thread_emails' => $threadEmails,
+                    'thread_email_count' => count($threadEmails) ?? 0,
                     'open_count' => $email->events->where('event_type', 'open')->count(),
                     'click_count' => $email->events->where('event_type', 'click')->count(),
                     'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
