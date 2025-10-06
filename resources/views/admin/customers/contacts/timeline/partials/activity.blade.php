@@ -108,8 +108,8 @@
                             <p class="user_cont mt-4">
                                 {{ $customer_contact->name ?? "---"}}
                                 with IP {{ $item['data']->ip ?? 'Unknown' }}
-                                u{{ $item['data']->browser ?? 'Unknown Browser' }}
-                                from sing {{ $item['data']->country ?? 'Unknown' }}
+                                using {{ $item['data']->browser ?? 'Unknown Browser' }}
+                                from {{ $item['data']->country ?? 'Unknown' }}
                                 and entered at
                                 {{ isset($activityData->user_in_time) ? \Carbon\Carbon::parse($activityData->user_in_time)->format('Y-m-d H:i:s') : '---' }},
                                 left at
