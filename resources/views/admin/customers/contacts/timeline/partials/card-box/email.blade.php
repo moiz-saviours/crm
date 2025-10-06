@@ -12,6 +12,7 @@
                                 {{ $item['data']['from']['name'] ?? ($item['data']['from']['email'] ?? 'Unknown') }}
                             </span>
 
+
                             <div class="email-tooltip-card">
                                 <p><strong>Subject:</strong> {{ $item['data']['subject'] ?? '(No Subject)' }}</p>
                                 <p><strong>From:</strong> {{ $item['data']['from']['name'] ?? '' }}
@@ -31,6 +32,7 @@
                                 </p>
                             </div>
                         </h2>
+
 
 
 
@@ -59,9 +61,29 @@
                         @endif
                     </div>
                 </div>
+              {{-- Thread Count (Bootstrap Tooltip) --}}
+                @if (!empty($item['data']['thread_email_count']) && $item['data']['thread_email_count'] > 0)
+                    <span class="ms-2 text-muted"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="This thread contains {{ $item['data']['thread_email_count'] }} related email(s)">
+                        <i class="fa fa-envelope"></i>
+                        <sup>{{ $item['data']['thread_email_count'] }}</sup>
+                    </span>
+                @endif
+
                 <p>{{ !empty($item['data']['date']) ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
                 </p>
+                
             </div>
+                {{-- Body preview --}}
+                <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;">
+                    {!! \Illuminate\Support\Str::limit(
+                        $item['data']['body']['text'] ?? 'No body content available.', 
+                        100, 
+                        '...'
+                    ) !!}
+                </p>
         </div>
 
         <div>
@@ -206,7 +228,7 @@
                     </div>
                 </div>
             @endif
-
+            @if (isset($item['data']['thread_email_count']) && $item['data']['thread_email_count'] > 0)
             <div class="comment-active_head">
                 <div>
                     <div>
@@ -219,8 +241,9 @@
                     </div>
                 </div>
             </div>
+            @endif
             <div class="thread-emails" id="thread-{{ $item['data']['uuid'] }}" style="display: none;">
-                @if (!empty($item['data']['thread_emails']))
+                @if (isset($item['data']['thread_email_count']) && $item['data']['thread_email_count'] > 0)
                     @foreach ($item['data']['thread_emails'] as $threadItem)
                         <div class="thread-email-item border-top pt-3 mt-3">
                             <div class="new-profile-email-wrapper">
