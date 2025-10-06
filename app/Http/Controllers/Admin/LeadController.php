@@ -425,21 +425,30 @@ class LeadController extends Controller
 
             $deviceInfo = json_decode($lead->device_info, true);
 
-            $customer_contact = new CustomerContact([
-                'brand_key' => $lead->brand_key,
-                'team_key' => null,
-                'name' => $lead->name,
-                'email' => $lead->email,
-                'phone' => $lead->phone,
-                'address' => $lead->address,
-                'city' => $lead->city,
-                'state' => $lead->state,
-                'country' => $lead->country,
-                'zipcode' => $lead->zipcode,
-                'ip_address' => $deviceInfo['ip'] ?? null,
-            ]);
+            $existingContact = CustomerContact::where('email', $lead->email)->first();
 
-            $customer_contact->save();
+            if ($existingContact) {
+                $customer_contact = $existingContact;
+            }
+            else {
+                $customer_contact = new CustomerContact([
+                    'brand_key' => $lead->brand_key,
+                    'team_key' => null,
+                    'name' => $lead->name,
+                    'email' => $lead->email,
+                    'phone' => $lead->phone,
+                    'address' => $lead->address,
+                    'city' => $lead->city,
+                    'state' => $lead->state,
+                    'country' => $lead->country,
+                    'zipcode' => $lead->zipcode,
+                    'ip_address' => $deviceInfo['ip'] ?? null,
+                ]);
+
+                $customer_contact->save();
+            }
+
+
             $lead_status = LeadStatus::where('name', 'Converted')->first();
             $lead_data = [
                 'cus_contact_key' => $customer_contact->special_key,
@@ -448,22 +457,26 @@ class LeadController extends Controller
                 $lead_data['lead_status_id'] = $lead_status->id;
             }
 
+            $lead->update($lead_data);
+
             UserActivity::create([
                 'event_type'  => 'conversion',
                 'visitor_id' => $lead->visitor_id,
                 'event_data'  => json_encode([
-                    'message'        => "Lead converted to customer",
+                    'message'        => $existingContact
+                        ? "Lead attached to existing customer"
+                        : "Lead converted to new customer",
                     'customer_name'  => $customer_contact->name,
                     'customer_email' => $customer_contact->email,
                     'converted_by'   => auth()->user()->name ?? 'System',
                 ]),
             ]);
 
-            $lead->update($lead_data);
-
             return response()->json([
                 'success' => true,
-                'message' => 'Lead converted to Customer successfully!',
+                'message' => $existingContact
+                    ? 'Lead attached to existing Customer successfully!'
+                    : 'Lead converted to Customer successfully!',
                 'data' => $customer_contact
             ]);
         } catch (\Exception $e) {
