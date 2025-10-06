@@ -2138,7 +2138,7 @@
             });
             // read more text function
             $('.moreless-button').click(function () {
-                $('.moretext').slideToggle();
+                $('.moretext').toggle();
                 if ($('.moreless-button').text() == "See more") {
                     $(this).text("See less")
                 } else {
@@ -2330,7 +2330,7 @@
 
                     // 🟢 Function to handle main email card toggle
                     function handleToggleEmailCardBox(container, caretEl) {
-                        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").slideToggle(200);
+                        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
 
                         // Always minimize timeline inside that card
                         container.find(".activity-section .timeline").slideUp(200);
@@ -2355,7 +2355,7 @@
 
                     // 🟢 Function to handle main email card toggle
 function toggleEmailContent($container) {
-    $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").slideToggle(200);
+    $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
     const $caret = $container.find(".toggle-email-caret").first();
     $caret.toggleClass("fa-caret-right fa-caret-down");
 }
@@ -2365,7 +2365,7 @@ function toggleActivityTimeline($container, target) {
     const $timeline = $container.find(target);
     const $caret = $container.find(`.toggle-activity[data-target='${target}']`);
 
-    $timeline.slideToggle(200);
+    $timeline.toggle();
     $caret.toggleClass("fa-caret-right fa-caret-down");
 }
 
