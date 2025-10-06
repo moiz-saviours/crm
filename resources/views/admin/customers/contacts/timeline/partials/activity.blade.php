@@ -90,6 +90,9 @@
                         </div>
                     </div>
                 </div>
+                @php
+                    $activityData = $item['data']->data ?? null;
+                @endphp
 
                 <div class="cstm_note_2">
                     <div class="row">
@@ -100,45 +103,54 @@
                                 using {{ $item['data']->browser ?? 'Unknown Browser' }}
                                 from {{ $item['data']->country ?? 'Unknown' }}
                                 and entered at
-                                {{ $item['data']->data->user_in_time ? \Carbon\Carbon::parse($item['data']->data->user_in_time)->format('Y-m-d H:i:s') : '---' }},
+                                {{ isset($activityData->user_in_time) ? \Carbon\Carbon::parse($activityData->user_in_time)->format('Y-m-d H:i:s') : '---' }},
                                 left at
-                                {{ $item['data']->data->user_out_time ? \Carbon\Carbon::parse($item['data']->data->user_out_time)->format('Y-m-d H:i:s') : '---' }},
-                                visited '{{ $item['data']->data->url ?? '---' }}',
-                                stayed for {{ $item['data']->data->total_duration ?? '---' }} seconds,
-                                scrolled {{ $item['data']->data->scroll_max_percent ?? 0 }}% down,
-                                clicked {{ $item['data']->data->click_count ?? 0 }} times
-                                @if(!empty($item['data']->data->form_submissions) && count($item['data']->data->form_submissions) > 0)
-                                    @php
-                                        $formData = $item['data']->data->form_submissions[0]->data ?? null;
-                                    @endphp
-                                    , submitted form '{{ $item['data']->data->form_submissions[0]->form_name ?? '' }}'
+                                {{ isset($activityData->user_out_time) ? \Carbon\Carbon::parse($activityData->user_out_time)->format('Y-m-d H:i:s') : '---' }},
+                                visited '{{ $activityData->url ?? '---' }}',
+                                stayed for {{ $activityData->total_duration ?? '---' }} seconds,
+                                scrolled {{ $activityData->scroll_max_percent ?? 0 }}% down,
+                                clicked {{ $activityData->click_count ?? 0 }} times
 
-                                    @if($formData)
+                                @if(!empty($activityData->form_submissions) && count($activityData->form_submissions) > 0)
+                                    @foreach($activityData->form_submissions as $formSubmission)
+                                        @php
+                                            $formData = $formSubmission->data ?? null;
+                                            $formName = $formSubmission->form_name ?? '';
+                                        @endphp
+                                        , submitted form '{{ $formName }}'
+
+                            @if($formData)
                                 <div class="form-infromation">
                                     <p class="main-heading">Form Submit:</p>
-                                    @if(isset($formData->Name) && !empty($formData->Name))
-                                    <p class="name-title">Name</p>
-                                    <p class="name-content">{{ $formData->Name ?? "---" }}</p>
+
+                                    @if(!empty($formData->Name))
+                                        <p class="name-title">Name</p>
+                                        <p class="name-content">{{ $formData->Name ?? "---"}}</p>
                                     @endif
-                                    @if(isset($formData->Email) && !empty($formData->Email))
-                                    <p class="name-title">Email</p>
-                                    <p class="name-content">{{ $formData->Email }}</p>
+
+                                    @if(!empty($formData->Email))
+                                        <p class="name-title">Email</p>
+                                        <p class="name-content">{{ $formData->Email ?? "---"}}</p>
                                     @endif
-                                    @if(isset($formData->Phone) && !empty($formData->Phone))
-                                    <p class="name-title">Phone</p>
-                                    <p class="name-content">{{ $formData->Phone }}</p>
+
+                                    @if(!empty($formData->Phone))
+                                        <p class="name-title">Phone</p>
+                                        <p class="name-content">{{ $formData->Phone ?? "---"}}</p>
                                     @endif
-                                    @if(isset($formData->msg) && !empty($formData->msg))
-                                    <p class="name-title">Messaage</p>
-                                    <p class="name-content">{{ $formData->msg }}</p>
+
+                                    @if(!empty($formData->msg))
+                                        <p class="name-title">Message</p>
+                                        <p class="name-content">{{ $formData->msg ?? "---"}}</p>
                                     @endif
                                 </div>
-                                    @endif
                                 @endif
-                            </p>
+                                @endforeach
+                                @endif
+                                </p>
                         </div>
                     </div>
                 </div>
+
             </div>
 
         @elseif ($item['type'] === 'conversion')
