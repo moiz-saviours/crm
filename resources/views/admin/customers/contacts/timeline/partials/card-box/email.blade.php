@@ -326,6 +326,26 @@
                         data-references='@json($item['data']['references'] ?? null)'>
                         Reply
                     </div>
+                    @php
+                        $toCount = is_array($item['data']['to']) ? count($item['data']['to']) : 1;
+                        $ccCount = isset($item['data']['cc']) && is_array($item['data']['cc']) ? count($item['data']['cc']) : 0;
+                    @endphp
+
+                    @if ($toCount + $ccCount > 1)
+                        <div class="activities-seprater replyall-btn"
+                            data-from="{{ $item['data']['from']['email'] ?? '' }}"
+                            data-to='@json($item['data']['to'] ?? [])'
+                            data-cc='@json($item['data']['cc'] ?? [])'
+                            data-subject="{{ $item['data']['subject'] ?? '' }}"
+                            data-date="{{ isset($item['data']['date']) ? $item['data']['date']->format('M d, Y H:i') : '' }}"
+                            data-body='@json($item['data']['body']['html'] ?? $item['data']['body']['text'] ?? '')'
+                            data-thread-id="{{ $item['data']['thread_id'] ?? '' }}"
+                            data-in-reply-to="{{ $item['data']['message_id'] ?? '' }}"
+                            data-references='@json($item['data']['references'] ?? null)'>
+                            Reply All
+                        </div>
+                    @endif
+
                     <div class="activities-seprater forward-btn" data-from="{{ $item['data']['from']['email'] ?? '' }}"
                         data-subject="{{ $item['data']['subject'] ?? '' }}"
                         data-date="{{ $item['data']['date']->format('M d, Y H:i') ?? '' }}"
@@ -333,18 +353,7 @@
                         data-message-id="{{ $item['data']['message_id'] ?? '' }}">
                         Forward
                     </div>
-                    <div class="activities-seprater replyall-btn"
-                        data-from="{{ $item['data']['from']['email'] ?? '' }}"
-                        data-to='@json($item['data']['to'] ?? [])'
-                        data-cc='@json($item['data']['cc'] ?? [])'
-                        data-subject="{{ $item['data']['subject'] ?? '' }}"
-                        data-date="{{ $item['data']['date']->format('M d, Y H:i') ?? '' }}"
-                        data-body='@json($item['data']['body']['html'] ?? $item['data']['body']['text'])'
-                        data-thread-id="{{ $item['data']['thread_id'] ?? '' }}"
-                        data-in-reply-to="{{ $item['data']['message_id'] ?? '' }}"
-                        data-references='@json($item['data']['references'] ?? null)'>
-                        Reply All
-                    </div>
+
 
                     {{-- <div class="activities-seprater open-form-btn">Delete</div> --}}
                 </div>
