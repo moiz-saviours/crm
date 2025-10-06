@@ -62,7 +62,7 @@
         }
 
         .email-child-wrapper input, .email-child-wrapper tags.tagify {
-            width: 100%;
+            width: 90%;
             border: none;
         }
 
