@@ -47,54 +47,53 @@
         margin: -11px -3px -15px -28px
     }
 
-    /* //tooltip */
-      .email-tooltip-wrapper {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-        }
+       /* UNIVERSAL TOOLTIP SYSTEM */
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
 
-        /* Tooltip card styling */
-        .email-tooltip-card {
-            position: absolute;
-            top: -135%;
-            /* show above */
-            left: 0;
-            background: #fff;
-            border: 1px solid #ddd;
-            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
-            padding: 12px 15px;
-            border-radius: 6px;
-            z-index: 999;
-            min-width: 280px;
-            font-size: 13px;
-            color: #333;
+/* Tooltip Box */
+.tooltip-card {
+    position: absolute;
+    top: -11rem; /* positioned above by default */
+    left: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    padding: 12px 15px;
+    border-radius: 6px;
+    z-index: 999;
+    min-width: 240px;
+    max-width: 280px;
+    font-size: 13px;
+    color: #333;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
 
-            /* keep it hidden but rendered */
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease;
-        }
+/* Tooltip text content */
+.tooltip-card p {
+    margin: 6px 0;
+    line-height: 1.4;
+}
 
-        .email-tooltip-card p {
-            margin: 6px 0;
-            /* spacing between lines */
-            line-height: 1.4;
-        }
+/* Show on hover */
+.tooltip-wrapper:hover .tooltip-card {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0.5s; /* delay before showing */
+}
 
-        /* Hover show with delay */
-        .email-tooltip-wrapper:hover .email-tooltip-card {
-            opacity: 1;
-            visibility: visible;
-            transition-delay: 0.5s;
-            /* ⬅️ delay before showing */
-        }
+/* Hide instantly on leave */
+.tooltip-wrapper .tooltip-card {
+    transition-delay: 0s;
+}
 
-        /* Hide instantly when mouse leaves */
-        .email-tooltip-wrapper .email-tooltip-card {
-            transition-delay: 0s;
-        }
-        /* end tooltip */
+
+        
 </style>
 <div class="email-threading-row" style="margin-bottom: 15px;">
     <p class="activities-seprater d-none"> Thread email replies </p>
