@@ -132,18 +132,7 @@
 
             }
 
-            .sidebar-icons {
-                box-sizing: border-box;
-                border: unset;
-                margin: 0;
-                padding: 0;
-                text-align: center;
-                display: block;
-                position: relative;
-                inline-size: 42px;
-                margin-inline: 0;
-                background-color: rgba(0, 0, 0, 0);
-            }
+
 
             .sidebar-icons i {
                 background-color: #EAF0F6;
@@ -2264,6 +2253,47 @@
                     $('#emailTemplate').addClass('open');
                 });
 
+                $(document).on('click', '.replyall-btn', function () {
+                    let fromEmail = ``;
+                    let subject = $(this).data('subject');
+                    let date = $(this).data('date');
+                    let body = $(this).data('body');
+                    let threadId = $(this).data('thread-id');
+                    let inReplyTo = $(this).data('in-reply-to');
+                    let references = $(this).data('references');
+
+                    // Get recipients (TO + CC)
+                    let toRecipients = $(this).data('to') || [];
+                    let ccRecipients = $(this).data('cc') || [];
+                    // Exclude the current user's own email from the list
+                    let allRecipients = [...toRecipients, ...ccRecipients]
+                        .map(r => typeof r === 'string' ? r : r.email)
+                        .filter(email => email && email !== fromEmail);
+
+                        
+                    try {
+                        if (typeof body === "string" && body.trim().startsWith('"')) {
+                            body = JSON.parse(body);
+                        }
+                    } catch (e) {}
+
+                    // Prefill To/Subject
+                    $('#toFieldInput').val(allRecipients.join(', '));
+                    $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+
+                    // Clear editor + set quoted history
+                    $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
+
+                    // Store metadata
+                    $('#thread_id').val(threadId || '');
+                    $('#in_reply_to').val(inReplyTo || '');
+                    $('#references').val(references ? JSON.stringify(references) : '');
+
+                    toggleQuotedHistory(true);
+                    $('#emailTemplate').addClass('open');
+                });
+
+
                 $(document).on('click', '.open-email-form', () => {
                     $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
                     toggleQuotedHistory(false);
@@ -2298,48 +2328,78 @@
                     let currentPage = {{ $page }};
                     const limit = 100;
 
-            // Function for toggle-btnss
-            function handleToggleEmailCardBox(container, caretEl) {
-                // Toggle content areas
-                container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").slideToggle(200);
+                    // 🟢 Function to handle main email card toggle
+                    function handleToggleEmailCardBox(container, caretEl) {
+                        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").slideToggle(200);
 
-                // Always minimize timeline
-                let timeline = container.find(".activity-section .timeline");
-                timeline.slideUp(200);
+                        // Always minimize timeline inside that card
+                        container.find(".activity-section .timeline").slideUp(200);
+                        container.find(".toggle-activity").removeClass("fa-caret-down").addClass("fa-caret-right");
 
-                // Reset activity button text
-                container.find(".activity-section .toggle-activity").text("Maximize");
+                        // Flip caret icon for main email card only
+                        caretEl.toggleClass('fa-caret-right fa-caret-down');
+                    };
 
-                // Update caret icon
-                caretEl.toggleClass('fa-caret-right fa-caret-down');
-            }
+                    // 🟢 Function to handle activity section toggle
+                    function handleToggleActivity(container, target, caretIcon) {
+                        let timeline = container.find(target);
 
-            // Function for toggle-activity
-            function handleToggleActivity(container, target) {
-                let timeline = container.find(target);
+                        if (timeline.is(":visible")) {
+                            timeline.slideUp(200);
+                            caretIcon.removeClass("fa-caret-down").addClass("fa-caret-right");
+                        } else {
+                            timeline.slideDown(200);
+                            caretIcon.removeClass("fa-caret-right").addClass("fa-caret-down");
+                        }
+                    };
 
-                if (timeline.is(":visible")) {
-                    timeline.slideUp(200);
-                    container.find(".activity-section .toggle-activity").text("Maximize");
-                } else {
-                    timeline.slideDown(200);
-                    container.find(".activity-section .toggle-activity").text("Minimize");
-                }
-            }
+                    // 🟢 Function to handle main email card toggle
+function toggleEmailContent($container) {
+    $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").slideToggle(200);
+    const $caret = $container.find(".toggle-email-caret").first();
+    $caret.toggleClass("fa-caret-right fa-caret-down");
+}
 
-            // jQuery event delegation for .toggle-btnss
-            $('.card-box').on('click', '.toggle-btnss', function () {
-                let container = $(this).closest(".email-box-container");
-                let caret = $(this).find('.fa-caret-right, .fa-caret-down');
-                handleToggleEmailCardBox(container, caret);
-            });
+// 🟢 Function to handle activity section toggle
+function toggleActivityTimeline($container, target) {
+    const $timeline = $container.find(target);
+    const $caret = $container.find(`.toggle-activity[data-target='${target}']`);
 
-            // Separate activity toggle (if clicked directly)
-            $('.card-box').on('click', '.toggle-activity', function () {
-                let container = $(this).closest(".email-box-container");
-                let target = $(this).data('target');
-                handleToggleActivity(container, target);
-            });
+    $timeline.slideToggle(200);
+    $caret.toggleClass("fa-caret-right fa-caret-down");
+}
+
+           // --- Event bindings ---
+// Main email caret
+$(".card-box").on("click", ".toggle-email-caret", function (e) {
+    e.stopPropagation();
+    const $container = $(this).closest(".email-box-container");
+    toggleEmailContent($container);
+});
+
+// Clicking on the heading should do the same
+$(".card-box").on("click", ".toggle-email-header", function (e) {
+    e.stopPropagation();
+    const $container = $(this).closest(".email-box-container");
+    toggleEmailContent($container);
+});
+
+// Activity caret
+$(".card-box").on("click", ".toggle-activity", function (e) {
+    e.stopPropagation();
+    const $container = $(this).closest(".email-box-container");
+    const target = $(this).data("target");
+    toggleActivityTimeline($container, target);
+});
+
+// Clicking on the activity paragraph also toggles same
+$(".card-box").on("click", ".toggle-activity-row", function (e) {
+    e.stopPropagation();
+    const $container = $(this).closest(".email-box-container");
+    const $caret = $(this).find(".toggle-activity");
+    const target = $caret.data("target");
+    toggleActivityTimeline($container, target);
+});
 
 
 
@@ -2364,15 +2424,6 @@
                             fetchEmails(true); // append
                         });
                     }
-
-                    // Visibility toggle
-                    // function toggleShowMoreVisibility(data) {
-                    //     if (!data.emails || data.emails.length < data.limit) {
-                    //         showMoreContainer.style.display = "none";
-                    //     } else {
-                    //         showMoreContainer.style.display = "block";
-                    //     }
-                    // }
 
             // Render Emails (HTML string only)
                 function renderEmails(emails) {
