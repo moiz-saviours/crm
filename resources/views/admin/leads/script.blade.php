@@ -380,5 +380,46 @@
                     }
                 });
         });
+
+        /** Convert Lead to Customer */
+        $(document).on('click', '.convertBtn', function (e) {
+            e.preventDefault();
+
+            const $btn = $(this);
+            const leadId = $btn.data('id');
+
+            if (!leadId) {
+                toastr.error('Invalid lead ID.');
+                return;
+            }
+
+            const url = `{{ route('admin.lead.convert', '') }}/${leadId}`;
+
+            convertLeadToCustomer(leadId, url, $btn);
+        });
+
+        function convertLeadToCustomer(leadId, url, $btn) {
+            $btn.prop('disabled', true).addClass('disabled');
+
+            AjaxRequestPromise(url, null, 'POST', { useToastr: false })
+                .then(res => {
+                    if (res?.success) {
+                        toastr.success(res?.message || 'Lead converted successfully.');
+
+                        $(`#tr-${leadId} .convertBtn`).remove();
+
+                        $(`#tr-${leadId} td[data-field="leadStatus"]`).text('Converted');
+                    } else {
+                        toastr.error(res?.message || 'Conversion failed.');
+                        $btn.prop('disabled', false).removeClass('disabled');
+                    }
+                })
+                .catch(err => {
+                    const msg = err?.message || 'Something went wrong!';
+                    toastr.error(msg);
+                    $btn.prop('disabled', false).removeClass('disabled');
+                });
+        }
+
     });
 </script>
