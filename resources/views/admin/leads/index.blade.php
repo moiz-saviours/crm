@@ -114,7 +114,7 @@
                                                         ---
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-center text-nowrap" data-field="customerContact">
                                                     @if(isset($lead->customer_contact))
                                                         <a href="{{route('admin.customer.contact.edit',[$lead->customer_contact->id])}}">{{ $lead->customer_contact->name }}</a>
 {{--                                                        <br> {{ $lead->customer_contact->special_key }}--}}
