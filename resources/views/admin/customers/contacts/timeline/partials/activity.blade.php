@@ -23,6 +23,14 @@
         font-size: 0.675rem;
         vertical-align: super;
     }
+    .activity-title {
+        color: var(--bs-primary);
+        font-weight: 500;
+    }
+    a {
+        text-decoration: none;
+        text-underline: none;
+    }
 </style>
 @if (!empty($timeline) && count($timeline) > 0)
     @include('admin.customers.contacts.timeline.static-content.email')
@@ -100,13 +108,18 @@
                             <p class="user_cont mt-4">
                                 {{ $customer_contact->name ?? "---"}}
                                 with IP {{ $item['data']->ip ?? 'Unknown' }}
-                                using {{ $item['data']->browser ?? 'Unknown Browser' }}
-                                from {{ $item['data']->country ?? 'Unknown' }}
+                                u{{ $item['data']->browser ?? 'Unknown Browser' }}
+                                from sing {{ $item['data']->country ?? 'Unknown' }}
                                 and entered at
                                 {{ isset($activityData->user_in_time) ? \Carbon\Carbon::parse($activityData->user_in_time)->format('Y-m-d H:i:s') : '---' }},
                                 left at
                                 {{ isset($activityData->user_out_time) ? \Carbon\Carbon::parse($activityData->user_out_time)->format('Y-m-d H:i:s') : '---' }},
-                                visited '{{ $activityData->url ?? '---' }}',
+                                Viewed <a href="{{ $activityData->url ?? '#' }}"
+                                          class="activity-title"
+                                          target="_blank"
+                                          rel="noopener noreferrer">
+                                    '{{ $activityData->title ?? '---' }}'
+                                </a>,
                                 stayed for {{ $activityData->total_duration ?? '---' }} seconds,
                                 scrolled {{ $activityData->scroll_max_percent ?? 0 }}% down,
                                 clicked {{ $activityData->click_count ?? 0 }} times
