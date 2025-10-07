@@ -4,7 +4,9 @@
         class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
         <div class="d-flex align-items-center">
             <span
-                class="profile-avatar-h me-3">{{ strtoupper(substr($email->from_name?:$email->from_email, 0, 2)) }}</span>
+                class="profile-avatar-h me-3">{{ strtoupper(implode('', array_map(function($word) {
+    return substr($word, 0, 1);
+}, array_slice(explode(' ', $email->from_name ?: $email->from_email), 0, 2)))) }}</span>
             <div>
                 <span class="main-area-email-para">{{ $email->from_email }}</span><br/>
                 <span class="main-area-email-para-time">Created {{ $email->message_date->diffForHumans() }}</span>
@@ -24,7 +26,7 @@
                            aria-hidden="true"></i>
                         <span class="status-dot"></span>
                     </div>
-                    <p class="user_name mb-0">Hasnat Khan</p>
+                    <p class="user_name mb-0">{{ $email->from_name }}</p>
                     <i class="fas fa-caret-down ms-2 custom-fa-caret-down"
                        aria-hidden="true"></i>
                 </div>
