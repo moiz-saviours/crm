@@ -987,7 +987,10 @@
         .email-minimized .email-divider {
             display: none;
         }
-
+.quoted-history-container {
+    position: relative;
+    margin-top: 10px;
+}
         .show-quoted-btn {
             background: #f0f0f0; /* light highlight */
             border: 1px solid #ccc;
@@ -999,6 +1002,14 @@
             padding: 5px 15px;
             margin-bottom: 5px;
             transition: all 0.2s ease-in-out;
+
+            position: absolute;
+            left: 0;
+            top: 0;
+            line-height: 1;
+
+    transform: translateY(-100%); /* move it just above the quoted box */
+    z-index: 2;
         }
 
     </style>
@@ -1148,15 +1159,19 @@
                         </div>
 
                         <!-- Quoted history (non-editable) -->
-                        <div class="quoted-history-wrapper d-none">
-                            <button class="show-quoted-btn btn btn-outline-primary" type="button">...</button>
-                            <div class="quoted-history"
-                                 style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
-                                <!-- quoted content goes here -->
-                                Previous email reply or forwarded message content...
+                        <div class="quoted-history-container position-relative">
+                            <button class="show-quoted-btn btn btn-sm btn-outline-secondary mx-3" type="button" title="Show quoted">
+                                ...
+                            </button>
+
+                            <div class="quoted-history-wrapper">
+                                <div class="quoted-history"
+                                    style="display: none;border-left: 0px solid rgb(204, 204, 204);padding-left: 0px;padding-top: 15px;font-size: 13px;color: rgb(85, 85, 85);">
+                                    <!-- quoted content goes here -->
+                                    Previous email reply or forwarded message content...
+                                </div>
                             </div>
                         </div>
-
 
                         <input type="hidden" name="email_content" id="emailContent">
 
@@ -1483,13 +1498,18 @@
 
 
     </script>
-    <script>
-        document.addEventListener("click", function (e) {
-            if (e.target.classList.contains("show-quoted-btn")) {
-                let quoted = e.target.nextElementSibling;
-                quoted.style.display = quoted.style.display === "none" ? "block" : "none";
-                e.target.textContent = quoted.style.display === "block" ? "Hide quoted" : "...";
-            }
-        });
-    </script>
+<script>
+document.addEventListener("click", function (e) {
+    if (e.target.closest(".show-quoted-btn")) {
+        const btn = e.target.closest(".show-quoted-btn");
+        const quoted = btn.parentElement.querySelector(".quoted-history");
+
+        const isVisible = quoted.style.display === "block";
+        quoted.style.display = isVisible ? "none" : "block";
+
+        // Change button text between "..." and "Hide"
+        btn.textContent = isVisible ? "..." : "Hide";
+    }
+});
+</script>
 @endpush

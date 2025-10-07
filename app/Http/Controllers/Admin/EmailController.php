@@ -361,6 +361,41 @@ public function fetchNewEmails(Request $request)
             'to.*.email' => 'One or more recipients are not valid email addresses.',
         ]);
 
+        $emailContent = $validated['email_content'] ?? '';
+        $totalImageSize = 0;
+
+        // Find all base64 images in the email content
+        preg_match_all('/data:image\/[^;]+;base64,([A-Za-z0-9+\/=]+)/', $emailContent, $matches);
+
+        foreach ($matches[1] as $base64String) {
+            $decoded = base64_decode($base64String, true);
+            if ($decoded !== false) {
+                $totalImageSize += strlen($decoded);
+            }
+        }
+
+        // 5 MB limit for total embedded image size
+        $maxTotalSize = 5 * 1024 * 1024;
+
+        if ($totalImageSize > $maxTotalSize) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Embedded images are too large. Please reduce total image size (max 5 MB).'
+            ], 422);
+        }
+
+        // Optional: validate overall HTML size
+        $totalContentSize = strlen($emailContent);
+        if ($totalContentSize > 7 * 1024 * 1024) { // 7 MB total
+            return response()->json([
+                'success' => false,
+                'message' => 'Email content is too large. Please simplify or reduce embedded content (max 7 MB).'
+            ], 422);
+        }
+
+
+        
+
         try {
             $sender = $this->findSender($validated['from']);
             if (!$sender) {

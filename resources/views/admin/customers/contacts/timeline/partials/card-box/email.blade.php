@@ -27,7 +27,7 @@
 
 <h2 class="email-tooltip-wrapper tooltip-wrapper toggle-email-header" style="cursor:pointer;">
     {{-- Subject --}}
-    Email - {{ \Illuminate\Support\Str::limit($item['data']['subject'] ?? '(No Subject)', 30) }}
+    Email - <strong>{{ \Illuminate\Support\Str::limit($item['data']['subject'] ?? '(No Subject)', 30) }}</strong>
 
     {{-- From (inline) --}}
     <span class="user_cont">
@@ -44,15 +44,15 @@
         </p>
 
         @if(!empty($toList))
-            <p><strong>To:</strong> {{ $toList }}</p>
+            <p><strong>to:</strong> {{ $toList }}</p>
         @endif
 
         @if(!empty($ccList))
-            <p><strong>CC:</strong> {{ $ccList }}</p>
+            <p><strong>cc:</strong> {{ $ccList }}</p>
         @endif
 
         @if(!empty($bccList))
-            <p><strong>BCC:</strong> {{ $bccList }}</p>
+            <p><strong>bcc:</strong> {{ $bccList }}</p>
         @endif
 
         <p><strong>Date:</strong>
@@ -61,7 +61,7 @@
                 : 'Unknown Date' }}
         </p>
     </div>
-</h2>
+</h2><br>
 
 
 
@@ -90,9 +90,10 @@
         }}
     </p>
 
-    <span class="folder-dot" style="color: #28a745;">&bull;</span>
-    <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
-
+    <div class="email-folder">
+        <span class="folder-dot" style="color: #28a745;">&bull;</span>
+        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+    </div>
     {{-- Tooltip with Full Info --}}
     <div class="tooltip-card">
         <p><strong>From:</strong>
@@ -189,7 +190,7 @@
 
         </div>
         {{-- Body preview --}}
-        <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;">
+        <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
             {!! \Illuminate\Support\Str::limit($item['data']['body']['text'] ?? 'No body content available.', 100, '...') !!}
         </p>
     </div>
@@ -275,7 +276,7 @@
     <div class="tooltip-card">
         <p><strong>From:</strong> {{ $item['data']['from']['email'] ?? 'Unknown' }}</p>
 
-        <p><strong>To:</strong>
+        <p><strong>to:</strong>
             {{ collect(
                 is_string($item['data']['to'])
                     ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
@@ -286,7 +287,7 @@
         </p>
 
         @if(!empty($item['data']['cc']))
-            <p><strong>Cc:</strong>
+            <p><strong>cc:</strong>
                 {{ collect(
                     is_string($item['data']['cc'])
                         ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
@@ -298,7 +299,7 @@
         @endif
 
         @if(!empty($item['data']['bcc']))
-            <p><strong>Bcc:</strong>
+            <p><strong>bcc:</strong>
                 {{ collect(
                     is_string($item['data']['bcc'])
                         ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
@@ -310,9 +311,10 @@
         @endif
     </div>
 </div>
-
-                        <span class="folder-dot" style="color: #28a745;">&bull;</span>
-                        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+                        <div class="folder-name">
+                            <span class="folder-dot" style="color: #28a745;">&bull;</span>
+                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+                        </div>
                     </div>
                 </div>
 
