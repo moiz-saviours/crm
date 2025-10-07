@@ -72,8 +72,8 @@
                                     aria-expanded="false"
                                     aria-controls="moreContent">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-caret-down toggle-icon me-2"></i>
-                                        <span class="toggle-text">More</span>
+                                        <i class="fas fa-caret-down me-2"></i>
+                                        <span class="toggle-text">Less</span>
                                     </div>
                                 </button>
 
@@ -2059,6 +2059,24 @@
     @push('script')
 
         <script>
+
+            $(document).ready(function () {
+                var $collapseEl = $("#moreContent");
+                var $toggleBtn = $(".toggle-btn");
+                var $toggleText = $toggleBtn.find(".toggle-text");
+                var $toggleIcon = $toggleBtn.find(".fa-caret-down");
+
+                $collapseEl.on("shown.bs.collapse", function () {
+                    $toggleText.text("Less");
+                    $toggleIcon.removeClass("fa-caret-right").addClass("fa-caret-down");
+                });
+
+                // When collapse is hidden
+                $collapseEl.on("hidden.bs.collapse", function () {
+                    $toggleText.text("More");
+                    $toggleIcon.removeClass("fa-caret-down").addClass("fa-caret-right");
+                });
+            });
             // Ensure right sidebar updates with email selection
             document.querySelectorAll(".email-main-body").forEach((item) => {
                 item.addEventListener("click", function (e) {
@@ -2087,8 +2105,7 @@
             const tooltipList = [...tooltipTriggerList].map(
                 (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
             );
-        </script>
-        <script>
+
             document.addEventListener("DOMContentLoaded", () => {
                 // Select all sortable containers
                 const containers = document.querySelectorAll(
@@ -2241,9 +2258,7 @@
             $(window).on("load", function () {
                 $("#loader").removeClass("show");
             });
-        </script>
-        // for date picker
-        <script>
+
             flatpickr("#dateRange", {
                 mode: "range", // allows From → To
                 dateFormat: "Y-m-d", // backend format
@@ -2251,10 +2266,7 @@
                 altFormat: "F j, Y", // e.g. July 16, 2025
                 showMonths: 1 // can set to 2 if you want two months side-by-side
             });
-        </script>
 
-        // this is for the popup
-        <script>
             // Simple JavaScript to toggle the dropdown menu
             document.addEventListener('DOMContentLoaded', function () {
                 const toggle = document.getElementById('userDropdownToggle');
