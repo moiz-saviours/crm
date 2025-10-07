@@ -416,7 +416,7 @@
                 ${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : '---'}
             </td>
         `;
-                        $(`#tr-${leadId} td[data-field="customerContact"]`).replaceWith(contactTd);
+                        $(`#tr-${leadId} td[data-field="customer_contact"]`).replaceWith(contactTd);
 
                     } else {
                         toastr.error(res?.message || 'Conversion failed.');
