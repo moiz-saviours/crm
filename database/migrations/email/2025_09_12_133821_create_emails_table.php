@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->json('cc')->nullable()->default(null);
             $table->json('bcc')->nullable()->default(null);
             $table->string('subject')->nullable()->default(null);
-            $table->text('body_html')->nullable()->default(null);
+            $table->longText('body_html')->nullable()->default(null);
             $table->text('body_text')->nullable()->default(null);
             // IMAP specific
             $table->bigInteger('imap_uid')->nullable()->default(null)->comment('IMAP UID');

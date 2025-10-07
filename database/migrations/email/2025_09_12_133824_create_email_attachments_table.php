@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('storage_name')->nullable()->default(null);
             $table->string('mime_type')->nullable()->default(null);
             $table->bigInteger('size')->nullable()->default(null);
+            $table->string('extension')->nullable()->default(null);
             $table->string('storage_path')->nullable()->default(null);
             $table->string('content_id')->nullable()->default(null);
             $table->boolean('is_inline')->default(false);
