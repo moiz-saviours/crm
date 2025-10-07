@@ -999,6 +999,7 @@
             padding: 5px 15px;
             margin-bottom: 5px;
             transition: all 0.2s ease-in-out;
+
             position: absolute;
             left: 0;
             top: 0;
@@ -1152,15 +1153,19 @@
                         </div>
 
                         <!-- Quoted history (non-editable) -->
-                        <div class="quoted-history-wrapper d-none">
-                            <button class="show-quoted-btn btn btn-outline-primary" type="button">...</button>
-                            <div class="quoted-history"
-                                 style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
-                                <!-- quoted content goes here -->
-                                Previous email reply or forwarded message content...
+                        <div class="quoted-history-container position-relative">
+                            <button class="show-quoted-btn btn btn-sm btn-outline-secondary mx-3" type="button" title="Show quoted">
+                                ...
+                            </button>
+
+                            <div class="quoted-history-wrapper">
+                                <div class="quoted-history"
+                                    style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
+                                    <!-- quoted content goes here -->
+                                    Previous email reply or forwarded message content...
+                                </div>
                             </div>
                         </div>
-
 
                         <input type="hidden" name="email_content" id="emailContent">
 
