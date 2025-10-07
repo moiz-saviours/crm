@@ -9,6 +9,7 @@
         <div class="container-fluid loading-container">
             <section class="email-main-body-section">
                 <div class="row custom-my-row">
+                    <!-- Page 1 Start -->
                     <!-- Left Sidebar (col-md-2) -->
                     <div class="col-md-2 p-0" id="leftSidebar">
                         <div class="bg-white left-sidebar-custom d-flex flex-column p-3 main-content-col" id="left-sidebar">
@@ -66,19 +67,19 @@
                                     type="button" data-bs-toggle="collapse" data-bs-target="#moreContent" aria-expanded="false"
                                     aria-controls="moreContent">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-caret-right toggle-icon me-2"></i>
+                                        <i class="fas fa-caret-down toggle-icon me-2"></i>
                                         <span class="toggle-text">More</span>
                                     </div>
                                 </button>
 
                                 <!-- Collapsible Content -->
-                                <div class="collapse mt-2" id="moreContent">
+                                <div class="collapse show mt-2" id="moreContent">
                                     <a href="#email-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                        id="email-tab" data-bs-toggle="tab" data-bs-target="#email-pane" role="tab"
                                        aria-controls="email-pane" aria-selected="false">
                                         Email
-                                        <span class="badge rounded-pill text-bg-light">8</span>
+                                        <span class="badge rounded-pill text-bg-light">{{count($emails)}}</span>
                                     </a>
                                     <a href="#calls-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -89,14 +90,16 @@
                                     </a>
                                     <a href="#sent-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                                       id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent-pane" role="tab" aria-controls="sent-pane"
+                                       id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent-pane" role="tab"
+                                       aria-controls="sent-pane"
                                        aria-selected="false">
                                         Sent
                                         <span class="badge rounded-pill text-bg-light">0</span>
                                     </a>
                                     <a href="#spam-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                                       id="spam-tab" data-bs-toggle="tab" data-bs-target="#spam-pane" role="tab" aria-controls="spam-pane"
+                                       id="spam-tab" data-bs-toggle="tab" data-bs-target="#spam-pane" role="tab"
+                                       aria-controls="spam-pane"
                                        aria-selected="false">
                                         Spam
                                         <span class="badge rounded-pill text-bg-light">0</span>
@@ -135,83 +138,6 @@
 
                         </div>
                     </div>
-                    <!-- Hidden Filter Panel (col-md-2) -->
-                    <div class="col-md-2 d-none" id="filterPanel">
-                        <div class="filter-content">
-                            <!-- fixed top -->
-                            <a href="#" id="exitSearch" class="exit-search">
-                                <i class="fas fa-chevron-left"></i> Exit search
-                            </a>
-
-                            <div class="custom-header-text-search d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0">Filter by:</h6>
-                                <a href="#" id="clearFilters" class="small custom-clear">Clear all</a>
-                            </div>
-
-                            <!-- scrollable section -->
-                            <div class="filter-scrollable">
-                                <div class="filter-group">
-                                    <label class="filter-label">Status</label>
-                                    <select class="form-select custom-status-select">
-                                        <option selected>Select a status</option>
-                                        <option>Open</option>
-                                        <option>Closed</option>
-                                    </select>
-                                </div>
-
-                                <div class="filter-group">
-                                    <label class="filter-label">Channel</label>
-                                    <select class="form-select custom-status-select">
-                                        <option class="cstm-opt">Select a channel</option>
-                                        <option class="cstm-opt">Email</option>
-                                        <option class="cstm-opt">Chat</option>
-                                    </select>
-                                </div>
-
-                                <div class="filter-group">
-                                    <label class="filter-label">Channel Account</label>
-                                    <select class="form-select custom-status-select">
-                                        <option selected>Select a channel account</option>
-                                    </select>
-                                </div>
-
-                                <div class="filter-group">
-                                    <label class="filter-label">Contact</label>
-                                    <select class="form-select custom-status-select">
-                                        <option selected>Select a contact</option>
-                                    </select>
-                                </div>
-
-                                <div class="filter-group">
-                                    <label class="filter-label">Assignee</label>
-                                    <select class="form-select custom-status-select">
-                                        <option selected>Select an assignee</option>
-                                    </select>
-                                </div>
-
-                                <div class="filter-group d-block">
-                                    <label class="filter-label">Date</label>
-                                    <div class="gap-2">
-                                        <input id="dateRange" class="form-control " placeholder="Select date range" />
-                                    </div>
-                                </div>
-
-                                <div class="filter-group mt-3">
-                                    <small class="d-block mb-2">More options</small>
-                                    <div class="form-check mb-1">
-                                        <input class="form-check-input custom-form-check" type="checkbox" id="hideFiltered" checked />
-                                        <label class="form-check-label" for="hideFiltered">Hide filtered</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="hideTrash" checked />
-                                        <label class="form-check-label" for="hideTrash">Hide trash</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
 
                     <!-- Email Content Area (col-md-3) -->
                     <div class="col-md-3 uppper-part-main list-column">
@@ -249,9 +175,12 @@
                                 <div class="tab-pane fade show active" id="unassigned-pane" role="tabpanel"
                                      aria-labelledby="unassigned-tab">
                                     <div class="list-group" id="email-list-unassigned" role="tablist">
-                                        <a href="#email-detail-1" class="list-group-item list-group-item-action email-main-body active"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-1" data-sidebar-target="#sidebar-detail-1"
-                                           role="tab" aria-controls="email-detail-1" aria-selected="true" data-name="Hasnat Khan"
+                                        <a href="#email-detail-1"
+                                           class="list-group-item list-group-item-action email-main-body active"
+                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"
+                                           data-sidebar-target="#sidebar-detail-1"
+                                           role="tab" aria-controls="email-detail-1" aria-selected="true"
+                                           data-name="Hasnat Khan"
                                            data-email="hasnat.khan@stellers.org" data-subject="Re: Test">
                                             <div class="d-flex align-items-center">
                                                 <div class="icon-checkbox-wrapper me-3">
@@ -274,15 +203,18 @@
                                                 <p class="para-second mb-0">11s</p>
                                             </div>
                                         </a>
-                                        <a href="#email-detail-2" class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-2" data-sidebar-target="#sidebar-detail-2"
-                                           role="tab" aria-controls="email-detail-2" aria-selected="false" data-name="Moiz Athar"
+                                        <a href="#email-detail-2"
+                                           class="list-group-item list-group-item-action email-main-body"
+                                           data-bs-toggle="tab" data-bs-target="#email-detail-2"
+                                           data-sidebar-target="#sidebar-detail-2"
+                                           role="tab" aria-controls="email-detail-2" aria-selected="false"
+                                           data-name="Moiz Athar"
                                            data-email="moiz@saviours.co" data-subject="Project Update">
                                             <div class="d-flex align-items-center">
                                                 <div class="icon-checkbox-wrapper me-3">
                                                     <i class="far fa-envelope"></i>
                                                     <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox" />
+                                                        <input type="checkbox" class="hover-checkbox"/>
                                                         <span class="check-icon"></span>
                                                     </label>
                                                 </div>
@@ -300,17 +232,21 @@
                                     </div>
                                 </div>
                                 <!-- Assigned to Me Tab Pane -->
-                                <div class="tab-pane fade" id="assigned-pane" role="tabpanel" aria-labelledby="assigned-tab">
+                                <div class="tab-pane fade" id="assigned-pane" role="tabpanel"
+                                     aria-labelledby="assigned-tab">
                                     <div class="list-group" id="email-list-assigned" role="tablist">
-                                        <a href="#email-detail-3" class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-3" data-sidebar-target="#sidebar-detail-3"
-                                           role="tab" aria-controls="email-detail-3" aria-selected="true" data-name="Sarah Johnson"
+                                        <a href="#email-detail-3"
+                                           class="list-group-item list-group-item-action email-main-body"
+                                           data-bs-toggle="tab" data-bs-target="#email-detail-3"
+                                           data-sidebar-target="#sidebar-detail-3"
+                                           role="tab" aria-controls="email-detail-3" aria-selected="true"
+                                           data-name="Sarah Johnson"
                                            data-email="sarah.j@example.com" data-subject="Meeting Request">
                                             <div class="d-flex align-items-center">
                                                 <div class="icon-checkbox-wrapper me-3">
                                                     <i class="far fa-envelope"></i>
                                                     <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox" />
+                                                        <input type="checkbox" class="hover-checkbox"/>
                                                         <span class="check-icon"></span>
                                                     </label>
                                                 </div>
@@ -331,16 +267,19 @@
                                 </div>
 
                                 <!-- All Open Tab Pane -->
-                                <div class="tab-pane fade" id="all-open-pane" role="tabpanel" aria-labelledby="all-open-tab">
+                                <div class="tab-pane fade" id="all-open-pane" role="tabpanel"
+                                     aria-labelledby="all-open-tab">
                                     <div class="list-group" id="email-list-all-open" role="tablist">
-                                        <a href="#email-detail-1" class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-1" data-sidebar-target="#sidebar-detail-1"
+                                        <a href="#email-detail-1"
+                                           class="list-group-item list-group-item-action email-main-body"
+                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"
+                                           data-sidebar-target="#sidebar-detail-1"
                                            role="tab" aria-controls="email-detail-1" aria-selected="true">
                                             <div class="d-flex align-items-center">
                                                 <div class="icon-checkbox-wrapper me-3">
                                                     <i class="far fa-envelope active-enelops"></i>
                                                     <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox" />
+                                                        <input type="checkbox" class="hover-checkbox"/>
                                                         <span class="check-icon"></span>
                                                     </label>
                                                 </div>
@@ -356,14 +295,16 @@
                                                 <p class="para-second mb-0">11s</p>
                                             </div>
                                         </a>
-                                        <a href="#email-detail-2" class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-2" data-sidebar-target="#sidebar-detail-2"
+                                        <a href="#email-detail-2"
+                                           class="list-group-item list-group-item-action email-main-body"
+                                           data-bs-toggle="tab" data-bs-target="#email-detail-2"
+                                           data-sidebar-target="#sidebar-detail-2"
                                            role="tab" aria-controls="email-detail-2" aria-selected="false">
                                             <div class="d-flex align-items-center">
                                                 <div class="icon-checkbox-wrapper me-3">
                                                     <i class="far fa-envelope"></i>
                                                     <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox" />
+                                                        <input type="checkbox" class="hover-checkbox"/>
                                                         <span class="check-icon"></span>
                                                     </label>
                                                 </div>
@@ -383,14 +324,16 @@
                                 <!-- Email Tab Pane -->
                                 <div class="tab-pane fade" id="email-pane" role="tabpanel" aria-labelledby="email-tab">
                                     <div class="list-group" id="email-list-email" role="tablist">
-                                        <a href="#email-detail-1" class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-1" data-sidebar-target="#sidebar-detail-1"
+                                        <a href="#email-detail-1"
+                                           class="list-group-item list-group-item-action email-main-body"
+                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"
+                                           data-sidebar-target="#sidebar-detail-1"
                                            role="tab" aria-controls="email-detail-1" aria-selected="true">
                                             <div class="d-flex align-items-center">
                                                 <div class="icon-checkbox-wrapper me-3">
                                                     <i class="far fa-envelope active-enelops"></i>
                                                     <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox" />
+                                                        <input type="checkbox" class="hover-checkbox"/>
                                                         <span class="check-icon"></span>
                                                     </label>
                                                 </div>
@@ -448,7 +391,8 @@
                                 </div>
 
                                 <!-- All Closed Tab Pane -->
-                                <div class="tab-pane fade" id="all-closed-pane" role="tabpanel" aria-labelledby="all-closed-tab">
+                                <div class="tab-pane fade" id="all-closed-pane" role="tabpanel"
+                                     aria-labelledby="all-closed-tab">
                                     <div class="list-group" id="email-list-all-closed" role="tablist">
                                         <div class="text-center p-4 text-muted">
                                             <i class="fas fa-inbox fa-2x mb-3"></i>
@@ -467,11 +411,12 @@
                                 <!-- Email Detail for Email ID 1 -->
                                 <div class="tab-pane fade show active" id="email-detail-1" role="tabpanel"
                                      aria-labelledby="email-detail-1-tab">
-                                    <div class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <span class="profile-avatar-h me-3">H</span>
                                             <div>
-                                                <span class="main-area-email-para">hasnat.khan@stellers.org</span><br />
+                                                <span class="main-area-email-para">hasnat.khan@stellers.org</span><br/>
                                                 <span class="main-area-email-para-time">Created 3 hours ago</span>
                                             </div>
                                         </div>
@@ -511,32 +456,50 @@
                                                     </p>
                                                     <p class="email-body mt-2">
                                                         Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here. This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
+                                                        email for demonstration purposes. Test email content goes here.
+                                                        This is a sample
                                                         email for demonstration purposes.
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr />
+                                        <hr/>
                                         <div class="resizable-panel">
                                             <div class="resizable-content">
-                                                <div class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
+                                                <div
+                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
                                                     <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>
                                                     <span class="email-comment-tabs email-decription">Email <i
                                                             class="fas fa-caret-down ms-1"></i></span>
@@ -548,11 +511,14 @@
                                                 </div>
                                                 <div
                                                     class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">
-                                                    <div class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
+                                                    <div
+                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
                                                         <i class="fas fa-reply" id="reply-icon"></i>
                                                         <div class="d-flex flex-wrap align-items-center flex-grow-1">
-                                                            <input class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
-                                                                   placeholder="Enter or choose a recipient" type="text" autocomplete="off" />
+                                                            <input
+                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
+                                                                placeholder="Enter or choose a recipient" type="text"
+                                                                autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                     <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>
@@ -561,17 +527,21 @@
                                         </div>
                                         <div class="form-control mt-2 email-compose-box">
                                             <div class="editor-wrapper">
-                                                <div id="editorContent" class=" text-placeholder" contenteditable="true">
+                                                <div id="editorContent" class=" text-placeholder"
+                                                     contenteditable="true">
                                                     Write a message. Press '/' or highlight text to
                                                     access AI commands.
                                                 </div>
                                                 <div class="editor-toolbar d-flex justify-content-between">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip" title="Change Font"></i>
-                                                        <i class="editor-icon fas fa-smile me-3 text-primary" data-bs-toggle="tooltip"
+                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"
+                                                           title="Change Font"></i>
+                                                        <i class="editor-icon fas fa-smile me-3 text-primary"
+                                                           data-bs-toggle="tooltip"
                                                            title="Press window with ;"></i>
                                                         <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-link" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-link" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
@@ -583,31 +553,37 @@
                                                             </ul>
                                                         </div>
                                                         <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-image" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-image" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Upload New Image</a>
+                                                                    <a class="dropdown-item" href="#">Upload New
+                                                                        Image</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Insert Existing Image</a>
+                                                                    <a class="dropdown-item" href="#">Insert Existing
+                                                                        Image</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
                                                         <div class="dropup me-3">
-                                                            <i class="editor-icon fas fa-paperclip" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-paperclip" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
                                                                     <a class="dropdown-item" href="#">Attach File</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Browse Documents</a>
+                                                                    <a class="dropdown-item" href="#">Browse
+                                                                        Documents</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
                                                         <div class="dropup me-3">
-                                                            <button class="btn btn-secondary insert-btn" type="button" data-bs-toggle="dropdown"
+                                                            <button class="btn btn-secondary insert-btn" type="button"
+                                                                    data-bs-toggle="dropdown"
                                                                     aria-expanded="false">
                                                                 Insert
                                                             </button>
@@ -616,7 +592,8 @@
                                                                     <a class="dropdown-item" href="#">Insert Invoice</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Insert Documents</a>
+                                                                    <a class="dropdown-item" href="#">Insert
+                                                                        Documents</a>
                                                                 </li>
                                                                 <li>
                                                                     <a class="dropdown-item" href="#">Insert Code</a>
@@ -633,12 +610,14 @@
                                     </div>
                                 </div>
                                 <!-- Email Detail for Email ID 2 -->
-                                <div class="tab-pane fade" id="email-detail-2" role="tabpanel" aria-labelledby="email-detail-2-tab">
-                                    <div class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
+                                <div class="tab-pane fade" id="email-detail-2" role="tabpanel"
+                                     aria-labelledby="email-detail-2-tab">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <span class="profile-avatar-h me-3">M</span>
                                             <div>
-                                                <span class="main-area-email-para">moiz@saviours.co</span><br />
+                                                <span class="main-area-email-para">moiz@saviours.co</span><br/>
                                                 <span class="main-area-email-para-time">Created 5 minutes ago</span>
                                             </div>
                                         </div>
@@ -717,10 +696,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr />
+                                        <hr/>
                                         <div class="resizable-panel">
                                             <div class="resizable-content">
-                                                <div class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
+                                                <div
+                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
                                                     <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>
                                                     <span class="email-comment-tabs email-decription">Email <i
                                                             class="fas fa-caret-down ms-1"></i></span>
@@ -732,11 +712,14 @@
                                                 </div>
                                                 <div
                                                     class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">
-                                                    <div class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
+                                                    <div
+                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
                                                         <i class="fas fa-reply" id="reply-icon"></i>
                                                         <div class="d-flex flex-wrap align-items-center flex-grow-1">
-                                                            <input class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
-                                                                   placeholder="Enter or choose a recipient" type="text" autocomplete="off" />
+                                                            <input
+                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
+                                                                placeholder="Enter or choose a recipient" type="text"
+                                                                autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                     <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>
@@ -745,17 +728,22 @@
                                         </div>
                                         <div class="form-control mt-2 email-compose-box">
                                             <div class="editor-wrapper">
-                                                <div id="editorContent" class="text-muted text-placeholder" contenteditable="true">
+                                                <div id="editorContent" class="text-muted text-placeholder"
+                                                     contenteditable="true">
                                                     Write a message. Press '/' or highlight text to
                                                     access AI commands.
                                                 </div>
-                                                <div class="editor-toolbar d-flex justify-content-between align-items-center">
+                                                <div
+                                                    class="editor-toolbar d-flex justify-content-between align-items-center">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip" title="Change Font"></i>
-                                                        <i class="editor-icon fas fa-smile me-3 text-primary" data-bs-toggle="tooltip"
+                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"
+                                                           title="Change Font"></i>
+                                                        <i class="editor-icon fas fa-smile me-3 text-primary"
+                                                           data-bs-toggle="tooltip"
                                                            title="Insert Emoji"></i>
                                                         <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-link" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-link" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
@@ -767,31 +755,37 @@
                                                             </ul>
                                                         </div>
                                                         <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-image" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-image" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Upload New Image</a>
+                                                                    <a class="dropdown-item" href="#">Upload New
+                                                                        Image</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Insert Existing Image</a>
+                                                                    <a class="dropdown-item" href="#">Insert Existing
+                                                                        Image</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
                                                         <div class="dropup me-3">
-                                                            <i class="editor-icon fas fa-paperclip" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-paperclip" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
                                                                     <a class="dropdown-item" href="#">Attach File</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Browse Documents</a>
+                                                                    <a class="dropdown-item" href="#">Browse
+                                                                        Documents</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
                                                         <div class="dropup me-3">
-                                                            <button class="btn btn-secondary insert-btn" type="button" data-bs-toggle="dropdown"
+                                                            <button class="btn btn-secondary insert-btn" type="button"
+                                                                    data-bs-toggle="dropdown"
                                                                     aria-expanded="false">
                                                                 Insert
                                                             </button>
@@ -800,7 +794,8 @@
                                                                     <a class="dropdown-item" href="#">Insert Invoice</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Insert Documents</a>
+                                                                    <a class="dropdown-item" href="#">Insert
+                                                                        Documents</a>
                                                                 </li>
                                                                 <li>
                                                                     <a class="dropdown-item" href="#">Insert Code</a>
@@ -817,12 +812,14 @@
                                     </div>
                                 </div>
                                 <!-- Email Detail for Email ID 3 -->
-                                <div class="tab-pane fade" id="email-detail-3" role="tabpanel" aria-labelledby="email-detail-3-tab">
-                                    <div class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
+                                <div class="tab-pane fade" id="email-detail-3" role="tabpanel"
+                                     aria-labelledby="email-detail-3-tab">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
                                         <div class="d-flex align-items-center">
                                             <span class="profile-avatar-h me-3">S</span>
                                             <div>
-                                                <span class="main-area-email-para">sarah.j@example.com</span><br />
+                                                <span class="main-area-email-para">sarah.j@example.com</span><br/>
                                                 <span class="main-area-email-para-time">Created 15 minutes ago</span>
                                             </div>
                                         </div>
@@ -833,13 +830,16 @@
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-4">
                                             <div class="user-info-dropdown">
-                                                <div class="user-info d-flex align-items-center" id="userDropdownToggle" role="button" aria-expanded="false">
+                                                <div class="user-info d-flex align-items-center" id="userDropdownToggle"
+                                                     role="button" aria-expanded="false">
                                                     <div class="icon-wrapper me-2">
-                                                        <i class="fas fa-user-circle profile-icon" aria-hidden="true"></i>
+                                                        <i class="fas fa-user-circle profile-icon"
+                                                           aria-hidden="true"></i>
                                                         <span class="status-dot"></span>
                                                     </div>
                                                     <p class="user_name mb-0">Hasnat Khan</p>
-                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down" aria-hidden="true"></i>
+                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"
+                                                       aria-hidden="true"></i>
                                                 </div>
 
                                                 <div class="user-dropdown-menu" id="userDropdownMenu">
@@ -853,7 +853,8 @@
                                                     </div>
 
                                                     <div class="user-list">
-                                                        <div class="user-item-row active-user d-flex align-items-center justify-content-between">
+                                                        <div
+                                                            class="user-item-row active-user d-flex align-items-center justify-content-between">
                                                             <div class="d-flex align-items-center">
                                                                 <div class="avatar-sm me-2">
                                                                     <i class="fas fa-user-circle"></i>
@@ -896,10 +897,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr />
+                                        <hr/>
                                         <div class="resizable-panel">
                                             <div class="resizable-content">
-                                                <div class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
+                                                <div
+                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
                                                     <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>
                                                     <span class="email-comment-tabs email-decription">Email <i
                                                             class="fas fa-caret-down ms-1"></i></span>
@@ -911,11 +913,14 @@
                                                 </div>
                                                 <div
                                                     class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">
-                                                    <div class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
+                                                    <div
+                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
                                                         <i class="fas fa-reply" id="reply-icon"></i>
                                                         <div class="d-flex flex-wrap align-items-center flex-grow-1">
-                                                            <input class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
-                                                                   placeholder="Enter or choose a recipient" type="text" autocomplete="off" />
+                                                            <input
+                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
+                                                                placeholder="Enter or choose a recipient" type="text"
+                                                                autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                     <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>
@@ -924,17 +929,22 @@
                                         </div>
                                         <div class="form-control mt-2 email-compose-box">
                                             <div class="editor-wrapper">
-                                                <div id="editorContent" class="text-muted text-placeholder" contenteditable="true">
+                                                <div id="editorContent" class="text-muted text-placeholder"
+                                                     contenteditable="true">
                                                     Write a message. Press '/' or highlight text to
                                                     access AI commands.
                                                 </div>
-                                                <div class="editor-toolbar d-flex justify-content-between align-items-center">
+                                                <div
+                                                    class="editor-toolbar d-flex justify-content-between align-items-center">
                                                     <div class="d-flex align-items-center">
-                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip" title="Change Font"></i>
-                                                        <i class="editor-icon fas fa-smile me-3 text-primary" data-bs-toggle="tooltip"
+                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"
+                                                           title="Change Font"></i>
+                                                        <i class="editor-icon fas fa-smile me-3 text-primary"
+                                                           data-bs-toggle="tooltip"
                                                            title="Insert Emoji"></i>
                                                         <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-link" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-link" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
@@ -946,31 +956,37 @@
                                                             </ul>
                                                         </div>
                                                         <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-image" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-image" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Upload New Image</a>
+                                                                    <a class="dropdown-item" href="#">Upload New
+                                                                        Image</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Insert Existing Image</a>
+                                                                    <a class="dropdown-item" href="#">Insert Existing
+                                                                        Image</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
                                                         <div class="dropup me-3">
-                                                            <i class="editor-icon fas fa-paperclip" role="button" data-bs-toggle="dropdown"
+                                                            <i class="editor-icon fas fa-paperclip" role="button"
+                                                               data-bs-toggle="dropdown"
                                                                aria-expanded="false"></i>
                                                             <ul class="dropdown-menu">
                                                                 <li>
                                                                     <a class="dropdown-item" href="#">Attach File</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Browse Documents</a>
+                                                                    <a class="dropdown-item" href="#">Browse
+                                                                        Documents</a>
                                                                 </li>
                                                             </ul>
                                                         </div>
                                                         <div class="dropup me-3">
-                                                            <button class="btn btn-secondary insert-btn" type="button" data-bs-toggle="dropdown"
+                                                            <button class="btn btn-secondary insert-btn" type="button"
+                                                                    data-bs-toggle="dropdown"
                                                                     aria-expanded="false">
                                                                 Insert
                                                             </button>
@@ -979,7 +995,8 @@
                                                                     <a class="dropdown-item" href="#">Insert Invoice</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a class="dropdown-item" href="#">Insert Documents</a>
+                                                                    <a class="dropdown-item" href="#">Insert
+                                                                        Documents</a>
                                                                 </li>
                                                                 <li>
                                                                     <a class="dropdown-item" href="#">Insert Code</a>
@@ -1024,17 +1041,21 @@
 
                                         <div class="btn-group" role="group">
                                             <div class="dropdown custom-popup">
-                                                <button type="button" class="btn btn-tertiary-light" id="actionMenuButton1"
+                                                <button type="button" class="btn btn-tertiary-light"
+                                                        id="actionMenuButton1"
                                                         data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-h"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-start ms-2" aria-labelledby="actionMenuButton1">
+                                                <ul class="dropdown-menu dropdown-menu-start ms-2"
+                                                    aria-labelledby="actionMenuButton1">
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="fas fa-trash me-2 text-danger"></i>
+                                                        <a class="dropdown-item" href="#"><i
+                                                                class="fas fa-trash me-2 text-danger"></i>
                                                             Move to Trash</a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="fas fa-ban me-2 text-warning"></i>
+                                                        <a class="dropdown-item" href="#"><i
+                                                                class="fas fa-ban me-2 text-warning"></i>
                                                             Block Sender</a>
                                                     </li>
                                                     <li>
@@ -1053,10 +1074,11 @@
                                     <div class="d-flex align-items-center mt-3 mb-3 ms-2">
                                         <span class="profile-avatar-h me-3 right-sidebar-profile-avator">H</span>
                                         <div>
-                                            <span class="main-area-email-para-right-sidebar">hasnat.khan@stellers.org</span><br />
+                                            <span
+                                                class="main-area-email-para-right-sidebar">hasnat.khan@stellers.org</span><br/>
                                         </div>
                                     </div>
-                                    <hr />
+                                    <hr/>
 
                                     <div id="sortable-container-1">
                                         <!-- About Contact -->
@@ -1102,7 +1124,8 @@
                                         <!-- Companies -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#companies-section-1" aria-expanded="false" aria-controls="companies-section-1">
+                                                 data-bs-target="#companies-section-1" aria-expanded="false"
+                                                 aria-controls="companies-section-1">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Companies (1)</span>
@@ -1113,7 +1136,8 @@
                                                         <span class="btn btn-sm btn-outline-primary">Primary</span>
                                                         <div>
                                                             <span class="btn btn-sm btn-dark">Preview</span>
-                                                            <span class="btn btn-sm btn-dark dropdown-toggle">More</span>
+                                                            <span
+                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-2">
@@ -1142,7 +1166,8 @@
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Other Conversations (1)</span>
                                             </div>
-                                            <div class="collapse custom-sidebar-content" id="other-conversations-section-1">
+                                            <div class="collapse custom-sidebar-content"
+                                                 id="other-conversations-section-1">
                                                 <div class="other-conversations-section">
                                                     <p>
                                                         <i class="fas fa-envelope"></i> Assigned to Moiz
@@ -1160,7 +1185,8 @@
                                         <!-- Contacts -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#contacts-section-1" aria-expanded="false" aria-controls="contacts-section-1">
+                                                 data-bs-target="#contacts-section-1" aria-expanded="false"
+                                                 aria-controls="contacts-section-1">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Contacts (0)</span>
@@ -1199,7 +1225,8 @@
                                         <!-- Payments -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#payments-section-1" aria-expanded="false" aria-controls="payments-section-1">
+                                                 data-bs-target="#payments-section-1" aria-expanded="false"
+                                                 aria-controls="payments-section-1">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Payments (0)</span>
@@ -1223,7 +1250,8 @@
                                         <!-- Tickets -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#ticket-section-1" aria-expanded="false" aria-controls="ticket-section-1">
+                                                 data-bs-target="#ticket-section-1" aria-expanded="false"
+                                                 aria-controls="ticket-section-1">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Tickets (02)</span>
@@ -1234,7 +1262,8 @@
                                         <!-- Deals -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#deals-section-1" aria-expanded="false" aria-controls="deals-section-1">
+                                                 data-bs-target="#deals-section-1" aria-expanded="false"
+                                                 aria-controls="deals-section-1">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Deals (04)</span>
@@ -1251,37 +1280,44 @@
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Other Tickets (04)</span>
                                             </div>
-                                            <div class="collapse custom-sidebar-content" id="other-ticket-section-1"></div>
+                                            <div class="collapse custom-sidebar-content"
+                                                 id="other-ticket-section-1"></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Right Sidebar for Email ID 2 -->
-                                <div class="tab-pane fade" id="sidebar-detail-2" role="tabpanel" aria-labelledby="email-detail-2-tab">
+                                <div class="tab-pane fade" id="sidebar-detail-2" role="tabpanel"
+                                     aria-labelledby="email-detail-2-tab">
                                     <div class="right-sidebar-header d-flex justify-content-between align-items-center">
                                         <div class="btn-group me-2" role="group">
                                             <button type="button" class="btn btn-tertiary-light">
                                                 <i class="fas fa-check-circle me-1" aria-hidden="true"></i>
                                                 <span>Close conversation</span>
                                             </button>
-                                            <button id="extraBtn2" type="button" class="btn btn-secondary" style="display: none">
+                                            <button id="extraBtn2" type="button" class="btn btn-secondary"
+                                                    style="display: none">
                                                 <i class="fas fa-trash me-1" aria-hidden="true"></i>
                                                 <span>Trash</span>
                                             </button>
                                         </div>
                                         <div class="btn-group" role="group">
                                             <div class="dropdown custom-popup">
-                                                <button type="button" class="btn btn-tertiary-light" id="actionMenuButton2"
+                                                <button type="button" class="btn btn-tertiary-light"
+                                                        id="actionMenuButton2"
                                                         data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-h"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-start ms-2" aria-labelledby="actionMenuButton2">
+                                                <ul class="dropdown-menu dropdown-menu-start ms-2"
+                                                    aria-labelledby="actionMenuButton2">
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="fas fa-trash me-2 text-danger"></i>
+                                                        <a class="dropdown-item" href="#"><i
+                                                                class="fas fa-trash me-2 text-danger"></i>
                                                             Move to Trash</a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="fas fa-ban me-2 text-warning"></i>
+                                                        <a class="dropdown-item" href="#"><i
+                                                                class="fas fa-ban me-2 text-warning"></i>
                                                             Block Sender</a>
                                                     </li>
                                                     <li>
@@ -1300,10 +1336,11 @@
                                     <div class="d-flex align-items-center mt-3 mb-3 ms-2">
                                         <span class="profile-avatar-h me-3 right-sidebar-profile-avator">M</span>
                                         <div>
-                                            <span class="main-area-email-para-right-sidebar">moiz@saviours.co</span><br />
+                                            <span
+                                                class="main-area-email-para-right-sidebar">moiz@saviours.co</span><br/>
                                         </div>
                                     </div>
-                                    <hr />
+                                    <hr/>
 
                                     <div id="sortable-container-2">
                                         <!-- About Contact -->
@@ -1349,7 +1386,8 @@
                                         <!-- Companies -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#companies-section-2" aria-expanded="false" aria-controls="companies-section-2">
+                                                 data-bs-target="#companies-section-2" aria-expanded="false"
+                                                 aria-controls="companies-section-2">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Companies (1)</span>
@@ -1360,7 +1398,8 @@
                                                         <span class="btn btn-sm btn-outline-primary">Primary</span>
                                                         <div>
                                                             <span class="btn btn-sm btn-dark">Preview</span>
-                                                            <span class="btn btn-sm btn-dark dropdown-toggle">More</span>
+                                                            <span
+                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-2">
@@ -1389,7 +1428,8 @@
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Other Conversations (1)</span>
                                             </div>
-                                            <div class="collapse custom-sidebar-content" id="other-conversations-section-2">
+                                            <div class="collapse custom-sidebar-content"
+                                                 id="other-conversations-section-2">
                                                 <div class="other-conversations-section">
                                                     <p>
                                                         <i class="fas fa-envelope"></i> Assigned to Moiz
@@ -1407,7 +1447,8 @@
                                         <!-- Contacts -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#contacts-section-2" aria-expanded="false" aria-controls="contacts-section-2">
+                                                 data-bs-target="#contacts-section-2" aria-expanded="false"
+                                                 aria-controls="contacts-section-2">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Contacts (0)</span>
@@ -1446,7 +1487,8 @@
                                         <!-- Payments -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#payments-section-2" aria-expanded="false" aria-controls="payments-section-2">
+                                                 data-bs-target="#payments-section-2" aria-expanded="false"
+                                                 aria-controls="payments-section-2">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Payments (0)</span>
@@ -1470,7 +1512,8 @@
                                         <!-- Tickets -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#ticket-section-2" aria-expanded="false" aria-controls="ticket-section-2">
+                                                 data-bs-target="#ticket-section-2" aria-expanded="false"
+                                                 aria-controls="ticket-section-2">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Tickets (02)</span>
@@ -1481,7 +1524,8 @@
                                         <!-- Deals -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#deals-section-2" aria-expanded="false" aria-controls="deals-section-2">
+                                                 data-bs-target="#deals-section-2" aria-expanded="false"
+                                                 aria-controls="deals-section-2">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Deals (04)</span>
@@ -1498,37 +1542,44 @@
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Other Tickets (04)</span>
                                             </div>
-                                            <div class="collapse custom-sidebar-content" id="other-ticket-section-2"></div>
+                                            <div class="collapse custom-sidebar-content"
+                                                 id="other-ticket-section-2"></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Right Sidebar for Email ID 3 -->
-                                <div class="tab-pane fade" id="sidebar-detail-3" role="tabpanel" aria-labelledby="email-detail-3-tab">
+                                <div class="tab-pane fade" id="sidebar-detail-3" role="tabpanel"
+                                     aria-labelledby="email-detail-3-tab">
                                     <div class="right-sidebar-header d-flex justify-content-between align-items-center">
                                         <div class="btn-group me-2" role="group">
                                             <button type="button" class="btn btn-tertiary-light">
                                                 <i class="fas fa-check-circle me-1" aria-hidden="true"></i>
                                                 <span>Close conversation</span>
                                             </button>
-                                            <button id="extraBtn3" type="button" class="btn btn-secondary" style="display: none">
+                                            <button id="extraBtn3" type="button" class="btn btn-secondary"
+                                                    style="display: none">
                                                 <i class="fas fa-trash me-1" aria-hidden="true"></i>
                                                 <span>Trash</span>
                                             </button>
                                         </div>
                                         <div class="btn-group" role="group">
                                             <div class="dropdown custom-popup">
-                                                <button type="button" class="btn btn-tertiary-light" id="actionMenuButton3"
+                                                <button type="button" class="btn btn-tertiary-light"
+                                                        id="actionMenuButton3"
                                                         data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-h"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-start ms-2" aria-labelledby="actionMenuButton3">
+                                                <ul class="dropdown-menu dropdown-menu-start ms-2"
+                                                    aria-labelledby="actionMenuButton3">
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="fas fa-trash me-2 text-danger"></i>
+                                                        <a class="dropdown-item" href="#"><i
+                                                                class="fas fa-trash me-2 text-danger"></i>
                                                             Move to Trash</a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item" href="#"><i class="fas fa-ban me-2 text-warning"></i>
+                                                        <a class="dropdown-item" href="#"><i
+                                                                class="fas fa-ban me-2 text-warning"></i>
                                                             Block Sender</a>
                                                     </li>
                                                     <li>
@@ -1547,10 +1598,11 @@
                                     <div class="d-flex align-items-center mt-3 mb-3 ms-2">
                                         <span class="profile-avatar-h me-3 right-sidebar-profile-avator">A</span>
                                         <div>
-                                            <span class="main-area-email-para-right-sidebar">ashter@example.com</span><br />
+                                            <span
+                                                class="main-area-email-para-right-sidebar">ashter@example.com</span><br/>
                                         </div>
                                     </div>
-                                    <hr />
+                                    <hr/>
 
                                     <div id="sortable-container-3">
                                         <!-- About Contact -->
@@ -1596,7 +1648,8 @@
                                         <!-- Companies -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#companies-section-3" aria-expanded="false" aria-controls="companies-section-3">
+                                                 data-bs-target="#companies-section-3" aria-expanded="false"
+                                                 aria-controls="companies-section-3">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Companies (1)</span>
@@ -1607,7 +1660,8 @@
                                                         <span class="btn btn-sm btn-outline-primary">Primary</span>
                                                         <div>
                                                             <span class="btn btn-sm btn-dark">Preview</span>
-                                                            <span class="btn btn-sm btn-dark dropdown-toggle">More</span>
+                                                            <span
+                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>
                                                         </div>
                                                     </div>
                                                     <div class="d-flex align-items-center mb-2">
@@ -1636,7 +1690,8 @@
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Other Conversations (1)</span>
                                             </div>
-                                            <div class="collapse custom-sidebar-content" id="other-conversations-section-3">
+                                            <div class="collapse custom-sidebar-content"
+                                                 id="other-conversations-section-3">
                                                 <div class="other-conversations-section">
                                                     <p>
                                                         <i class="fas fa-envelope"></i> Assigned to Moiz
@@ -1654,7 +1709,8 @@
                                         <!-- Contacts -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#contacts-section-3" aria-expanded="false" aria-controls="contacts-section-3">
+                                                 data-bs-target="#contacts-section-3" aria-expanded="false"
+                                                 aria-controls="contacts-section-3">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Contacts (0)</span>
@@ -1693,7 +1749,8 @@
                                         <!-- Payments -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#payments-section-3" aria-expanded="false" aria-controls="payments-section-3">
+                                                 data-bs-target="#payments-section-3" aria-expanded="false"
+                                                 aria-controls="payments-section-3">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Payments (0)</span>
@@ -1717,7 +1774,8 @@
                                         <!-- Tickets -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#ticket-section-3" aria-expanded="false" aria-controls="ticket-section-3">
+                                                 data-bs-target="#ticket-section-3" aria-expanded="false"
+                                                 aria-controls="ticket-section-3">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Tickets (02)</span>
@@ -1728,7 +1786,8 @@
                                         <!-- Deals -->
                                         <div class="sortable-item">
                                             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#deals-section-3" aria-expanded="false" aria-controls="deals-section-3">
+                                                 data-bs-target="#deals-section-3" aria-expanded="false"
+                                                 aria-controls="deals-section-3">
                                                 <i class="fas fa-grip-vertical drag-handle-icon"></i>
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Deals (04)</span>
@@ -1745,20 +1804,104 @@
                                                 <i class="fas fa-angle-right custom-toggle-icon"></i>
                                                 <span>Other Tickets (04)</span>
                                             </div>
-                                            <div class="collapse custom-sidebar-content" id="other-ticket-section-3"></div>
+                                            <div class="collapse custom-sidebar-content"
+                                                 id="other-ticket-section-3"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Hidden Merged col-md-10 (search results + empty state) -->
 
+                    <!-- Page 1 End -->
+
+                    <!-- Page 2 Start -->
+
+                    <!-- Hidden Filter Panel (col-md-2) -->
+                    <div class="col-md-2 d-none" id="filterPanel">
+                        <div class="filter-content">
+                            <!-- fixed top -->
+                            <a href="#" id="exitSearch" class="exit-search">
+                                <i class="fas fa-chevron-left"></i> Exit search
+                            </a>
+
+                            <div
+                                class="custom-header-text-search d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Filter by:</h6>
+                                <a href="#" id="clearFilters" class="small custom-clear">Clear all</a>
+                            </div>
+
+                            <!-- scrollable section -->
+                            <div class="filter-scrollable">
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="form-select custom-status-select">
+                                        <option selected>Select a status</option>
+                                        <option>Open</option>
+                                        <option>Closed</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">Channel</label>
+                                    <select class="form-select custom-status-select">
+                                        <option class="cstm-opt">Select a channel</option>
+                                        <option class="cstm-opt">Email</option>
+                                        <option class="cstm-opt">Chat</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">Channel Account</label>
+                                    <select class="form-select custom-status-select">
+                                        <option selected>Select a channel account</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">Contact</label>
+                                    <select class="form-select custom-status-select">
+                                        <option selected>Select a contact</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">Assignee</label>
+                                    <select class="form-select custom-status-select">
+                                        <option selected>Select an assignee</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group d-block">
+                                    <label class="filter-label">Date</label>
+                                    <div class="gap-2">
+                                        <input id="dateRange" class="form-control " placeholder="Select date range"/>
+                                    </div>
+                                </div>
+
+                                <div class="filter-group mt-3">
+                                    <small class="d-block mb-2">More options</small>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input custom-form-check" type="checkbox"
+                                               id="hideFiltered" checked/>
+                                        <label class="form-check-label" for="hideFiltered">Hide filtered</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="hideTrash" checked/>
+                                        <label class="form-check-label" for="hideTrash">Hide trash</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Merged col-md-10 (search results + empty state) -->
                     <div class="col-md-10 d-none" id="mergedContent">
                         <div class="search-top">
                             <div style="flex: 1" class="pe-2">
                                 <div class="search-bar d-flex align-items-center">
-                                    <input class="search-input" type="text" placeholder="Search Inbox" id="searchInput" />
+                                    <input class="search-input" type="text" placeholder="Search Inbox"
+                                           id="searchInput"/>
                                     <i class="fas fa-search ms-2"></i>
                                 </div>
                             </div>
@@ -1769,7 +1912,7 @@
                                         Newest
                                     </button>
                                     <ul class="dropdown-menu cust-hide-search" aria-labelledby="dropdownMenuButton">
-                                        <li><a class="dropdown-item" href="#">Newest  </a></li>
+                                        <li><a class="dropdown-item" href="#">Newest </a></li>
                                         <li><a class="dropdown-item" href="#">Oldest</a></li>
 
                                     </ul>
@@ -1788,7 +1931,7 @@
                   height: 100vh;
                 ">
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" />
+                                    <input class="form-check-input" type="checkbox"/>
                                 </div>
                                 <div class="text-muted small">Newest</div>
                                 <div class="mt-4 small text-muted">
@@ -1816,6 +1959,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Page 2 End -->
                 </div>
             </section>
         </div>
@@ -1831,23 +1976,18 @@
                 item.addEventListener("click", function (e) {
                     e.preventDefault();
                     // Remove active class from all email items
-                    document
-                        .querySelectorAll(".email-main-body")
-                        .forEach((el) => el.classList.remove("active"));
+                    document.querySelectorAll(".email-main-body").forEach((el) => el.classList.remove("active"));
                     // Add active class to clicked item
                     this.classList.add("active");
                     // Get the target email detail and sidebar panes
                     const emailTarget = this.getAttribute("data-bs-target");
                     const sidebarTarget = this.getAttribute("data-sidebar-target");
+
                     // Activate email detail pane
-                    document
-                        .querySelectorAll("#email-detail-content .tab-pane")
-                        .forEach((pane) => pane.classList.remove("show", "active"));
+                    document.querySelectorAll("#email-detail-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
                     document.querySelector(emailTarget).classList.add("show", "active");
                     // Activate sidebar pane
-                    document
-                        .querySelectorAll("#right-sidebar-content .tab-pane")
-                        .forEach((pane) => pane.classList.remove("show", "active"));
+                    document.querySelectorAll("#right-sidebar-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
                     document.querySelector(sidebarTarget).classList.add("show", "active");
                 });
             });
@@ -1922,7 +2062,6 @@
                         emailHeader.classList.remove("d-none");
                     }
                 });
-
 
             // for add button trash with close conservation button
             const checkbox = document.getElementById("main-checkbox");
@@ -1999,7 +2138,6 @@
                 }
             });
 
-
             $(document).ready(function () {
                 $("#actionsBtn").on("click", function (e) {
                     e.stopPropagation();
@@ -2035,19 +2173,19 @@
         // this is for the popup
         <script>
             // Simple JavaScript to toggle the dropdown menu
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const toggle = document.getElementById('userDropdownToggle');
                 const menu = document.getElementById('userDropdownMenu');
 
                 if (toggle && menu) {
-                    toggle.addEventListener('click', function(event) {
+                    toggle.addEventListener('click', function (event) {
                         // Toggle the 'show' class to display/hide the menu
                         menu.classList.toggle('show');
                         event.stopPropagation();
                     });
 
                     // Close the menu when clicking outside
-                    document.addEventListener('click', function(event) {
+                    document.addEventListener('click', function (event) {
                         if (menu.classList.contains('show') && !menu.contains(event.target) && !toggle.contains(event.target)) {
                             menu.classList.remove('show');
                         }
