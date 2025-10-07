@@ -134,7 +134,7 @@
                 @endphp
 
                 @if ($emails->isEmpty())
-                    <div class="text-center py-4">
+                    <div class="text-center py-4 no-emails-placeholder">
                         <i class="fa fa-envelope-open text-muted" style="font-size: 32px;"></i>
                         <p class="mt-2 text-muted">No emails available yet.</p>
                         <small class="text-secondary">
@@ -152,7 +152,6 @@
                         @endif
                     @endforeach
 
-                    {{-- Show More Button --}}
                     <div id="show-more-container" class="text-center mt-3">
                         <button id="show-more-btn" class="btn btn-outline-primary btn-sm">
                             Show More
