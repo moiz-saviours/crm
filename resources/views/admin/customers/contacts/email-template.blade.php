@@ -987,7 +987,10 @@
         .email-minimized .email-divider {
             display: none;
         }
-
+.quoted-history-container {
+    position: relative;
+    margin-top: 10px;
+}
         .show-quoted-btn {
             background: #f0f0f0; /* light highlight */
             border: 1px solid #ccc;
@@ -1004,6 +1007,9 @@
             left: 0;
             top: 0;
             line-height: 1;
+
+    transform: translateY(-100%); /* move it just above the quoted box */
+    z-index: 2;
         }
 
     </style>
@@ -1160,7 +1166,7 @@
 
                             <div class="quoted-history-wrapper">
                                 <div class="quoted-history"
-                                    style="display:none; border-left:2px solid #ccc; padding-left:10px; font-size:13px; color:#555;">
+                                    style="display: none;border-left: 0px solid rgb(204, 204, 204);padding-left: 0px;padding-top: 15px;font-size: 13px;color: rgb(85, 85, 85);">
                                     <!-- quoted content goes here -->
                                     Previous email reply or forwarded message content...
                                 </div>
