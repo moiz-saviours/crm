@@ -605,6 +605,7 @@
                 font-weight: 600;
                 font-size: var(--nf-profile-para-size);
                 margin: 0px !important;
+                cursor: pointer
             }
 
             .activities-addition-links {
@@ -926,6 +927,13 @@
             .user-email-template {
                 padding-left: 47px;
 
+            }
+
+            .user-email-template img {
+                display: block;
+                max-width: 100%;
+                height: auto;
+                object-fit: contain;
             }
 
             .contentdisplay {
@@ -2328,6 +2336,8 @@
                     let folder = 'all';
                     let currentPage = {{ $page }};
                     const limit = 100;
+                    const noEmailsPlaceholder = document.querySelector('.no-emails-placeholder');
+
 
                     // 🟢 Function to handle main email card toggle
                     function handleToggleEmailCardBox(container, caretEl) {
@@ -2385,24 +2395,35 @@ $(".card-box").on("click", ".toggle-email-header", function (e) {
     toggleEmailContent($container);
 });
 
-// Activity caret
-$(".card-box").on("click", ".toggle-activity", function (e) {
+$(".card-box").on("click", ".toggle-activity, .toggle-activity-row", function(e) {
     e.stopPropagation();
+
     const $container = $(this).closest(".email-box-container");
-    const target = $(this).data("target");
-    toggleActivityTimeline($container, target);
+    const $caret = $(this).hasClass("toggle-activity-row")
+        ? $(this).find(".toggle-activity")
+        : $(this);
+
+    // Clean up target (remove leading # if exists)
+    const rawTarget = $caret.data("target");
+    const target = rawTarget.replace(/^#/, ""); // ensure clean ID
+    const $activityBox = $container.find(`#${target}`);
+
+    // Check email and activity states
+    const $emailContent = $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle");
+    const isEmailOpen = $emailContent.is(":visible");
+    const isActivityOpen = $activityBox.is(":visible");
+
+    if (!isActivityOpen) {
+        // Opening activity
+        if (!isEmailOpen) {
+            toggleEmailContent($container); // open email box if closed
+        }
+        toggleActivityTimeline($container, `#${target}`); // open activity
+    } else {
+        // Closing only activity
+        toggleActivityTimeline($container, `#${target}`);
+    }
 });
-
-// Clicking on the activity paragraph also toggles same
-$(".card-box").on("click", ".toggle-activity-row", function (e) {
-    e.stopPropagation();
-    const $container = $(this).closest(".email-box-container");
-    const $caret = $(this).find(".toggle-activity");
-    const target = $caret.data("target");
-    toggleActivityTimeline($container, target);
-});
-
-
 
             
 
@@ -2434,51 +2455,63 @@ $(".card-box").on("click", ".toggle-activity-row", function (e) {
                     return emails; // already a single HTML string
                 }
 
-                // Fetch Emails function
-                function fetchEmails(append = false) {
+function fetchEmails(append = false) {
+    if (emailLoader) emailLoader.style.display = 'block';
+    if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'none';
 
-                    if (emailLoader) emailLoader.style.display = 'block';
+    // Disable both buttons during fetch
+    if (refreshButton) refreshButton.disabled = true;
+    if (fetchButton) fetchButton.disabled = true;
 
-                    fetch("{{ route('admin.customer.contact.emails.fetch') }}" +
-                        "?customer_email=" + encodeURIComponent(customerEmail) +
-                        "&folder=" + encodeURIComponent(folder) +
-                        "&page=" + currentPage +
-                        "&limit=" + limit)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (emailLoader) emailLoader.style.display = 'none';
+    fetch("{{ route('admin.customer.contact.emails.fetch') }}" +
+        "?customer_email=" + encodeURIComponent(customerEmail) +
+        "&folder=" + encodeURIComponent(folder) +
+        "&page=" + currentPage +
+        "&limit=" + limit)
+    .then(res => res.json())
+    .then(data => {
+        if (emailLoader) emailLoader.style.display = 'none';
 
-                        if (data.error) {
-                            console.warn("⚠️ Server response:", data.error);
-                            toastr.warning("We couldn't load new emails right now.");
-                            return;
-                        }
+        // Re-enable buttons
+        if (refreshButton) refreshButton.disabled = false;
+        if (fetchButton) fetchButton.disabled = false;
 
-                        if (!data.emails || data.emails.trim() === "") {
-                            if (currentPage === 1 && emailSection) {
-                                emailSection.innerHTML = '<p class="text-muted">No emails found.</p>';
-                            }
-                            if (showMoreContainer) showMoreContainer.style.display = 'none';
-                            toastr.info("No emails available.");
-                            return;
-                        }
+        if (data.error) {
+            console.warn("⚠️ Server response:", data.error);
+            toastr.warning("We couldn't load new emails right now.");
+            return;
+        }
 
-                        const html = renderEmails(data.emails);
-                        if (append && emailSection) {
-                            emailSection.insertAdjacentHTML('beforeend', html);
-                        } else if (emailSection) {
-                            emailSection.innerHTML = html;
-                        }
+        if (!data.emails || data.emails.trim() === "") {
+            if (currentPage === 1 && emailSection) {
+                emailSection.innerHTML = '';
+                if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'block';
+            }
+            if (showMoreContainer) showMoreContainer.style.display = 'none';
+            toastr.info("No emails available.");
+            return;
+        }
 
-                        toastr.success("Emails loaded successfully.");
-                        // toggleShowMoreVisibility(data);
-                    })
-                    .catch(err => {
-                        if (emailLoader) emailLoader.style.display = 'none';
-                        console.error("❌ Error fetching emails:", err);
-                        toastr.error("Something went wrong while fetching emails. Please try again.");
-                    });
-                }
+        const html = renderEmails(data.emails);
+        if (append && emailSection) {
+            emailSection.insertAdjacentHTML('beforeend', html);
+        } else if (emailSection) {
+            emailSection.innerHTML = html;
+        }
+
+        if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'none';
+        toastr.success("Emails loaded successfully.");
+    })
+    .catch(err => {
+        if (emailLoader) emailLoader.style.display = 'none';
+        if (refreshButton) refreshButton.disabled = false;
+        if (fetchButton) fetchButton.disabled = false;
+        console.error("❌ Error fetching emails:", err);
+        toastr.error("Something went wrong while fetching emails. Please try again.");
+    });
+}
+
+
 
                     // Refresh button: reset to first page & reload
                     refreshButton.addEventListener('click', function() {
@@ -2486,45 +2519,65 @@ $(".card-box").on("click", ".toggle-activity-row", function (e) {
                         fetchEmails(false); // reload first page
                     });
 
-                    // Fetch new emails
-                fetchButton.addEventListener('click', function () {
-                    console.log("📩 Fetching NEW emails for:", customerEmail);
-                    emailLoader.style.display = 'block';
+                // Fetch new emails
+fetchButton.addEventListener('click', function () {
+    console.log("📩 Fetching NEW emails for:", customerEmail);
 
-                    fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
-                        "?customer_email=" + encodeURIComponent(customerEmail), {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            emailLoader.style.display = 'none';
+    if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'none';
+    if (emailLoader) emailLoader.style.display = 'block';
 
-                            if (data.status === "error") {
-                                fetchEmails();
-                                toastr.error(data.message || "Something went wrong.");
-                                return;
-                            }
+    // Disable both buttons during fetch
+    if (refreshButton) refreshButton.disabled = true;
+    if (fetchButton) fetchButton.disabled = true;
 
-                            if (data.status === "success") {
-                                fetchEmails();
-                                toastr.success(data.message);
-                            }
+    fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
+        "?customer_email=" + encodeURIComponent(customerEmail), {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (emailLoader) emailLoader.style.display = 'none';
+            if (refreshButton) refreshButton.disabled = false;
+            if (fetchButton) fetchButton.disabled = false;
 
-                            if (data.status === "warning") {
-                                fetchEmails();
-                                console.log(data.message);
-                            }
-                        })
-                        .catch(error => {
-                            emailLoader.style.display = 'none';
-                            console.error(error);
-                            toastr.error("Failed to fetch emails. Please try again later.");
-                        });
-                });
+            if (data.status === "error") {
+                fetchEmails();
+                toastr.error(data.message || "Something went wrong.");
+                return;
+            }
+
+            if (data.status === "success") {
+                fetchEmails();
+                toastr.success(data.message);
+            }
+
+            if (data.status === "warning") {
+                fetchEmails();
+                console.log(data.message);
+            }
+
+            // Fallback: if no emails appear after fetch
+            setTimeout(() => {
+                if (emailSection && emailSection.innerHTML.trim() === "") {
+                    if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'block';
+                }
+            }, 500);
+        })
+        .catch(error => {
+            if (emailLoader) emailLoader.style.display = 'none';
+            if (refreshButton) refreshButton.disabled = false;
+            if (fetchButton) fetchButton.disabled = false;
+            console.error(error);
+            toastr.error("Failed to fetch emails. Please try again later.");
+            if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'block';
+        });
+});
+
+
 
 
                     // Tabs
