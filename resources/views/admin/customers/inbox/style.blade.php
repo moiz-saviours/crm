@@ -3,6 +3,9 @@
     /*
  * Theme-on Root Variables
  */
+    /*
+ * Theme-on Root Variables
+ */
     :root {
         --bs-brand-custom: #0091ae;
         --nf-mainnav-bg: #2d3e50;
@@ -41,12 +44,14 @@
         width: 100%;
         margin: 0;
         padding: 0;
+        /* font-size: var(--font-base); */
     }
 
     .custome-email-body {
         min-height: 100vh;
         background-color: var(--theme-on-background-light);
         font-family: Arial, sans-serif;
+        min-width: 100vh;
     }
 
     .row.g-0 {
@@ -68,44 +73,6 @@
         /* Smooth transitions */
     }
 
-    @media screen and (max-width: 1200px) {
-        .left-sidebar {
-            width: clamp(180px, 20vw, 250px);
-            padding: calc(var(--padding-base) * 0.75) calc(var(--padding-base) * 0.5);
-        }
-    }
-
-    @media screen and (max-width: 992px) {
-        .left-sidebar {
-            width: clamp(150px, 20vw, 200px);
-            padding: calc(var(--padding-base) * 0.75) calc(var(--padding-base) * 0.5);
-        }
-    }
-
-    @media screen and (max-width: 768px) {
-        .left-sidebar {
-            width: clamp(120px, 25vw, 180px);
-            padding: calc(var(--padding-base) * 0.6) calc(var(--padding-base) * 0.4);
-        }
-    }
-
-    @media screen and (max-width: 576px) {
-        .left-sidebar {
-            width: 100%;
-            min-width: 3.75rem;
-            /* 60px */
-            padding: calc(var(--padding-base) * 0.5) calc(var(--padding-base) * 0.3);
-        }
-    }
-
-    @media screen and (orientation: portrait) {
-        .left-sidebar {
-            width: 100%;
-            height: auto;
-            min-height: auto;
-        }
-    }
-
     .head-icons {
         display: flex;
         justify-content: space-between;
@@ -114,7 +81,7 @@
     }
 
     .icon-side {
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--theme-on-text-medium);
         display: flex;
         align-items: center;
@@ -127,16 +94,16 @@
     }
 
     .search-side i {
-        font-size: clamp(0.7rem, 0.9vw, 0.9rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .icon-side span {
         font-weight: 500;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .main-heading {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: bold;
         color: var(--bs-brand-custom);
         display: flex;
@@ -145,7 +112,7 @@
 
     .main-heading .fa-circle {
         color: var(--theme-on-accent);
-        font-size: clamp(0.4rem, 0.5vw, 0.5rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .main-heading .fa-caret-down {
@@ -170,19 +137,21 @@
     .list-group-item.active {
         background-color: var(--theme-on-active-bg);
         color: #000;
-        font-weight: 500;
+        font-weight: bold;
         border-color: none;
     }
 
     .list-group-item.active {
         border-left: clamp(0.1rem, 0.1875vw, 0.1875rem) solid var(--bs-brand-custom);
-        padding-left: calc(clamp(0.4rem, 0.625vw, 0.625rem) - clamp(0.1rem, 0.1875vw, 0.1875rem));
+        padding-left: calc(
+            clamp(0.4rem, 0.625vw, 0.625rem) - clamp(0.1rem, 0.1875vw, 0.1875rem)
+        );
     }
 
     .list-group-item .badge {
         background-color: transparent;
         color: var(--bs-secondary-color);
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: normal;
     }
 
@@ -204,7 +173,7 @@
         padding: clamp(0.3rem, 0.4vw, 0.4rem);
         border-radius: clamp(0.1rem, 0.1875vw, 0.1875rem);
         font-weight: bold;
-        font-size: clamp(0.6rem, 0.7vw, 0.7rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-body-bottom-button .button-one {
@@ -235,12 +204,6 @@
         padding-right: clamp(0.2rem, 0.3125vw, 0.3125rem);
     }
 
-    @media screen and (max-width: 576px) {
-        #unassigned-pane {
-            max-height: clamp(25rem, 31.25vh, 31.25rem);
-        }
-    }
-
     #unassigned-pane::-webkit-scrollbar {
         width: clamp(0.3rem, 0.375vw, 0.375rem);
     }
@@ -260,12 +223,6 @@
         overflow-y: auto;
         flex-grow: 1;
         /* Allow flex growth */
-    }
-
-    @media screen and (max-width: 992px) {
-        .uppper-part-main {
-            margin-left: 0;
-        }
     }
 
     .uppper-part {
@@ -290,7 +247,7 @@
         /* regular style */
         content: "\f0c8";
         /* fa-square icon */
-        font-size: clamp(0.9rem, 1.125vw, 1.125rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--theme-on-text-medium);
         border-radius: clamp(0.2rem, 0.25vw, 0.25rem);
         padding: clamp(0.1rem, 0.125vw, 0.125rem);
@@ -302,7 +259,7 @@
         /* keep icon centered */
     }
 
-    .custom-checkbox input:checked+.check-icon::before {
+    .custom-checkbox input:checked + .check-icon::before {
         font-weight: 900;
         content: "\f14a";
         color: var(--bs-brand-custom);
@@ -312,27 +269,27 @@
     .uppper-part .open-btn,
     .uppper-part .close-btn {
         border: none;
-        font-weight: 500;
-        /*padding: clamp(0.3rem, 0.5vw, 0.5rem) clamp(0.4rem, 0.625vw, 0.625rem);*/
-        padding: 5px 7px;
-        font-size: 14px;
+        font-weight: bold;
+        padding: clamp(0.3rem, 0.5vw, 0.5rem) clamp(0.4rem, 0.625vw, 0.625rem);
     }
 
     .uppper-part .open-btn {
         background-color: var(--theme-on-info);
-        border-radius: clamp(0.1rem, 0.1875vw, 0.1875rem) 0 0 clamp(0.1rem, 0.1875vw, 0.1875rem);
+        border-radius: clamp(0.1rem, 0.1875vw, 0.1875rem) 0 0
+        clamp(0.1rem, 0.1875vw, 0.1875rem);
     }
 
     .uppper-part .close-btn {
         background-color: var(--nf-mainnav-bg);
         color: #fff;
-        border-radius: 0 clamp(0.1rem, 0.1875vw, 0.1875rem) clamp(0.1rem, 0.1875vw, 0.1875rem) 0;
+        border-radius: 0 clamp(0.1rem, 0.1875vw, 0.1875rem)
+        clamp(0.1rem, 0.1875vw, 0.1875rem) 0;
     }
 
     .uppper-part .upper-text {
         color: var(--theme-on-link);
         font-weight: bold;
-        font-size: clamp(0.8rem, 1vw, 1rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-main-body {
@@ -350,7 +307,9 @@
     .email-main-body.active-email {
         background-color: var(--theme-on-active-bg);
         border-left: clamp(0.1rem, 0.1875vw, 0.1875rem) solid var(--bs-brand-custom);
-        padding-left: calc(clamp(0.4rem, 0.625vw, 0.625rem) - clamp(0.1rem, 0.1875vw, 0.1875rem));
+        padding-left: calc(
+            clamp(0.4rem, 0.625vw, 0.625rem) - clamp(0.1rem, 0.1875vw, 0.1875rem)
+        );
     }
 
     .active-enelops {
@@ -358,7 +317,7 @@
         color: #fff;
         padding: clamp(0.3rem, 0.5vw, 0.5rem);
         border-radius: 50%;
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-main-body .fa-envelope {
@@ -366,29 +325,29 @@
         color: #fff;
         padding: clamp(0.3rem, 0.5vw, 0.5rem);
         border-radius: 50%;
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-main-body .email-address {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: bold;
         line-height: 1.2;
         color: var(--theme-on-text-dark);
     }
 
     .email-main-body .email-subject {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: normal;
         color: var(--theme-on-text-dark);
     }
 
     .email-main-body .small-para {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         line-height: 1.2;
     }
 
     .email-main-body .para-second {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--theme-on-text-light);
         white-space: nowrap;
     }
@@ -426,19 +385,9 @@
         border-radius: 50%;
         font-weight: bold;
         color: #fff;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         overflow: hidden;
         flex-shrink: 0;
-    }
-
-    @media screen and (max-width: 576px) {
-
-        .profile-avatar-h,
-        .profile-avatar-m {
-            width: clamp(1.5rem, 2vw, 2rem);
-            height: clamp(1.5rem, 2vw, 2rem);
-            font-size: clamp(0.6rem, 0.75vw, 0.75rem);
-        }
     }
 
     .profile-avatar-h {
@@ -450,23 +399,23 @@
     }
 
     .main-area-email-para {
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: 500;
         line-height: 1.2;
     }
 
     .main-area-email-para-time {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--theme-on-text-light);
     }
 
     .close-convo-btn {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: bold;
     }
 
     .profile-description {
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         font-style: unset;
         font-weight: 600;
         text-transform: unset;
@@ -484,6 +433,7 @@
 
     .profile-icon {
         font-size: clamp(2rem, 2.5vw, 2.5rem);
+
         color: var(--theme-on-info);
     }
 
@@ -505,12 +455,12 @@
     .user_name {
         color: var(--bs-brand-custom);
         font-weight: bold;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-info-text,
     .date-time {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-divider {
@@ -522,11 +472,13 @@
         background-color: var(--theme-on-background-secondary);
         padding: clamp(0.4rem, 0.625vw, 0.625rem);
         border-radius: clamp(0.3rem, 0.5vw, 0.5rem);
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
+        min-width: 100%;
+        max-width: 200px;
     }
 
     .email-reply-block .last-span {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-reply-block .last-span .last-span-icon {
@@ -545,7 +497,7 @@
 
     .envelop-open-text-section {
         font-weight: 500;
-        font-size: clamp(0.75rem, 0.9375vw, 0.9375rem);
+        font-size: var(--nf-profile-para-size);
         padding-block: clamp(0.6rem, 0.75vw, 0.75rem);
         padding-inline: clamp(1.4rem, 1.75vw, 1.75rem);
         position: relative;
@@ -562,11 +514,10 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        margin-bottom: 50px;
     }
 
     .text-placeholder {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         color: rgb(68, 68, 68);
         cursor: text;
         flex-grow: 1;
@@ -575,11 +526,11 @@
     }
 
     .email-area-choose-reciepeint {
-        font-size: clamp(0.9rem, 1.125vw, 1.125rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .email-area-choose-reciepeint .email-area-input-for-recipeint {
-        font-size: clamp(0.8rem, 1vw, 1rem);
+        font-size: var(--nf-profile-para-size);
         border: none;
         width: auto;
     }
@@ -597,7 +548,7 @@
     }
 
     .editor-icon {
-        font-size: clamp(0.8rem, 1vw, 1rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--nf-mainnav-bg);
         cursor: pointer;
         transition: color 0.2s;
@@ -613,7 +564,7 @@
 
     .insert-btn,
     .send-option-btn {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         padding: clamp(0.3rem, 0.375vw, 0.375rem) clamp(0.6rem, 0.75vw, 0.75rem);
         border-radius: clamp(1.25rem, 1.5625vw, 1.5625rem);
         font-weight: bold;
@@ -644,7 +595,7 @@
         border: none;
         color: #333;
         border-radius: clamp(0.25rem, 0.3125vw, 0.3125rem);
-        font-size: clamp(0.75rem, 0.9375vw, 0.9375rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: 600;
     }
 
@@ -653,7 +604,8 @@
         border: none;
         color: #fff;
         border-left: 1px solid #fff;
-        border-radius: 0 clamp(1.25rem, 1.5625vw, 1.5625rem) clamp(1.25rem, 1.5625vw, 1.5625rem) 0;
+        border-radius: 0 clamp(1.25rem, 1.5625vw, 1.5625rem)
+        clamp(1.25rem, 1.5625vw, 1.5625rem) 0;
         padding-left: clamp(0.2rem, 0.25vw, 0.25rem);
         padding-right: clamp(0.2rem, 0.25vw, 0.25rem);
     }
@@ -678,40 +630,27 @@
         flex-shrink: 0;
         transition: width 0.3s ease;
     }
-
-    @media screen and (max-width: 1200px) {
-        .right-sidebar {
-            width: clamp(180px, 18vw, 250px);
-        }
-    }
-
-    @media screen and (max-width: 992px) {
-        .right-sidebar {
-            width: clamp(150px, 15vw, 200px);
-        }
-    }
-
-    @media screen and (max-width: 768px) {
-        .right-sidebar {
-            width: 100%;
-            height: auto;
-        }
-    }
-
     .right-sidebar-header {
         background-color: #fff;
         border-bottom: 1px solid var(--theme-on-border);
-        padding: clamp(0.85rem, 1.0625vw, 1.0625rem) clamp(0.5rem, 0.625vw, 0.625rem) clamp(1.1rem, 1.375vw, 1.375rem) clamp(0.3rem, 0.375vw, 0.375rem);
+        padding: clamp(0.85rem, 1.0625vw, 1.0625rem) clamp(0.5rem, 0.625vw, 0.625rem)
+        clamp(1.1rem, 1.375vw, 1.375rem) clamp(0.3rem, 0.375vw, 0.375rem);
     }
 
     .right-sidebar-header .btn-tertiary-light {
         background-color: var(--theme-on-gray-100);
         color: var(--bs-secondary-color);
         border: none;
-        border-radius: 2px;
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
-        padding: clamp(0.35rem, 0.45vw, 0.5rem) clamp(0.5rem, 0.7vw, 0.75rem);
-        max-width: clamp(100px, 9vw, 120px);
+        border-radius: 4px;
+        font-size: var(--nf-profile-para-size);
+        padding: clamp(0.2rem, 0.6vw, 0.4rem) clamp(0.8rem, 1vw, 1.2rem);
+        max-width: 100%; /* allow it to grow with parent */
+        width: auto;
+        white-space: normal; /* allow text to wrap */
+        text-align: center;
+        line-height: 1.3;
+        word-break: break-word;
+        box-sizing: border-box;
     }
 
     .right-sidebar-header .btn-group button:not(:first-child) {
@@ -727,13 +666,13 @@
     }
 
     .contact-info-item .info-label {
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--bs-secondary-color);
         margin-bottom: clamp(0.2rem, 0.25vw, 0.25rem);
     }
 
     .contact-info-item .info-value {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         color: #212529;
         font-weight: 600;
     }
@@ -749,7 +688,7 @@
 
     .main-area-email-para-right-sidebar {
         color: var(--bs-brand-custom);
-        font-size: clamp(0.9rem, 1.125vw, 1.125rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: 600;
     }
 
@@ -759,11 +698,11 @@
     }
 
     .right-sidebar-circle-icon {
-        font-size: clamp(0.75rem, 0.9375vw, 0.9375rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .right-sidebar-text-span {
-        font-size: clamp(0.75rem, 0.9375vw, 0.9375rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: 600;
         color: #333;
     }
@@ -771,7 +710,7 @@
     /* Logical CSS */
     .selected-enelop {
         color: var(--bs-brand-custom);
-        font-size: clamp(1rem, 1.25vw, 1.25rem);
+        font-size: var(--nf-profile-para-size);
         margin-left: clamp(0.2rem, 0.25vw, 0.25rem);
     }
 
@@ -797,12 +736,6 @@
         margin-left: calc(-1 * var(--sidebar-width));
     }
 
-    @media screen and (max-width: 992px) {
-        body.sidebar-collapsed .uppper-part-main {
-            margin-left: 0;
-        }
-    }
-
     /* Icon hover and rotation */
     .left-sidebar .icon-side i {
         transition: transform 0.3s ease-in-out;
@@ -818,7 +751,7 @@
 
     /* Bootstrap dropdown adjustment */
     .dropdown-menu {
-        left:18% !important;
+        left: 18% !important;
         transform: translateX(-50%) !important;
         top: 100% !important;
     }
@@ -842,7 +775,8 @@
         cursor: ns-resize;
         background: var(--theme-on-border);
         border-top: 1px solid var(--theme-on-gray-200);
-        border-radius: 0 0 clamp(0.3rem, 0.375vw, 0.375rem) clamp(0.3rem, 0.375vw, 0.375rem);
+        border-radius: 0 0 clamp(0.3rem, 0.375vw, 0.375rem)
+        clamp(0.3rem, 0.375vw, 0.375rem);
     }
 
     .recipient-selection-container {
@@ -856,7 +790,7 @@
         border-radius: clamp(0.6rem, 0.75vw, 0.75rem);
         padding: clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.4rem, 0.5vw, 0.5rem);
         margin: clamp(0.1rem, 0.125vw, 0.125rem);
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         color: #333;
     }
 
@@ -903,7 +837,7 @@
         position: absolute;
         top: clamp(0.75rem, 0.9375vw, 0.9375rem);
         right: clamp(1rem, 1.25vw, 1.25rem);
-        font-size: clamp(1rem, 1.25vw, 1.25rem);
+        font-size: var(--nf-profile-para-size);
         cursor: pointer;
         color: var(--theme-on-text-medium);
     }
@@ -975,7 +909,7 @@
         align-items: center;
         padding: clamp(0.4rem, 0.5vw, 0.5rem) clamp(0.5rem, 0.625vw, 0.625rem);
         cursor: pointer;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         color: #343a40;
         position: relative;
     }
@@ -988,7 +922,7 @@
         margin-right: clamp(0.4rem, 0.5vw, 0.5rem);
         transition: transform 0.2s ease;
         color: var(--theme-on-link);
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .custom-sidebar-header:not(.collapsed) .custom-toggle-icon {
@@ -998,7 +932,7 @@
     .drag-handle-icon {
         cursor: grab;
         color: var(--bs-secondary-color);
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         margin-right: clamp(0.6rem, 0.75vw, 0.75rem);
     }
 
@@ -1008,7 +942,7 @@
 
     .info-circle-icon {
         color: var(--bs-secondary-color);
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         margin-left: clamp(0.4rem, 0.5vw, 0.5rem);
         opacity: 0.7;
     }
@@ -1021,7 +955,7 @@
 
     .custom-sidebar-content .contact-info-item p {
         margin-bottom: clamp(0.2rem, 0.25vw, 0.25rem);
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .custom-sidebar-content .info-label {
@@ -1055,7 +989,7 @@
     }
 
     .company-header .btn {
-        font-size: clamp(0.6rem, 0.75vw, 0.75rem);
+        font-size: var(--nf-profile-para-size);
         padding: clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.4rem, 0.5vw, 0.5rem);
     }
 
@@ -1065,7 +999,7 @@
     }
 
     .company-name {
-        font-size: clamp(0.9rem, 1.125vw, 1.125rem);
+        font-size: var(--nf-profile-para-size);
         font-weight: 600;
         color: #343a40;
     }
@@ -1090,11 +1024,11 @@
     }
 
     .company-link i {
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .view-commpany {
-        font-size: clamp(0.75rem, 0.9375vw, 0.9375rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--bs-brand-custom);
         font-weight: 500;
     }
@@ -1108,13 +1042,13 @@
 
     .other-conversations-section-ptwo {
         font-weight: 900;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--bs-brand-custom);
         text-decoration: none;
     }
 
     .other-conversations-section-pone {
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     /* Right sidebar contacts */
@@ -1125,19 +1059,21 @@
     }
 
     .contacts-section .contacts-section-para {
-        font-size: clamp(0.8rem, 1vw, 1rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .right-sec-payment-btn {
         background-color: var(--theme-on-info);
-        border-radius: clamp(0.15rem, 0.1875vw, 0.1875rem) 0 0 clamp(0.15rem, 0.1875vw, 0.1875rem);
+        border-radius: clamp(0.15rem, 0.1875vw, 0.1875rem) 0 0
+        clamp(0.15rem, 0.1875vw, 0.1875rem);
         padding: clamp(0.4rem, 0.5vw, 0.5rem) clamp(0.5rem, 0.625vw, 0.625rem);
         border: none;
         color: #343a40;
     }
 
     .email-header-main {
-        padding: clamp(0.9rem, 1.125vw, 1.125rem) clamp(0.5rem, 0.625vw, 0.625rem) clamp(0.95rem, 1.1875vw, 1.1875rem) clamp(0.5rem, 0.625vw, 0.625rem);
+        padding: clamp(0.9rem, 1.125vw, 1.125rem) clamp(0.5rem, 0.625vw, 0.625rem)
+        clamp(0.95rem, 1.1875vw, 1.1875rem) clamp(0.5rem, 0.625vw, 0.625rem);
     }
 
     .left-bottom-buttons-above-hr {
@@ -1156,13 +1092,6 @@
         overflow-x: hidden;
         max-height: calc(100vh - clamp(10rem, 12.5vh, 12.5rem));
     }
-
-    @media screen and (max-width: 576px) {
-        #inbox-tabs {
-            max-height: calc(100vh - clamp(7.5rem, 9.375vh, 9.375rem));
-        }
-    }
-
     .action-dropdown {
         position: relative;
         display: inline-block;
@@ -1174,7 +1103,7 @@
         padding: clamp(0.4rem, 0.5vw, 0.5rem) clamp(0.7rem, 0.875vw, 0.875rem);
         border-radius: clamp(0.25rem, 0.3125vw, 0.3125rem);
         cursor: pointer;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .custom-menu {
@@ -1189,13 +1118,14 @@
         padding: clamp(0.3rem, 0.375vw, 0.375rem) 0;
         min-width: clamp(10rem, 12.5vw, 12.5rem);
         display: none;
-        box-shadow: 0 clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.5rem, 0.625vw, 0.625rem) rgba(0, 0, 0, 0.15);
+        box-shadow: 0 clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.5rem, 0.625vw, 0.625rem)
+        rgba(0, 0, 0, 0.15);
         z-index: 1000;
     }
 
     .custom-menu li {
         padding: clamp(0.4rem, 0.5vw, 0.5rem) clamp(0.6rem, 0.75vw, 0.75rem);
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         cursor: pointer;
         display: flex;
         justify-content: space-between;
@@ -1210,15 +1140,8 @@
         max-height: clamp(10rem, 12.5vh, 12.5rem);
         overflow-y: auto;
         padding-right: clamp(0.4rem, 0.5vw, 0.5rem);
-        max-width: clamp(20rem, 25vw, 25rem);
+        max-width: clamp(20rem, 33vw, 39rem);
     }
-
-    @media screen and (max-width: 576px) {
-        .email-reply-wrapper {
-            max-height: clamp(7.5rem, 9.375vh, 9.375rem);
-        }
-    }
-
     .email-reply-wrapper::-webkit-scrollbar {
         width: clamp(0.3rem, 0.375vw, 0.375rem);
     }
@@ -1261,7 +1184,8 @@
         background: #fff;
         border: 1px solid var(--theme-on-gray-300);
         border-radius: clamp(0.4rem, 0.5vw, 0.5rem);
-        box-shadow: 0px clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.5rem, 0.625vw, 0.625rem) rgba(0, 0, 0, 0.1);
+        box-shadow: 0px clamp(0.2rem, 0.25vw, 0.25rem)
+        clamp(0.5rem, 0.625vw, 0.625rem) rgba(0, 0, 0, 0.1);
         padding: clamp(0.5rem, 0.625vw, 0.625rem) clamp(0.75rem, 0.9375vw, 0.9375rem);
         min-width: clamp(9rem, 11.25vw, 11.25rem);
         z-index: 1000;
@@ -1275,7 +1199,10 @@
         border-width: clamp(0.4rem, 0.5vw, 0.5rem);
         border-style: solid;
         border-color: #fff transparent transparent transparent;
-        filter: drop-shadow(0px clamp(0.1rem, 0.125vw, 0.125rem) clamp(0.1rem, 0.125vw, 0.125rem) rgba(0, 0, 0, 0.1));
+        filter: drop-shadow(
+            0px clamp(0.1rem, 0.125vw, 0.125rem) clamp(0.1rem, 0.125vw, 0.125rem)
+            rgba(0, 0, 0, 0.1)
+        );
     }
 
     .custom-dropdown a {
@@ -1283,7 +1210,7 @@
         padding: clamp(0.3rem, 0.375vw, 0.375rem) clamp(0.5rem, 0.625vw, 0.625rem);
         color: #333;
         text-decoration: none;
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
     }
 
     .custom-dropdown a:hover {
@@ -1299,7 +1226,7 @@
     }
 
     .right-sidebar-header,
-    .right-sidebar>.d-flex,
+    .right-sidebar > .d-flex,
     .right-sidebar hr {
         flex-shrink: 0;
     }
@@ -1325,7 +1252,7 @@
     }
 
     .custom-fa-caret-down {
-        font-size: clamp(0.7rem, 0.875vw, 0.875rem);
+        font-size: var(--nf-profile-para-size);
         color: var(--bs-brand-custom);
     }
 
@@ -1348,7 +1275,8 @@
         min-width: clamp(12.5rem, 15.625vw, 15.625rem);
         background-color: #fff;
         border: 1px solid #ccc;
-        box-shadow: 0 clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.3rem, 0.375vw, 0.375rem) rgba(0, 0, 0, 0.1);
+        box-shadow: 0 clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.3rem, 0.375vw, 0.375rem)
+        rgba(0, 0, 0, 0.1);
         border-radius: clamp(0.4rem, 0.5vw, 0.5rem);
         padding: clamp(0.5rem, 0.625vw, 0.625rem);
         margin-top: clamp(0.5rem, 0.625vw, 0.625rem);
@@ -1366,10 +1294,11 @@
 
     .user-dropdown-menu .search-box input {
         width: 100%;
-        padding: clamp(0.4rem, 0.5vw, 0.5rem) clamp(1.75rem, 2.1875vw, 2.1875rem) clamp(0.4rem, 0.5vw, 0.5rem) clamp(0.75rem, 0.9375vw, 0.9375rem);
+        padding: clamp(0.4rem, 0.5vw, 0.5rem) clamp(1.75rem, 2.1875vw, 2.1875rem)
+        clamp(0.4rem, 0.5vw, 0.5rem) clamp(0.75rem, 0.9375vw, 0.9375rem);
         border: 1px solid #0091ae;
         border-radius: clamp(0.25rem, 0.3125vw, 0.3125rem);
-        font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+        font-size: var(--nf-profile-para-size);
         color: #555;
         outline: none;
     }
@@ -1393,9 +1322,7 @@
 
     .user-dropdown-menu .user-item {
         display: flex;
-        justify-content
     }
-
 
     /* Wrapper for each filter group */
     .filter-group {
@@ -1417,7 +1344,7 @@
         border: 1px solid #cbd6e2;
         border-radius: 4px;
         padding: 8px 12px;
-        font-size: 14px;
+        font-size: var(--nf-profile-para-size);
         color: #33475b;
         transition: border-color 0.2s ease-in-out;
     }
@@ -1432,7 +1359,7 @@
 
     /* "To" text */
     .filter-group .text {
-        font-size: 13px;
+        font-size: var(--nf-profile-para-size);
         font-weight: 500;
         color: #5c6f82;
         margin: 0;
@@ -1564,7 +1491,7 @@
         align-items: center;
         gap: 8px;
         margin-bottom: 18px;
-        font-size: .8rem;
+        font-size: 0.8rem;
     }
 
     #filterPanel h6 {
@@ -1637,7 +1564,7 @@
         color: rgb(153, 172, 194);
         cursor: not-allowed;
         text-decoration: none;
-        font-size: clamp(12px, 0.85vw, 16px);
+        font-size: var(--nf-profile-para-size);
     }
 
     .right-sidebar-header .btn-group:first-child button {
@@ -1660,16 +1587,15 @@
         z-index: 1000;
     }
 
-    .cus-dropcol-2{
+    .cus-dropcol-2 {
         color: var(--theme-on-text-medium);
         padding: 0.5rem;
-        font-size: .8rem;
-
+        font-size: 0.8rem;
     }
-    .cus-dropcol-2:hover{
+
+    .cus-dropcol-2:hover {
         background-color: #e5f5f8 !important;
         color: var(--theme-on-text-medium) !important;
-
     }
 
     /* Sidebar scrollable containers */
@@ -1709,7 +1635,6 @@
 
     /* Sidebar scrollable containers End  */
 
-
     /* ////////////////custom-hide se4arch bar dropdown //////////////////////////// */
     /* Custom dropdown menu style */
     .dropdown-menu.cust-hide-search {
@@ -1718,12 +1643,10 @@
         overflow-y: auto;
         border-radius: 0.5rem;
         border: 1px solid #dee2e6;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         padding: 0.5rem 0;
         left: 58% !important;
-        transform: translateX(-50%
-        -50%
-        ) !important;
+        transform: translateX(-50% -50%) !important;
         top: 100% !important;
     }
 
@@ -1738,9 +1661,8 @@
     /* Hover / active state */
     .dropdown-menu.cust-hide-search .dropdown-item:hover,
     .dropdown-menu.cust-hide-search .dropdown-item:focus {
-        background-color:#e5f5f8;
+        background-color: #e5f5f8;
         color: var(--theme-on-text-medium);
-
     }
 
     /* Divider inside custom menu */
@@ -1748,21 +1670,22 @@
         margin: 0.5rem 0;
     }
 
-    .unassign-btn{
-        background-color:#e5f5f8;
-        border:  solid 1px (--theme-on-text-medium);
+    .unassign-btn {
+        background-color: #e5f5f8;
+        border: solid 1px (--theme-on-text-medium);
         border-radius: 5px;
         color: var(--theme-on-text-medium);
-        font-size: .8rem;
+        font-size: var(--nf-profile-para-size);
     }
-    .item-user-name,.item-user-status{
-        font-size: .8rem;
+
+    .item-user-name,
+    .item-user-status {
+        font-size: var(--nf-profile-para-size);
     }
 
     /* /////////custome my row  /////////////// */
     .no-left-padding > * {
         padding-left: 0 !important;
     }
-
 </style>
 <!-- Ashter working css end  -->
