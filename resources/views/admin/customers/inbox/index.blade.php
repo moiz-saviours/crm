@@ -44,7 +44,7 @@
                                    aria-controls="unassigned-pane" aria-selected="true">
                                     Unassigned
                                     <span
-                                        class="badge rounded-pill text-bg-light">{{ $emails->where('assigned_to', null)->count() }}</span>
+                                        class="badge rounded-pill text-bg-light">{{ $sections['unassigned']['count'] }}</span>
                                 </a>
 
                                 <a href="#assigned-pane"
@@ -53,7 +53,7 @@
                                    aria-controls="assigned-pane" aria-selected="false">
                                     Assigned me
                                     <span
-                                        class="badge rounded-pill text-bg-light">{{ $emails->where('assigned_to', auth()->id())->count() }}</span>
+                                        class="badge rounded-pill text-bg-light">{{ $sections['assigned_to_me']['count'] }}</span>
                                 </a>
 
                                 <a href="#all-open-pane"
@@ -62,7 +62,7 @@
                                    aria-controls="all-open-pane" aria-selected="false">
                                     All open
                                     <span
-                                        class="badge rounded-pill text-bg-light">{{ $emails->where('is_read', true)->count() }}</span>
+                                        class="badge rounded-pill text-bg-light">{{ $sections['read']['count'] }}</span>
                                 </a>
 
                                 <!-- More / Less Toggle -->
@@ -84,7 +84,7 @@
                                        id="email-tab" data-bs-toggle="tab" data-bs-target="#email-pane" role="tab"
                                        aria-controls="email-pane" aria-selected="false">
                                         Email
-                                        <span class="badge rounded-pill text-bg-light">{{count($emails)}}</span>
+                                        <span class="badge rounded-pill text-bg-light">{{$sections['all']['count']}}</span>
                                     </a>
                                     <a href="#calls-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -93,6 +93,14 @@
                                         Calls
                                         <span class="badge rounded-pill text-bg-light">0</span>
                                     </a>
+                                    <a href="#all-closed-pane"
+                                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                       id="all-open-tab" data-bs-toggle="tab" data-bs-target="#all-closed-pane" role="tab"
+                                       aria-controls="all-closed-pane" aria-selected="false">
+                                        All Closed
+                                        <span
+                                            class="badge rounded-pill text-bg-light">{{ $sections['unread']['count'] }}</span>
+                                    </a>
                                     <a href="#sent-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                        id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent-pane" role="tab"
@@ -100,7 +108,7 @@
                                        aria-selected="false">
                                         Sent
                                         <span
-                                            class="badge rounded-pill text-bg-light">{{ $emails->where('type', 'sent')->count() }}</span>
+                                            class="badge rounded-pill text-bg-light">{{ $sections['sent']['count'] }}</span>
                                     </a>
                                     <a href="#spam-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -109,7 +117,7 @@
                                        aria-selected="false">
                                         Spam
                                         <span
-                                            class="badge rounded-pill text-bg-light">{{ $emails->where('is_spam', true)->count() }}</span>
+                                            class="badge rounded-pill text-bg-light">{{ $sections['spam']['count'] }}</span>
                                     </a>
                                     <a href="#trash-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -117,7 +125,7 @@
                                        aria-controls="trash-pane" aria-selected="false">
                                         Trash
                                         <span
-                                            class="badge rounded-pill text-bg-light">{{ $emails->where('is_trashed', true)->count() }}</span>
+                                            class="badge rounded-pill text-bg-light">{{ $sections['trashed']['count'] }}</span>
                                     </a>
                                 </div>
 
@@ -242,9 +250,9 @@
                                         {{--                                        </a>--}}
                                         <!-- Static End -->
 
-                                        @foreach($emails->where('assigned_to', null) as $email)
-                                            @include('admin.customers.inbox.partials.email-list')
-                                        @endforeach
+                                        <!-- Unassigned Emails -->
+                                        {!! $sections['unassigned']['email_list'] !!}
+
                                     </div>
                                 </div>
                                 <!-- Assigned to Me Tab Pane -->
@@ -279,9 +287,9 @@
                                         {{--                                                <p class="para-second mb-0">15m</p>--}}
                                         {{--                                            </div>--}}
                                         {{--                                        </a>--}}
-                                        @foreach($emails->where('assigned_to', auth()->id()) as $email)
-                                            @include('admin.customers.inbox.partials.email-list')
-                                        @endforeach
+
+                                        <!-- Assigned to Me -->
+                                        {!! $sections['assigned_to_me']['email_list'] !!}
                                     </div>
                                 </div>
 
@@ -338,9 +346,10 @@
                                         {{--                                                <p class="para-second mb-0">5m</p>--}}
                                         {{--                                            </div>--}}
                                         {{--                                        </a>--}}
-                                        @foreach($emails->where('is_read', true) as $email)
-                                            @include('admin.customers.inbox.partials.email-list')
-                                        @endforeach
+
+                                        <!-- Read Emails -->
+                                        {!! $sections['read']['email_list'] !!}
+
                                     </div>
                                 </div>
                                 <!-- Email Tab Pane -->
@@ -372,9 +381,9 @@
                                         {{--                                            </div>--}}
                                         {{--                                        </a>--}}
 
-                                        @foreach($emails as $email)
-                                            @include('admin.customers.inbox.partials.email-list')
-                                        @endforeach
+                                        <!-- All Emails -->
+                                        {!! $sections['all']['email_list'] !!}
+
                                     </div>
                                 </div>
                                 <!-- Calls Tab Pane -->
@@ -390,47 +399,58 @@
                                 <!-- Trash Tab Pane -->
                                 <div class="tab-pane fade" id="trash-pane" role="tabpanel" aria-labelledby="trash-tab">
                                     <div class="list-group" id="email-list-trash" role="tablist">
-                                        @if($emails->where('is_trashed', true)->count())
-                                            @foreach($emails->where('is_trashed', true) as $email)
-                                                @include('admin.customers.inbox.partials.email-list')
-                                            @endforeach
-                                        @else
-                                            <div class="text-center p-4 text-muted">
-                                                <i class="fas fa-trash fa-2x mb-3"></i>
-                                                <p>No trash conversations</p>
-                                            </div>
-                                        @endif
+                                        <!-- Trashed Emails -->
+                                        {!! $sections['trashed']['email_list'] !!}
+
+{{--                                        @if($emails->where('is_trashed', true)->count())--}}
+{{--                                            @foreach($emails->where('is_trashed', true) as $email)--}}
+{{--                                                @include('admin.customers.inbox.partials.email-list')--}}
+{{--                                            @endforeach--}}
+{{--                                        @else--}}
+{{--                                            <div class="text-center p-4 text-muted">--}}
+{{--                                                <i class="fas fa-trash fa-2x mb-3"></i>--}}
+{{--                                                <p>No trash conversations</p>--}}
+{{--                                            </div>--}}
+{{--                                        @endif--}}
                                     </div>
                                 </div>
                                 <!-- Sent Tab Pane -->
                                 <div class="tab-pane fade" id="sent-pane" role="tabpanel" aria-labelledby="sent-tab">
                                     <div class="list-group" id="email-list-sent" role="tablist">
-                                        @if($emails->where('type', 'sent')->count())
-                                            @foreach($emails->where('type', 'sent') as $email)
-                                                @include('admin.customers.inbox.partials.email-list')
-                                            @endforeach
-                                        @else
-                                            <div class="text-center p-4 text-muted">
-                                                <i class="fas fa-paper-plane fa-2x mb-3"></i>
-                                                <p>No sent conversations</p>
-                                            </div>
-                                        @endif
+
+                                        <!-- Sent Emails -->
+                                        {!! $sections['sent']['email_list'] !!}
+
+{{--                                        @if($emails->where('type', 'sent')->count())--}}
+{{--                                            @foreach($emails->where('type', 'sent') as $email)--}}
+{{--                                                @include('admin.customers.inbox.partials.email-list')--}}
+{{--                                            @endforeach--}}
+{{--                                        @else--}}
+{{--                                            <div class="text-center p-4 text-muted">--}}
+{{--                                                <i class="fas fa-paper-plane fa-2x mb-3"></i>--}}
+{{--                                                <p>No sent conversations</p>--}}
+{{--                                            </div>--}}
+{{--                                        @endif--}}
                                     </div>
                                 </div>
 
                                 <!-- Spam Tab Pane -->
                                 <div class="tab-pane fade" id="spam-pane" role="tabpanel" aria-labelledby="spam-tab">
                                     <div class="list-group" id="email-list-spam" role="tablist">
-                                        @if($emails->where('is_spam', true)->count())
-                                            @foreach($emails->where('is_spam', true) as $email)
-                                                @include('admin.customers.inbox.partials.email-list')
-                                            @endforeach
-                                        @else
-                                            <div class="text-center p-4 text-muted">
-                                                <i class="fas fa-ban fa-2x mb-3"></i>
-                                                <p>No spam conversations</p>
-                                            </div>
-                                        @endif
+                                        <!-- Spa    m Emails -->
+                                        {!! $sections['spam']['email_list'] !!}
+
+
+{{--                                        @if($emails->where('is_spam', true)->count())--}}
+{{--                                            @foreach($emails->where('is_spam', true) as $email)--}}
+{{--                                                @include('admin.customers.inbox.partials.email-list')--}}
+{{--                                            @endforeach--}}
+{{--                                        @else--}}
+{{--                                            <div class="text-center p-4 text-muted">--}}
+{{--                                                <i class="fas fa-ban fa-2x mb-3"></i>--}}
+{{--                                                <p>No spam conversations</p>--}}
+{{--                                            </div>--}}
+{{--                                        @endif--}}
                                     </div>
                                 </div>
 
@@ -438,16 +458,19 @@
                                 <div class="tab-pane fade" id="all-closed-pane" role="tabpanel"
                                      aria-labelledby="all-closed-tab">
                                     <div class="list-group" id="email-list-all-closed" role="tablist">
-                                        @if($emails->where('is_read', false)->count())
-                                            @foreach($emails->where('is_read', false) as $email)
-                                                @include('admin.customers.inbox.partials.email-list')
-                                            @endforeach
-                                        @else
-                                            <div class="text-center p-4 text-muted">
-                                                <i class="fas fa-inbox fa-2x mb-3"></i>
-                                                <p>No closed conversations</p>
-                                            </div>
-                                        @endif
+
+                                        <!-- Unread Emails -->
+                                        {!! $sections['unread']['email_list'] !!}
+{{--                                        @if($emails->where('is_read', false)->count())--}}
+{{--                                            @foreach($emails->where('is_read', false) as $email)--}}
+{{--                                                @include('admin.customers.inbox.partials.email-list')--}}
+{{--                                            @endforeach--}}
+{{--                                        @else--}}
+{{--                                            <div class="text-center p-4 text-muted">--}}
+{{--                                                <i class="fas fa-inbox fa-2x mb-3"></i>--}}
+{{--                                                <p>No closed conversations</p>--}}
+{{--                                            </div>--}}
+{{--                                        @endif--}}
                                     </div>
                                 </div>
                             </div>
@@ -1108,795 +1131,798 @@
                     <div class="col-md-3 right-sidebar list-column">
                         <div class="main-content-col" id="right-sidebar">
                             <div class="tab-content" id="right-sidebar-content">
-                                <!-- Right Sidebar for Email ID 1 -->
-                                <div class="tab-pane fade show active" id="sidebar-detail-1" role="tabpanel"
-                                     aria-labelledby="email-detail-1-tab">
-                                    <div class="right-sidebar-header d-flex justify-content-between align-items-center">
-                                        <div class="btn-group me-2" role="group">
+                                @foreach($emails as $email)
+                                    @include('admin.customers.inbox.partials.sidebar-details')
+                                @endforeach
+{{--                                <!-- Right Sidebar for Email ID 1 -->--}}
+{{--                                <div class="tab-pane fade show active" id="sidebar-detail-1" role="tabpanel"--}}
+{{--                                     aria-labelledby="email-detail-1-tab">--}}
+{{--                                    <div class="right-sidebar-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <div class="btn-group me-2" role="group">--}}
 
-                                            <button type="button"
-                                                    class="custom-btn-right btn btn-tertiary-light d-flex align-items-center justify-content-center">
-                                                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>
-                                                <span>Close conversation</span>
-                                            </button>
+{{--                                            <button type="button"--}}
+{{--                                                    class="custom-btn-right btn btn-tertiary-light d-flex align-items-center justify-content-center">--}}
+{{--                                                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>--}}
+{{--                                                <span>Close conversation</span>--}}
+{{--                                            </button>--}}
 
-                                            <button id="extraBtn1" type="button"
-                                                    class="btn btn-tertiary-light d-none d-flex align-items-center justify-content-center">
-                                                <i class="fas fa-trash me-1" aria-hidden="true"></i>
-                                                <span>Trash</span>
-                                            </button>
-                                        </div>
+{{--                                            <button id="extraBtn1" type="button"--}}
+{{--                                                    class="btn btn-tertiary-light d-none d-flex align-items-center justify-content-center">--}}
+{{--                                                <i class="fas fa-trash me-1" aria-hidden="true"></i>--}}
+{{--                                                <span>Trash</span>--}}
+{{--                                            </button>--}}
+{{--                                        </div>--}}
 
-                                        <div class="btn-group" role="group">
-                                            <div class="dropdown custom-popup">
-                                                <button type="button" class="btn btn-tertiary-light"
-                                                        id="actionMenuButton1"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-h"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-start ms-2"
-                                                    aria-labelledby="actionMenuButton1">
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-trash me-2 text-danger"></i>
-                                                            Move to Trash</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-ban me-2 text-warning"></i>
-                                                            Block Sender</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-exclamation-triangle me-2 text-secondary"></i>
-                                                            Mark as Spam</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <button type="button" class="btn btn-tertiary-light info-circle-iconnn">
-                                                <i class="fas fa-info-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+{{--                                        <div class="btn-group" role="group">--}}
+{{--                                            <div class="dropdown custom-popup">--}}
+{{--                                                <button type="button" class="btn btn-tertiary-light"--}}
+{{--                                                        id="actionMenuButton1"--}}
+{{--                                                        data-bs-toggle="dropdown" aria-expanded="false">--}}
+{{--                                                    <i class="fas fa-ellipsis-h"></i>--}}
+{{--                                                </button>--}}
+{{--                                                <ul class="dropdown-menu dropdown-menu-start ms-2"--}}
+{{--                                                    aria-labelledby="actionMenuButton1">--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-trash me-2 text-danger"></i>--}}
+{{--                                                            Move to Trash</a>--}}
+{{--                                                    </li>--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-ban me-2 text-warning"></i>--}}
+{{--                                                            Block Sender</a>--}}
+{{--                                                    </li>--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-exclamation-triangle me-2 text-secondary"></i>--}}
+{{--                                                            Mark as Spam</a>--}}
+{{--                                                    </li>--}}
+{{--                                                </ul>--}}
+{{--                                            </div>--}}
+{{--                                            <button type="button" class="btn btn-tertiary-light info-circle-iconnn">--}}
+{{--                                                <i class="fas fa-info-circle"></i>--}}
+{{--                                            </button>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
 
-                                    <div class="d-flex align-items-center mt-3 mb-3 ms-2">
-                                        <span class="profile-avatar-h me-3 right-sidebar-profile-avator">H</span>
-                                        <div>
-                                            <span
-                                                class="main-area-email-para-right-sidebar">hasnat.khan@stellers.org</span><br/>
-                                        </div>
-                                    </div>
-                                    <hr/>
+{{--                                    <div class="d-flex align-items-center mt-3 mb-3 ms-2">--}}
+{{--                                        <span class="profile-avatar-h me-3 right-sidebar-profile-avator">H</span>--}}
+{{--                                        <div>--}}
+{{--                                            <span--}}
+{{--                                                class="main-area-email-para-right-sidebar">hasnat.khan@stellers.org</span><br/>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <hr/>--}}
 
-                                    <div id="sortable-container-1">
-                                        <!-- About Contact -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#about-contact-section-1" aria-expanded="false"
-                                                 aria-controls="about-contact-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>About this Contact</span>
-                                                <i class="fas fa-info-circle info-circle-icon ms-auto"></i>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="about-contact-section-1">
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Email</p>
-                                                    <p class="info-value">hasnatkha@gmail.com</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Phone Number</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Contact owner</p>
-                                                    <p class="info-value">Moiz Athar</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Total revenue</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Recent deal amount</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">
-                                                        Date entered (Customer Lifecycle Stage)
-                                                    </p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                    <div id="sortable-container-1">--}}
+{{--                                        <!-- About Contact -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#about-contact-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="about-contact-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>About this Contact</span>--}}
+{{--                                                <i class="fas fa-info-circle info-circle-icon ms-auto"></i>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="about-contact-section-1">--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Email</p>--}}
+{{--                                                    <p class="info-value">hasnatkha@gmail.com</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Phone Number</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Contact owner</p>--}}
+{{--                                                    <p class="info-value">Moiz Athar</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Total revenue</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Recent deal amount</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">--}}
+{{--                                                        Date entered (Customer Lifecycle Stage)--}}
+{{--                                                    </p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Companies -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#companies-section-1" aria-expanded="false"
-                                                 aria-controls="companies-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Companies (1)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="companies-section-1">
-                                                <div class="company-card">
-                                                    <div class="company-header">
-                                                        <span class="btn btn-sm btn-outline-primary">Primary</span>
-                                                        <div>
-                                                            <span class="btn btn-sm btn-dark">Preview</span>
-                                                            <span
-                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <span class="me-2 fw-bold">--</span>
-                                                        <i class="fas fa-building fa-2x text-muted ms-auto"></i>
-                                                    </div>
-                                                    <p class="company-link">
-                                                        <a href="http://pivotbookwriting.com" target="_blank">pivotbookwriting.com<i
-                                                                class="fas fa-external-link-alt"></i></a>
-                                                        <i class="fas fa-copy"></i>
-                                                    </p>
-                                                    <p>Phone: --</p>
-                                                </div>
-                                                <p class="view-commpany ms-3 mt-2">
-                                                    View Associated Company
-                                                </p>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Companies -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#companies-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="companies-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Companies (1)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="companies-section-1">--}}
+{{--                                                <div class="company-card">--}}
+{{--                                                    <div class="company-header">--}}
+{{--                                                        <span class="btn btn-sm btn-outline-primary">Primary</span>--}}
+{{--                                                        <div>--}}
+{{--                                                            <span class="btn btn-sm btn-dark">Preview</span>--}}
+{{--                                                            <span--}}
+{{--                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="d-flex align-items-center mb-2">--}}
+{{--                                                        <span class="me-2 fw-bold">--</span>--}}
+{{--                                                        <i class="fas fa-building fa-2x text-muted ms-auto"></i>--}}
+{{--                                                    </div>--}}
+{{--                                                    <p class="company-link">--}}
+{{--                                                        <a href="http://pivotbookwriting.com" target="_blank">pivotbookwriting.com<i--}}
+{{--                                                                class="fas fa-external-link-alt"></i></a>--}}
+{{--                                                        <i class="fas fa-copy"></i>--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>Phone: --</p>--}}
+{{--                                                </div>--}}
+{{--                                                <p class="view-commpany ms-3 mt-2">--}}
+{{--                                                    View Associated Company--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Other Conversations -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#other-conversations-section-1" aria-expanded="false"
-                                                 aria-controls="other-conversations-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Other Conversations (1)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content"
-                                                 id="other-conversations-section-1">
-                                                <div class="other-conversations-section">
-                                                    <p>
-                                                        <i class="fas fa-envelope"></i> Assigned to Moiz
-                                                        Athar
-                                                    </p>
-                                                    <p>
-                                                        <a href="http://pivotbookwriting.com" target="_blank">Test
-                                                            <i class="fas fa-external-link-alt ms-2"></i></a>
-                                                    </p>
-                                                    <p>Latest message sent 8 hours ago</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Other Conversations -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#other-conversations-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="other-conversations-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Other Conversations (1)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content"--}}
+{{--                                                 id="other-conversations-section-1">--}}
+{{--                                                <div class="other-conversations-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        <i class="fas fa-envelope"></i> Assigned to Moiz--}}
+{{--                                                        Athar--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>--}}
+{{--                                                        <a href="http://pivotbookwriting.com" target="_blank">Test--}}
+{{--                                                            <i class="fas fa-external-link-alt ms-2"></i></a>--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>Latest message sent 8 hours ago</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Contacts -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#contacts-section-1" aria-expanded="false"
-                                                 aria-controls="contacts-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Contacts (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="contacts-section-1">
-                                                <div class="contacts-section">
-                                                    <p>See the people associated with this record</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Contacts -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#contacts-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="contacts-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Contacts (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="contacts-section-1">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>See the people associated with this record</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Subscriptions -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#subscriptions-section-1" aria-expanded="false"
-                                                 aria-controls="subscriptions-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Subscriptions (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="subscriptions-section-1">
-                                                <div class="contacts-section">
-                                                    <p>
-                                                        Automate subscription management and recurring
-                                                        billing from this record
-                                                    </p>
-                                                    <div class="d-flex justify-content-center">
-                                                        <button class="right-sec-payment-btn">
-                                                            Set up Payment
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Subscriptions -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#subscriptions-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="subscriptions-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Subscriptions (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="subscriptions-section-1">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        Automate subscription management and recurring--}}
+{{--                                                        billing from this record--}}
+{{--                                                    </p>--}}
+{{--                                                    <div class="d-flex justify-content-center">--}}
+{{--                                                        <button class="right-sec-payment-btn">--}}
+{{--                                                            Set up Payment--}}
+{{--                                                        </button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Payments -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#payments-section-1" aria-expanded="false"
-                                                 aria-controls="payments-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Payments (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="payments-section-1">
-                                                <div class="contacts-section">
-                                                    <p>
-                                                        Track payments associated with this record. A
-                                                        payment is created when a customer pays or
-                                                        recurring payment is processed through HubSpot.
-                                                    </p>
-                                                    <div class="d-flex justify-content-center">
-                                                        <button class="right-sec-payment-btn">
-                                                            Set up Payment
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Payments -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#payments-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="payments-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Payments (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="payments-section-1">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        Track payments associated with this record. A--}}
+{{--                                                        payment is created when a customer pays or--}}
+{{--                                                        recurring payment is processed through HubSpot.--}}
+{{--                                                    </p>--}}
+{{--                                                    <div class="d-flex justify-content-center">--}}
+{{--                                                        <button class="right-sec-payment-btn">--}}
+{{--                                                            Set up Payment--}}
+{{--                                                        </button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Tickets -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#ticket-section-1" aria-expanded="false"
-                                                 aria-controls="ticket-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Tickets (02)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="ticket-section-1"></div>
-                                        </div>
+{{--                                        <!-- Tickets -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#ticket-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="ticket-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Tickets (02)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="ticket-section-1"></div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Deals -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#deals-section-1" aria-expanded="false"
-                                                 aria-controls="deals-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Deals (04)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="deals-section-1"></div>
-                                        </div>
+{{--                                        <!-- Deals -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#deals-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="deals-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Deals (04)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="deals-section-1"></div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Other Tickets -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#other-ticket-section-1" aria-expanded="false"
-                                                 aria-controls="other-ticket-section-1">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Other Tickets (04)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content"
-                                                 id="other-ticket-section-1"></div>
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                        <!-- Other Tickets -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#other-ticket-section-1" aria-expanded="false"--}}
+{{--                                                 aria-controls="other-ticket-section-1">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Other Tickets (04)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content"--}}
+{{--                                                 id="other-ticket-section-1"></div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <!-- Right Sidebar for Email ID 2 -->
-                                <div class="tab-pane fade" id="sidebar-detail-2" role="tabpanel"
-                                     aria-labelledby="email-detail-2-tab">
-                                    <div class="right-sidebar-header d-flex justify-content-between align-items-center">
-                                        <div class="btn-group me-2" role="group">
-                                            <button type="button" class="btn btn-tertiary-light">
-                                                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>
-                                                <span>Close conversation</span>
-                                            </button>
-                                            <button id="extraBtn2" type="button" class="btn btn-secondary"
-                                                    style="display: none">
-                                                <i class="fas fa-trash me-1" aria-hidden="true"></i>
-                                                <span>Trash</span>
-                                            </button>
-                                        </div>
-                                        <div class="btn-group" role="group">
-                                            <div class="dropdown custom-popup">
-                                                <button type="button" class="btn btn-tertiary-light"
-                                                        id="actionMenuButton2"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-h"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-start ms-2"
-                                                    aria-labelledby="actionMenuButton2">
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-trash me-2 text-danger"></i>
-                                                            Move to Trash</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-ban me-2 text-warning"></i>
-                                                            Block Sender</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-exclamation-triangle me-2 text-secondary"></i>
-                                                            Mark as Spam</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <button type="button" class="btn btn-tertiary-light info-circle-iconnn">
-                                                <i class="fas fa-info-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+{{--                                <!-- Right Sidebar for Email ID 2 -->--}}
+{{--                                <div class="tab-pane fade" id="sidebar-detail-2" role="tabpanel"--}}
+{{--                                     aria-labelledby="email-detail-2-tab">--}}
+{{--                                    <div class="right-sidebar-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <div class="btn-group me-2" role="group">--}}
+{{--                                            <button type="button" class="btn btn-tertiary-light">--}}
+{{--                                                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>--}}
+{{--                                                <span>Close conversation</span>--}}
+{{--                                            </button>--}}
+{{--                                            <button id="extraBtn2" type="button" class="btn btn-secondary"--}}
+{{--                                                    style="display: none">--}}
+{{--                                                <i class="fas fa-trash me-1" aria-hidden="true"></i>--}}
+{{--                                                <span>Trash</span>--}}
+{{--                                            </button>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="btn-group" role="group">--}}
+{{--                                            <div class="dropdown custom-popup">--}}
+{{--                                                <button type="button" class="btn btn-tertiary-light"--}}
+{{--                                                        id="actionMenuButton2"--}}
+{{--                                                        data-bs-toggle="dropdown" aria-expanded="false">--}}
+{{--                                                    <i class="fas fa-ellipsis-h"></i>--}}
+{{--                                                </button>--}}
+{{--                                                <ul class="dropdown-menu dropdown-menu-start ms-2"--}}
+{{--                                                    aria-labelledby="actionMenuButton2">--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-trash me-2 text-danger"></i>--}}
+{{--                                                            Move to Trash</a>--}}
+{{--                                                    </li>--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-ban me-2 text-warning"></i>--}}
+{{--                                                            Block Sender</a>--}}
+{{--                                                    </li>--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-exclamation-triangle me-2 text-secondary"></i>--}}
+{{--                                                            Mark as Spam</a>--}}
+{{--                                                    </li>--}}
+{{--                                                </ul>--}}
+{{--                                            </div>--}}
+{{--                                            <button type="button" class="btn btn-tertiary-light info-circle-iconnn">--}}
+{{--                                                <i class="fas fa-info-circle"></i>--}}
+{{--                                            </button>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
 
-                                    <div class="d-flex align-items-center mt-3 mb-3 ms-2">
-                                        <span class="profile-avatar-h me-3 right-sidebar-profile-avator">M</span>
-                                        <div>
-                                            <span
-                                                class="main-area-email-para-right-sidebar">moiz@saviours.co</span><br/>
-                                        </div>
-                                    </div>
-                                    <hr/>
+{{--                                    <div class="d-flex align-items-center mt-3 mb-3 ms-2">--}}
+{{--                                        <span class="profile-avatar-h me-3 right-sidebar-profile-avator">M</span>--}}
+{{--                                        <div>--}}
+{{--                                            <span--}}
+{{--                                                class="main-area-email-para-right-sidebar">moiz@saviours.co</span><br/>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <hr/>--}}
 
-                                    <div id="sortable-container-2">
-                                        <!-- About Contact -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#about-contact-section-2" aria-expanded="false"
-                                                 aria-controls="about-contact-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>About this Contact</span>
-                                                <i class="fas fa-info-circle info-circle-icon ms-auto"></i>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="about-contact-section-2">
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Email</p>
-                                                    <p class="info-value">moiz@saviours.co</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Phone Number</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Contact owner</p>
-                                                    <p class="info-value">Moiz Athar</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Total revenue</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Recent deal amount</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">
-                                                        Date entered (Customer Lifecycle Stage)
-                                                    </p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                    <div id="sortable-container-2">--}}
+{{--                                        <!-- About Contact -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#about-contact-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="about-contact-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>About this Contact</span>--}}
+{{--                                                <i class="fas fa-info-circle info-circle-icon ms-auto"></i>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="about-contact-section-2">--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Email</p>--}}
+{{--                                                    <p class="info-value">moiz@saviours.co</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Phone Number</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Contact owner</p>--}}
+{{--                                                    <p class="info-value">Moiz Athar</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Total revenue</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Recent deal amount</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">--}}
+{{--                                                        Date entered (Customer Lifecycle Stage)--}}
+{{--                                                    </p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Companies -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#companies-section-2" aria-expanded="false"
-                                                 aria-controls="companies-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Companies (1)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="companies-section-2">
-                                                <div class="company-card">
-                                                    <div class="company-header">
-                                                        <span class="btn btn-sm btn-outline-primary">Primary</span>
-                                                        <div>
-                                                            <span class="btn btn-sm btn-dark">Preview</span>
-                                                            <span
-                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <span class="me-2 fw-bold">--</span>
-                                                        <i class="fas fa-building fa-2x text-muted ms-auto"></i>
-                                                    </div>
-                                                    <p class="company-link">
-                                                        <a href="http://pivotbookwriting.com" target="_blank">pivotbookwriting.com<i
-                                                                class="fas fa-external-link-alt"></i></a>
-                                                        <i class="fas fa-copy"></i>
-                                                    </p>
-                                                    <p>Phone: --</p>
-                                                </div>
-                                                <p class="view-commpany ms-3 mt-2">
-                                                    View Associated Company
-                                                </p>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Companies -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#companies-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="companies-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Companies (1)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="companies-section-2">--}}
+{{--                                                <div class="company-card">--}}
+{{--                                                    <div class="company-header">--}}
+{{--                                                        <span class="btn btn-sm btn-outline-primary">Primary</span>--}}
+{{--                                                        <div>--}}
+{{--                                                            <span class="btn btn-sm btn-dark">Preview</span>--}}
+{{--                                                            <span--}}
+{{--                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="d-flex align-items-center mb-2">--}}
+{{--                                                        <span class="me-2 fw-bold">--</span>--}}
+{{--                                                        <i class="fas fa-building fa-2x text-muted ms-auto"></i>--}}
+{{--                                                    </div>--}}
+{{--                                                    <p class="company-link">--}}
+{{--                                                        <a href="http://pivotbookwriting.com" target="_blank">pivotbookwriting.com<i--}}
+{{--                                                                class="fas fa-external-link-alt"></i></a>--}}
+{{--                                                        <i class="fas fa-copy"></i>--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>Phone: --</p>--}}
+{{--                                                </div>--}}
+{{--                                                <p class="view-commpany ms-3 mt-2">--}}
+{{--                                                    View Associated Company--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Other Conversations -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#other-conversations-section-2" aria-expanded="false"
-                                                 aria-controls="other-conversations-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Other Conversations (1)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content"
-                                                 id="other-conversations-section-2">
-                                                <div class="other-conversations-section">
-                                                    <p>
-                                                        <i class="fas fa-envelope"></i> Assigned to Moiz
-                                                        Athar
-                                                    </p>
-                                                    <p>
-                                                        <a href="http://pivotbookwriting.com" target="_blank">Test
-                                                            <i class="fas fa-external-link-alt ms-2"></i></a>
-                                                    </p>
-                                                    <p>Latest message sent 8 hours ago</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Other Conversations -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#other-conversations-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="other-conversations-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Other Conversations (1)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content"--}}
+{{--                                                 id="other-conversations-section-2">--}}
+{{--                                                <div class="other-conversations-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        <i class="fas fa-envelope"></i> Assigned to Moiz--}}
+{{--                                                        Athar--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>--}}
+{{--                                                        <a href="http://pivotbookwriting.com" target="_blank">Test--}}
+{{--                                                            <i class="fas fa-external-link-alt ms-2"></i></a>--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>Latest message sent 8 hours ago</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Contacts -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#contacts-section-2" aria-expanded="false"
-                                                 aria-controls="contacts-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Contacts (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="contacts-section-2">
-                                                <div class="contacts-section">
-                                                    <p>See the people associated with this record</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Contacts -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#contacts-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="contacts-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Contacts (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="contacts-section-2">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>See the people associated with this record</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Subscriptions -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#subscriptions-section-2" aria-expanded="false"
-                                                 aria-controls="subscriptions-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Subscriptions (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="subscriptions-section-2">
-                                                <div class="contacts-section">
-                                                    <p>
-                                                        Automate subscription management and recurring
-                                                        billing from this record
-                                                    </p>
-                                                    <div class="d-flex justify-content-center">
-                                                        <button class="right-sec-payment-btn">
-                                                            Set up Payment
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Subscriptions -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#subscriptions-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="subscriptions-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Subscriptions (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="subscriptions-section-2">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        Automate subscription management and recurring--}}
+{{--                                                        billing from this record--}}
+{{--                                                    </p>--}}
+{{--                                                    <div class="d-flex justify-content-center">--}}
+{{--                                                        <button class="right-sec-payment-btn">--}}
+{{--                                                            Set up Payment--}}
+{{--                                                        </button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Payments -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#payments-section-2" aria-expanded="false"
-                                                 aria-controls="payments-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Payments (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="payments-section-2">
-                                                <div class="contacts-section">
-                                                    <p>
-                                                        Track payments associated with this record. A
-                                                        payment is created when a customer pays or
-                                                        recurring payment is processed through HubSpot.
-                                                    </p>
-                                                    <div class="d-flex justify-content-center">
-                                                        <button class="right-sec-payment-btn">
-                                                            Set up Payment
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Payments -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#payments-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="payments-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Payments (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="payments-section-2">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        Track payments associated with this record. A--}}
+{{--                                                        payment is created when a customer pays or--}}
+{{--                                                        recurring payment is processed through HubSpot.--}}
+{{--                                                    </p>--}}
+{{--                                                    <div class="d-flex justify-content-center">--}}
+{{--                                                        <button class="right-sec-payment-btn">--}}
+{{--                                                            Set up Payment--}}
+{{--                                                        </button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Tickets -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#ticket-section-2" aria-expanded="false"
-                                                 aria-controls="ticket-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Tickets (02)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="ticket-section-2"></div>
-                                        </div>
+{{--                                        <!-- Tickets -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#ticket-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="ticket-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Tickets (02)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="ticket-section-2"></div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Deals -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#deals-section-2" aria-expanded="false"
-                                                 aria-controls="deals-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Deals (04)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="deals-section-2"></div>
-                                        </div>
+{{--                                        <!-- Deals -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#deals-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="deals-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Deals (04)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="deals-section-2"></div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Other Tickets -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#other-ticket-section-2" aria-expanded="false"
-                                                 aria-controls="other-ticket-section-2">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Other Tickets (04)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content"
-                                                 id="other-ticket-section-2"></div>
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                        <!-- Other Tickets -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#other-ticket-section-2" aria-expanded="false"--}}
+{{--                                                 aria-controls="other-ticket-section-2">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Other Tickets (04)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content"--}}
+{{--                                                 id="other-ticket-section-2"></div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <!-- Right Sidebar for Email ID 3 -->
-                                <div class="tab-pane fade" id="sidebar-detail-3" role="tabpanel"
-                                     aria-labelledby="email-detail-3-tab">
-                                    <div class="right-sidebar-header d-flex justify-content-between align-items-center">
-                                        <div class="btn-group me-2" role="group">
-                                            <button type="button" class="btn btn-tertiary-light">
-                                                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>
-                                                <span>Close conversation</span>
-                                            </button>
-                                            <button id="extraBtn3" type="button" class="btn btn-secondary"
-                                                    style="display: none">
-                                                <i class="fas fa-trash me-1" aria-hidden="true"></i>
-                                                <span>Trash</span>
-                                            </button>
-                                        </div>
-                                        <div class="btn-group" role="group">
-                                            <div class="dropdown custom-popup">
-                                                <button type="button" class="btn btn-tertiary-light"
-                                                        id="actionMenuButton3"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-h"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-start ms-2"
-                                                    aria-labelledby="actionMenuButton3">
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-trash me-2 text-danger"></i>
-                                                            Move to Trash</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-ban me-2 text-warning"></i>
-                                                            Block Sender</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"><i
-                                                                class="fas fa-exclamation-triangle me-2 text-secondary"></i>
-                                                            Mark as Spam</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <button type="button" class="btn btn-tertiary-light info-circle-iconnn">
-                                                <i class="fas fa-info-circle"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+{{--                                <!-- Right Sidebar for Email ID 3 -->--}}
+{{--                                <div class="tab-pane fade" id="sidebar-detail-3" role="tabpanel"--}}
+{{--                                     aria-labelledby="email-detail-3-tab">--}}
+{{--                                    <div class="right-sidebar-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <div class="btn-group me-2" role="group">--}}
+{{--                                            <button type="button" class="btn btn-tertiary-light">--}}
+{{--                                                <i class="fas fa-check-circle me-1" aria-hidden="true"></i>--}}
+{{--                                                <span>Close conversation</span>--}}
+{{--                                            </button>--}}
+{{--                                            <button id="extraBtn3" type="button" class="btn btn-secondary"--}}
+{{--                                                    style="display: none">--}}
+{{--                                                <i class="fas fa-trash me-1" aria-hidden="true"></i>--}}
+{{--                                                <span>Trash</span>--}}
+{{--                                            </button>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="btn-group" role="group">--}}
+{{--                                            <div class="dropdown custom-popup">--}}
+{{--                                                <button type="button" class="btn btn-tertiary-light"--}}
+{{--                                                        id="actionMenuButton3"--}}
+{{--                                                        data-bs-toggle="dropdown" aria-expanded="false">--}}
+{{--                                                    <i class="fas fa-ellipsis-h"></i>--}}
+{{--                                                </button>--}}
+{{--                                                <ul class="dropdown-menu dropdown-menu-start ms-2"--}}
+{{--                                                    aria-labelledby="actionMenuButton3">--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-trash me-2 text-danger"></i>--}}
+{{--                                                            Move to Trash</a>--}}
+{{--                                                    </li>--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-ban me-2 text-warning"></i>--}}
+{{--                                                            Block Sender</a>--}}
+{{--                                                    </li>--}}
+{{--                                                    <li>--}}
+{{--                                                        <a class="dropdown-item" href="#"><i--}}
+{{--                                                                class="fas fa-exclamation-triangle me-2 text-secondary"></i>--}}
+{{--                                                            Mark as Spam</a>--}}
+{{--                                                    </li>--}}
+{{--                                                </ul>--}}
+{{--                                            </div>--}}
+{{--                                            <button type="button" class="btn btn-tertiary-light info-circle-iconnn">--}}
+{{--                                                <i class="fas fa-info-circle"></i>--}}
+{{--                                            </button>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
 
-                                    <div class="d-flex align-items-center mt-3 mb-3 ms-2">
-                                        <span class="profile-avatar-h me-3 right-sidebar-profile-avator">A</span>
-                                        <div>
-                                            <span
-                                                class="main-area-email-para-right-sidebar">ashter@example.com</span><br/>
-                                        </div>
-                                    </div>
-                                    <hr/>
+{{--                                    <div class="d-flex align-items-center mt-3 mb-3 ms-2">--}}
+{{--                                        <span class="profile-avatar-h me-3 right-sidebar-profile-avator">A</span>--}}
+{{--                                        <div>--}}
+{{--                                            <span--}}
+{{--                                                class="main-area-email-para-right-sidebar">ashter@example.com</span><br/>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <hr/>--}}
 
-                                    <div id="sortable-container-3">
-                                        <!-- About Contact -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#about-contact-section-3" aria-expanded="false"
-                                                 aria-controls="about-contact-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>About this Contact</span>
-                                                <i class="fas fa-info-circle info-circle-icon ms-auto"></i>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="about-contact-section-3">
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Email</p>
-                                                    <p class="info-value">ashter@example.com</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Phone Number</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Contact owner</p>
-                                                    <p class="info-value">Moiz Athar</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Total revenue</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">Recent deal amount</p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                                <div class="contact-info-item">
-                                                    <p class="info-label">
-                                                        Date entered (Customer Lifecycle Stage)
-                                                    </p>
-                                                    <p class="info-value">---</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                    <div id="sortable-container-3">--}}
+{{--                                        <!-- About Contact -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#about-contact-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="about-contact-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>About this Contact</span>--}}
+{{--                                                <i class="fas fa-info-circle info-circle-icon ms-auto"></i>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="about-contact-section-3">--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Email</p>--}}
+{{--                                                    <p class="info-value">ashter@example.com</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Phone Number</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Contact owner</p>--}}
+{{--                                                    <p class="info-value">Moiz Athar</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Total revenue</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">Recent deal amount</p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="contact-info-item">--}}
+{{--                                                    <p class="info-label">--}}
+{{--                                                        Date entered (Customer Lifecycle Stage)--}}
+{{--                                                    </p>--}}
+{{--                                                    <p class="info-value">---</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Companies -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#companies-section-3" aria-expanded="false"
-                                                 aria-controls="companies-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Companies (1)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="companies-section-3">
-                                                <div class="company-card">
-                                                    <div class="company-header">
-                                                        <span class="btn btn-sm btn-outline-primary">Primary</span>
-                                                        <div>
-                                                            <span class="btn btn-sm btn-dark">Preview</span>
-                                                            <span
-                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <span class="me-2 fw-bold">--</span>
-                                                        <i class="fas fa-building fa-2x text-muted ms-auto"></i>
-                                                    </div>
-                                                    <p class="company-link">
-                                                        <a href="http://pivotbookwriting.com" target="_blank">pivotbookwriting.com<i
-                                                                class="fas fa-external-link-alt"></i></a>
-                                                        <i class="fas fa-copy"></i>
-                                                    </p>
-                                                    <p>Phone: --</p>
-                                                </div>
-                                                <p class="view-commpany ms-3 mt-2">
-                                                    View Associated Company
-                                                </p>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Companies -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#companies-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="companies-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Companies (1)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="companies-section-3">--}}
+{{--                                                <div class="company-card">--}}
+{{--                                                    <div class="company-header">--}}
+{{--                                                        <span class="btn btn-sm btn-outline-primary">Primary</span>--}}
+{{--                                                        <div>--}}
+{{--                                                            <span class="btn btn-sm btn-dark">Preview</span>--}}
+{{--                                                            <span--}}
+{{--                                                                class="btn btn-sm btn-dark dropdown-toggle">More</span>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="d-flex align-items-center mb-2">--}}
+{{--                                                        <span class="me-2 fw-bold">--</span>--}}
+{{--                                                        <i class="fas fa-building fa-2x text-muted ms-auto"></i>--}}
+{{--                                                    </div>--}}
+{{--                                                    <p class="company-link">--}}
+{{--                                                        <a href="http://pivotbookwriting.com" target="_blank">pivotbookwriting.com<i--}}
+{{--                                                                class="fas fa-external-link-alt"></i></a>--}}
+{{--                                                        <i class="fas fa-copy"></i>--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>Phone: --</p>--}}
+{{--                                                </div>--}}
+{{--                                                <p class="view-commpany ms-3 mt-2">--}}
+{{--                                                    View Associated Company--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Other Conversations -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#other-conversations-section-3" aria-expanded="false"
-                                                 aria-controls="other-conversations-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Other Conversations (1)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content"
-                                                 id="other-conversations-section-3">
-                                                <div class="other-conversations-section">
-                                                    <p>
-                                                        <i class="fas fa-envelope"></i> Assigned to Moiz
-                                                        Athar
-                                                    </p>
-                                                    <p>
-                                                        <a href="http://pivotbookwriting.com" target="_blank">Test
-                                                            <i class="fas fa-external-link-alt ms-2"></i></a>
-                                                    </p>
-                                                    <p>Latest message sent 8 hours ago</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Other Conversations -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#other-conversations-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="other-conversations-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Other Conversations (1)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content"--}}
+{{--                                                 id="other-conversations-section-3">--}}
+{{--                                                <div class="other-conversations-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        <i class="fas fa-envelope"></i> Assigned to Moiz--}}
+{{--                                                        Athar--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>--}}
+{{--                                                        <a href="http://pivotbookwriting.com" target="_blank">Test--}}
+{{--                                                            <i class="fas fa-external-link-alt ms-2"></i></a>--}}
+{{--                                                    </p>--}}
+{{--                                                    <p>Latest message sent 8 hours ago</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Contacts -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#contacts-section-3" aria-expanded="false"
-                                                 aria-controls="contacts-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Contacts (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="contacts-section-3">
-                                                <div class="contacts-section">
-                                                    <p>See the people associated with this record</p>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Contacts -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#contacts-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="contacts-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Contacts (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="contacts-section-3">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>See the people associated with this record</p>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Subscriptions -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#subscriptions-section-3" aria-expanded="false"
-                                                 aria-controls="subscriptions-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Subscriptions (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="subscriptions-section-3">
-                                                <div class="contacts-section">
-                                                    <p>
-                                                        Automate subscription management and recurring
-                                                        billing from this record
-                                                    </p>
-                                                    <div class="d-flex justify-content-center">
-                                                        <button class="right-sec-payment-btn">
-                                                            Set up Payment
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Subscriptions -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#subscriptions-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="subscriptions-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Subscriptions (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="subscriptions-section-3">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        Automate subscription management and recurring--}}
+{{--                                                        billing from this record--}}
+{{--                                                    </p>--}}
+{{--                                                    <div class="d-flex justify-content-center">--}}
+{{--                                                        <button class="right-sec-payment-btn">--}}
+{{--                                                            Set up Payment--}}
+{{--                                                        </button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Payments -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#payments-section-3" aria-expanded="false"
-                                                 aria-controls="payments-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Payments (0)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="payments-section-3">
-                                                <div class="contacts-section">
-                                                    <p>
-                                                        Track payments associated with this record. A
-                                                        payment is created when a customer pays or
-                                                        recurring payment is processed through HubSpot.
-                                                    </p>
-                                                    <div class="d-flex justify-content-center">
-                                                        <button class="right-sec-payment-btn">
-                                                            Set up Payment
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+{{--                                        <!-- Payments -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#payments-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="payments-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Payments (0)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="payments-section-3">--}}
+{{--                                                <div class="contacts-section">--}}
+{{--                                                    <p>--}}
+{{--                                                        Track payments associated with this record. A--}}
+{{--                                                        payment is created when a customer pays or--}}
+{{--                                                        recurring payment is processed through HubSpot.--}}
+{{--                                                    </p>--}}
+{{--                                                    <div class="d-flex justify-content-center">--}}
+{{--                                                        <button class="right-sec-payment-btn">--}}
+{{--                                                            Set up Payment--}}
+{{--                                                        </button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Tickets -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#ticket-section-3" aria-expanded="false"
-                                                 aria-controls="ticket-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Tickets (02)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="ticket-section-3"></div>
-                                        </div>
+{{--                                        <!-- Tickets -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#ticket-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="ticket-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Tickets (02)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="ticket-section-3"></div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Deals -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#deals-section-3" aria-expanded="false"
-                                                 aria-controls="deals-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Deals (04)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content" id="deals-section-3"></div>
-                                        </div>
+{{--                                        <!-- Deals -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#deals-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="deals-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Deals (04)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content" id="deals-section-3"></div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- Other Tickets -->
-                                        <div class="sortable-item">
-                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
-                                                 data-bs-target="#other-ticket-section-3" aria-expanded="false"
-                                                 aria-controls="other-ticket-section-3">
-                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>
-                                                <i class="fas fa-angle-right custom-toggle-icon"></i>
-                                                <span>Other Tickets (04)</span>
-                                            </div>
-                                            <div class="collapse custom-sidebar-content"
-                                                 id="other-ticket-section-3"></div>
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                        <!-- Other Tickets -->--}}
+{{--                                        <div class="sortable-item">--}}
+{{--                                            <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"--}}
+{{--                                                 data-bs-target="#other-ticket-section-3" aria-expanded="false"--}}
+{{--                                                 aria-controls="other-ticket-section-3">--}}
+{{--                                                <i class="fas fa-grip-vertical drag-handle-icon"></i>--}}
+{{--                                                <i class="fas fa-angle-right custom-toggle-icon"></i>--}}
+{{--                                                <span>Other Tickets (04)</span>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="collapse custom-sidebar-content"--}}
+{{--                                                 id="other-ticket-section-3"></div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
                             </div>
                         </div>
                     </div>
@@ -2081,24 +2107,123 @@
             document.querySelectorAll(".email-main-body").forEach((item) => {
                 item.addEventListener("click", function (e) {
                     e.preventDefault();
-                    // Remove active class from all email items
-                    document.querySelectorAll(".email-main-body").forEach((el) => el.classList.remove("active"));
-                    // Add active class to clicked item
+
+                    const parentTabPane = this.closest('.tab-pane');
+
+                    if (parentTabPane) {
+                        parentTabPane.querySelectorAll(".email-main-body").forEach((el) => el.classList.remove("active"));
+                        parentTabPane.querySelectorAll(".fa-envelope").forEach((el) => el.classList.remove("active-enelops"));
+                    }
+
                     this.classList.add("active");
-                    // Get the target email detail and sidebar panes
+                    const envelopeIcon = this.querySelector(".fa-envelope");
+                    if (envelopeIcon) {
+                        envelopeIcon.classList.add("active-enelops");
+                    }
+
                     const emailTarget = this.getAttribute("data-bs-target");
                     const sidebarTarget = this.getAttribute("data-sidebar-target");
 
-                    // Activate email detail pane
                     document.querySelectorAll("#email-detail-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
-                    document.querySelector(emailTarget).classList.add("show", "active");
-                    // Activate sidebar pane
+                    const emailPane = document.querySelector(emailTarget);
+                    if (emailPane) {
+                        emailPane.classList.add("show", "active");
+                    }
+
                     document.querySelectorAll("#right-sidebar-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
-                    document.querySelector(sidebarTarget).classList.add("show", "active");
+                    const sidebarPane = document.querySelector(sidebarTarget);
+                    if (sidebarPane) {
+                        sidebarPane.classList.add("show", "active");
+                    }
                 });
             });
 
-            // Initialize Bootstrap tooltips
+            // Handle inbox tabs click to show first email detail and sidebar
+            document.querySelectorAll('#inbox-tabs [data-bs-toggle="tab"]').forEach((tab) => {
+                tab.addEventListener('show.bs.tab', function (e) {
+                    // Reset all active states
+                    document.querySelectorAll(".email-main-body").forEach((el) => el.classList.remove("active"));
+                    document.querySelectorAll(".fa-envelope").forEach((el) => el.classList.remove("active-enelops"));
+
+                    document.querySelectorAll("#email-detail-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
+                    document.querySelectorAll("#right-sidebar-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
+
+                    // Get the target tab pane that will become active
+                    const targetPaneId = e.target.getAttribute('data-bs-target');
+                    const targetPane = document.querySelector(targetPaneId);
+
+                    if (targetPane) {
+                        // Find the first email in the newly active tab
+                        const firstEmail = targetPane.querySelector('.email-main-body');
+                        if (firstEmail) {
+                            // Activate the first email
+                            firstEmail.classList.add('active');
+                            const firstEnvelope = firstEmail.querySelector('.fa-envelope');
+                            if (firstEnvelope) {
+                                firstEnvelope.classList.add('active-enelops');
+                            }
+
+                            // Get the email detail and sidebar targets from the first email
+                            const emailTarget = firstEmail.getAttribute('data-bs-target');
+                            const sidebarTarget = firstEmail.getAttribute('data-sidebar-target');
+
+                            // Activate the corresponding email detail pane
+                            if (emailTarget) {
+                                const emailPane = document.querySelector(emailTarget);
+                                if (emailPane) {
+                                    emailPane.classList.add("show", "active");
+                                }
+                            }
+
+                            // Activate the corresponding sidebar pane
+                            if (sidebarTarget) {
+                                const sidebarPane = document.querySelector(sidebarTarget);
+                                if (sidebarPane) {
+                                    sidebarPane.classList.add("show", "active");
+                                }
+                            }
+                        } else {
+                            // If no emails in this tab (empty state), clear the detail and sidebar
+                            document.querySelectorAll("#email-detail-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
+                            document.querySelectorAll("#right-sidebar-content .tab-pane").forEach((pane) => pane.classList.remove("show", "active"));
+                        }
+                    }
+                });
+            });
+
+            // Initialize first email as active on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                const activeTabPane = document.querySelector('#inbox-tab-content .tab-pane.active');
+                if (activeTabPane) {
+                    const firstEmail = activeTabPane.querySelector('.email-main-body');
+                    if (firstEmail && !firstEmail.classList.contains('active')) {
+                        // Activate first email
+                        firstEmail.classList.add('active');
+                        const firstEnvelope = firstEmail.querySelector('.fa-envelope');
+                        if (firstEnvelope) {
+                            firstEnvelope.classList.add('active-enelops');
+                        }
+
+                        // Activate corresponding email detail and sidebar
+                        const emailTarget = firstEmail.getAttribute('data-bs-target');
+                        const sidebarTarget = firstEmail.getAttribute('data-sidebar-target');
+
+                        if (emailTarget) {
+                            const emailPane = document.querySelector(emailTarget);
+                            if (emailPane) emailPane.classList.add("show", "active");
+                        }
+
+                        if (sidebarTarget) {
+                            const sidebarPane = document.querySelector(sidebarTarget);
+                            if (sidebarPane) sidebarPane.classList.add("show", "active");
+                        }
+                    }
+                }
+            });
+
+
+
+
             const tooltipTriggerList = document.querySelectorAll(
                 '[data-bs-toggle="tooltip"]'
             );
