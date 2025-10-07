@@ -20,6 +20,7 @@ class FetchEmails extends Command
 
     public function handle()
     {
+        ini_set('max_execution_time', 300);
         $startTime = microtime(true);
         $this->info('Starting email fetch process...');
 
