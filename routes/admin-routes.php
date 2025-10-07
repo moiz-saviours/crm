@@ -286,7 +286,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::get('/change-lead-status/{lead?}', [AdminLeadController::class, 'change_lead_status'])->name('change.lead-status');
             Route::get('/change-status/{lead?}', [AdminLeadController::class, 'change_status'])->name('change.status');
             Route::delete('/delete/{lead?}', [AdminLeadController::class, 'delete'])->name('delete');
-            Route::post('/convert/{lead}', [AdminLeadController::class, 'convertToCustomer'])->name('convert');
+            Route::post('/convert/{lead}', [AdminLeadController::class, 'convert_to_customer'])->name('convert');
         });
     });
     /** Lead Status Routes */
