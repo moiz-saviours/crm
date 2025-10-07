@@ -12,7 +12,8 @@
                     <!-- Page 1 Start -->
                     <!-- Left Sidebar (col-md-2) -->
                     <div class="col-md-2 p-0" id="leftSidebar">
-                        <div class="bg-white left-sidebar-custom d-flex flex-column p-3 main-content-col" id="left-sidebar">
+                        <div class="bg-white left-sidebar-custom d-flex flex-column p-3 main-content-col"
+                             id="left-sidebar">
 
                             <!-- Header Icons -->
                             <div class="head-icons mb-3">
@@ -31,7 +32,7 @@
                                 You're available
                                 <i class="fas fa-caret-down ms-1"></i>
                             </div>
-                            <hr class="border-bottom-dark my-2 sidebar-label" />
+                            <hr class="border-bottom-dark my-2 sidebar-label"/>
 
                             <!-- Tabs in Left Sidebar -->
                             <div class="list-group flex-grow-1 sidebar-label" id="inbox-tabs" role="tablist">
@@ -42,7 +43,8 @@
                                    id="unassigned-tab" data-bs-toggle="tab" data-bs-target="#unassigned-pane" role="tab"
                                    aria-controls="unassigned-pane" aria-selected="true">
                                     Unassigned
-                                    <span class="badge rounded-pill text-bg-light">4</span>
+                                    <span
+                                        class="badge rounded-pill text-bg-light">{{ $emails->where('assigned_to', null)->count() }}</span>
                                 </a>
 
                                 <a href="#assigned-pane"
@@ -50,7 +52,8 @@
                                    id="assigned-tab-1" data-bs-toggle="tab" data-bs-target="#assigned-pane" role="tab"
                                    aria-controls="assigned-pane" aria-selected="false">
                                     Assigned me
-                                    <span class="badge rounded-pill text-bg-light">4</span>
+                                    <span
+                                        class="badge rounded-pill text-bg-light">{{ $emails->where('assigned_to', auth()->id())->count() }}</span>
                                 </a>
 
                                 <a href="#all-open-pane"
@@ -58,13 +61,15 @@
                                    id="all-open-tab" data-bs-toggle="tab" data-bs-target="#all-open-pane" role="tab"
                                    aria-controls="all-open-pane" aria-selected="false">
                                     All open
-                                    <span class="badge rounded-pill text-bg-light">4</span>
+                                    <span
+                                        class="badge rounded-pill text-bg-light">{{ $emails->where('is_read', true)->count() }}</span>
                                 </a>
 
                                 <!-- More / Less Toggle -->
                                 <button
                                     class="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-dark toggle-btn"
-                                    type="button" data-bs-toggle="collapse" data-bs-target="#moreContent" aria-expanded="false"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#moreContent"
+                                    aria-expanded="false"
                                     aria-controls="moreContent">
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-caret-down toggle-icon me-2"></i>
@@ -94,7 +99,8 @@
                                        aria-controls="sent-pane"
                                        aria-selected="false">
                                         Sent
-                                        <span class="badge rounded-pill text-bg-light">0</span>
+                                        <span
+                                            class="badge rounded-pill text-bg-light">{{ $emails->where('type', 'sent')->count() }}</span>
                                     </a>
                                     <a href="#spam-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
@@ -102,20 +108,22 @@
                                        aria-controls="spam-pane"
                                        aria-selected="false">
                                         Spam
-                                        <span class="badge rounded-pill text-bg-light">0</span>
+                                        <span
+                                            class="badge rounded-pill text-bg-light">{{ $emails->where('is_spam', true)->count() }}</span>
                                     </a>
                                     <a href="#trash-pane"
                                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                        id="trash-tab" data-bs-toggle="tab" data-bs-target="#trash-pane" role="tab"
                                        aria-controls="trash-pane" aria-selected="false">
                                         Trash
-                                        <span class="badge rounded-pill text-bg-light">0</span>
+                                        <span
+                                            class="badge rounded-pill text-bg-light">{{ $emails->where('is_trashed', true)->count() }}</span>
                                     </a>
                                 </div>
 
                             </div>
 
-                            <hr class="sidebar-label-hr" />
+                            <hr class="sidebar-label-hr"/>
 
                             <!-- Bottom buttons -->
                             <div class="d-flex justify-content-center email-body-bottom-button sidebar-label">
@@ -125,8 +133,10 @@
                                     </button>
 
                                     <ul class="actions-menu list-unstyled mt-2" id="actionsMenu" style="display:none;">
-                                        <li><a class="dropdown-item cus-dropcol-2" href="#">Manage Team Availability</a></li>
-                                        <li><a class="dropdown-item cus-dropcol-2" href="#">Create a View <i class="fas fa-eye ms-2"></i>
+                                        <li><a class="dropdown-item cus-dropcol-2" href="#">Manage Team Availability</a>
+                                        </li>
+                                        <li><a class="dropdown-item cus-dropcol-2" href="#">Create a View <i
+                                                    class="fas fa-eye ms-2"></i>
                                             </a></li>
                                         <li><a class="dropdown-item cus-dropcol-2" href="#">Connect a Channel</a></li>
                                     </ul>
@@ -175,94 +185,103 @@
                                 <div class="tab-pane fade show active" id="unassigned-pane" role="tabpanel"
                                      aria-labelledby="unassigned-tab">
                                     <div class="list-group" id="email-list-unassigned" role="tablist">
-                                        <a href="#email-detail-1"
-                                           class="list-group-item list-group-item-action email-main-body active"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"
-                                           data-sidebar-target="#sidebar-detail-1"
-                                           role="tab" aria-controls="email-detail-1" aria-selected="true"
-                                           data-name="Hasnat Khan"
-                                           data-email="hasnat.khan@stellers.org" data-subject="Re: Test">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-checkbox-wrapper me-3">
-                                                    <i class="far fa-envelope active-enelops"></i>
-                                                    <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" id="main-checkbox">
-                                                        <span class="check-icon"></span>
-                                                    </label>
-                                                    </label>
-                                                </div>
-                                                <div class="email-contents flex-grow-1">
-                                                    <p class="mb-0 email-address">
-                                                        hasnat.khan@stellers.org
-                                                    </p>
-                                                    <p class="mb-0 email-subject">Re: Test</p>
-                                                    <p class="small-para mb-0 text-muted">
-                                                        <i class="fas fa-reply me-2"></i> test email
-                                                    </p>
-                                                </div>
-                                                <p class="para-second mb-0">11s</p>
-                                            </div>
-                                        </a>
-                                        <a href="#email-detail-2"
-                                           class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-2"
-                                           data-sidebar-target="#sidebar-detail-2"
-                                           role="tab" aria-controls="email-detail-2" aria-selected="false"
-                                           data-name="Moiz Athar"
-                                           data-email="moiz@saviours.co" data-subject="Project Update">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-checkbox-wrapper me-3">
-                                                    <i class="far fa-envelope"></i>
-                                                    <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox"/>
-                                                        <span class="check-icon"></span>
-                                                    </label>
-                                                </div>
-                                                <div class="email-contents flex-grow-1">
-                                                    <p class="mb-0 email-address">moiz@saviours.co</p>
-                                                    <p class="mb-0 email-subject">Project Update</p>
-                                                    <p class="small-para mb-0 text-muted">
-                                                        <i class="fas fa-reply me-2"></i> Regarding the
-                                                        new feature.
-                                                    </p>
-                                                </div>
-                                                <p class="para-second mb-0">5m</p>
-                                            </div>
-                                        </a>
+                                        <!-- Static Start -->
+                                        {{--                                        <a href="#email-detail-1"--}}
+                                        {{--                                           class="list-group-item list-group-item-action email-main-body active"--}}
+                                        {{--                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"--}}
+                                        {{--                                           data-sidebar-target="#sidebar-detail-1"--}}
+                                        {{--                                           role="tab" aria-controls="email-detail-1" aria-selected="true"--}}
+                                        {{--                                           data-name="Hasnat Khan"--}}
+                                        {{--                                           data-email="hasnat.khan@stellers.org" data-subject="Re: Test">--}}
+                                        {{--                                            <div class="d-flex align-items-center">--}}
+                                        {{--                                                <div class="icon-checkbox-wrapper me-3">--}}
+                                        {{--                                                    <i class="far fa-envelope active-enelops"></i>--}}
+                                        {{--                                                    <label class="custom-checkbox me-2">--}}
+                                        {{--                                                        <input type="checkbox" id="main-checkbox">--}}
+                                        {{--                                                        <span class="check-icon"></span>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <div class="email-contents flex-grow-1">--}}
+                                        {{--                                                    <p class="mb-0 email-address">--}}
+                                        {{--                                                        hasnat.khan@stellers.org--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                    <p class="mb-0 email-subject">Re: Test</p>--}}
+                                        {{--                                                    <p class="small-para mb-0 text-muted">--}}
+                                        {{--                                                        <i class="fas fa-reply me-2"></i> test email--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <p class="para-second mb-0">11s</p>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </a>--}}
+                                        {{--                                        <a href="#email-detail-2"--}}
+                                        {{--                                           class="list-group-item list-group-item-action email-main-body"--}}
+                                        {{--                                           data-bs-toggle="tab" data-bs-target="#email-detail-2"--}}
+                                        {{--                                           data-sidebar-target="#sidebar-detail-2"--}}
+                                        {{--                                           role="tab" aria-controls="email-detail-2" aria-selected="false"--}}
+                                        {{--                                           data-name="Moiz Athar"--}}
+                                        {{--                                           data-email="moiz@saviours.co" data-subject="Project Update">--}}
+                                        {{--                                            <div class="d-flex align-items-center">--}}
+                                        {{--                                                <div class="icon-checkbox-wrapper me-3">--}}
+                                        {{--                                                    <i class="far fa-envelope"></i>--}}
+                                        {{--                                                    <label class="custom-checkbox me-2">--}}
+                                        {{--                                                        <input type="checkbox" class="hover-checkbox"/>--}}
+                                        {{--                                                        <span class="check-icon"></span>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <div class="email-contents flex-grow-1">--}}
+                                        {{--                                                    <p class="mb-0 email-address">moiz@saviours.co</p>--}}
+                                        {{--                                                    <p class="mb-0 email-subject">Project Update</p>--}}
+                                        {{--                                                    <p class="small-para mb-0 text-muted">--}}
+                                        {{--                                                        <i class="fas fa-reply me-2"></i> Regarding the--}}
+                                        {{--                                                        new feature.--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <p class="para-second mb-0">5m</p>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </a>--}}
+                                        <!-- Static End -->
+
+                                        @foreach($emails->where('assigned_to', null) as $email)
+                                            @include('admin.customers.inbox.partials.email-list')
+                                        @endforeach
                                     </div>
                                 </div>
                                 <!-- Assigned to Me Tab Pane -->
                                 <div class="tab-pane fade" id="assigned-pane" role="tabpanel"
                                      aria-labelledby="assigned-tab">
                                     <div class="list-group" id="email-list-assigned" role="tablist">
-                                        <a href="#email-detail-3"
-                                           class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-3"
-                                           data-sidebar-target="#sidebar-detail-3"
-                                           role="tab" aria-controls="email-detail-3" aria-selected="true"
-                                           data-name="Sarah Johnson"
-                                           data-email="sarah.j@example.com" data-subject="Meeting Request">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-checkbox-wrapper me-3">
-                                                    <i class="far fa-envelope"></i>
-                                                    <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox"/>
-                                                        <span class="check-icon"></span>
-                                                    </label>
-                                                </div>
-                                                <div class="email-contents flex-grow-1">
-                                                    <p class="mb-0 email-address">
-                                                        sarah.j@example.com
-                                                    </p>
-                                                    <p class="mb-0 email-subject">Meeting Request</p>
-                                                    <p class="small-para mb-0 text-muted">
-                                                        <i class="fas fa-reply me-2"></i> Let's schedule a
-                                                        call next week.
-                                                    </p>
-                                                </div>
-                                                <p class="para-second mb-0">15m</p>
-                                            </div>
-                                        </a>
+                                        {{--                                        <a href="#email-detail-3"--}}
+                                        {{--                                           class="list-group-item list-group-item-action email-main-body"--}}
+                                        {{--                                           data-bs-toggle="tab" data-bs-target="#email-detail-3"--}}
+                                        {{--                                           data-sidebar-target="#sidebar-detail-3"--}}
+                                        {{--                                           role="tab" aria-controls="email-detail-3" aria-selected="true"--}}
+                                        {{--                                           data-name="Sarah Johnson"--}}
+                                        {{--                                           data-email="sarah.j@example.com" data-subject="Meeting Request">--}}
+                                        {{--                                            <div class="d-flex align-items-center">--}}
+                                        {{--                                                <div class="icon-checkbox-wrapper me-3">--}}
+                                        {{--                                                    <i class="far fa-envelope"></i>--}}
+                                        {{--                                                    <label class="custom-checkbox me-2">--}}
+                                        {{--                                                        <input type="checkbox" class="hover-checkbox"/>--}}
+                                        {{--                                                        <span class="check-icon"></span>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <div class="email-contents flex-grow-1">--}}
+                                        {{--                                                    <p class="mb-0 email-address">--}}
+                                        {{--                                                        sarah.j@example.com--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                    <p class="mb-0 email-subject">Meeting Request</p>--}}
+                                        {{--                                                    <p class="small-para mb-0 text-muted">--}}
+                                        {{--                                                        <i class="fas fa-reply me-2"></i> Let's schedule a--}}
+                                        {{--                                                        call next week.--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <p class="para-second mb-0">15m</p>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </a>--}}
+                                        @foreach($emails->where('assigned_to', auth()->id()) as $email)
+                                            @include('admin.customers.inbox.partials.email-list')
+                                        @endforeach
                                     </div>
                                 </div>
 
@@ -270,85 +289,92 @@
                                 <div class="tab-pane fade" id="all-open-pane" role="tabpanel"
                                      aria-labelledby="all-open-tab">
                                     <div class="list-group" id="email-list-all-open" role="tablist">
-                                        <a href="#email-detail-1"
-                                           class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"
-                                           data-sidebar-target="#sidebar-detail-1"
-                                           role="tab" aria-controls="email-detail-1" aria-selected="true">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-checkbox-wrapper me-3">
-                                                    <i class="far fa-envelope active-enelops"></i>
-                                                    <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox"/>
-                                                        <span class="check-icon"></span>
-                                                    </label>
-                                                </div>
-                                                <div class="email-contents flex-grow-1">
-                                                    <p class="mb-0 email-address">
-                                                        hasnat.khan@stellers.org
-                                                    </p>
-                                                    <p class="mb-0 email-subject">Re: Test</p>
-                                                    <p class="small-para mb-0 text-muted">
-                                                        <i class="fas fa-reply me-2"></i> test email
-                                                    </p>
-                                                </div>
-                                                <p class="para-second mb-0">11s</p>
-                                            </div>
-                                        </a>
-                                        <a href="#email-detail-2"
-                                           class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-2"
-                                           data-sidebar-target="#sidebar-detail-2"
-                                           role="tab" aria-controls="email-detail-2" aria-selected="false">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-checkbox-wrapper me-3">
-                                                    <i class="far fa-envelope"></i>
-                                                    <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox"/>
-                                                        <span class="check-icon"></span>
-                                                    </label>
-                                                </div>
-                                                <div class="email-contents flex-grow-1">
-                                                    <p class="mb-0 email-address">moiz@saviours.co</p>
-                                                    <p class="mb-0 email-subject">Project Update</p>
-                                                    <p class="small-para mb-0 text-muted">
-                                                        <i class="fas fa-reply me-2"></i> Regarding the
-                                                        new feature.
-                                                    </p>
-                                                </div>
-                                                <p class="para-second mb-0">5m</p>
-                                            </div>
-                                        </a>
+                                        {{--                                        <a href="#email-detail-1"--}}
+                                        {{--                                           class="list-group-item list-group-item-action email-main-body"--}}
+                                        {{--                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"--}}
+                                        {{--                                           data-sidebar-target="#sidebar-detail-1"--}}
+                                        {{--                                           role="tab" aria-controls="email-detail-1" aria-selected="true">--}}
+                                        {{--                                            <div class="d-flex align-items-center">--}}
+                                        {{--                                                <div class="icon-checkbox-wrapper me-3">--}}
+                                        {{--                                                    <i class="far fa-envelope active-enelops"></i>--}}
+                                        {{--                                                    <label class="custom-checkbox me-2">--}}
+                                        {{--                                                        <input type="checkbox" class="hover-checkbox"/>--}}
+                                        {{--                                                        <span class="check-icon"></span>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <div class="email-contents flex-grow-1">--}}
+                                        {{--                                                    <p class="mb-0 email-address">--}}
+                                        {{--                                                        hasnat.khan@stellers.org--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                    <p class="mb-0 email-subject">Re: Test</p>--}}
+                                        {{--                                                    <p class="small-para mb-0 text-muted">--}}
+                                        {{--                                                        <i class="fas fa-reply me-2"></i> test email--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <p class="para-second mb-0">11s</p>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </a>--}}
+                                        {{--                                        <a href="#email-detail-2"--}}
+                                        {{--                                           class="list-group-item list-group-item-action email-main-body"--}}
+                                        {{--                                           data-bs-toggle="tab" data-bs-target="#email-detail-2"--}}
+                                        {{--                                           data-sidebar-target="#sidebar-detail-2"--}}
+                                        {{--                                           role="tab" aria-controls="email-detail-2" aria-selected="false">--}}
+                                        {{--                                            <div class="d-flex align-items-center">--}}
+                                        {{--                                                <div class="icon-checkbox-wrapper me-3">--}}
+                                        {{--                                                    <i class="far fa-envelope"></i>--}}
+                                        {{--                                                    <label class="custom-checkbox me-2">--}}
+                                        {{--                                                        <input type="checkbox" class="hover-checkbox"/>--}}
+                                        {{--                                                        <span class="check-icon"></span>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <div class="email-contents flex-grow-1">--}}
+                                        {{--                                                    <p class="mb-0 email-address">moiz@saviours.co</p>--}}
+                                        {{--                                                    <p class="mb-0 email-subject">Project Update</p>--}}
+                                        {{--                                                    <p class="small-para mb-0 text-muted">--}}
+                                        {{--                                                        <i class="fas fa-reply me-2"></i> Regarding the--}}
+                                        {{--                                                        new feature.--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <p class="para-second mb-0">5m</p>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </a>--}}
+                                        @foreach($emails->where('is_read', true) as $email)
+                                            @include('admin.customers.inbox.partials.email-list')
+                                        @endforeach
                                     </div>
                                 </div>
                                 <!-- Email Tab Pane -->
                                 <div class="tab-pane fade" id="email-pane" role="tabpanel" aria-labelledby="email-tab">
                                     <div class="list-group" id="email-list-email" role="tablist">
-                                        <a href="#email-detail-1"
-                                           class="list-group-item list-group-item-action email-main-body"
-                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"
-                                           data-sidebar-target="#sidebar-detail-1"
-                                           role="tab" aria-controls="email-detail-1" aria-selected="true">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-checkbox-wrapper me-3">
-                                                    <i class="far fa-envelope active-enelops"></i>
-                                                    <label class="custom-checkbox me-2">
-                                                        <input type="checkbox" class="hover-checkbox"/>
-                                                        <span class="check-icon"></span>
-                                                    </label>
-                                                </div>
-                                                <div class="email-contents flex-grow-1">
-                                                    <p class="mb-0 email-address">
-                                                        hasnat.khan@stellers.org
-                                                    </p>
-                                                    <p class="mb-0 email-subject">Re: Test</p>
-                                                    <p class="small-para mb-0 text-muted">
-                                                        <i class="fas fa-reply me-2"></i> test email
-                                                    </p>
-                                                </div>
-                                                <p class="para-second mb-0">11s</p>
-                                            </div>
-                                        </a>
+                                        {{--                                        <a href="#email-detail-1"--}}
+                                        {{--                                           class="list-group-item list-group-item-action email-main-body"--}}
+                                        {{--                                           data-bs-toggle="tab" data-bs-target="#email-detail-1"--}}
+                                        {{--                                           data-sidebar-target="#sidebar-detail-1"--}}
+                                        {{--                                           role="tab" aria-controls="email-detail-1" aria-selected="true">--}}
+                                        {{--                                            <div class="d-flex align-items-center">--}}
+                                        {{--                                                <div class="icon-checkbox-wrapper me-3">--}}
+                                        {{--                                                    <i class="far fa-envelope active-enelops"></i>--}}
+                                        {{--                                                    <label class="custom-checkbox me-2">--}}
+                                        {{--                                                        <input type="checkbox" class="hover-checkbox"/>--}}
+                                        {{--                                                        <span class="check-icon"></span>--}}
+                                        {{--                                                    </label>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <div class="email-contents flex-grow-1">--}}
+                                        {{--                                                    <p class="mb-0 email-address">--}}
+                                        {{--                                                        hasnat.khan@stellers.org--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                    <p class="mb-0 email-subject">Re: Test</p>--}}
+                                        {{--                                                    <p class="small-para mb-0 text-muted">--}}
+                                        {{--                                                        <i class="fas fa-reply me-2"></i> test email--}}
+                                        {{--                                                    </p>--}}
+                                        {{--                                                </div>--}}
+                                        {{--                                                <p class="para-second mb-0">11s</p>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </a>--}}
+
+                                        @foreach($emails as $email)
+                                            @include('admin.customers.inbox.partials.email-list')
+                                        @endforeach
                                     </div>
                                 </div>
                                 <!-- Calls Tab Pane -->
@@ -364,29 +390,47 @@
                                 <!-- Trash Tab Pane -->
                                 <div class="tab-pane fade" id="trash-pane" role="tabpanel" aria-labelledby="trash-tab">
                                     <div class="list-group" id="email-list-trash" role="tablist">
-                                        <div class="text-center p-4 text-muted">
-                                            <i class="fas fa-trash fa-2x mb-3"></i>
-                                            <p>No trash conversations</p>
-                                        </div>
+                                        @if($emails->where('is_trashed', true)->count())
+                                            @foreach($emails->where('is_trashed', true) as $email)
+                                                @include('admin.customers.inbox.partials.email-list')
+                                            @endforeach
+                                        @else
+                                            <div class="text-center p-4 text-muted">
+                                                <i class="fas fa-trash fa-2x mb-3"></i>
+                                                <p>No trash conversations</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                                 <!-- Sent Tab Pane -->
                                 <div class="tab-pane fade" id="sent-pane" role="tabpanel" aria-labelledby="sent-tab">
                                     <div class="list-group" id="email-list-sent" role="tablist">
-                                        <div class="text-center p-4 text-muted">
-                                            <i class="fas fa-paper-plane fa-2x mb-3"></i>
-                                            <p>No sent conversations</p>
-                                        </div>
+                                        @if($emails->where('type', 'sent')->count())
+                                            @foreach($emails->where('type', 'sent') as $email)
+                                                @include('admin.customers.inbox.partials.email-list')
+                                            @endforeach
+                                        @else
+                                            <div class="text-center p-4 text-muted">
+                                                <i class="fas fa-paper-plane fa-2x mb-3"></i>
+                                                <p>No sent conversations</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
                                 <!-- Spam Tab Pane -->
                                 <div class="tab-pane fade" id="spam-pane" role="tabpanel" aria-labelledby="spam-tab">
                                     <div class="list-group" id="email-list-spam" role="tablist">
-                                        <div class="text-center p-4 text-muted">
-                                            <i class="fas fa-ban fa-2x mb-3"></i>
-                                            <p>No spam conversations</p>
-                                        </div>
+                                        @if($emails->where('is_spam', true)->count())
+                                            @foreach($emails->where('is_spam', true) as $email)
+                                                @include('admin.customers.inbox.partials.email-list')
+                                            @endforeach
+                                        @else
+                                            <div class="text-center p-4 text-muted">
+                                                <i class="fas fa-ban fa-2x mb-3"></i>
+                                                <p>No spam conversations</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -394,10 +438,16 @@
                                 <div class="tab-pane fade" id="all-closed-pane" role="tabpanel"
                                      aria-labelledby="all-closed-tab">
                                     <div class="list-group" id="email-list-all-closed" role="tablist">
-                                        <div class="text-center p-4 text-muted">
-                                            <i class="fas fa-inbox fa-2x mb-3"></i>
-                                            <p>No closed conversations</p>
-                                        </div>
+                                        @if($emails->where('is_read', false)->count())
+                                            @foreach($emails->where('is_read', false) as $email)
+                                                @include('admin.customers.inbox.partials.email-list')
+                                            @endforeach
+                                        @else
+                                            <div class="text-center p-4 text-muted">
+                                                <i class="fas fa-inbox fa-2x mb-3"></i>
+                                                <p>No closed conversations</p>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -408,610 +458,648 @@
                     <div class="col-md-4 main-email-area-section list-column">
                         <div class="main-content-col" id="main-email-area">
                             <div class="tab-content" id="email-detail-content">
-                                <!-- Email Detail for Email ID 1 -->
-                                <div class="tab-pane fade show active" id="email-detail-1" role="tabpanel"
-                                     aria-labelledby="email-detail-1-tab">
-                                    <div
-                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <span class="profile-avatar-h me-3">H</span>
-                                            <div>
-                                                <span class="main-area-email-para">hasnat.khan@stellers.org</span><br/>
-                                                <span class="main-area-email-para-time">Created 3 hours ago</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span class="profile-description">Owner</span>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="user-info-dropdown">
-                                                <div class="user-info d-flex align-items-center">
-                                                    <div class="icon-wrapper me-2">
-                                                        <i class="fas fa-user-circle profile-icon"></i>
-                                                        <span class="status-dot"></span>
-                                                    </div>
-                                                    <p class="user_name mb-0">Hasnat Khan</p>
-                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"></i>
-                                                </div>
-                                            </div>
-                                            <h5 class="mb-3">Re: Test</h5>
-                                        </div>
+                                @foreach($emails as $email)
+                                    @include('admin.customers.inbox.partials.email-box')
+                                @endforeach
+                                {{--                                <!-- Email Detail for Email ID 1 -->--}}
+                                {{--                                <div class="tab-pane fade show active" id="email-detail-1" role="tabpanel"--}}
+                                {{--                                     aria-labelledby="email-detail-1-tab">--}}
+                                {{--                                    <div--}}
+                                {{--                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">--}}
+                                {{--                                        <div class="d-flex align-items-center">--}}
+                                {{--                                            <span class="profile-avatar-h me-3">H</span>--}}
+                                {{--                                            <div>--}}
+                                {{--                                                <span class="main-area-email-para">hasnat.khan@stellers.org</span><br/>--}}
+                                {{--                                                <span class="main-area-email-para-time">Created 3 hours ago</span>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                    <div class="p-3">--}}
+                                {{--                                        <div class="d-flex justify-content-between align-items-center mb-3">--}}
+                                {{--                                            <span class="profile-description">Owner</span>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="d-flex align-items-center justify-content-between mb-4">--}}
+                                {{--                                            <div class="user-info-dropdown">--}}
+                                {{--                                                <div class="user-info d-flex align-items-center" id="userDropdownToggle"--}}
+                                {{--                                                     role="button" aria-expanded="false">--}}
+                                {{--                                                    <div class="icon-wrapper me-2">--}}
+                                {{--                                                        <i class="fas fa-user-circle profile-icon"--}}
+                                {{--                                                           aria-hidden="true"></i>--}}
+                                {{--                                                        <span class="status-dot"></span>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <p class="user_name mb-0">Hasnat Khan</p>--}}
+                                {{--                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"--}}
+                                {{--                                                       aria-hidden="true"></i>--}}
+                                {{--                                                </div>--}}
 
-                                        <div class="email-reply-wrapper">
-                                            <div class="d-flex align-items-start email-reply-block">
-                                                <i class="fas fa-user-circle profile-icon me-4"></i>
-                                                <div class="flex-grow-1">
-                                                    <p class="email-from mb-0">
-                                                        <b>Hasnat Khan</b>
-                                                        <span class="text-muted small">8:19 PM</span>
-                                                        <span class="ms-4 last-span text-bold">
-                              Email
-                              <i class="fas fa-caret-down ms-2 last-span-icon"></i>
-                            </span>
-                                                    </p>
-                                                    <p class="mb-0 email-to text-muted small">
-                                                        To: hasnat.khan@stellers.org
-                                                    </p>
-                                                    <p class="email-body mt-2">
-                                                        Test email content goes here. This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes. Test email content goes here.
-                                                        This is a sample
-                                                        email for demonstration purposes.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr/>
-                                        <div class="resizable-panel">
-                                            <div class="resizable-content">
-                                                <div
-                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
-                                                    <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>
-                                                    <span class="email-comment-tabs email-decription">Email <i
-                                                            class="fas fa-caret-down ms-1"></i></span>
-                                                    <i class="fas fa-comment ms-4 me-2 icon-comment"></i>
-                                                    <span class="email-comment-tabs comment-description">Comment</span>
-                                                    <span class="ms-auto">
-                            <i class="fa-solid fa-up-right-and-down-left-from-center enlarge-icon"></i>
-                          </span>
-                                                </div>
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">
-                                                    <div
-                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
-                                                        <i class="fas fa-reply" id="reply-icon"></i>
-                                                        <div class="d-flex flex-wrap align-items-center flex-grow-1">
-                                                            <input
-                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
-                                                                placeholder="Enter or choose a recipient" type="text"
-                                                                autocomplete="off"/>
-                                                        </div>
-                                                    </div>
-                                                    <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control mt-2 email-compose-box">
-                                            <div class="editor-wrapper">
-                                                <div id="editorContent" class=" text-placeholder"
-                                                     contenteditable="true">
-                                                    Write a message. Press '/' or highlight text to
-                                                    access AI commands.
-                                                </div>
-                                                <div class="editor-toolbar d-flex justify-content-between">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"
-                                                           title="Change Font"></i>
-                                                        <i class="editor-icon fas fa-smile me-3 text-primary"
-                                                           data-bs-toggle="tooltip"
-                                                           title="Press window with ;"></i>
-                                                        <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-link" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Link</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Remove Link</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-image" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Upload New
-                                                                        Image</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Existing
-                                                                        Image</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropup me-3">
-                                                            <i class="editor-icon fas fa-paperclip" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Attach File</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Browse
-                                                                        Documents</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropup me-3">
-                                                            <button class="btn btn-secondary insert-btn" type="button"
-                                                                    data-bs-toggle="dropdown"
-                                                                    aria-expanded="false">
-                                                                Insert
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Invoice</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert
-                                                                        Documents</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Code</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    <button class="btn btn-primary send-btn">
-                                                        Send
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Email Detail for Email ID 2 -->
-                                <div class="tab-pane fade" id="email-detail-2" role="tabpanel"
-                                     aria-labelledby="email-detail-2-tab">
-                                    <div
-                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <span class="profile-avatar-h me-3">M</span>
-                                            <div>
-                                                <span class="main-area-email-para">moiz@saviours.co</span><br/>
-                                                <span class="main-area-email-para-time">Created 5 minutes ago</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span class="profile-description">Owner</span>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="user-info-dropdown">
-                                                <div class="user-info d-flex align-items-center">
-                                                    <div class="icon-wrapper me-2">
-                                                        <i class="fas fa-user-circle profile-icon"></i>
-                                                        <span class="status-dot"></span>
-                                                    </div>
-                                                    <p class="user_name mb-0">Moiz Athar</p>
-                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"></i>
-                                                </div>
-                                            </div>
-                                            <h5 class="mb-3">Project Update</h5>
-                                        </div>
+                                {{--                                                <div class="user-dropdown-menu" id="userDropdownMenu">--}}
+                                {{--                                                    <div class="search-box">--}}
+                                {{--                                                        <input type="text" placeholder="Search for a specific user">--}}
+                                {{--                                                        <i class="fas fa-search search-icon"></i>--}}
+                                {{--                                                    </div>--}}
 
-                                        <div class="email-reply-wrapper">
-                                            <div class="d-flex align-items-start email-reply-block">
-                                                <i class="fas fa-user-circle profile-icon me-4"></i>
-                                                <div class="flex-grow-1">
-                                                    <p class="email-from mb-0">
-                                                        <b>Moiz Athar</b>
-                                                        <span class="text-muted small">9:05 PM</span>
-                                                        <span class="ms-4 last-span text-bold">
-                              Email
-                              <i class="fas fa-caret-down ms-2 last-span-icon"></i>
-                            </span>
-                                                    </p>
-                                                    <p class="mb-0 email-to text-muted small">
-                                                        To: moiz@saviours.co
-                                                    </p>
-                                                    <p class="email-body mt-2">
-                                                        Regarding the new feature implementation. We've
-                                                        completed the initial testing phase and are ready
-                                                        for the next steps. Please review the attached
-                                                        document and let me know your thoughts. Regarding
-                                                        the new feature implementation. We've completed
-                                                        the initial testing phase and are ready for the
-                                                        next steps. Please review the attached document
-                                                        and let me know your thoughts.Regarding the new
-                                                        feature implementation. We've completed the
-                                                        initial testing phase and are ready for the next
-                                                        steps. Please review the attached document and let
-                                                        me know your thoughts. Regarding the new feature
-                                                        implementation. We've completed the initial
-                                                        testing phase and are ready for the next steps.
-                                                        Please review the attached document and let me
-                                                        know your thoughts. Regarding the new feature
-                                                        implementation. We've completed the initial
-                                                        testing phase and are ready for the next steps.
-                                                        Please review the attached document and let me
-                                                        know your thoughts.Regarding the new feature
-                                                        implementation. We've completed the initial
-                                                        testing phase and are ready for the next steps.
-                                                        Please review the attached document and let me
-                                                        know your thoughts. Regarding the new feature
-                                                        implementation. We've completed the initial
-                                                        testing phase and are ready for the next steps.
-                                                        Please review the attached document and let me
-                                                        know your thoughts. Regarding the new feature
-                                                        implementation. We've completed the initial
-                                                        testing phase and are ready for the next steps.
-                                                        Please review the attached document and let me
-                                                        know your thoughts.Regarding the new feature
-                                                        implementation. We've completed the initial
-                                                        testing phase and are ready for the next steps.
-                                                        Please review the attached document and let me
-                                                        know your thoughts.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr/>
-                                        <div class="resizable-panel">
-                                            <div class="resizable-content">
-                                                <div
-                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
-                                                    <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>
-                                                    <span class="email-comment-tabs email-decription">Email <i
-                                                            class="fas fa-caret-down ms-1"></i></span>
-                                                    <i class="fas fa-comment ms-4 me-2 icon-comment"></i>
-                                                    <span class="email-comment-tabs comment-description">Comment</span>
-                                                    <span class="ms-auto">
-                            <i class="fa-solid fa-up-right-and-down-left-from-center enlarge-icon"></i>
-                          </span>
-                                                </div>
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">
-                                                    <div
-                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
-                                                        <i class="fas fa-reply" id="reply-icon"></i>
-                                                        <div class="d-flex flex-wrap align-items-center flex-grow-1">
-                                                            <input
-                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
-                                                                placeholder="Enter or choose a recipient" type="text"
-                                                                autocomplete="off"/>
-                                                        </div>
-                                                    </div>
-                                                    <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control mt-2 email-compose-box">
-                                            <div class="editor-wrapper">
-                                                <div id="editorContent" class="text-muted text-placeholder"
-                                                     contenteditable="true">
-                                                    Write a message. Press '/' or highlight text to
-                                                    access AI commands.
-                                                </div>
-                                                <div
-                                                    class="editor-toolbar d-flex justify-content-between align-items-center">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"
-                                                           title="Change Font"></i>
-                                                        <i class="editor-icon fas fa-smile me-3 text-primary"
-                                                           data-bs-toggle="tooltip"
-                                                           title="Insert Emoji"></i>
-                                                        <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-link" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Link</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Remove Link</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-image" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Upload New
-                                                                        Image</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Existing
-                                                                        Image</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropup me-3">
-                                                            <i class="editor-icon fas fa-paperclip" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Attach File</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Browse
-                                                                        Documents</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropup me-3">
-                                                            <button class="btn btn-secondary insert-btn" type="button"
-                                                                    data-bs-toggle="dropdown"
-                                                                    aria-expanded="false">
-                                                                Insert
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Invoice</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert
-                                                                        Documents</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Code</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    <button class="btn btn-primary send-btn">
-                                                        Send
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Email Detail for Email ID 3 -->
-                                <div class="tab-pane fade" id="email-detail-3" role="tabpanel"
-                                     aria-labelledby="email-detail-3-tab">
-                                    <div
-                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">
-                                        <div class="d-flex align-items-center">
-                                            <span class="profile-avatar-h me-3">S</span>
-                                            <div>
-                                                <span class="main-area-email-para">sarah.j@example.com</span><br/>
-                                                <span class="main-area-email-para-time">Created 15 minutes ago</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="p-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span class="profile-description">Owner</span>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="user-info-dropdown">
-                                                <div class="user-info d-flex align-items-center" id="userDropdownToggle"
-                                                     role="button" aria-expanded="false">
-                                                    <div class="icon-wrapper me-2">
-                                                        <i class="fas fa-user-circle profile-icon"
-                                                           aria-hidden="true"></i>
-                                                        <span class="status-dot"></span>
-                                                    </div>
-                                                    <p class="user_name mb-0">Hasnat Khan</p>
-                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"
-                                                       aria-hidden="true"></i>
-                                                </div>
+                                {{--                                                    <div class="d-flex justify-content-end mb-2">--}}
+                                {{--                                                        <button class="unassign-btn">Unassign</button>--}}
+                                {{--                                                    </div>--}}
 
-                                                <div class="user-dropdown-menu" id="userDropdownMenu">
-                                                    <div class="search-box">
-                                                        <input type="text" placeholder="Search for a specific user">
-                                                        <i class="fas fa-search search-icon"></i>
-                                                    </div>
+                                {{--                                                    <div class="user-list">--}}
+                                {{--                                                        <div--}}
+                                {{--                                                            class="user-item-row active-user d-flex align-items-center justify-content-between">--}}
+                                {{--                                                            <div class="d-flex align-items-center">--}}
+                                {{--                                                                <div class="avatar-sm me-2">--}}
+                                {{--                                                                    <i class="fas fa-user-circle"></i>--}}
+                                {{--                                                                    <span class="status-dot-sm away"></span>--}}
+                                {{--                                                                </div>--}}
+                                {{--                                                                <div>--}}
+                                {{--                                                                    <p class="item-user-name mb-0">Hasnat Khan</p>--}}
+                                {{--                                                                    <p class="item-user-status mb-0 away-text">Away</p>--}}
+                                {{--                                                                </div>--}}
+                                {{--                                                            </div>--}}
+                                {{--                                                            <i class="fas fa-check check-icon"></i>--}}
+                                {{--                                                        </div>--}}
 
-                                                    <div class="d-flex justify-content-end mb-2">
-                                                        <button class="unassign-btn">Unassign</button>
-                                                    </div>
+                                {{--                                                    </div>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                            <h5 class="mb-3">Re: Test</h5>--}}
+                                {{--                                        </div>--}}
 
-                                                    <div class="user-list">
-                                                        <div
-                                                            class="user-item-row active-user d-flex align-items-center justify-content-between">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="avatar-sm me-2">
-                                                                    <i class="fas fa-user-circle"></i>
-                                                                    <span class="status-dot-sm away"></span>
-                                                                </div>
-                                                                <div>
-                                                                    <p class="item-user-name mb-0">Hasnat Khan</p>
-                                                                    <p class="item-user-status mb-0 away-text">Away</p>
-                                                                </div>
-                                                            </div>
-                                                            <i class="fas fa-check check-icon"></i>
-                                                        </div>
+                                {{--                                        <div class="email-reply-wrapper">--}}
+                                {{--                                            <div class="d-flex align-items-start email-reply-block">--}}
+                                {{--                                                <i class="fas fa-user-circle profile-icon me-4"></i>--}}
+                                {{--                                                <div class="flex-grow-1">--}}
+                                {{--                                                    <p class="email-from mb-0">--}}
+                                {{--                                                        <b>Hasnat Khan</b>--}}
+                                {{--                                                        <span class="text-muted small">8:19 PM</span>--}}
+                                {{--                                                        <span class="ms-4 last-span text-bold">--}}
+                                {{--                              Email--}}
+                                {{--                              <i class="fas fa-caret-down ms-2 last-span-icon"></i>--}}
+                                {{--                            </span>--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                    <p class="mb-0 email-to text-muted small">--}}
+                                {{--                                                        To: hasnat.khan@stellers.org--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                    <p class="email-body mt-2">--}}
+                                {{--                                                        Test email content goes here. This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes. Test email content goes here.--}}
+                                {{--                                                        This is a sample--}}
+                                {{--                                                        email for demonstration purposes.--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <hr/>--}}
+                                {{--                                        <div class="resizable-panel">--}}
+                                {{--                                            <div class="resizable-content">--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">--}}
+                                {{--                                                    <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>--}}
+                                {{--                                                    <span class="email-comment-tabs email-decription">Email <i--}}
+                                {{--                                                            class="fas fa-caret-down ms-1"></i></span>--}}
+                                {{--                                                    <i class="fas fa-comment ms-4 me-2 icon-comment"></i>--}}
+                                {{--                                                    <span class="email-comment-tabs comment-description">Comment</span>--}}
+                                {{--                                                    <span class="ms-auto">--}}
+                                {{--                            <i class="fa-solid fa-up-right-and-down-left-from-center enlarge-icon"></i>--}}
+                                {{--                          </span>--}}
+                                {{--                                                </div>--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">--}}
+                                {{--                                                    <div--}}
+                                {{--                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">--}}
+                                {{--                                                        <i class="fas fa-reply" id="reply-icon"></i>--}}
+                                {{--                                                        <div class="d-flex flex-wrap align-items-center flex-grow-1">--}}
+                                {{--                                                            <input--}}
+                                {{--                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"--}}
+                                {{--                                                                placeholder="Enter or choose a recipient"--}}
+                                {{--                                                                type="text"--}}
+                                {{--                                                                autocomplete="off"/>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="form-control mt-2 email-compose-box">--}}
+                                {{--                                            <div class="editor-wrapper">--}}
+                                {{--                                                <div id="editorContent" class=" text-placeholder"--}}
+                                {{--                                                     contenteditable="true">--}}
+                                {{--                                                    Write a message. Press '/' or highlight text to--}}
+                                {{--                                                    access AI commands.--}}
+                                {{--                                                </div>--}}
+                                {{--                                                <div class="editor-toolbar d-flex justify-content-between">--}}
+                                {{--                                                    <div class="d-flex align-items-center">--}}
+                                {{--                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"--}}
+                                {{--                                                           title="Change Font"></i>--}}
+                                {{--                                                        <i class="editor-icon fas fa-smile me-3 text-primary"--}}
+                                {{--                                                           data-bs-toggle="tooltip"--}}
+                                {{--                                                           title="Press window with ;"></i>--}}
+                                {{--                                                        <div class="dropdown me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-link" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Link</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Remove Link</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropdown me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-image" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Upload New--}}
+                                {{--                                                                        Image</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Existing--}}
+                                {{--                                                                        Image</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropup me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-paperclip" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Attach File</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Browse--}}
+                                {{--                                                                        Documents</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropup me-3">--}}
+                                {{--                                                            <button class="btn btn-secondary insert-btn" type="button"--}}
+                                {{--                                                                    data-bs-toggle="dropdown"--}}
+                                {{--                                                                    aria-expanded="false">--}}
+                                {{--                                                                Insert--}}
+                                {{--                                                            </button>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Invoice</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert--}}
+                                {{--                                                                        Documents</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Code</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <button class="btn btn-primary send-btn">--}}
+                                {{--                                                        Send--}}
+                                {{--                                                    </button>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                </div>--}}
+                                {{--                                <!-- Email Detail for Email ID 2 -->--}}
+                                {{--                                <div class="tab-pane fade" id="email-detail-2" role="tabpanel"--}}
+                                {{--                                     aria-labelledby="email-detail-2-tab">--}}
+                                {{--                                    <div--}}
+                                {{--                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">--}}
+                                {{--                                        <div class="d-flex align-items-center">--}}
+                                {{--                                            <span class="profile-avatar-h me-3">M</span>--}}
+                                {{--                                            <div>--}}
+                                {{--                                                <span class="main-area-email-para">moiz@saviours.co</span><br/>--}}
+                                {{--                                                <span class="main-area-email-para-time">Created 5 minutes ago</span>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                    <div class="p-3">--}}
+                                {{--                                        <div class="d-flex justify-content-between align-items-center mb-3">--}}
+                                {{--                                            <span class="profile-description">Owner</span>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="d-flex align-items-center justify-content-between mb-4">--}}
+                                {{--                                            <div class="user-info-dropdown">--}}
+                                {{--                                                <div class="user-info d-flex align-items-center">--}}
+                                {{--                                                    <div class="icon-wrapper me-2">--}}
+                                {{--                                                        <i class="fas fa-user-circle profile-icon"></i>--}}
+                                {{--                                                        <span class="status-dot"></span>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <p class="user_name mb-0">Moiz Athar</p>--}}
+                                {{--                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"></i>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                            <h5 class="mb-3">Project Update</h5>--}}
+                                {{--                                        </div>--}}
 
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <h5 class="mb-3">Meeting Request</h5>
-                                        </div>
+                                {{--                                        <div class="email-reply-wrapper">--}}
+                                {{--                                            <div class="d-flex align-items-start email-reply-block">--}}
+                                {{--                                                <i class="fas fa-user-circle profile-icon me-4"></i>--}}
+                                {{--                                                <div class="flex-grow-1">--}}
+                                {{--                                                    <p class="email-from mb-0">--}}
+                                {{--                                                        <b>Moiz Athar</b>--}}
+                                {{--                                                        <span class="text-muted small">9:05 PM</span>--}}
+                                {{--                                                        <span class="ms-4 last-span text-bold">--}}
+                                {{--                              Email--}}
+                                {{--                              <i class="fas fa-caret-down ms-2 last-span-icon"></i>--}}
+                                {{--                            </span>--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                    <p class="mb-0 email-to text-muted small">--}}
+                                {{--                                                        To: moiz@saviours.co--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                    <p class="email-body mt-2">--}}
+                                {{--                                                        Regarding the new feature implementation. We've--}}
+                                {{--                                                        completed the initial testing phase and are ready--}}
+                                {{--                                                        for the next steps. Please review the attached--}}
+                                {{--                                                        document and let me know your thoughts. Regarding--}}
+                                {{--                                                        the new feature implementation. We've completed--}}
+                                {{--                                                        the initial testing phase and are ready for the--}}
+                                {{--                                                        next steps. Please review the attached document--}}
+                                {{--                                                        and let me know your thoughts.Regarding the new--}}
+                                {{--                                                        feature implementation. We've completed the--}}
+                                {{--                                                        initial testing phase and are ready for the next--}}
+                                {{--                                                        steps. Please review the attached document and let--}}
+                                {{--                                                        me know your thoughts. Regarding the new feature--}}
+                                {{--                                                        implementation. We've completed the initial--}}
+                                {{--                                                        testing phase and are ready for the next steps.--}}
+                                {{--                                                        Please review the attached document and let me--}}
+                                {{--                                                        know your thoughts. Regarding the new feature--}}
+                                {{--                                                        implementation. We've completed the initial--}}
+                                {{--                                                        testing phase and are ready for the next steps.--}}
+                                {{--                                                        Please review the attached document and let me--}}
+                                {{--                                                        know your thoughts.Regarding the new feature--}}
+                                {{--                                                        implementation. We've completed the initial--}}
+                                {{--                                                        testing phase and are ready for the next steps.--}}
+                                {{--                                                        Please review the attached document and let me--}}
+                                {{--                                                        know your thoughts. Regarding the new feature--}}
+                                {{--                                                        implementation. We've completed the initial--}}
+                                {{--                                                        testing phase and are ready for the next steps.--}}
+                                {{--                                                        Please review the attached document and let me--}}
+                                {{--                                                        know your thoughts. Regarding the new feature--}}
+                                {{--                                                        implementation. We've completed the initial--}}
+                                {{--                                                        testing phase and are ready for the next steps.--}}
+                                {{--                                                        Please review the attached document and let me--}}
+                                {{--                                                        know your thoughts.Regarding the new feature--}}
+                                {{--                                                        implementation. We've completed the initial--}}
+                                {{--                                                        testing phase and are ready for the next steps.--}}
+                                {{--                                                        Please review the attached document and let me--}}
+                                {{--                                                        know your thoughts.--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <hr/>--}}
+                                {{--                                        <div class="resizable-panel">--}}
+                                {{--                                            <div class="resizable-content">--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">--}}
+                                {{--                                                    <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>--}}
+                                {{--                                                    <span class="email-comment-tabs email-decription">Email <i--}}
+                                {{--                                                            class="fas fa-caret-down ms-1"></i></span>--}}
+                                {{--                                                    <i class="fas fa-comment ms-4 me-2 icon-comment"></i>--}}
+                                {{--                                                    <span class="email-comment-tabs comment-description">Comment</span>--}}
+                                {{--                                                    <span class="ms-auto">--}}
+                                {{--                            <i class="fa-solid fa-up-right-and-down-left-from-center enlarge-icon"></i>--}}
+                                {{--                          </span>--}}
+                                {{--                                                </div>--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">--}}
+                                {{--                                                    <div--}}
+                                {{--                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">--}}
+                                {{--                                                        <i class="fas fa-reply" id="reply-icon"></i>--}}
+                                {{--                                                        <div class="d-flex flex-wrap align-items-center flex-grow-1">--}}
+                                {{--                                                            <input--}}
+                                {{--                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"--}}
+                                {{--                                                                placeholder="Enter or choose a recipient"--}}
+                                {{--                                                                type="text"--}}
+                                {{--                                                                autocomplete="off"/>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="form-control mt-2 email-compose-box">--}}
+                                {{--                                            <div class="editor-wrapper">--}}
+                                {{--                                                <div id="editorContent" class="text-muted text-placeholder"--}}
+                                {{--                                                     contenteditable="true">--}}
+                                {{--                                                    Write a message. Press '/' or highlight text to--}}
+                                {{--                                                    access AI commands.--}}
+                                {{--                                                </div>--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="editor-toolbar d-flex justify-content-between align-items-center">--}}
+                                {{--                                                    <div class="d-flex align-items-center">--}}
+                                {{--                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"--}}
+                                {{--                                                           title="Change Font"></i>--}}
+                                {{--                                                        <i class="editor-icon fas fa-smile me-3 text-primary"--}}
+                                {{--                                                           data-bs-toggle="tooltip"--}}
+                                {{--                                                           title="Insert Emoji"></i>--}}
+                                {{--                                                        <div class="dropdown me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-link" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Link</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Remove Link</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropdown me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-image" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Upload New--}}
+                                {{--                                                                        Image</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Existing--}}
+                                {{--                                                                        Image</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropup me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-paperclip" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Attach File</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Browse--}}
+                                {{--                                                                        Documents</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropup me-3">--}}
+                                {{--                                                            <button class="btn btn-secondary insert-btn" type="button"--}}
+                                {{--                                                                    data-bs-toggle="dropdown"--}}
+                                {{--                                                                    aria-expanded="false">--}}
+                                {{--                                                                Insert--}}
+                                {{--                                                            </button>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Invoice</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert--}}
+                                {{--                                                                        Documents</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Code</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <button class="btn btn-primary send-btn">--}}
+                                {{--                                                        Send--}}
+                                {{--                                                    </button>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                </div>--}}
+                                {{--                                <!-- Email Detail for Email ID 3 -->--}}
+                                {{--                                <div class="tab-pane fade" id="email-detail-3" role="tabpanel"--}}
+                                {{--                                     aria-labelledby="email-detail-3-tab">--}}
+                                {{--                                    <div--}}
+                                {{--                                        class="d-flex justify-content-between align-items-center email-header-main px-3 border-bottom">--}}
+                                {{--                                        <div class="d-flex align-items-center">--}}
+                                {{--                                            <span class="profile-avatar-h me-3">S</span>--}}
+                                {{--                                            <div>--}}
+                                {{--                                                <span class="main-area-email-para">sarah.j@example.com</span><br/>--}}
+                                {{--                                                <span class="main-area-email-para-time">Created 15 minutes ago</span>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                    <div class="p-3">--}}
+                                {{--                                        <div class="d-flex justify-content-between align-items-center mb-3">--}}
+                                {{--                                            <span class="profile-description">Owner</span>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="d-flex align-items-center justify-content-between mb-4">--}}
+                                {{--                                            <div class="user-info-dropdown">--}}
+                                {{--                                                <div class="user-info d-flex align-items-center" id="userDropdownToggle"--}}
+                                {{--                                                     role="button" aria-expanded="false">--}}
+                                {{--                                                    <div class="icon-wrapper me-2">--}}
+                                {{--                                                        <i class="fas fa-user-circle profile-icon"--}}
+                                {{--                                                           aria-hidden="true"></i>--}}
+                                {{--                                                        <span class="status-dot"></span>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <p class="user_name mb-0">Hasnat Khan</p>--}}
+                                {{--                                                    <i class="fas fa-caret-down ms-2 custom-fa-caret-down"--}}
+                                {{--                                                       aria-hidden="true"></i>--}}
+                                {{--                                                </div>--}}
 
-                                        <div class="email-reply-wrapper">
-                                            <div class="d-flex align-items-start email-reply-block">
-                                                <i class="fas fa-user-circle  profile-icon me-4"></i>
-                                                <div class="flex-grow-1">
-                                                    <p class="email-from mb-0">
-                                                        <b>Sarah Johnson</b>
-                                                        <span class="text-muted small">7:45 PM</span>
-                                                        <span class="ms-4 last-span text-bold">
-                              Email
-                              <i class="fas fa-caret-down ms-2 last-span-icon"></i>
-                            </span>
-                                                    </p>
-                                                    <p class="mb-0 email-to text-muted small">
-                                                        To: team@company.com
-                                                    </p>
-                                                    <p class="email-body mt-2">
-                                                        I'd like to schedule a meeting to discuss the
-                                                        upcoming project timeline. Are you available next
-                                                        Tuesday at 2 PM?
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr/>
-                                        <div class="resizable-panel">
-                                            <div class="resizable-content">
-                                                <div
-                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">
-                                                    <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>
-                                                    <span class="email-comment-tabs email-decription">Email <i
-                                                            class="fas fa-caret-down ms-1"></i></span>
-                                                    <i class="fas fa-comment ms-4 me-2 icon-comment"></i>
-                                                    <span class="email-comment-tabs comment-description">Comment</span>
-                                                    <span class="ms-auto">
-                            <i class="fa-solid fa-up-right-and-down-left-from-center enlarge-icon"></i>
-                          </span>
-                                                </div>
-                                                <div
-                                                    class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">
-                                                    <div
-                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">
-                                                        <i class="fas fa-reply" id="reply-icon"></i>
-                                                        <div class="d-flex flex-wrap align-items-center flex-grow-1">
-                                                            <input
-                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"
-                                                                placeholder="Enter or choose a recipient" type="text"
-                                                                autocomplete="off"/>
-                                                        </div>
-                                                    </div>
-                                                    <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-control mt-2 email-compose-box">
-                                            <div class="editor-wrapper">
-                                                <div id="editorContent" class="text-muted text-placeholder"
-                                                     contenteditable="true">
-                                                    Write a message. Press '/' or highlight text to
-                                                    access AI commands.
-                                                </div>
-                                                <div
-                                                    class="editor-toolbar d-flex justify-content-between align-items-center">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"
-                                                           title="Change Font"></i>
-                                                        <i class="editor-icon fas fa-smile me-3 text-primary"
-                                                           data-bs-toggle="tooltip"
-                                                           title="Insert Emoji"></i>
-                                                        <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-link" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Link</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Remove Link</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropdown me-3">
-                                                            <i class="editor-icon fas fa-image" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Upload New
-                                                                        Image</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Existing
-                                                                        Image</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropup me-3">
-                                                            <i class="editor-icon fas fa-paperclip" role="button"
-                                                               data-bs-toggle="dropdown"
-                                                               aria-expanded="false"></i>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Attach File</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Browse
-                                                                        Documents</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div class="dropup me-3">
-                                                            <button class="btn btn-secondary insert-btn" type="button"
-                                                                    data-bs-toggle="dropdown"
-                                                                    aria-expanded="false">
-                                                                Insert
-                                                            </button>
-                                                            <ul class="dropdown-menu">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Invoice</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert
-                                                                        Documents</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a class="dropdown-item" href="#">Insert Code</a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    <button class="btn btn-primary send-btn">
-                                                        Send
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {{--                                                <div class="user-dropdown-menu" id="userDropdownMenu">--}}
+                                {{--                                                    <div class="search-box">--}}
+                                {{--                                                        <input type="text" placeholder="Search for a specific user">--}}
+                                {{--                                                        <i class="fas fa-search search-icon"></i>--}}
+                                {{--                                                    </div>--}}
+
+                                {{--                                                    <div class="d-flex justify-content-end mb-2">--}}
+                                {{--                                                        <button class="unassign-btn">Unassign</button>--}}
+                                {{--                                                    </div>--}}
+
+                                {{--                                                    <div class="user-list">--}}
+                                {{--                                                        <div--}}
+                                {{--                                                            class="user-item-row active-user d-flex align-items-center justify-content-between">--}}
+                                {{--                                                            <div class="d-flex align-items-center">--}}
+                                {{--                                                                <div class="avatar-sm me-2">--}}
+                                {{--                                                                    <i class="fas fa-user-circle"></i>--}}
+                                {{--                                                                    <span class="status-dot-sm away"></span>--}}
+                                {{--                                                                </div>--}}
+                                {{--                                                                <div>--}}
+                                {{--                                                                    <p class="item-user-name mb-0">Hasnat Khan</p>--}}
+                                {{--                                                                    <p class="item-user-status mb-0 away-text">Away</p>--}}
+                                {{--                                                                </div>--}}
+                                {{--                                                            </div>--}}
+                                {{--                                                            <i class="fas fa-check check-icon"></i>--}}
+                                {{--                                                        </div>--}}
+
+                                {{--                                                    </div>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                            <h5 class="mb-3">Meeting Request</h5>--}}
+                                {{--                                        </div>--}}
+
+                                {{--                                        <div class="email-reply-wrapper">--}}
+                                {{--                                            <div class="d-flex align-items-start email-reply-block">--}}
+                                {{--                                                <i class="fas fa-user-circle  profile-icon me-4"></i>--}}
+                                {{--                                                <div class="flex-grow-1">--}}
+                                {{--                                                    <p class="email-from mb-0">--}}
+                                {{--                                                        <b>Sarah Johnson</b>--}}
+                                {{--                                                        <span class="text-muted small">7:45 PM</span>--}}
+                                {{--                                                        <span class="ms-4 last-span text-bold">--}}
+                                {{--                              Email--}}
+                                {{--                              <i class="fas fa-caret-down ms-2 last-span-icon"></i>--}}
+                                {{--                            </span>--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                    <p class="mb-0 email-to text-muted small">--}}
+                                {{--                                                        To: team@company.com--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                    <p class="email-body mt-2">--}}
+                                {{--                                                        I'd like to schedule a meeting to discuss the--}}
+                                {{--                                                        upcoming project timeline. Are you available next--}}
+                                {{--                                                        Tuesday at 2 PM?--}}
+                                {{--                                                    </p>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <hr/>--}}
+                                {{--                                        <div class="resizable-panel">--}}
+                                {{--                                            <div class="resizable-content">--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="d-flex justify-content-start align-items-center mt-3 envelop-open-text-section">--}}
+                                {{--                                                    <i class="fas fa-envelope-open-text me-1 icon-email-reply"></i>--}}
+                                {{--                                                    <span class="email-comment-tabs email-decription">Email <i--}}
+                                {{--                                                            class="fas fa-caret-down ms-1"></i></span>--}}
+                                {{--                                                    <i class="fas fa-comment ms-4 me-2 icon-comment"></i>--}}
+                                {{--                                                    <span class="email-comment-tabs comment-description">Comment</span>--}}
+                                {{--                                                    <span class="ms-auto">--}}
+                                {{--                            <i class="fa-solid fa-up-right-and-down-left-from-center enlarge-icon"></i>--}}
+                                {{--                          </span>--}}
+                                {{--                                                </div>--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="d-flex justify-content-between align-items-center text-muted mt-2 mb-2 email-area-choose-reciepeint">--}}
+                                {{--                                                    <div--}}
+                                {{--                                                        class="recipient-selection-container d-flex align-items-center flex-grow-1 me-3">--}}
+                                {{--                                                        <i class="fas fa-reply" id="reply-icon"></i>--}}
+                                {{--                                                        <div class="d-flex flex-wrap align-items-center flex-grow-1">--}}
+                                {{--                                                            <input--}}
+                                {{--                                                                class="email-area-input-for-recipeint ms-2 flex-grow-1 border-0"--}}
+                                {{--                                                                placeholder="Enter or choose a recipient"--}}
+                                {{--                                                                type="text"--}}
+                                {{--                                                                autocomplete="off"/>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <i class="fas fa-ellipsis-v ms-3" id="more-options-icon"></i>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                        <div class="form-control mt-2 email-compose-box">--}}
+                                {{--                                            <div class="editor-wrapper">--}}
+                                {{--                                                <div id="editorContent" class="text-muted text-placeholder"--}}
+                                {{--                                                     contenteditable="true">--}}
+                                {{--                                                    Write a message. Press '/' or highlight text to--}}
+                                {{--                                                    access AI commands.--}}
+                                {{--                                                </div>--}}
+                                {{--                                                <div--}}
+                                {{--                                                    class="editor-toolbar d-flex justify-content-between align-items-center">--}}
+                                {{--                                                    <div class="d-flex align-items-center">--}}
+                                {{--                                                        <i class="editor-icon fas fa-font me-3" data-bs-toggle="tooltip"--}}
+                                {{--                                                           title="Change Font"></i>--}}
+                                {{--                                                        <i class="editor-icon fas fa-smile me-3 text-primary"--}}
+                                {{--                                                           data-bs-toggle="tooltip"--}}
+                                {{--                                                           title="Insert Emoji"></i>--}}
+                                {{--                                                        <div class="dropdown me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-link" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Link</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Remove Link</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropdown me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-image" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Upload New--}}
+                                {{--                                                                        Image</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Existing--}}
+                                {{--                                                                        Image</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropup me-3">--}}
+                                {{--                                                            <i class="editor-icon fas fa-paperclip" role="button"--}}
+                                {{--                                                               data-bs-toggle="dropdown"--}}
+                                {{--                                                               aria-expanded="false"></i>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Attach File</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Browse--}}
+                                {{--                                                                        Documents</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                        <div class="dropup me-3">--}}
+                                {{--                                                            <button class="btn btn-secondary insert-btn" type="button"--}}
+                                {{--                                                                    data-bs-toggle="dropdown"--}}
+                                {{--                                                                    aria-expanded="false">--}}
+                                {{--                                                                Insert--}}
+                                {{--                                                            </button>--}}
+                                {{--                                                            <ul class="dropdown-menu">--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Invoice</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert--}}
+                                {{--                                                                        Documents</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                                <li>--}}
+                                {{--                                                                    <a class="dropdown-item" href="#">Insert Code</a>--}}
+                                {{--                                                                </li>--}}
+                                {{--                                                            </ul>--}}
+                                {{--                                                        </div>--}}
+                                {{--                                                    </div>--}}
+                                {{--                                                    <button class="btn btn-primary send-btn">--}}
+                                {{--                                                        Send--}}
+                                {{--                                                    </button>--}}
+                                {{--                                                </div>--}}
+                                {{--                                            </div>--}}
+                                {{--                                        </div>--}}
+                                {{--                                    </div>--}}
+                                {{--                                </div>--}}
                             </div>
                         </div>
                     </div>
@@ -2019,56 +2107,51 @@
                     });
                 });
             });
-            // for the icon open close
-            document
-                .getElementById("main-checkbox")
-                .addEventListener("change", function () {
-                    const isChecked = this.checked;
-                    const defaultActions = document.getElementById("default-actions");
-                    const selectedActions = document.getElementById("selected-actions");
-                    const emailIcon = document.getElementById("email-icon");
-                    const emailHeader = document.getElementById("email-header");
-                    const upperText = document.querySelector(".upper-text");
+            $(document).on('click', '.hover-checkbox', function (e) {
+                e.stopPropagation();
+                const isChecked = $(this).is(':checked');
+                const $listItem = $(this).closest('.list-group-item');
+                const $icon = $listItem.find('.fa-envelope');
+                const $defaultActions = $('#default-actions');
+                const $selectedActions = $('#selected-actions');
+                const $emailIcon = $('#email-icon');
+                const $emailHeader = $('#email-header');
+                const $upperText = $('.upper-text');
 
-                    if (isChecked) {
-                        defaultActions.classList.add("d-none");
-                        selectedActions.classList.remove("d-none");
-                        upperText.classList.add("d-none"); // Changed back to d-none for simplicity and space
-                        emailIcon.classList.remove(
-                            "fa-regular",
-                            "fa-envelope",
-                            "active-enelops"
-                        );
-                        emailIcon.classList.add(
-                            "fa-solid",
-                            "fa-square-check",
-                            "selected-enelop"
-                        );
-                        emailHeader.classList.add("d-none");
-                    } else {
-                        defaultActions.classList.remove("d-none");
-                        selectedActions.classList.add("d-none");
-                        upperText.classList.remove("d-none"); // Changed back to d-none
-                        emailIcon.classList.remove(
-                            "fa-solid",
-                            "fa-square-check",
-                            "selected-enelop"
-                        );
-                        emailIcon.classList.add(
-                            "fa-regular",
-                            "fa-envelope",
-                            "active-enelops"
-                        );
-                        emailHeader.classList.remove("d-none");
-                    }
-                });
+                const checkedCount = $('.hover-checkbox:checked').length;
+                const anyChecked = checkedCount > 0;
 
-            // for add button trash with close conservation button
-            const checkbox = document.getElementById("main-checkbox");
-            const trashBtn = document.getElementById("extraBtn1");
+                if (anyChecked) {
+                    $defaultActions.addClass('d-none');
+                    $selectedActions.removeClass('d-none');
+                    $upperText.addClass('d-none');
+                    $emailIcon.removeClass('fa-regular fa-envelope active-enelops');
+                    $emailIcon.addClass('fa-solid fa-square-check selected-enelop');
+                    $emailHeader.addClass('d-none');
 
-            checkbox.addEventListener("change", () => {
-                trashBtn.classList.toggle("d-none", !checkbox.checked);
+                    $('#selected-count').text(checkedCount);
+                } else {
+                    $defaultActions.removeClass('d-none');
+                    $selectedActions.addClass('d-none');
+                    $upperText.removeClass('d-none');
+                    $emailIcon.removeClass('fa-solid fa-square-check selected-enelop');
+                    $emailIcon.addClass('fa-regular fa-envelope active-enelops');
+                    $emailHeader.removeClass('d-none');
+                }
+
+                if (isChecked) {
+                    $icon.removeClass('fa-regular active-enelops');
+                    $icon.addClass('fa-solid fa-square-check selected-enelop');
+                } else {
+                    $icon.removeClass('fa-solid fa-square-check selected-enelop');
+                    $icon.addClass('fa-regular active-enelops');
+                }
+            });
+
+            $(document).on('change', '.select-all-checkbox', function () {
+                const isChecked = $(this).is(':checked');
+                $('.hover-checkbox').prop('checked', isChecked).trigger('change');
+                trashBtn.classList.toggle("d-none", !isChecked);
             });
             // for email-open
             $(function () {
