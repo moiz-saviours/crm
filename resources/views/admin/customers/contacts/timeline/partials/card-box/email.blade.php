@@ -90,9 +90,10 @@
         }}
     </p>
 
-    <span class="folder-dot" style="color: #28a745;">&bull;</span>
-    <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
-
+    <div class="email-folder">
+        <span class="folder-dot" style="color: #28a745;">&bull;</span>
+        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+    </div>
     {{-- Tooltip with Full Info --}}
     <div class="tooltip-card">
         <p><strong>From:</strong>
@@ -189,7 +190,7 @@
 
         </div>
         {{-- Body preview --}}
-        <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;">
+        <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
             {!! \Illuminate\Support\Str::limit($item['data']['body']['text'] ?? 'No body content available.', 100, '...') !!}
         </p>
     </div>
@@ -310,9 +311,10 @@
         @endif
     </div>
 </div>
-
-                        <span class="folder-dot" style="color: #28a745;">&bull;</span>
-                        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+                        <div class="folder-name">
+                            <span class="folder-dot" style="color: #28a745;">&bull;</span>
+                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+                        </div>
                     </div>
                 </div>
 
