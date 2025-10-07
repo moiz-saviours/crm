@@ -559,6 +559,7 @@
 
             .data-highlights p {
                 font-size: var(--nf-profile-para-size);
+                margin-bottom: 0px;
             }
 
             .data-row {
@@ -596,7 +597,7 @@
                 /* padding-left: 15px; */
                 font-size: var(--nf-profile-heading-size);
                 color: var(--bs-primary);
-                padding-top: 10px;
+                /*padding-top: 10px;*/
             }
 
             .activities-seprater {
