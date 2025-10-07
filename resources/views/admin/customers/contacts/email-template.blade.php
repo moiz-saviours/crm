@@ -999,6 +999,10 @@
             padding: 5px 15px;
             margin-bottom: 5px;
             transition: all 0.2s ease-in-out;
+            position: absolute;
+            left: 0;
+            top: 0;
+            line-height: 1;
         }
 
     </style>
@@ -1483,13 +1487,18 @@
 
 
     </script>
-    <script>
-        document.addEventListener("click", function (e) {
-            if (e.target.classList.contains("show-quoted-btn")) {
-                let quoted = e.target.nextElementSibling;
-                quoted.style.display = quoted.style.display === "none" ? "block" : "none";
-                e.target.textContent = quoted.style.display === "block" ? "Hide quoted" : "...";
-            }
-        });
-    </script>
+<script>
+document.addEventListener("click", function (e) {
+    if (e.target.closest(".show-quoted-btn")) {
+        const btn = e.target.closest(".show-quoted-btn");
+        const quoted = btn.parentElement.querySelector(".quoted-history");
+
+        const isVisible = quoted.style.display === "block";
+        quoted.style.display = isVisible ? "none" : "block";
+
+        // Change button text between "..." and "Hide"
+        btn.textContent = isVisible ? "..." : "Hide";
+    }
+});
+</script>
 @endpush
