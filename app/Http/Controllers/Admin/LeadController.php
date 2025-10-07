@@ -418,7 +418,7 @@ class LeadController extends Controller
         return 'Unknown';
     }
 
-    public function convertToCustomer(Request $request, $id)
+    public function convert_to_customer(Request $request, $id)
     {
         try {
             $lead = Lead::findOrFail($id);
