@@ -197,23 +197,23 @@
         scrollbar-color: var(--theme-on-text-light) #f1f1f1;
     }
 
-    #unassigned-pane {
+    #inbox-tab-content .tab-pane {
         max-height: clamp(40rem, 52.25vh, 52.25rem);
         /* Fluid max-height */
         overflow-y: auto;
         padding-right: clamp(0.2rem, 0.3125vw, 0.3125rem);
     }
 
-    #unassigned-pane::-webkit-scrollbar {
+    #inbox-tab-content .tab-pane::-webkit-scrollbar {
         width: clamp(0.3rem, 0.375vw, 0.375rem);
     }
 
-    #unassigned-pane::-webkit-scrollbar-thumb {
+    #inbox-tab-content .tab-pane::-webkit-scrollbar-thumb {
         background: #bbb;
         border-radius: clamp(0.2rem, 0.25vw, 0.25rem);
     }
 
-    #unassigned-pane::-webkit-scrollbar-thumb:hover {
+    #inbox-tab-content .tab-pane::-webkit-scrollbar-thumb:hover {
         background: var(--theme-on-text-light);
     }
 
