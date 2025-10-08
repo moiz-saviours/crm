@@ -36,26 +36,26 @@
 
     {{-- Tooltip Card --}}
     <div class="email-tooltip-card tooltip-card">
-        <p><strong>Subject:</strong> {{ $item['data']['subject'] ?? '(No Subject)' }}</p>
+        <p>Subject: {{ $item['data']['subject'] ?? '(No Subject)' }}</p>
 
-        <p><strong>From:</strong>
+        <p>From:
             {{ $fromName ?: '(No Name)' }}
             ({{ $fromEmail ?: 'Unknown Email' }})
         </p>
 
         @if(!empty($toList))
-            <p><strong>to:</strong> {{ $toList }}</p>
+            <p>to: {{ $toList }}</p>
         @endif
 
         @if(!empty($ccList))
-            <p><strong>cc:</strong> {{ $ccList }}</p>
+            <p>cc: {{ $ccList }}</p>
         @endif
 
         @if(!empty($bccList))
-            <p><strong>bcc:</strong> {{ $bccList }}</p>
+            <p>bcc: {{ $bccList }}</p>
         @endif
 
-        <p><strong>Date:</strong>
+        <p>Date:
             {{ !empty($item['data']['date'])
                 ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A')
                 : 'Unknown Date' }}
@@ -96,11 +96,11 @@
     </div>
     {{-- Tooltip with Full Info --}}
     <div class="tooltip-card">
-        <p><strong>From:</strong>
+        <p>From:
             {{ $item['data']['from']['email'] ?? '' }}
         </p>
 
-        <p><strong>to:</strong>
+        <p>to:
             {{
                 collect(
                     is_string($item['data']['to'])
@@ -116,7 +116,7 @@
         </p>
 
         @if(!empty($item['data']['cc']))
-            <p><strong>cc:</strong>
+            <p>cc:
                 {{
                     collect(
                         is_string($item['data']['cc'])
@@ -133,7 +133,7 @@
         @endif
 
         @if(!empty($item['data']['bcc']))
-            <p><strong>bcc:</strong>
+            <p>bcc:
                 {{
                     collect(
                         is_string($item['data']['bcc'])
@@ -245,11 +245,9 @@
                         <p>{{ $item['data']['from']['name'] ?? $item['data']['from']['email'] ?? '' }}
                         </p>
 <div class="tooltip-wrapper" style="display: inline-block;">
-    <p class="mb-0" style="font-weight: 500">
-        from:
-        {{ $item['data']['from']['email'] ?? '' }}
-        <br>
-        to:
+    <p class="mb-0">
+        from: {{ $item['data']['from']['email'] ?? '' }}<br>
+        to: 
         {{ collect(
             is_string($item['data']['to'])
                 ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
@@ -258,7 +256,6 @@
         ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
         ->take(1)
         ->implode(', ') }}
-
         @if(
             count(
                 collect(
@@ -270,13 +267,56 @@
         )
             , <span class="text-muted">...</span>
         @endif
+        @if(!empty($item['data']['cc']))
+            <br>cc: 
+            {{ collect(
+                is_string($item['data']['cc'])
+                    ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
+                    : $item['data']['cc'],
+            )
+            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+            ->take(1)
+            ->implode(', ') }}
+            @if(
+                count(
+                    collect(
+                        is_string($item['data']['cc'])
+                            ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
+                            : $item['data']['cc'],
+                    )
+                ) > 1
+            )
+                , <span class="text-muted">...</span>
+            @endif
+        @endif
+        @if(!empty($item['data']['bcc']))
+            <br>bcc: 
+            {{ collect(
+                is_string($item['data']['bcc'])
+                    ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
+                    : $item['data']['bcc'],
+            )
+            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+            ->take(1)
+            ->implode(', ') }}
+            @if(
+                count(
+                    collect(
+                        is_string($item['data']['bcc'])
+                            ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
+                            : $item['data']['bcc'],
+                    )
+                ) > 1
+            )
+                , <span class="text-muted">...</span>
+            @endif
+        @endif
     </p>
 
-    <!-- Custom Tooltip -->
+    <!-- Custom Tooltip (unchanged) -->
     <div class="tooltip-card">
-        <p><strong>From:</strong> {{ $item['data']['from']['email'] ?? '' }}</p>
-
-        <p><strong>to:</strong>
+        <p>from: {{ $item['data']['from']['email'] ?? '' }}</p>
+        <p>to:
             {{ collect(
                 is_string($item['data']['to'])
                     ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
@@ -285,9 +325,8 @@
             ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
             ->implode(', ') }}
         </p>
-
         @if(!empty($item['data']['cc']))
-            <p><strong>cc:</strong>
+            <p>cc:
                 {{ collect(
                     is_string($item['data']['cc'])
                         ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
@@ -297,9 +336,8 @@
                 ->implode(', ') }}
             </p>
         @endif
-
         @if(!empty($item['data']['bcc']))
-            <p><strong>bcc:</strong>
+            <p>bcc:
                 {{ collect(
                     is_string($item['data']['bcc'])
                         ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
@@ -439,7 +477,7 @@
                             <div class="user_profile_text">
                                 <p>{{ $threadItem['from']['name'] ?? ($threadItem['from']['email'] ?? '') }}
                                 </p>
-                                <p style="font-weight: 500">
+                                <p>
                                     to:
                                     {{ collect(
                                         is_string($threadItem['to']) ? json_decode($threadItem['to'], true) ?? [$threadItem['to']] : $threadItem['to'],

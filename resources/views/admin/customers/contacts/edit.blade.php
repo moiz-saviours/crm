@@ -953,7 +953,7 @@
             .user_profile_text p {
                 margin-bottom: -3px;
                 font-size: 0.75rem;
-                font-weight: 700;
+                /* font-weight: 700; */
                 margin-top: 4px;
                 padding-left: 8px;
             }

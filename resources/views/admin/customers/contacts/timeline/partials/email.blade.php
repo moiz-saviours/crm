@@ -84,7 +84,7 @@
 .tooltip-wrapper:hover .tooltip-card {
     opacity: 1;
     visibility: visible;
-    transition-delay: 0.5s; /* delay before showing */
+    transition-delay: 0.9s; /* delay before showing */
 }
 
 /* Hide instantly on leave */
