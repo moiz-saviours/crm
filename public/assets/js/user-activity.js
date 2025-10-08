@@ -1,23 +1,63 @@
 (function () {
-    let currentScript = document.currentScript;
-    if (!currentScript) {
-        const scripts = document.querySelectorAll('script[src*="user-activity.js"]');
-        currentScript = scripts[scripts.length - 1] || null;
+
+    function getCurrentScript() {
+        let currentScript = document.currentScript;
+        if (!currentScript) {
+            const scripts = document.querySelectorAll('script[src*="user-activity.js"]');
+            currentScript = scripts[scripts.length - 1] || null;
+        }
+        return currentScript;
+    }
+    function getScriptToken(currentScript) {
+        if (!currentScript) {
+            console.error("Script tag not found!");
+            return null;
+        }
+        const url = new URL(currentScript.src);
+        const token = url.searchParams.get("token");
+
+        if (!token) {
+            console.error("Brand token missing in script URL!");
+            return null;
+        }
+
+        return token;
+    }
+    function getApiBaseUrl(currentScript) {
+        if (!currentScript) {
+            console.error("Script tag not found!");
+            return null;
+        }
+
+        const url = new URL(currentScript.src);
+        let apiBaseUrl = "";
+        const hostname = window.location.hostname;
+        const scriptPath = url.pathname;
+
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            apiBaseUrl = url.origin + "/api";
+            console.log("Environment: Local");
+        }
+        else if (hostname.includes('dev.') || hostname.includes('development.') || hostname.includes('staging.')) {
+            apiBaseUrl = url.origin + "/crm-development/api";
+            console.log("Environment: Development");
+        }
+        else if (scriptPath.includes("/crm-development/")) {
+            apiBaseUrl = url.origin + "/crm-development/api";
+            console.log("Environment: Development (path-based)");
+        }
+        else {
+            apiBaseUrl = url.origin + "/api";
+            console.log("Environment: Live");
+        }
+
+        console.log("Using API base URL:", apiBaseUrl);
+        return apiBaseUrl;
     }
 
-    if (!currentScript) {
-        console.error("Script tag not found!");
-        return;
-    }
-
-    const url = new URL(currentScript.src);
-
-    let apiBaseUrl = "";
-    if (url.pathname.includes("/crm-development/")) {
-        apiBaseUrl = url.origin + "/crm-development/api"; // Development
-    } else {
-        apiBaseUrl = url.origin + "/api"; // Live
-    }
+    const currentScript = getCurrentScript();
+    const token = getScriptToken(currentScript);
+    const apiBaseUrl = getApiBaseUrl(currentScript);
 
     const startTime = Date.now();
     let maxScroll = 0;
