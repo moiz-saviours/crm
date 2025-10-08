@@ -107,7 +107,7 @@
 </div>
 <div>
     <div class="recent-activities">
-        <div id="email-section">
+        <div>
             <!-- Folders Tabs -->
             <ul class="nav nav-tabs d-none" id="email-folders" style="margin-bottom: 15px;">
                 <li class="nav-item"><a class="nav-link active" href="#" data-folder="all">All</a></li>
@@ -121,10 +121,6 @@
 
             <p class="date-by-order">{{ now()->format('F Y') }}</p>
 
-            <!-- Loader -->
-            <div id="email-loader" style="display: none; text-align: center; padding: 20px;">
-                <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading emails...
-            </div>
 
             <!-- Email Content -->
 
@@ -144,18 +140,13 @@
                 @else
                     {{-- Static header --}}
                     @include('admin.customers.contacts.timeline.static-content.email')
-
-                    {{-- Render emails with same `$item` structure --}}
-                    @foreach ($timeline as $item)
-                        @if ($item['type'] === 'email')
-                            @include('admin.customers.contacts.timeline.partials.card-box.email')
-                        @endif
-                    @endforeach
-
-                    <div id="show-more-container" class="text-center mt-3">
-                        <button id="show-more-btn" class="btn btn-outline-primary btn-sm">
-                            Show More
-                        </button>
+                    <div id="emails-section">
+                        {{-- Render emails with same `$item` structure --}}
+                        @foreach ($timeline as $item)
+                            @if ($item['type'] === 'email')
+                                @include('admin.customers.contacts.timeline.partials.card-box.email')
+                            @endif
+                        @endforeach
                     </div>
                 @endif
             </div>

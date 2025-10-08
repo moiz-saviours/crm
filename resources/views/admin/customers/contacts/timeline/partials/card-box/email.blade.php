@@ -15,7 +15,7 @@
                 ? json_decode($field, true) ?? [$field]
                 : $field
         )
-        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? 'Unknown')) : $r)
+        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
         ->filter()
         ->implode(', ');
     };
@@ -31,7 +31,7 @@
 
     {{-- From (inline) --}}
     <span class="user_cont">
-        from {{ $fromName ?: $fromEmail ?: 'Unknown' }}
+        from {{ $fromName ?: $fromEmail ?: '' }}
     </span>
 
     {{-- Tooltip Card --}}
@@ -80,7 +80,7 @@
                         : $item['data']['to'],
                 )
                 ->map(fn($r) => is_array($r)
-                    ? ($r['email'] ?? ($r['name'] ?? 'Unknown'))
+                    ? ($r['email'] ?? ($r['name'] ?? ''))
                     : $r
                 )
                 ->implode(', '),
@@ -92,12 +92,12 @@
 
     <div class="email-folder">
         <span class="folder-dot" style="color: #28a745;">&bull;</span>
-        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+        <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? '') }}</span>
     </div>
     {{-- Tooltip with Full Info --}}
     <div class="tooltip-card">
         <p><strong>From:</strong>
-            {{ $item['data']['from']['email'] ?? 'Unknown' }}
+            {{ $item['data']['from']['email'] ?? '' }}
         </p>
 
         <p><strong>to:</strong>
@@ -108,7 +108,7 @@
                         : $item['data']['to'],
                 )
                 ->map(fn($r) => is_array($r)
-                    ? ($r['email'] ?? ($r['name'] ?? 'Unknown'))
+                    ? ($r['email'] ?? ($r['name'] ?? ''))
                     : $r
                 )
                 ->implode(', ')
@@ -124,7 +124,7 @@
                             : $item['data']['cc'],
                     )
                     ->map(fn($r) => is_array($r)
-                        ? ($r['email'] ?? ($r['name'] ?? 'Unknown'))
+                        ? ($r['email'] ?? ($r['name'] ?? ''))
                         : $r
                     )
                     ->implode(', ')
@@ -141,7 +141,7 @@
                             : $item['data']['bcc'],
                     )
                     ->map(fn($r) => is_array($r)
-                        ? ($r['email'] ?? ($r['name'] ?? 'Unknown'))
+                        ? ($r['email'] ?? ($r['name'] ?? ''))
                         : $r
                     )
                     ->implode(', ')
@@ -185,13 +185,13 @@
                 </span>
             @endif
 
-            <p>{{ !empty($item['data']['date']) ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
+            <p style="font-size: 9px;">{{ !empty($item['data']['date']) ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
             </p>
 
         </div>
         {{-- Body preview --}}
         <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
-            {!! \Illuminate\Support\Str::limit($item['data']['body']['text'] ?? 'No body content available.', 100, '...') !!}
+            {!! \Illuminate\Support\Str::limit($item['data']['body']['text'] ?? '', 100, '...') !!}
         </p>
     </div>
 
@@ -242,12 +242,12 @@
                         </div>
                     </div>
                     <div class="user_profile_text">
-                        <p>{{ $item['data']['from']['name'] ?? 'Unknown' }}
+                        <p>{{ $item['data']['from']['name'] ?? $item['data']['from']['email'] ?? '' }}
                         </p>
 <div class="tooltip-wrapper" style="display: inline-block;">
     <p class="mb-0" style="font-weight: 500">
         from:
-        {{ $item['data']['from']['email'] ?? 'Unknown' }}
+        {{ $item['data']['from']['email'] ?? '' }}
         <br>
         to:
         {{ collect(
@@ -255,7 +255,7 @@
                 ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
                 : $item['data']['to'],
         )
-        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? 'Unknown')) : $r)
+        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
         ->take(1)
         ->implode(', ') }}
 
@@ -274,7 +274,7 @@
 
     <!-- Custom Tooltip -->
     <div class="tooltip-card">
-        <p><strong>From:</strong> {{ $item['data']['from']['email'] ?? 'Unknown' }}</p>
+        <p><strong>From:</strong> {{ $item['data']['from']['email'] ?? '' }}</p>
 
         <p><strong>to:</strong>
             {{ collect(
@@ -282,7 +282,7 @@
                     ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
                     : $item['data']['to'],
             )
-            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? 'Unknown')) : $r)
+            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
             ->implode(', ') }}
         </p>
 
@@ -293,7 +293,7 @@
                         ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
                         : $item['data']['cc'],
                 )
-                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? 'Unknown')) : $r)
+                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
                 ->implode(', ') }}
             </p>
         @endif
@@ -305,7 +305,7 @@
                         ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
                         : $item['data']['bcc'],
                 )
-                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? 'Unknown')) : $r)
+                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
                 ->implode(', ') }}
             </p>
         @endif
@@ -313,7 +313,7 @@
 </div>
                         <div class="folder-name">
                             <span class="folder-dot" style="color: #28a745;">&bull;</span>
-                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? 'Unknown') }}</span>
+                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? '') }}</span>
                         </div>
                     </div>
                 </div>
@@ -332,8 +332,7 @@
                         $toCount = is_array($item['data']['to']) ? count($item['data']['to']) : 1;
                         $ccCount = isset($item['data']['cc']) && is_array($item['data']['cc']) ? count($item['data']['cc']) : 0;
                     @endphp
-
-                    @if ($toCount + $ccCount > 1)
+                    {{-- @if ($toCount + $ccCount > 1) --}}
                         <div class="activities-seprater replyall-btn"
                             data-from="{{ $item['data']['from']['email'] ?? '' }}"
                             data-to='@json($item['data']['to'] ?? [])'
@@ -346,7 +345,7 @@
                             data-references='@json($item['data']['references'] ?? null)'>
                             Reply All
                         </div>
-                    @endif
+                    {{-- @endif --}}
 
                     <div class="activities-seprater forward-btn" data-from="{{ $item['data']['from']['email'] ?? '' }}"
                         data-subject="{{ $item['data']['subject'] ?? '' }}"
@@ -370,7 +369,7 @@
                 $htmlContent = $item['data']['body']['html'] ?? '';
                 $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
                 $previewContent = $isHtmlEmpty
-                    ? $item['data']['body']['text'] ?? 'No body content available.'
+                    ? $item['data']['body']['text'] ?? ''
                     : strip_tags($htmlContent);
                 $previewContent = Str::limit($previewContent, 100, '...');
             @endphp
@@ -380,7 +379,7 @@
 
     <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
         <div class="user_cont user-email-template">
-            {!! $isHtmlEmpty ? nl2br($item['data']['body']['text'] ?? 'No body content available.') : $htmlContent !!}
+            {!! $isHtmlEmpty ? nl2br($item['data']['body']['text'] ?? '') : $htmlContent !!}
         </div>
 
         @if (!empty($item['data']['attachments']))
@@ -438,13 +437,13 @@
                                 </div>
                             </div>
                             <div class="user_profile_text">
-                                <p>{{ $threadItem['from']['name'] ?? ($threadItem['from']['email'] ?? 'Unknown') }}
+                                <p>{{ $threadItem['from']['name'] ?? ($threadItem['from']['email'] ?? '') }}
                                 </p>
                                 <p style="font-weight: 500">
                                     to:
                                     {{ collect(
                                         is_string($threadItem['to']) ? json_decode($threadItem['to'], true) ?? [$threadItem['to']] : $threadItem['to'],
-                                    )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? 'Unknown') : $r)->implode(', ') }}
+                                    )->map(fn($r) => is_array($r) ? $r['email'] ?? ($r['name'] ?? '') : $r)->implode(', ') }}
                                 </p>
                                 <p class="text-muted small">
                                     {{ !empty($threadItem['date']) ? \Carbon\Carbon::parse($threadItem['date'])->format('M d, Y h:i A') : 'Unknown Date' }}
@@ -456,7 +455,7 @@
                                 $threadHtmlContent = $threadItem['body']['html'] ?? '';
                                 $threadIsHtmlEmpty = empty(trim(strip_tags($threadHtmlContent)));
                             @endphp
-                            {!! $threadIsHtmlEmpty ? nl2br($threadItem['body']['text'] ?? 'No body content available.') : $threadHtmlContent !!}
+                            {!! $threadIsHtmlEmpty ? nl2br($threadItem['body']['text'] ?? '') : $threadHtmlContent !!}
                         </div>
                         @if (!empty($threadItem['attachments']))
                             <div class="attachments-section mb-4">
