@@ -1,11 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const scriptEl = document.currentScript;
-    if (!scriptEl) {
+    let currentScript = document.currentScript;
+    if (!currentScript) {
+        const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
+        currentScript = scripts[scripts.length - 1] || null;
+    }
+
+    if (!currentScript) {
         console.error("Script tag not found!");
         return;
     }
 
-    const url = new URL(scriptEl.src);
+    const url = new URL(currentScript.src);
     const token = url.searchParams.get("token");
 
     if (!token) {
