@@ -4,7 +4,24 @@
 
     <div class="container">
         <h3 class="mb-4">User Activity Logs</h3>
-
+        @php
+            function renderKeyValue($data) {
+                echo '<table class="table table-sm mb-0 table-bordered">';
+                foreach ($data as $key => $value) {
+                    echo '<tr>';
+                    echo '<td><strong>' . ucfirst(str_replace('_', ' ', $key)) . '</strong></td>';
+                    echo '<td>';
+                    if (is_array($value) || is_object($value)) {
+                        renderKeyValue($value);
+                    } else {
+                        echo e($value);
+                    }
+                    echo '</td>';
+                    echo '</tr>';
+                }
+                echo '</table>';
+            }
+        @endphp
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead class="table-light">
@@ -20,14 +37,7 @@
                             <td><strong>{{ ucfirst(str_replace('_', ' ', $key)) }}</strong></td>
                             <td>
                                 @if (is_array($value) || is_object($value))
-                                    <table class="table table-sm mb-0 table-bordered">
-                                        @foreach ($value as $subKey => $subValue)
-                                            <tr>
-                                                <td><strong>{{ ucfirst(str_replace('_', ' ', $subKey)) }}</strong></td>
-                                                <td>{{ is_array($subValue) || is_object($subValue) ? json_encode($subValue) : $subValue }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </table>
+                                    {!! renderKeyValue($value) !!}
                                 @else
                                     {{ $value }}
                                 @endif
