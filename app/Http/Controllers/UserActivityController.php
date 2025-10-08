@@ -12,7 +12,7 @@ class UserActivityController extends Controller
 
     public function index()
     {
-        $activities = UserActivity::latest()->get()->map(function ($activity) {
+        $activities = UserActivity::where('event_type','page_view')->latest()->get()->map(function ($activity) {
             $data = json_decode($activity->event_data, true);
 
             $ip       = $activity->ip;
