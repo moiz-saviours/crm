@@ -8,21 +8,6 @@
         }
         return currentScript;
     }
-    function getScriptToken(currentScript) {
-        if (!currentScript) {
-            console.error("Script tag not found!");
-            return null;
-        }
-        const url = new URL(currentScript.src);
-        const token = url.searchParams.get("token");
-
-        if (!token) {
-            console.error("Brand token missing in script URL!");
-            return null;
-        }
-
-        return token;
-    }
     function getApiBaseUrl(currentScript) {
         if (!currentScript) {
             console.error("Script tag not found!");
@@ -56,7 +41,6 @@
     }
 
     const currentScript = getCurrentScript();
-    const token = getScriptToken(currentScript);
     const apiBaseUrl = getApiBaseUrl(currentScript);
 
     const startTime = Date.now();
