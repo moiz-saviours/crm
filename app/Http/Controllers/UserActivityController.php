@@ -12,7 +12,7 @@ class UserActivityController extends Controller
 
     public function index()
     {
-        $activities = UserActivity::latest()->get()->map(function ($activity) {
+        $activities = UserActivity::where('event_type','page_view')->latest()->get()->map(function ($activity) {
             $data = json_decode($activity->event_data, true);
 
             $ip       = $activity->ip;
@@ -21,12 +21,22 @@ class UserActivityController extends Controller
             $location = trim(($activity->city ? $activity->city . ', ' : '') . ($activity->country ?? ''), ', ');
 
             $details = $this->makeReadable($data);
-
-            return "Visitor {$visitor} with IP {$ip} using {$browser}"
-                . ($location ? " from {$location}" : "")
-                . " {$details}";
+            return [
+                'id' => $activity->id,
+                'ip' => $ip,
+                'browser' => $browser,
+                'visitor' => $visitor,
+                'location' => $location,
+                'details' => $details,
+                ...$data,
+                'created_at' =>  Carbon::parse($activity->created_at)->addHours(5)->format('Y-m-d h:i:s A'),
+                'user_in_time'=>Carbon::parse($data['user_in_time'])->addHours(5)->format('Y-m-d h:i:s A'),
+                'user_out_time'=>Carbon::parse($data['user_out_time'])->addHours(5)->format('Y-m-d h:i:s A'),
+                'message'=>"Visitor {$visitor} with IP {$ip} using {$browser}"
+                    . ($location ? " from {$location}" : "")
+                    . " {$details}"
+            ];
         });
-
         return view('admin.user-activity.index', compact('activities'));
     }
 

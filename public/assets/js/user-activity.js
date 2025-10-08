@@ -1,13 +1,17 @@
 (function () {
-    const scriptEl = document.currentScript;
-    if (!scriptEl) {
+    let currentScript = document.currentScript;
+    if (!currentScript) {
+        const scripts = document.querySelectorAll('script[src*="user-activity.js"]');
+        currentScript = scripts[scripts.length - 1] || null;
+    }
+
+    if (!currentScript) {
         console.error("Script tag not found!");
         return;
     }
 
-    const url = new URL(scriptEl.src);
+    const url = new URL(currentScript.src);
 
-    // Environment detection (same as wl-script)
     let apiBaseUrl = "";
     if (url.pathname.includes("/crm-development/")) {
         apiBaseUrl = url.origin + "/crm-development/api"; // Development
