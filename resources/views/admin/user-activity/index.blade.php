@@ -17,7 +17,7 @@
                     if (is_array($value) || is_object($value)) {
                         renderKeyValue($value);
                     } else {
-                        $isDateField = preg_match('/(_at|date|timestamp)$/i', $key);
+                        $isDateField = preg_match('/(_at|_date|_timestamp)$/i', $key);
                         $isDateValue = false;
 
                         // Check if the value looks like a date or datetime string
