@@ -1,5 +1,5 @@
 (function () {
-    const scriptEl = document.querySelector('script[src*="user-activity.js"]');
+    const scriptEl = document.currentScript;
     if (!scriptEl) {
         console.error("Script tag not found!");
         return;
