@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const scriptEl = document.querySelector('script[src*="wl-script.js"]');
+    const scriptEl = document.currentScript;
     if (!scriptEl) {
         console.error("Script tag not found!");
         return;

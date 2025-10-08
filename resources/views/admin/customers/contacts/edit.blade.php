@@ -2654,5 +2654,21 @@
         });
     });
 </script>
+            </script>
+        <script>
+            $(document).on('click', '.toggle-form-section', function () {
+                const content = $(this).closest('.data-highlights').find('.form-submissions-content');
+                const icon = $(this).find('.toggle-icon');
+
+                content.slideToggle(300);
+
+                if (icon.hasClass('open')) {
+                    icon.removeClass('open').css('transform', 'rotate(0deg)');
+                } else {
+                    icon.addClass('open').css('transform', 'rotate(90deg)');
+                }
+            });
+        </script>
+
     @endpush
 @endsection

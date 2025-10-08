@@ -86,10 +86,23 @@ class UserActivityController extends Controller
 
         $browser = $this->getBrowser($request->userAgent());
 
+        $eventData = $request->event_data;
+        $eventData = array_merge($eventData, [
+            'ip'       => $geo['query'] ?? null,
+            'browser'  => $browser,
+            'country'  => $geo['country'] ?? null,
+            'state'    => $geo['regionName'] ?? null,
+            'region'   => $geo['region'] ?? null,
+            'city'     => $geo['city'] ?? null,
+            'zip_code' => $geo['zip'] ?? null,
+            'latitude' => $geo['lat'] ?? null,
+            'longitude'=> $geo['lon'] ?? null,
+        ]);
+
         UserActivity::create([
             'visitor_id' => $request->visitor_id,
             'event_type' => $request->event_type,
-            'event_data' => json_encode($request->event_data),
+            'event_data' => json_encode($eventData),
             'ip'         => $geo['query'] ?? null,
             'user_agent' => $request->userAgent(),
             'browser'    => $browser,
