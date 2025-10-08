@@ -53,11 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Using API base URL:", apiBaseUrl);
         return apiBaseUrl;
     }
-
-    const currentScript = getCurrentScript();
-    const token = getScriptToken(currentScript);
-    const apiBaseUrl = getApiBaseUrl(currentScript);
-
     function getVisitorId() {
         let id = localStorage.getItem("visitor_id");
         if (!id) {
@@ -82,6 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         form.addEventListener("submit", async function () {
+            const currentScript = getCurrentScript();
+            const token = getScriptToken(currentScript);
+            const apiBaseUrl = getApiBaseUrl(currentScript);
             const formData = {};
             const fields = form.querySelectorAll("label, input, textarea, select");
 
