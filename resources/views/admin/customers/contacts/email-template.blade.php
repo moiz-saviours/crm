@@ -1008,8 +1008,9 @@
             top: 0;
             line-height: 1;
 
-    transform: translateY(-100%); /* move it just above the quoted box */
-    z-index: 2;
+            transform: translateY(-100%); /* move it just above the quoted box */
+            z-index: 2;
+            display: none;
         }
 
     </style>

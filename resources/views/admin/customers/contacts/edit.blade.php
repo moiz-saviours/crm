@@ -5,13 +5,6 @@
         @include('admin.customers.contacts.style')
 
         <style>
-            /*body {*/
-            /*    font-family: Arial, sans-serif;*/
-            /*    margin: 0;*/
-            /*    padding: 0;*/
-            /*    display: flex;*/
-            /*    height: 100vh;*/
-            /*}*/
 
             .fetching-buttons {
                 font-size: 0.813rem;
@@ -75,7 +68,8 @@
             .nav-tabs .nav-link.main-tabs-view {
                 border-radius: 0px;
                 font-weight: 400;
-                font-size: var(--nf-profile-para-size);;
+                font-size: var(--nf-profile-para-size);
+                ;
                 /*font-size: 0.813rem;*/
                 padding: 12px 28px;
                 color: rgb(51, 71, 91);
@@ -219,9 +213,9 @@
             }
 
             /* .avatar-img-box {
-                                            width: 53px;
-                                            height: 43px;
-                                        } */
+                                                    width: 53px;
+                                                    height: 43px;
+                                                } */
 
             .avatar-img {
                 border-radius: 50%;
@@ -331,7 +325,7 @@
                 gap: 8px;
                 cursor: pointer;
                 align-items: baseline;
-                user-select:none;
+                user-select: none;
                 cursor: alias;
             }
 
@@ -443,8 +437,7 @@
                 margin: 5px 0px;
             }
 
-            .custom-right-detail-column {
-            }
+            .custom-right-detail-column {}
 
             .contact-card-details-para {
                 font-weight: 500;
@@ -631,11 +624,11 @@
             }
 
             /* .email-child-wrapper {
-                                            color: #007bff;
-                                            padding: 10px 15px;
+                                                    color: #007bff;
+                                                    padding: 10px 15px;
 
-                                            font-size: 14px;
-                                        } */
+                                                    font-size: 14px;
+                                                } */
 
             .comment-box {
                 margin-top: 10px;
@@ -729,7 +722,7 @@
             .data-highlights h2 {
                 text-align: left;
                 /* padding-left: 15px;
-                                            padding-bottom: 15px; */
+                                                    padding-bottom: 15px; */
                 font-size: var(--nf-profile-heading-size);
                 color: var(--bs-primary);
             }
@@ -853,8 +846,7 @@
                 border: 1px solid #ddd;
             }
 
-            .your-comment-btn {
-            }
+            .your-comment-btn {}
 
             .toolbar {
                 background-color: #dddddda6;
@@ -949,6 +941,7 @@
             .new-profile-email-wrapper {
                 display: flex;
                 gap: 7px;
+                font-size: 9px;
             }
 
             .new-profile-parent-wrapper {
@@ -960,7 +953,7 @@
             .user_profile_text p {
                 margin-bottom: -3px;
                 font-size: 0.75rem;
-                font-weight: 700;
+                /* font-weight: 700; */
                 margin-top: 4px;
                 padding-left: 8px;
             }
@@ -1290,9 +1283,9 @@
             }
 
             /* .doc-attachment:hover {
-                                        transform: scale(1.05);
-                                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-                                        } */
+                                                transform: scale(1.05);
+                                                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                                                } */
 
             .icon-doc {
                 font-size: 24px;
@@ -1426,8 +1419,7 @@
 
             }
 
-            .showhide:hover {
-            }
+            .showhide:hover {}
 
 
             .show_btn:hover {
@@ -1455,6 +1447,9 @@
                 text-overflow: ellipsis;
                 vertical-align: bottom;
             }
+            #show-more-container {
+                display: none;
+            }
         </style>
     @endpush
     <div class="new-class-hide-scroll">
@@ -1472,8 +1467,7 @@
 
                             <div class="sidebarr">
                                 <div class="main-left-sidebar-actions">
-                                    <a href="{{ route('admin.customer.contact.index') }}"
-                                       class="view-subscription-link">
+                                    <a href="{{ route('admin.customer.contact.index') }}" class="view-subscription-link">
                                         <span><i class="fa fa-angle-left " aria-hidden="true"></i>
                                             contacts</span>
                                     </a>
@@ -1487,7 +1481,7 @@
                                         <div class="avatar-img-box" style="padding-inline-end: 10px;">
                                             @if (file_exists(public_path('assets/images/user1.png')))
                                                 <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
-                                                     src="{{ asset('assets/images/user1.png') }}">
+                                                    src="{{ asset('assets/images/user1.png') }}">
                                             @else
                                                 @php
                                                     $words = explode(
@@ -1498,8 +1492,7 @@
                                                         $words[0][0] . (count($words) > 1 ? $words[1][0] : ''),
                                                     );
                                                 @endphp
-                                                <div
-                                                    class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                                <div class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
                                                     style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
                                                     {{ $initials }}
                                                 </div>
@@ -1517,17 +1510,16 @@
                                             <div class="email_sec">
                                                 <p id="customerEmail">{{ $customer_contact->email }}</p>
                                                 <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
-                                                   data-bs-toggle="tooltip" data-bs-placement="top"
-                                                   title="Copy email to clipboard"></i>
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="Copy email to clipboard"></i>
                                             </div>
                                         </div>
                                         <div>
 
                                             <button class="custom-contact-detail-dropdown" type="button"
-                                                    id="dropdownMenuButtonedit" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
+                                                id="dropdownMenuButtonedit" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="fa fa-pencil prof-edit-icons edit-icons-kit"
-                                                   aria-hidden="true"></i>
+                                                    aria-hidden="true"></i>
                                             </button>
                                             <ul class="dropdown-menu custom-edit-detail-dropdown-show"
                                                 aria-labelledby="dropdownMenuButtonedit">
@@ -1562,35 +1554,32 @@
 
                                 <div>
                                     <div class="profile_actions">
-                                        <div class="text-center sidebar-icons">
-
-                                            <i class="fa fa-pencil-square-o " aria-hidden="true"></i>
-                                            <p> Note</p>
-
+                                        <div class="text-center sidebar-icons active" >
+                                            <i class="fa fa-list" aria-hidden="true"></i>
+                                            <p>Activity</p>
                                         </div>
-
-                                        <div class="text-center sidebar-icons">
-
-                                            <i class="fa fa-envelope " aria-hidden="true"></i>
-                                            <p> Email</p>
+                                        <div class="text-center sidebar-icons" >
+                                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                                            <p>Email</p>
                                         </div>
-
+                                        <div class="text-center sidebar-icons" >
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            <p>Note</p>
+                                        </div>
                                         <div class="text-center sidebar-icons">
-
-                                            <i class="fa fa-phone " aria-hidden="true"></i>
+                                            <i class="fa fa-phone" aria-hidden="true"></i>
                                             <p>Call</p>
                                         </div>
                                         <div class="text-center sidebar-icons">
-                                            <i class="fa fa-calendar " aria-hidden="true"></i>
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
                                             <p>Meeting</p>
                                         </div>
                                         <div class="text-center sidebar-icons">
-                                            <i class="fa fa-list " aria-hidden="true"></i>
+                                            <i class="fa fa-list" aria-hidden="true"></i>
                                             <p>Task</p>
                                         </div>
-
                                         <div class="text-center sidebar-icons">
-                                            <i class="fa fa-calendar-check-o " aria-hidden="true"></i>
+                                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
                                             <p>More</p>
                                         </div>
                                     </div>
@@ -1603,11 +1592,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplecontact"
-                                                        aria-expanded="true" aria-controls="collapseExamplecontact">
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplecontact"
+                                                    aria-expanded="true" aria-controls="collapseExamplecontact">
                                                     <i class="fa fa-chevron-down toggle-icon" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
+                                                        style="padding-right: 5px;"></i>
                                                     About this contact
                                                 </button>
                                             </div>
@@ -1631,13 +1619,13 @@
                                                 <div class="mb-4">
                                                     <p class="contact-card-details-head">Last contacted</p>
                                                     <input class="contact-details-input-fields " type="text"
-                                                           placeholder="">
+                                                        placeholder="">
                                                 </div>
                                                 <div class="mb-4">
                                                     <div class="">
                                                         <button class="custom-contact-detail-dropdown dropdown-toggle"
-                                                                type="button" id="dropdownMenuButtonlead"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                            type="button" id="dropdownMenuButtonlead"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
                                                             Lead
                                                         </button>
                                                         <ul class="dropdown-menu custom-contact-detail-dropdown-show"
@@ -1663,12 +1651,11 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplesubscriptions"
-                                                        aria-expanded="true"
-                                                        aria-controls="collapseExamplesubscriptions">
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseExamplesubscriptions" aria-expanded="true"
+                                                    aria-controls="collapseExamplesubscriptions">
                                                     <i class="fa fa-caret-down" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
+                                                        style="padding-right: 5px;"></i>
                                                     Communication subscriptions
                                                 </button>
                                             </div>
@@ -1693,10 +1680,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"
-                                                        aria-expanded="true" aria-controls="collapseExampleweb">
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"
+                                                    aria-expanded="true" aria-controls="collapseExampleweb">
                                                     <i class="fa fa-caret-down" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
+                                                        style="padding-right: 5px;"></i>
                                                     Website Activity
                                                 </button>
                                             </div>
@@ -1722,24 +1709,24 @@
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link main-tabs-view" id="overview-tab" data-bs-toggle="tab"
-                                                data-bs-target="#overview" type="button" role="tab"
-                                                aria-controls="overview" aria-selected="true">Overview
+                                            data-bs-target="#overview" type="button" role="tab"
+                                            aria-controls="overview" aria-selected="true">Overview
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link main-tabs-view active" id="activity-tab"
-                                                data-bs-toggle="tab" data-bs-target="#activity" type="button"
-                                                role="tab" aria-controls="activity" aria-selected="true">Activities
+                                            data-bs-toggle="tab" data-bs-target="#activity" type="button"
+                                            role="tab" aria-controls="activity" aria-selected="true">Activities
                                         </button>
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="myTabContent">
                                     <div class="tab-pane fade" id="overview" role="tabpanel"
-                                         aria-labelledby="overview-tab">
+                                        aria-labelledby="overview-tab">
                                         @include('admin.customers.contacts.timeline.components.overview')
                                     </div>
                                     <div class="tab-pane fade active show" id="activity" role="tabpanel"
-                                         aria-labelledby="activity-tab">
+                                        aria-labelledby="activity-tab">
                                         @include('admin.customers.contacts.timeline.components.activities')
                                     </div>
                                 </div>
@@ -1753,11 +1740,10 @@
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample"
-                                                        aria-expanded="true" aria-controls="collapseExample">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                                                    aria-expanded="true" aria-controls="collapseExample">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Company
                                                     <span> ( {{ $customer_contact->companies->count() }} )</span>
                                                 </button>
@@ -1779,7 +1765,7 @@
                                                     <span> Domain :
                                                         @if (!empty($customer_contact->company->domain))
                                                             <a href="https://{{ $customer_contact->company->domain }}"
-                                                               target="_blank">
+                                                                target="_blank">
                                                                 {{ $customer_contact->company->domain }}
                                                             </a>
                                                         @else
@@ -1798,12 +1784,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplepayment"
-                                                        aria-expanded="true" aria-controls="collapseExamplepayment">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplepayment"
+                                                    aria-expanded="true" aria-controls="collapseExamplepayment">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Payments <span> ( {{ $customer_contact->payments->count() ?? '---' }} )
                                                     </span>
                                                 </button>
@@ -1837,8 +1821,7 @@
                                                                 @elseif($payment->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($payment->status == 2)
-                                                                    <span
-                                                                        class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($payment->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -1874,12 +1857,10 @@
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExampleinvoice"
-                                                        aria-expanded="true" aria-controls="collapseExampleinvoice">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleinvoice"
+                                                    aria-expanded="true" aria-controls="collapseExampleinvoice">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Invoices <span> ({{ $customer_contact->invoices->count() }}) </span>
                                                 </button>
                                             </div>
@@ -1908,8 +1889,7 @@
                                                                 @elseif($invoice->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($invoice->status == 2)
-                                                                    <span
-                                                                        class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($invoice->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -1956,10 +1936,10 @@
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
                                                 <button class="btn custom-btn-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"
-                                                        aria-expanded="true" aria-controls="collapseExampleatt">
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"
+                                                    aria-expanded="true" aria-controls="collapseExampleatt">
                                                     <i class="fa fa-caret-down" style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                        aria-hidden="true"></i>
                                                     Attachments
                                                 </button>
                                             </div>
@@ -1998,8 +1978,8 @@
 
         {{--        MY SCRIPT --}}
         <script>
-            $(document).ready(function () {
-                $('.showhide-payment, .showhide-invoice').click(function () {
+            $(document).ready(function() {
+                $('.showhide-payment, .showhide-invoice').click(function() {
                     // Determine which type: "payment" or "invoice"
                     let type = $(this).hasClass('showhide-payment') ? 'payment' : 'invoice';
 
@@ -2018,20 +1998,20 @@
         </script>
 
         <script>
-            $(document).ready(function () {
-                $('.toggle-collapse').each(function () {
+            $(document).ready(function() {
+                $('.toggle-collapse').each(function() {
                     var $button = $(this);
                     var target = $button.data('bs-target'); // Get target id from data-bs-target
                     var $collapse = $(target);
 
                     // On show event
-                    $collapse.on('show.bs.collapse', function () {
+                    $collapse.on('show.bs.collapse', function() {
                         $button.find('.toggle-icon').removeClass('fa-chevron-right').addClass(
                             'fa-chevron-down');
                     });
 
                     // On hide event
-                    $collapse.on('hide.bs.collapse', function () {
+                    $collapse.on('hide.bs.collapse', function() {
                         $button.find('.toggle-icon').removeClass('fa-chevron-down').addClass(
                             'fa-chevron-right');
                     });
@@ -2051,8 +2031,8 @@
             }
 
             // Second comment function
-            $(document).ready(function () {
-                $('#toggleButton').click(function () {
+            $(document).ready(function() {
+                $('#toggleButton').click(function() {
                     const contents = $('#contents');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2064,21 +2044,21 @@
                 });
             });
             // select to function
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Toggle dropdown visibility
-                $(".dropdown-toggle").on("click", function () {
+                $(".dropdown-toggle").on("click", function() {
                     $(".dropdown-content").toggle();
                 });
                 // Filter list based on search input
-                $(".search-input").on("input", function () {
+                $(".search-input").on("input", function() {
                     const filter = $(this).val().toLowerCase();
-                    $(".checkbox-item").each(function () {
+                    $(".checkbox-item").each(function() {
                         const label = $(this).find("label").text().toLowerCase();
                         $(this).toggle(label.includes(filter));
                     });
                 });
                 // Close dropdown if clicked outside
-                $(document).on("click", function (e) {
+                $(document).on("click", function(e) {
                     if (!$(e.target).closest(".dropdown").length) {
                         $(".dropdown-content").hide();
                     }
@@ -2086,15 +2066,15 @@
             });
             // $('select>option:eq(3)').attr('selected', true);
             // Searching Input function
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Expand and collapse the search bar
-                $(".search-btns").on("click", function (e) {
+                $(".search-btns").on("click", function(e) {
                     e.preventDefault(); // Prevent form submission on button click
                     $(".search-containers").toggleClass("expanded");
                     $(".search-inputs").focus();
                 });
                 // Handle form submission for search
-                $("#search-form").on("submit", function (e) {
+                $("#search-form").on("submit", function(e) {
                     e.preventDefault(); // Prevent default form submission
                     const query = $(".search-inputs").val().trim();
                     if (query) {
@@ -2107,7 +2087,7 @@
                     }
                 });
                 // Collapse the search bar when clicking outside
-                $(document).on("click", function (e) {
+                $(document).on("click", function(e) {
                     if (!$(e.target).closest(".search-containers").length) {
                         $(".search-containers").removeClass("expanded");
                     }
@@ -2115,24 +2095,24 @@
             });
 
             // EMAIL TEMPLATE OPEN AND CLOSE
-            $(document).ready(function () {
+            $(document).ready(function() {
                 const emailTemplate = $('#emailTemplate');
 
                 // Open form
-                $('.open-email-form').click(function () {
+                $('.open-email-form').click(function() {
                     emailTemplate.addClass('open');
 
                 });
 
                 // Close form
-                $('.close-btn').click(function () {
+                $('.close-btn').click(function() {
                     emailTemplate.removeClass('open');
 
                 });
             });
             // view threads function
-            $(document).ready(function () {
-                $('#toggleButtonThread').click(function () {
+            $(document).ready(function() {
+                $('#toggleButtonThread').click(function() {
                     const contents = $('#thread');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2146,7 +2126,7 @@
                 });
             });
             // read more text function
-            $('.moreless-button').click(function () {
+            $('.moreless-button').click(function() {
                 $('.moretext').toggle();
                 if ($('.moreless-button').text() == "See more") {
                     $(this).text("See less")
@@ -2157,11 +2137,11 @@
 
             // Copy Clipboard Email
 
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Initialize Bootstrap tooltips
                 $('[data-bs-toggle="tooltip"]').tooltip();
 
-                $(document).on('click', '.copyEmail', async function () {
+                $(document).on('click', '.copyEmail', async function() {
                     try {
                         let emailText = $("#customerEmail").text().trim();
                         await navigator.clipboard.writeText(emailText);
@@ -2181,446 +2161,499 @@
         </script>
 
         {{-- // --}}
-            <script>
-                $(document).on('click', '.reply-btn', function () {
-                    let fromEmail = `{{$customer_contact->email}}`;
-                    let subject = $(this).data('subject');
-                    let date = $(this).data('date');
-                    let body = $(this).data('body');
-                    let threadId = $(this).data('thread-id');
-                    let inReplyTo = $(this).data('in-reply-to');
-                    let references = $(this).data('references');
+<script>
+    $(document).on('click', '.reply-btn', function() {
+        let fromEmail = `{{ $customer_contact->email }}`;
+        let subject = $(this).data('subject');
+        let date = $(this).data('date');
+        let body = $(this).data('body');
+        let threadId = $(this).data('thread-id');
+        let inReplyTo = $(this).data('in-reply-to');
+        let references = $(this).data('references');
 
-                    try {
-                        if (typeof body === "string" && body.trim().startsWith('"')) {
-                            body = JSON.parse(body);
-                        }
-                    } catch (e) {
-                    }
-
-                    // Prefill To/Subject
-                    $('#toFieldInput').val(fromEmail);
-                    $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
-
-                    // Clear editor + set quoted history
-                    $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
-
-                    // Store metadata
-                    $('#thread_id').val(threadId || '');
-                    $('#in_reply_to').val(inReplyTo || '');
-                    $('#references').val(references ? JSON.stringify(references) : '');
-
-                    toggleQuotedHistory(true);
-                    $('#emailTemplate').addClass('open');
-                });
-
-                $(document).on('click', '.forward-btn', function () {
-                    let fromEmail = `{{$customer_contact->email}}`;
-                    let subject = $(this).data('subject');
-                    let date = $(this).data('date');
-                    let body = $(this).data('body');
-                    let originalMessageId = $(this).data('message-id');
-
-                    try {
-                        if (typeof body === "string" && body.trim().startsWith('"')) {
-                            body = JSON.parse(body);
-                        }
-                    } catch (e) {
-                        console.warn('Failed to parse body:', e);
-                    }
-
-                    // Clear To field (user will specify new recipients)
-                    $('#toFieldInput').val('');
-
-                    // Prepend "Fwd:" to subject if not already present
-                    $('#emailSubject').val(subject.startsWith("Fwd:") ? subject : "Fwd: " + subject);
-
-                    // Format forwarded content in quoted history
-                    $('.quoted-history').html(`
-                        <p><b>---------- Forwarded message ----------</b></p>
-                        <p><b>From:</b> ${fromEmail}<br>
-                        <b>Sent:</b> ${date}<br>
-                        <b>Subject:</b> ${subject}</p>
-                        ${body}
-                    `);
-
-                    // Set email content with new body and quoted history
-                    let newContent = $('#emailBody').val() || ''; // Assuming #emailBody is the textarea for new content
-                    $('#emailBody').val(newContent + $('.quoted-history').html());
-
-                    // Store metadata for forwarding
-                    $('#is_forward').val('true');
-                    $('#forward_id').val(originalMessageId || '');
-
-                    // Clear reply-specific fields (not needed for forward)
-                    $('#thread_id').val('');
-                    $('#in_reply_to').val('');
-                    $('#references').val('');
-
-                    // Show quoted history and open email template
-                    toggleQuotedHistory(true);
-                    $('#emailTemplate').addClass('open');
-                });
-
-                $(document).on('click', '.replyall-btn', function () {
-                    let fromEmail = ``;
-                    let subject = $(this).data('subject');
-                    let date = $(this).data('date');
-                    let body = $(this).data('body');
-                    let threadId = $(this).data('thread-id');
-                    let inReplyTo = $(this).data('in-reply-to');
-                    let references = $(this).data('references');
-
-                    // Get recipients (TO + CC)
-                    let toRecipients = $(this).data('to') || [];
-                    let ccRecipients = $(this).data('cc') || [];
-                    // Exclude the current user's own email from the list
-                    let allRecipients = [...toRecipients, ...ccRecipients]
-                        .map(r => typeof r === 'string' ? r : r.email)
-                        .filter(email => email && email !== fromEmail);
-
-                        
-                    try {
-                        if (typeof body === "string" && body.trim().startsWith('"')) {
-                            body = JSON.parse(body);
-                        }
-                    } catch (e) {}
-
-                    // Prefill To/Subject
-                    $('#toFieldInput').val(allRecipients.join(', '));
-                    $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
-
-                    // Clear editor + set quoted history
-                    $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
-
-                    // Store metadata
-                    $('#thread_id').val(threadId || '');
-                    $('#in_reply_to').val(inReplyTo || '');
-                    $('#references').val(references ? JSON.stringify(references) : '');
-
-                    toggleQuotedHistory(true);
-                    $('#emailTemplate').addClass('open');
-                });
-
-
-                $(document).on('click', '.open-email-form', () => {
-                    $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
-                    toggleQuotedHistory(false);
-                    $('#emailTemplate').addClass('open');
-                });
-                $(document).on('click', '.close-btn', () => {
-                    $('#emailTemplate').removeClass('open');
-                    toggleQuotedHistory(false);
-                    $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
-                });
-                function toggleQuotedHistory(show = false) {
-                    let $wrapper = $('.quoted-history-wrapper');
-                    if (!$wrapper.length) return;
-                    if (show) {
-                        $wrapper.removeClass('d-none');
-                    } else {
-                        $wrapper.addClass('d-none');
-                    }
-                }
-            </script>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const emailSection = document.getElementById('email-content-section');
-                    const emailLoader = document.getElementById('email-loader');
-                    const refreshButton = document.getElementById('refresh-emails');
-                    const fetchButton = document.getElementById('fetch-emails');
-                    const showMoreContainer = document.getElementById('show-more-container');
-                    const showMoreBtn = document.getElementById('show-more-btn');
-                    const customerEmail = "{{ $customer_contact->email }}";
-                    let folder = 'all';
-                    let currentPage = {{ $page }};
-                    const limit = 100;
-                    const noEmailsPlaceholder = document.querySelector('.no-emails-placeholder');
-
-
-                    // 🟢 Function to handle main email card toggle
-                    function handleToggleEmailCardBox(container, caretEl) {
-                        container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
-
-                        // Always minimize timeline inside that card
-                        container.find(".activity-section .timeline").slideUp(200);
-                        container.find(".toggle-activity").removeClass("fa-caret-down").addClass("fa-caret-right");
-
-                        // Flip caret icon for main email card only
-                        caretEl.toggleClass('fa-caret-right fa-caret-down');
-                    };
-
-                    // 🟢 Function to handle activity section toggle
-                    function handleToggleActivity(container, target, caretIcon) {
-                        let timeline = container.find(target);
-
-                        if (timeline.is(":visible")) {
-                            timeline.slideUp(200);
-                            caretIcon.removeClass("fa-caret-down").addClass("fa-caret-right");
-                        } else {
-                            timeline.slideDown(200);
-                            caretIcon.removeClass("fa-caret-right").addClass("fa-caret-down");
-                        }
-                    };
-
-                    // 🟢 Function to handle main email card toggle
-function toggleEmailContent($container) {
-    $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle").toggle();
-    const $caret = $container.find(".toggle-email-caret").first();
-    $caret.toggleClass("fa-caret-right fa-caret-down");
-}
-
-// 🟢 Function to handle activity section toggle
-function toggleActivityTimeline($container, target) {
-    const $timeline = $container.find(target);
-    const $caret = $container.find(`.toggle-activity[data-target='${target}']`);
-
-    $timeline.toggle();
-    $caret.toggleClass("fa-caret-right fa-caret-down");
-}
-
-           // --- Event bindings ---
-// Main email caret
-$(".card-box").on("click", ".toggle-email-caret", function (e) {
-    e.stopPropagation();
-    const $container = $(this).closest(".email-box-container");
-    toggleEmailContent($container);
-});
-
-// Clicking on the heading should do the same
-$(".card-box").on("click", ".toggle-email-header", function (e) {
-    e.stopPropagation();
-    const $container = $(this).closest(".email-box-container");
-    toggleEmailContent($container);
-});
-
-$(".card-box").on("click", ".toggle-activity, .toggle-activity-row", function(e) {
-    e.stopPropagation();
-
-    const $container = $(this).closest(".email-box-container");
-    const $caret = $(this).hasClass("toggle-activity-row")
-        ? $(this).find(".toggle-activity")
-        : $(this);
-
-    // Clean up target (remove leading # if exists)
-    const rawTarget = $caret.data("target");
-    const target = rawTarget.replace(/^#/, ""); // ensure clean ID
-    const $activityBox = $container.find(`#${target}`);
-
-    // Check email and activity states
-    const $emailContent = $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle");
-    const isEmailOpen = $emailContent.is(":visible");
-    const isActivityOpen = $activityBox.is(":visible");
-
-    if (!isActivityOpen) {
-        // Opening activity
-        if (!isEmailOpen) {
-            toggleEmailContent($container); // open email box if closed
-        }
-        toggleActivityTimeline($container, `#${target}`); // open activity
-    } else {
-        // Closing only activity
-        toggleActivityTimeline($container, `#${target}`);
-    }
-});
-
-            
-
-                    // Collapse All
-                    $(document).on("click", ".dropdown-item:contains('Collapse All')", function(e) {
-                        e.preventDefault();
-                        $(".contentdisplay, .contentdisplaytwo").hide();
-                    });
-
-                    // Expand All
-                    $(document).on("click", ".dropdown-item:contains('Expand All')", function(e) {
-                        e.preventDefault();
-                        $(".contentdisplay, .contentdisplaytwo").show();
-                    });
-
-                    // Show More click handler
-                    if (showMoreBtn) {
-                        showMoreBtn.addEventListener("click", function () {
-                            currentPage++;
-                            fetchEmails(true); // append
-                        });
-                    }
-
-            // Render Emails (HTML string only)
-                function renderEmails(emails) {
-                    if (!emails || emails.trim() === "") {
-                        return '<p class="text-muted">No emails found.</p>';
-                    }
-                    return emails; // already a single HTML string
-                }
-
-function fetchEmails(append = false) {
-    if (emailLoader) emailLoader.style.display = 'block';
-    if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'none';
-
-    // Disable both buttons during fetch
-    if (refreshButton) refreshButton.disabled = true;
-    if (fetchButton) fetchButton.disabled = true;
-
-    fetch("{{ route('admin.customer.contact.emails.fetch') }}" +
-        "?customer_email=" + encodeURIComponent(customerEmail) +
-        "&folder=" + encodeURIComponent(folder) +
-        "&page=" + currentPage +
-        "&limit=" + limit)
-    .then(res => res.json())
-    .then(data => {
-        if (emailLoader) emailLoader.style.display = 'none';
-
-        // Re-enable buttons
-        if (refreshButton) refreshButton.disabled = false;
-        if (fetchButton) fetchButton.disabled = false;
-
-        if (data.error) {
-            console.warn("⚠️ Server response:", data.error);
-            toastr.warning("We couldn't load new emails right now.");
-            return;
-        }
-
-        if (!data.emails || data.emails.trim() === "") {
-            if (currentPage === 1 && emailSection) {
-                emailSection.innerHTML = '';
-                if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'block';
+        try {
+            if (typeof body === "string" && body.trim().startsWith('"')) {
+                body = JSON.parse(body);
             }
-            if (showMoreContainer) showMoreContainer.style.display = 'none';
-            toastr.info("No emails available.");
-            return;
-        }
+        } catch (e) {}
 
-        const html = renderEmails(data.emails);
-        if (append && emailSection) {
-            emailSection.insertAdjacentHTML('beforeend', html);
-        } else if (emailSection) {
-            emailSection.innerHTML = html;
-        }
+        // Prefill To/Subject
+        $('#toFieldInput').val(fromEmail);
+        $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
 
-        if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'none';
-        toastr.success("Emails loaded successfully.");
-    })
-    .catch(err => {
-        if (emailLoader) emailLoader.style.display = 'none';
-        if (refreshButton) refreshButton.disabled = false;
-        if (fetchButton) fetchButton.disabled = false;
-        console.error("❌ Error fetching emails:", err);
-        toastr.error("Something went wrong while fetching emails. Please try again.");
+        // Clear editor + set quoted history
+        $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
+
+        // Store metadata
+        $('#thread_id').val(threadId || '');
+        $('#in_reply_to').val(inReplyTo || '');
+        $('#references').val(references ? JSON.stringify(references) : '');
+
+        toggleQuotedHistory(true);
+        $('#emailTemplate').addClass('open');
+        
+        // Show the show-quoted button only for reply
+        $('.show-quoted-btn').show();
     });
-}
 
+    $(document).on('click', '.forward-btn', function() {
+        let fromEmail = `{{ $customer_contact->email }}`;
+        let subject = $(this).data('subject');
+        let date = $(this).data('date');
+        let body = $(this).data('body');
+        let originalMessageId = $(this).data('message-id');
 
+        try {
+            if (typeof body === "string" && body.trim().startsWith('"')) {
+                body = JSON.parse(body);
+            }
+        } catch (e) {
+            console.warn('Failed to parse body:', e);
+        }
 
-                    // Refresh button: reset to first page & reload
+        // Clear To field (user will specify new recipients)
+        $('#toFieldInput').val('');
+
+        // Prepend "Fwd:" to subject if not already present
+        $('#emailSubject').val(subject.startsWith("Fwd:") ? subject : "Fwd: " + subject);
+
+        // Format forwarded content in quoted history
+        $('.quoted-history').html(`
+                <p><b>---------- Forwarded message ----------</b></p>
+                <p><b>From:</b> ${fromEmail}<br>
+                <b>Sent:</b> ${date}<br>
+                <b>Subject:</b> ${subject}</p>
+                ${body}
+            `);
+
+        // Set email content with new body and quoted history
+        let newContent = $('#emailBody').val() || ''; // Assuming #emailBody is the textarea for new content
+        $('#emailBody').val(newContent + $('.quoted-history').html());
+
+        // Store metadata for forwarding
+        $('#is_forward').val('true');
+        $('#forward_id').val(originalMessageId || '');
+
+        // Clear reply-specific fields (not needed for forward)
+        $('#thread_id').val('');
+        $('#in_reply_to').val('');
+        $('#references').val('');
+
+        // Show quoted history and open email template
+        toggleQuotedHistory(true);
+        $('#emailTemplate').addClass('open');
+        
+        // Show the show-quoted button only for forward
+        $('.show-quoted-btn').show();
+    });
+
+    $(document).on('click', '.replyall-btn', function() {
+        let fromEmail = ``;
+        let subject = $(this).data('subject');
+        let date = $(this).data('date');
+        let body = $(this).data('body');
+        let threadId = $(this).data('thread-id');
+        let inReplyTo = $(this).data('in-reply-to');
+        let references = $(this).data('references');
+
+        // Get recipients (TO + CC)
+        let toRecipients = $(this).data('to') || [];
+        let ccRecipients = $(this).data('cc') || [];
+        // Exclude the current user's own email from the list
+        let allRecipients = [...toRecipients, ...ccRecipients]
+            .map(r => typeof r === 'string' ? r : r.email)
+            .filter(email => email && email !== fromEmail);
+
+        try {
+            if (typeof body === "string" && body.trim().startsWith('"')) {
+                body = JSON.parse(body);
+            }
+        } catch (e) {}
+
+        // Prefill To/Subject
+        $('#toFieldInput').val(allRecipients.join(', '));
+        $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+
+        // Clear editor + set quoted history
+        $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
+
+        // Store metadata
+        $('#thread_id').val(threadId || '');
+        $('#in_reply_to').val(inReplyTo || '');
+        $('#references').val(references ? JSON.stringify(references) : '');
+
+        toggleQuotedHistory(true);
+        $('#emailTemplate').addClass('open');
+        
+        // Show the show-quoted button only for forward
+        $('.show-quoted-btn').show();
+    });
+
+    $(document).on('click', '.open-email-form', () => {
+        $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
+        toggleQuotedHistory(false);
+        $('#emailTemplate').addClass('open');
+        
+        // Hide the show-quoted button for new email
+        $('.show-quoted-btn').hide();
+    });
+
+    $(document).on('click', '.close-btn', () => {
+        $('#emailTemplate').removeClass('open');
+        toggleQuotedHistory(false);
+        $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
+        
+        // Hide the show-quoted button when closing
+        $('.show-quoted-btn').hide();
+    });
+
+    function toggleQuotedHistory(show = false) {
+        let $wrapper = $('.quoted-history-wrapper');
+        if (!$wrapper.length) return;
+        if (show) {
+            $wrapper.removeClass('d-none');
+        } else {
+            $wrapper.addClass('d-none');
+        }
+    }
+</script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const refreshButton = document.getElementById('refresh-emails');
+                const fetchButton = document.getElementById('fetch-emails');
+                const showMoreContainer = document.getElementById('show-more-container');
+                const showMoreBtn = document.getElementById('show-more-btn');
+                const customerEmail = "{{ $customer_contact->email }}";
+                let folder = 'all';
+                let currentPage = {{ $page }};
+                const limit = 10;
+                const noEmailsPlaceholder = document.querySelector('.no-emails-placeholder');
+
+                const tabs = document.querySelectorAll('.nav-link.customize');
+                const timelineSection = document.getElementById('timeline-section');
+                const timelineLoader = document.getElementById('timeline-loader');
+                const noTimelinePlaceholder = document.getElementById('no-timeline-placeholder');
+
+                // Show More click handler
+                if (showMoreBtn) {
+                    showMoreBtn.addEventListener("click", function() {
+                        currentPage++;
+                        refreshTimeline(true); // append
+                    });
+                }
+
+                // Get the active tab
+                function getActiveTab() {
+                    const activeTab = document.querySelector('.nav-link.customize.active');
+                    return activeTab ? activeTab.getAttribute('data-tab') : 'activities';
+                }
+
+                // Render Timeline (HTML string only)
+                function renderTimeline(timeline) {
+                    if (!timeline || timeline.trim() === "") {
+                        return '<p class="text-muted">No timeline items found.</p>';
+                    }
+                    return timeline; // Already a single HTML string
+                }
+
+                // Fetch Timeline (Refresh)
+               function refreshTimeline(append = false) {
+                    const activeTab = getActiveTab();
+                    const section = document.getElementById(`${activeTab}-section`) || timelineSection;
+                    if (timelineLoader) timelineLoader.style.display = 'block';
+                    if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
+
+                    // Disable all buttons during fetch
+                    if (refreshButton) refreshButton.disabled = true;
+                    if (fetchButton) fetchButton.disabled = true;
+                    if (showMoreBtn) showMoreBtn.disabled = true;
+
+                    fetch("{{ route('admin.customer.contact.timeline.refresh') }}" +
+                        "?customer_email=" + encodeURIComponent(customerEmail) +
+                        "&folder=" + encodeURIComponent("{{ request()->query('folder', 'all') }}") +
+                        "&tab=" + encodeURIComponent(activeTab) +
+                        "&page=" + currentPage +
+                        "&limit=" + limit)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (timelineLoader) timelineLoader.style.display = 'none';
+
+                        // Re-enable all buttons
+                        if (refreshButton) refreshButton.disabled = false;
+                        if (fetchButton) fetchButton.disabled = false;
+                        if (showMoreBtn) showMoreBtn.disabled = false;
+
+                        if (data.error) {
+                            console.warn("⚠️ Server response:", data.error);
+                            toastr.warning("We couldn't load the timeline right now.");
+                            return;
+                        }
+
+                        if (!data.timeline || data.timeline.trim() === "") {
+                            if (currentPage === 1 && section) {
+                                section.innerHTML = '';
+                                if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'block';
+                            }
+                            if (showMoreContainer) showMoreContainer.style.display = 'none';
+                            toastr.info("No timeline items available.");
+                            return;
+                        }
+
+                        const html = renderTimeline(data.timeline);
+                        if (append && section) {
+                            section.insertAdjacentHTML('beforeend', html);
+                        } else if (section) {
+                            section.innerHTML = html;
+                        }
+
+                        if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
+                        // Show/hide "Show More" button based on available items
+                        if (showMoreContainer) {
+                            showMoreContainer.style.display = (data.count >= data.limit) ? 'block' : 'none';
+                        }
+                        toastr.success("Timeline loaded successfully.");
+                    })
+                    .catch(err => {
+                        if (timelineLoader) timelineLoader.style.display = 'none';
+                        // Re-enable all buttons
+                        if (refreshButton) refreshButton.disabled = false;
+                        if (fetchButton) fetchButton.disabled = false;
+                        if (showMoreBtn) showMoreBtn.disabled = false;
+                        console.error("❌ Error fetching timeline:", err);
+                        toastr.error("Something went wrong while fetching the timeline. Please try again.");
+                    });
+                }
+
+                // Refresh button: reset to first page & reload
+                if (refreshButton) {
                     refreshButton.addEventListener('click', function() {
                         currentPage = 1;
-                        fetchEmails(false); // reload first page
+                        refreshTimeline(false); // reload first page
                     });
-
-                // Fetch new emails
-fetchButton.addEventListener('click', function () {
-    console.log("📩 Fetching NEW emails for:", customerEmail);
-
-    if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'none';
-    if (emailLoader) emailLoader.style.display = 'block';
-
-    // Disable both buttons during fetch
-    if (refreshButton) refreshButton.disabled = true;
-    if (fetchButton) fetchButton.disabled = true;
-
-    fetch("{{ route('admin.customer.contact.emails.fetch-new') }}" +
-        "?customer_email=" + encodeURIComponent(customerEmail), {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (emailLoader) emailLoader.style.display = 'none';
-            if (refreshButton) refreshButton.disabled = false;
-            if (fetchButton) fetchButton.disabled = false;
-
-            if (data.status === "error") {
-                fetchEmails();
-                toastr.error(data.message || "Something went wrong.");
-                return;
-            }
-
-            if (data.status === "success") {
-                fetchEmails();
-                toastr.success(data.message);
-            }
-
-            if (data.status === "warning") {
-                fetchEmails();
-                console.log(data.message);
-            }
-
-            // Fallback: if no emails appear after fetch
-            setTimeout(() => {
-                if (emailSection && emailSection.innerHTML.trim() === "") {
-                    if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'block';
                 }
-            }, 500);
-        })
-        .catch(error => {
-            if (emailLoader) emailLoader.style.display = 'none';
-            if (refreshButton) refreshButton.disabled = false;
-            if (fetchButton) fetchButton.disabled = false;
-            console.error(error);
-            toastr.error("Failed to fetch emails. Please try again later.");
-            if (noEmailsPlaceholder) noEmailsPlaceholder.style.display = 'block';
-        });
-});
 
+                // Fetch new timeline items
+                if (fetchButton) {
+                    fetchButton.addEventListener('click', function () {
+                        const activeTab = getActiveTab();
 
+                        if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
+                        if (timelineLoader) timelineLoader.style.display = 'block';
 
+                        // Disable all buttons during fetch
+                        if (refreshButton) refreshButton.disabled = true;
+                        if (fetchButton) fetchButton.disabled = true;
+                        if (showMoreBtn) showMoreBtn.disabled = true;
 
-                    // Tabs
-                    function setActiveTab(folder) {
-                        document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
-                            tab.classList.remove('active');
-                            if (tab.getAttribute('data-folder') === folder) {
-                                tab.classList.add('active');
-                            }
-                        });
-                    }
+                        fetch("{{ route('admin.customer.contact.timeline.fetch-remote') }}" +
+                            "?customer_email=" + encodeURIComponent(customerEmail) +
+                            "&tab=" + encodeURIComponent(activeTab), {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (timelineLoader) timelineLoader.style.display = 'none';
+                                // Re-enable all buttons
+                                if (refreshButton) refreshButton.disabled = false;
+                                if (fetchButton) fetchButton.disabled = false;
+                                if (showMoreBtn) showMoreBtn.disabled = false;
 
+                                if (data.status === "error") {
+                                    refreshTimeline();
+                                    toastr.error(data.message || "Something went wrong.");
+                                    return;
+                                }
+
+                                if (data.status === "success") {
+                                    refreshTimeline();
+                                    toastr.success(data.message);
+                                }
+
+                                if (data.status === "warning") {
+                                    refreshTimeline();
+                                    console.log(data.message);
+                                }
+
+                                // Fallback: if no timeline items appear after fetch
+                                setTimeout(() => {
+                                    const section = document.getElementById(`${activeTab}-section`) || timelineSection;
+                                    if (section && section.innerHTML.trim() === "") {
+                                        if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'block';
+                                    }
+                                }, 500);
+                            })
+                            .catch(error => {
+                                if (timelineLoader) timelineLoader.style.display = 'none';
+                                // Re-enable all buttons
+                                if (refreshButton) refreshButton.disabled = false;
+                                if (fetchButton) fetchButton.disabled = false;
+                                if (showMoreBtn) showMoreBtn.disabled = false;
+                                console.error(error);
+                                toastr.error("Failed to fetch timeline items. Please try again later.");
+                                if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'block';
+                            });
+                    });
+                }
+
+                // Tab click handler to set active tab and refresh
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function () {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        currentPage = 1;
+                    });
+                });
+
+                // Tabs
+                function setActiveTab(folder) {
                     document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
-                        tab.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            folder = this.getAttribute('data-folder');
-                            currentPage = 1;
-                            setActiveTab(folder);
-                            fetchEmails();
-                        });
+                        tab.classList.remove('active');
+                        if (tab.getAttribute('data-folder') === folder) {
+                            tab.classList.add('active');
+                        }
                     });
+                }
 
-                    setActiveTab(folder);
-                });
-            </script>
-
-         
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.toggle-thread-btn').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const targetId = this.getAttribute('data-target');
-                            const threadContainer = document.getElementById(targetId);
-                            if (threadContainer) {
-                                threadContainer.style.display = threadContainer.style.display === 'none' ?
-                                    'block' : 'none';
-                                this.textContent = threadContainer.style.display === 'none' ?
-                                    `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
-                                    `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
-                            }
-                        });
+                document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+                    tab.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        folder = this.getAttribute('data-folder');
+                        console.log(`Switching to folder: ${folder}`);
+                        currentPage = 1;
+                        setActiveTab(folder);
                     });
                 });
+
+                setActiveTab(folder);
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.toggle-thread-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        const threadContainer = document.getElementById(targetId);
+                        if (threadContainer) {
+                            threadContainer.style.display = threadContainer.style.display === 'none' ?
+                                'block' : 'none';
+                            this.textContent = threadContainer.style.display === 'none' ?
+                                `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
+                                `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
+                        }
+                    });
+                });
+            });
+        </script>
+
+<script>
+    // Thread toggle (vanilla JS, unchanged)
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.toggle-thread-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const threadContainer = document.getElementById(targetId);
+                if (threadContainer) {
+                    threadContainer.style.display = threadContainer.style.display === 'none' ? 'block' : 'none';
+                    this.textContent = threadContainer.style.display === 'none' ?
+                        `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
+                        `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
+                }
+            });
+        });
+    });
+
+    // jQuery-based email and activity toggling
+    $(document).ready(function() {
+        // Function to toggle the email box content
+        function toggleEmailContent($container) {
+            const $emailContent = $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle");
+            const $caret = $container.find(".toggle-email-caret").first();
+            const wasOpen = $caret.hasClass("fa-caret-down"); // Check caret state
+            $emailContent.toggle(); // Instant toggle
+            $caret.toggleClass("fa-caret-right fa-caret-down");
+
+            // If closing email box, hide all activity timelines
+            if (wasOpen) {
+                $container.find(".activity-section .timeline").hide();
+                $container.find(".toggle-activity").removeClass("fa-caret-down").addClass("fa-caret-right");
+            }
+        }
+
+        // Function to toggle the activity timeline
+        function toggleActivityTimeline($container, target) {
+            const $timeline = $container.find(target);
+            const $caret = $container.find(`.toggle-activity[data-target='${target}']`);
+
+            if ($timeline.css('display') === 'none') {
+                $timeline.show(); // Instant show
+                $caret.removeClass("fa-caret-right").addClass("fa-caret-down");
+            } else {
+                $timeline.hide(); // Instant hide
+                $caret.removeClass("fa-caret-down").addClass("fa-caret-right");
+            }
+        }
+
+        // Main email caret or header click
+        $(".card-box").on("click", ".toggle-email-caret, .toggle-email-header", function(e) {
+            e.stopPropagation();
+            const $container = $(this).closest(".email-box-container");
+            toggleEmailContent($container);
+        });
+
+        // Activity toggle (caret or row)
+        $(".card-box").on("click", ".toggle-activity, .toggle-activity-row", function(e) {
+            e.stopPropagation();
+
+            const $container = $(this).closest(".email-box-container");
+            const $caret = $(this).hasClass("toggle-activity-row") 
+                ? $(this).find(".toggle-activity") 
+                : $(this);
+
+            // Clean up target (remove leading # if exists)
+            const rawTarget = $caret.data("target");
+            const target = rawTarget.replace(/^#/, "");
+            const $activityBox = $container.find(`#${target}`);
+
+            // Check email state using caret class
+            const $emailCaret = $container.find(".toggle-email-caret").first();
+            const isEmailOpen = $emailCaret.hasClass("fa-caret-down");
+
+            if (!isEmailOpen) {
+                // Open email box, then activity timeline
+                toggleEmailContent($container);
+                if ($activityBox.css('display') === 'none') { // Only show if not visible
+                    toggleActivityTimeline($container, `#${target}`);
+                }
+            } else {
+                // Toggle activity directly
+                toggleActivityTimeline($container, `#${target}`);
+            }
+        });
+
+        // Collapse All
+        $(document).on("click", ".dropdown-item:contains('Collapse All')", function(e) {
+            e.preventDefault();
+            $(".contentdisplay, .contentdisplaytwo").hide();
+            $(".toggle-email-caret").removeClass("fa-caret-down").addClass("fa-caret-right");
+            $(".activity-section .timeline").hide();
+            $(".toggle-activity").removeClass("fa-caret-down").addClass("fa-caret-right");
+        });
+
+        // Expand All
+        $(document).on("click", ".dropdown-item:contains('Expand All')", function(e) {
+            e.preventDefault();
+            $(".contentdisplay, .contentdisplaytwo").show();
+            $(".toggle-email-caret").removeClass("fa-caret-right").addClass("fa-caret-down");
+            // Keep activities collapsed to avoid clutter
+        });
+    });
+</script>
             </script>
         <script>
             $(document).on('click', '.toggle-form-section', function () {

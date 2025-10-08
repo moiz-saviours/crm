@@ -28,6 +28,7 @@ class EmailController extends Controller
 {
     public function getEmails($customerEmail, $folder = "all", $page = 1, $limit = 100)
     {
+        // Existing getEmails method remains unchanged
         $user = Auth::guard('admin')->user();
         $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
             ->where('morph_type', get_class($user))
@@ -62,16 +63,13 @@ class EmailController extends Controller
             $query->where('folder', 'archive');
         } else {
             $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                // 1) Client is sender or in recipients
                 $q->where('from_email', $customerEmail)
                     ->orWhereJsonContains('to', ['email' => $customerEmail])
                     ->orWhereJsonContains('cc', ['email' => $customerEmail])
                     ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
 
-                // 2) OR Client ↔ Pseudo communication
                 if (!empty($auth_pseudo_emails)) {
                     $q->orWhere(function ($sub) use ($customerEmail, $auth_pseudo_emails) {
-                        // Case A: Client → My pseudo
                         $sub->where('from_email', $customerEmail)
                             ->where(function ($nested) use ($auth_pseudo_emails) {
                                 foreach ($auth_pseudo_emails as $addr) {
@@ -80,8 +78,6 @@ class EmailController extends Controller
                                         ->orWhereJsonContains('bcc', ['email' => $addr]);
                                 }
                             });
-
-                        // Case B: My pseudo → Client
                         $sub->orWhere(function ($nested) use ($customerEmail, $auth_pseudo_emails) {
                             $nested->whereIn('from_email', $auth_pseudo_emails)
                                 ->where(function ($nn) use ($customerEmail) {
@@ -94,7 +90,6 @@ class EmailController extends Controller
                 }
             });
         }
-
 
         if ($folder !== 'all') {
             $query->where('folder', $folder);
@@ -109,71 +104,67 @@ class EmailController extends Controller
             ->skip($offset)
             ->take($limit)
             ->get()
-            
             ->map(function ($email) use ($query) {
-        // Fetch thread emails (excluding the current email)
-        $threadEmails = $query->where('thread_id', $email->thread_id)
-            ->where('id', '!=', $email->id)
-            ->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
-            }])
-            ->get()
-            ->map(function ($threadEmail) {
-                return [
-                    'uuid' => 'email-' . $threadEmail->id,
-                    'thread_id' => $threadEmail->thread_id ?? [],
-                    'message_id' => $threadEmail->message_id ?? '',
-                    'references' => $threadEmail->references ?? [],
-                    'from' => [
-                        'name' => $threadEmail->from_name,
-                        'email' => $threadEmail->from_email,
-                    ],
-                    'to' => $threadEmail->to ?? [],
-                    'cc' => $threadEmail->cc ?? [],
-                    'bcc' => $threadEmail->bcc ?? [],
-                    'subject' => $threadEmail->subject,
-                    'folder' => $threadEmail->folder,
-                    'type' => $threadEmail->type,
-                    'date' => $threadEmail->message_date,
-                    'body' => [
-                        'html' => $threadEmail->body_html,
-                        'text' => $threadEmail->body_text,
-                    ],
-                    'attachments' => $threadEmail->attachments->map(function ($attachment) {
+                $threadEmails = $query->where('thread_id', $email->thread_id)
+                    ->where('id', '!=', $email->id)
+                    ->with(['attachments' => function ($q) {
+                        $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
+                    }])
+                    ->get()
+                    ->map(function ($threadEmail) {
                         return [
-                            'filename' => $attachment->original_name,
-                            'type' => $attachment->mime_type,
-                            'size' => $attachment->size,
-                            'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                            'uuid' => 'email-' . $threadEmail->id,
+                            'thread_id' => $threadEmail->thread_id ?? [],
+                            'message_id' => $threadEmail->message_id ?? '',
+                            'references' => $threadEmail->references ?? [],
+                            'from' => [
+                                'name' => $threadEmail->from_name,
+                                'email' => $threadEmail->from_email,
+                            ],
+                            'to' => $threadEmail->to ?? [],
+                            'cc' => $threadEmail->cc ?? [],
+                            'bcc' => $threadEmail->bcc ?? [],
+                            'subject' => $threadEmail->subject,
+                            'folder' => $threadEmail->folder,
+                            'type' => $threadEmail->type,
+                            'date' => $threadEmail->message_date,
+                            'body' => [
+                                'html' => $threadEmail->body_html,
+                                'text' => $threadEmail->body_text,
+                            ],
+                            'attachments' => $threadEmail->attachments->map(function ($attachment) {
+                                return [
+                                    'filename' => $attachment->original_name,
+                                    'type' => $attachment->mime_type,
+                                    'size' => $attachment->size,
+                                    'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
+                                ];
+                            })->toArray(),
+                            'open_count' => $threadEmail->events->where('event_type', 'open')->count(),
+                            'click_count' => $threadEmail->events->where('event_type', 'click')->count(),
+                            'bounce_count' => $threadEmail->events->where('event_type', 'bounce')->count(),
+                            'spam_count' => $threadEmail->events->where('event_type', 'spam')->count(),
+                            'events' => $threadEmail->events->map(function ($event) {
+                                $icons = [
+                                    'open' => 'fa-envelope-open',
+                                    'click' => 'fa-mouse-pointer',
+                                    'bounce' => 'fa-exclamation-triangle',
+                                    'spam' => 'fa-ban',
+                                ];
+                                return [
+                                    'id' => $event->id,
+                                    'event_type' => $event->event_type,
+                                    'created_at' => $event->created_at,
+                                    'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
+                                ];
+                            })->values()->toArray(),
                         ];
-                    })->toArray(),
-                    'open_count' => $threadEmail->events->where('event_type', 'open')->count(),
-                    'click_count' => $threadEmail->events->where('event_type', 'click')->count(),
-                    'bounce_count' => $threadEmail->events->where('event_type', 'bounce')->count(),
-                    'spam_count' => $threadEmail->events->where('event_type', 'spam')->count(),
-                    'events' => $threadEmail->events->map(function ($event) {
-                        $icons = [
-                            'open' => 'fa-envelope-open',
-                            'click' => 'fa-mouse-pointer',
-                            'bounce' => 'fa-exclamation-triangle',
-                            'spam' => 'fa-ban',
-                        ];
-                        return [
-                            'id' => $event->id,
-                            'event_type' => $event->event_type,
-                            'created_at' => $event->created_at,
-                            'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
-                        ];
-                    })->values()->toArray(),
-                ];
-            })->toArray();
+                    })->toArray();
                 return [
                     'uuid' => 'email-' . $email->id,
                     'thread_id' => $email->thread_id ?? [],
                     'message_id' => $email->message_id ?? '',
                     'references' => $email->references ?? [],
-
-
                     'from' => [
                         'name' => $email->from_name,
                         'email' => $email->from_email,
@@ -193,15 +184,13 @@ class EmailController extends Controller
                         return [
                             'id' => $attachment->id,
                             'filename' => $attachment->original_name,
-                            'type'     => $attachment->mime_type,
-                            'size'     => $attachment->size,
-                            'data'     => $attachment->base64_content 
-                                            ? 'data:' . $attachment->mime_type . ';base64,' . $attachment->base64_content 
-                                            : null,
+                            'type' => $attachment->mime_type,
+                            'size' => $attachment->size,
+                            'data' => $attachment->base64_content
+                                ? 'data:' . $attachment->mime_type . ';base64,' . $attachment->base64_content
+                                : null,
                         ];
                     })->toArray(),
-
-
                     'thread_emails' => $threadEmails,
                     'thread_email_count' => count($threadEmails) ?? 0,
                     'open_count' => $email->events->where('event_type', 'open')->count(),
@@ -226,122 +215,14 @@ class EmailController extends Controller
             })
             ->values()
             ->toArray();
-            
+
         return [
             'emails' => $emails,
-            'page'   => $page,
-            'limit'  => $limit,
-            'count'  => count($emails),
+            'page' => $page,
+            'limit' => $limit,
+            'count' => count($emails),
         ];
     }
-
-public function fetch(Request $request)
-{
-    try {
-        $customerEmail = urldecode(trim($request->query('customer_email')));
-        $folder = $request->query('folder', 'all');
-        $page = (int) $request->query('page', 1);
-        $limit = (int) $request->query('limit', 100);
-
-        if (empty($customerEmail)) {
-            return response()->json(['error' => 'Customer email is required'], 400);
-        }
-
-        $data = $this->getEmails($customerEmail, $folder, $page, $limit);
-        
-        
-
-        $htmlEmails = collect($data['emails'])->map(function ($email) {
-            // Each $email is already normalized from getEmails()
-            return view('admin.customers.contacts.timeline.partials.card-box.email', [
-                'item' => ['data' => $email],
-            ])->render();
-        })->implode(''); // join into one HTML string
-        
-        return response()->json([
-            'emails' => $htmlEmails, 
-            'html'   => $htmlEmails,
-            'page' => $data['page'],
-            'limit' => $data['limit'],
-            'count' => $data['count'],
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Processing complete.',
-            'details' => $e->getMessage(),
-        ], 500);
-    }
-}
-
-public function fetchNewEmails(Request $request)
-{
-    try {
-        $customerEmail = $request->query('customer_email');
-        if (!$customerEmail) {
-            Log::warning('Customer email missing for fetchNewEmails');
-
-            return response()->json([
-                'status' => 'warning',
-                'message' => 'No customer email provided. Please try again.'
-            ], 200);
-        }
-
-        $user = Auth::guard('admin')->user();
-        $pseudoEmails = UserPseudoRecord::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
-            ->where('imap_type', 'imap')
-            ->pluck('pseudo_email')
-            ->toArray();
-
-        if (empty($pseudoEmails)) {
-            Log::warning('No pseudo emails found for user', ['user_id' => $user->id]);
-
-            return response()->json([
-                'status' => 'warning',
-                'message' => 'No accounts found for this user. Please check settings.'
-            ], 200);
-        }
-
-        $command = ['emails:fetch', '--address=' . $customerEmail];
-        foreach ($pseudoEmails as $email) {
-            $command[] = '--account=' . $email;
-        }
-
-        $exitCode = Artisan::call(implode(' ', $command));
-
-        if ($exitCode !== 0) {
-            Log::error('Failed to run emails:fetch command', [
-                'customer_email' => $customerEmail,
-                'pseudo_emails'  => $pseudoEmails,
-                'exit_code'      => $exitCode,
-            ]);
-
-            return response()->json([
-                'status' => 'warning',
-                'message' => 'Unable to fetch new emails at the moment. Please try again later.'
-            ], status: 200);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'New emails fetched successfully.'
-        ], 200);
-
-    } catch (\Exception $e) {
-        Log::error('Error fetching new emails', [
-            'customer_email' => $request->query('customer_email'),
-            'error'          => $e->getMessage(),
-            'line'           => $e->getLine(),
-        ]);
-
-        return response()->json([
-            'status' => 'warning',
-            'message' => 'Something went wrong while fetching emails. Please try again later.'
-        ], 200);
-    }
-}
-
-
 
     public function sendEmail(Request $request): JsonResponse
     {
@@ -623,11 +504,11 @@ if ($request->hasFile('attachments')) {
             $trackingPixel = '<img src="' . route('emails.track.open', ['id' => $email->id]) . '" width="1" height="1" alt="" />';
             $mailer->Body = $content . $trackingPixel;
             $mailer->AltBody = $textContent;
-
             // Add recipients
             foreach ($toWithNames as $r) {
                 $mailer->addAddress($r['email'], $r['name'] ?? '');
             }
+
             foreach ($ccWithNames as $r) {
                 $mailer->addCC($r['email'], $r['name'] ?? '');
             }

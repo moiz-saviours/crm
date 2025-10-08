@@ -24,21 +24,26 @@
         vertical-align: super;
     }
 </style>
-@if (!empty($timeline) && count($timeline) > 0)
-    @include('admin.customers.contacts.timeline.static-content.email')
 
-    @foreach ($timeline as $item)
-        @if ($item['type'] === 'note')
-    @include('admin.customers.contacts.timeline.partials.card-box.note')
-        @elseif ($item['type'] === 'email')
-            @include('admin.customers.contacts.timeline.partials.card-box.email')
-        @elseif ($item['type'] === 'activity')
-            @include('admin.customers.contacts.timeline.partials.card-box.activity')
+<div id="activities-section">
+    @if (!empty($timeline) && count($timeline) > 0)
+        {{-- @include('admin.customers.contacts.timeline.static-content.email') --}}
+    <!-- Loader -->
 
-        @elseif ($item['type'] === 'conversion')
-            @include('admin.customers.contacts.timeline.partials.card-box.conversion')
-        @endif
-    @endforeach
-@else
-    <p class="text-muted">No notes or emails found.</p>
-@endif
+        @foreach ($timeline as $item)
+            @if ($item['type'] === 'note')
+                
+                @include('admin.customers.contacts.timeline.partials.card-box.note')
+            @elseif ($item['type'] === 'email')
+                @include('admin.customers.contacts.timeline.partials.card-box.email')
+            @elseif ($item['type'] === 'activity')
+                @include('admin.customers.contacts.timeline.partials.card-box.activity')
+            @elseif ($item['type'] === 'conversion')
+                @include('admin.customers.contacts.timeline.partials.card-box.conversion')
+            @endif
+        @endforeach
+</div>
+
+    @else
+        <p class="text-muted">No notes or emails found.</p>
+    @endif

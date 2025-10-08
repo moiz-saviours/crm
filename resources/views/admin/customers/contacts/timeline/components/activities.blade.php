@@ -27,42 +27,44 @@
     </div>
 </div>
 <div class="custom-tabs-row">
-    <ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link customize active" id="act-tab" data-bs-toggle="tab" data-bs-target="#act"
-                    type="button" role="tab" aria-controls="act" aria-selected="true">Activity
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link customize" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes"
-                    type="button" role="tab" aria-controls="notes" aria-selected="true">Notes
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link customize" id="emails-tab" data-bs-toggle="tab" data-bs-target="#emails"
-                    type="button" role="tab" aria-controls="emails" aria-selected="true">
-                Emails
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link customize" id="call-tab" data-bs-toggle="tab" data-bs-target="#call"
-                    type="button" role="tab" aria-controls="call" aria-selected="false" tabindex="-1">Calls
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link customize" id="task-tab" data-bs-toggle="tab" data-bs-target="#task"
-                    type="button" role="tab" aria-controls="task" aria-selected="false" tabindex="-1">Tasks
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link customize" id="meeting-tab" data-bs-toggle="tab" data-bs-target="#meeting"
-                    type="button" role="tab" aria-controls="meeting" aria-selected="false"
-                    tabindex="-1">Meetings
-            </button>
-        </li>
-    </ul>
+<ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize active" data-tab="activities" data-bs-toggle="tab" data-bs-target="#activities-container"
+                type="button" role="tab" aria-controls="activities" aria-selected="true">Activity
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="notes" data-bs-toggle="tab" data-bs-target="#notes-container"
+                type="button" role="tab" aria-controls="notes" aria-selected="false">Notes
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="emails" data-bs-toggle="tab" data-bs-target="#emails-container"
+                type="button" role="tab" aria-controls="emails" aria-selected="false">Emails
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="calls" data-bs-toggle="tab" data-bs-target="#calls-container"
+                type="button" role="tab" aria-controls="calls" aria-selected="false">Calls
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="tasks" data-bs-toggle="tab" data-bs-target="#tasks-container"
+                type="button" role="tab" aria-controls="tasks" aria-selected="false">Tasks
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="meetings" data-bs-toggle="tab" data-bs-target="#meetings-container"
+                type="button" role="tab" aria-controls="meetings" aria-selected="false">Meetings
+        </button>
+    </li>
+</ul>
+
     <div class="tab-content custom-tabs-row-scroll" id="myTabContent">
-        <div class="tab-pane fade show active" id="act" role="tabpanel" aria-labelledby="act-tab">
+        <div id="timeline-loader" style="display: none; text-align: center; padding: 20px;">
+            <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading...
+        </div>
+        <div class="tab-pane fade show active" id="activities-container" role="tabpanel" aria-labelledby="act-tab">
             <div>
                 <div>
                     <p class="recent-filters"> Filter by:
@@ -221,20 +223,25 @@
                                                   </div> --}}
             </div>
         </div>
-        <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+        <div class="tab-pane fade" id="notes-container" role="tabpanel" aria-labelledby="notes-tab">
             @include('admin.customers.contacts.timeline.partials.note')
         </div>
-        <div class="tab-pane fade" id="emails" role="tabpanel" aria-labelledby="email-tab">
+        <div class="tab-pane fade" id="emails-container" role="tabpanel" aria-labelledby="email-tab">
             @include('admin.customers.contacts.timeline.partials.email')
         </div>
-        <div class="tab-pane fade" id="call" role="tabpanel" aria-labelledby="call-tab">
+        <div class="tab-pane fade" id="calls-container" role="tabpanel" aria-labelledby="call-tab">
             @include('admin.customers.contacts.timeline.static-content.call')
         </div>
-        <div class="tab-pane fade" id="task" role="tabpanel" aria-labelledby="task-tab">
+        <div class="tab-pane fade" id="tasks-container" role="tabpanel" aria-labelledby="task-tab">
             @include('admin.customers.contacts.timeline.static-content.task')
         </div>
-        <div class="tab-pane fade" id="meeting" role="tabpanel" aria-labelledby="meeting-tab">
+        <div class="tab-pane fade" id="meetings-container" role="tabpanel" aria-labelledby="meeting-tab">
             @include('admin.customers.contacts.timeline.static-content.meeting')
+        </div>
+        <div id="show-more-container" class="text-center mt-3" style="display: {{ count($timeline) >= $limit ? 'block' : 'none' }};">
+            <button id="show-more-btn" class="btn btn-outline-primary btn-sm">
+                Show More
+            </button>
         </div>
     </div>
 </div>
