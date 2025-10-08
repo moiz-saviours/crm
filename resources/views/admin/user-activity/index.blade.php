@@ -19,11 +19,8 @@
                     } else {
                         $isDateField = preg_match('/(_at|_date|_timestamp)$/i', $key);
                         $isDateValue = false;
-
-                        // Check if the value looks like a date or datetime string
-                        if (is_string($value) && strtotime($value) !== false) {
+                        if (is_string($value) && preg_match('/\d{4}[-\/]\d{1,2}[-\/]\d{1,2}/', $value)) {
                             try {
-                                $parsedDate = Carbon::parse($value);
                                 $isDateValue = true;
                             } catch (Exception $e) {
                                 $isDateValue = false;
@@ -34,7 +31,7 @@
                             try {
                                 echo e(Carbon::parse($value)->addHours(5)->format('Y-m-d h:i:s A'));
                             } catch (Exception $e) {
-                                echo e($value); // fallback if invalid date
+                                echo e($value);
                             }
                         } else {
                             echo e($value);
