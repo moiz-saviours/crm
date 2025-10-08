@@ -234,129 +234,7 @@
                     </div>
                 </div>
             @endif
-            <div class="new-profile-parent-wrapper">
-                <div class="new-profile-email-wrapper">
-                    <div class="user_profile_img">
-                        <div class="avatarr">
-                            {{ $item['data']['from']['name'] ? strtoupper(substr($item['data']['from']['name'], 0, 2)) : strtoupper(substr($item['data']['from']['email'], 0, 2)) }}
-                        </div>
-                    </div>
-                    <div class="user_profile_text">
-                        <p>{{ $item['data']['from']['name'] ?? $item['data']['from']['email'] ?? '' }}
-                        </p>
-<div class="tooltip-wrapper" style="display: inline-block;">
-    <p class="mb-0">
-        from: {{ $item['data']['from']['email'] ?? '' }}<br>
-        to: 
-        {{ collect(
-            is_string($item['data']['to'])
-                ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
-                : $item['data']['to'],
-        )
-        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-        ->take(1)
-        ->implode(', ') }}
-        @if(
-            count(
-                collect(
-                    is_string($item['data']['to'])
-                        ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
-                        : $item['data']['to'],
-                )
-            ) > 1
-        )
-            , <span class="text-muted">...</span>
-        @endif
-        @if(!empty($item['data']['cc']))
-            <br>cc: 
-            {{ collect(
-                is_string($item['data']['cc'])
-                    ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
-                    : $item['data']['cc'],
-            )
-            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-            ->take(1)
-            ->implode(', ') }}
-            @if(
-                count(
-                    collect(
-                        is_string($item['data']['cc'])
-                            ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
-                            : $item['data']['cc'],
-                    )
-                ) > 1
-            )
-                , <span class="text-muted">...</span>
-            @endif
-        @endif
-        @if(!empty($item['data']['bcc']))
-            <br>bcc: 
-            {{ collect(
-                is_string($item['data']['bcc'])
-                    ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
-                    : $item['data']['bcc'],
-            )
-            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-            ->take(1)
-            ->implode(', ') }}
-            @if(
-                count(
-                    collect(
-                        is_string($item['data']['bcc'])
-                            ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
-                            : $item['data']['bcc'],
-                    )
-                ) > 1
-            )
-                , <span class="text-muted">...</span>
-            @endif
-        @endif
-    </p>
-
-    <!-- Custom Tooltip (unchanged) -->
-    <div class="tooltip-card">
-        <p>from: {{ $item['data']['from']['email'] ?? '' }}</p>
-        <p>to:
-            {{ collect(
-                is_string($item['data']['to'])
-                    ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
-                    : $item['data']['to'],
-            )
-            ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-            ->implode(', ') }}
-        </p>
-        @if(!empty($item['data']['cc']))
-            <p>cc:
-                {{ collect(
-                    is_string($item['data']['cc'])
-                        ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
-                        : $item['data']['cc'],
-                )
-                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-                ->implode(', ') }}
-            </p>
-        @endif
-        @if(!empty($item['data']['bcc']))
-            <p>bcc:
-                {{ collect(
-                    is_string($item['data']['bcc'])
-                        ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
-                        : $item['data']['bcc'],
-                )
-                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-                ->implode(', ') }}
-            </p>
-        @endif
-    </div>
-</div>
-                        <div class="folder-name">
-                            <span class="folder-dot" style="color: #28a745;">&bull;</span>
-                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? '') }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="new-profile-email-wrapper">
+                <div class="new-profile-email-wrapper d-flex justify-content-end gap-2 mt-2">
                     <div class="activities-seprater reply-btn" data-from="{{ $item['data']['from']['email'] ?? '' }}"
                         data-subject="{{ $item['data']['subject'] ?? '' }}"
                         data-date="{{ $item['data']['date']->format('M d, Y H:i') ?? '' }}"
@@ -370,7 +248,7 @@
                         $toCount = is_array($item['data']['to']) ? count($item['data']['to']) : 1;
                         $ccCount = isset($item['data']['cc']) && is_array($item['data']['cc']) ? count($item['data']['cc']) : 0;
                     @endphp
-                    {{-- @if ($toCount + $ccCount > 1) --}}
+                    @if ($toCount + $ccCount > 1)
                         <div class="activities-seprater replyall-btn"
                             data-from="{{ $item['data']['from']['email'] ?? '' }}"
                             data-to='@json($item['data']['to'] ?? [])'
@@ -383,7 +261,7 @@
                             data-references='@json($item['data']['references'] ?? null)'>
                             Reply All
                         </div>
-                    {{-- @endif --}}
+                    @endif
 
                     <div class="activities-seprater forward-btn" data-from="{{ $item['data']['from']['email'] ?? '' }}"
                         data-subject="{{ $item['data']['subject'] ?? '' }}"
@@ -392,9 +270,129 @@
                         data-message-id="{{ $item['data']['message_id'] ?? '' }}">
                         Forward
                     </div>
-
-
                     {{-- <div class="activities-seprater open-form-btn">Delete</div> --}}
+                </div>
+            <div class="new-profile-parent-wrapper">
+
+                <div class="new-profile-email-wrapper">
+                    <div class="user_profile_img">
+                        <div class="avatarr">
+                            {{ $item['data']['from']['name'] ? strtoupper(substr($item['data']['from']['name'], 0, 2)) : strtoupper(substr($item['data']['from']['email'], 0, 2)) }}
+                        </div>
+                    </div>
+                    <div class="user_profile_text">
+                        <p>{{ $item['data']['from']['name'] ?? $item['data']['from']['email'] ?? '' }}
+                        </p>
+                        <div class="tooltip-wrapper" style="display: inline-block;">
+                            <p class="mb-0">
+                                from: {{ $item['data']['from']['email'] ?? '' }}<br>
+                                to: 
+                                {{ collect(
+                                    is_string($item['data']['to'])
+                                        ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                                        : $item['data']['to'],
+                                )
+                                ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+                                ->take(1)
+                                ->implode(', ') }}
+                                @if(
+                                    count(
+                                        collect(
+                                            is_string($item['data']['to'])
+                                                ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                                                : $item['data']['to'],
+                                        )
+                                    ) > 1
+                                )
+                                    , <span class="text-muted">...</span>
+                                @endif
+                                @if(!empty($item['data']['cc']))
+                                    <br>cc: 
+                                    {{ collect(
+                                        is_string($item['data']['cc'])
+                                            ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
+                                            : $item['data']['cc'],
+                                    )
+                                    ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+                                    ->take(1)
+                                    ->implode(', ') }}
+                                    @if(
+                                        count(
+                                            collect(
+                                                is_string($item['data']['cc'])
+                                                    ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
+                                                    : $item['data']['cc'],
+                                            )
+                                        ) > 1
+                                    )
+                                        , <span class="text-muted">...</span>
+                                    @endif
+                                @endif
+                                @if(!empty($item['data']['bcc']))
+                                    <br>bcc: 
+                                    {{ collect(
+                                        is_string($item['data']['bcc'])
+                                            ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
+                                            : $item['data']['bcc'],
+                                    )
+                                    ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+                                    ->take(1)
+                                    ->implode(', ') }}
+                                    @if(
+                                        count(
+                                            collect(
+                                                is_string($item['data']['bcc'])
+                                                    ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
+                                                    : $item['data']['bcc'],
+                                            )
+                                        ) > 1
+                                    )
+                                        , <span class="text-muted">...</span>
+                                    @endif
+                                @endif
+                            </p>
+
+                            <!-- Custom Tooltip (unchanged) -->
+                            <div class="tooltip-card">
+                                <p>from: {{ $item['data']['from']['email'] ?? '' }}</p>
+                                <p>to:
+                                    {{ collect(
+                                        is_string($item['data']['to'])
+                                            ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                                            : $item['data']['to'],
+                                    )
+                                    ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+                                    ->implode(', ') }}
+                                </p>
+                                @if(!empty($item['data']['cc']))
+                                    <p>cc:
+                                        {{ collect(
+                                            is_string($item['data']['cc'])
+                                                ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
+                                                : $item['data']['cc'],
+                                        )
+                                        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+                                        ->implode(', ') }}
+                                    </p>
+                                @endif
+                                @if(!empty($item['data']['bcc']))
+                                    <p>bcc:
+                                        {{ collect(
+                                            is_string($item['data']['bcc'])
+                                                ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
+                                                : $item['data']['bcc'],
+                                        )
+                                        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
+                                        ->implode(', ') }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="folder-name">
+                            <span class="folder-dot" style="color: #28a745;">&bull;</span>
+                            <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? '') }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
