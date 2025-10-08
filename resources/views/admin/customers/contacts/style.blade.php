@@ -385,6 +385,7 @@
         max-height: 100px;
     }
 
+    /*New style for user activity*/
     .form-infromation p {
         margin: 3px;
     }
@@ -409,6 +410,24 @@
     }
     .form-infromation .main-heading {
         margin-bottom: 8px;
+    }
+    .cstm_form_cont {
+        display:block;
+        padding: 0px 23px;
+    }
+    .toggle-form-section {
+        transition: transform 0.3s;
+    }
+    .toggle-form-section i {
+        color: var(--bs-primary);
+    }
+    .submt_form_name {
+        color: var(--bs-primary);
+        font-weight: 500;
+    }
+    .cont_p {
+        padding: 0px 15px;
+
     }
 
 </style>
