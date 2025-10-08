@@ -18,7 +18,20 @@
                     @foreach ($data as $key => $value)
                         <tr>
                             <td><strong>{{ ucfirst(str_replace('_', ' ', $key)) }}</strong></td>
-                            <td>{{ $value }}</td>
+                            <td>
+                                @if (is_array($value) || is_object($value))
+                                    <table class="table table-sm mb-0 table-bordered">
+                                        @foreach ($value as $subKey => $subValue)
+                                            <tr>
+                                                <td><strong>{{ ucfirst(str_replace('_', ' ', $subKey)) }}</strong></td>
+                                                <td>{{ is_array($subValue) || is_object($subValue) ? json_encode($subValue) : $subValue }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
+                                @else
+                                    {{ $value }}
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                     <tr class="table-secondary">
