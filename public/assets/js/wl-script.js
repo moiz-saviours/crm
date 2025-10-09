@@ -74,7 +74,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 return null;
             }
         }
-        form.addEventListener("submit", async function () {
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
             const currentScript = getCurrentScript();
             const token = getScriptToken(currentScript);
             const apiBaseUrl = getApiBaseUrl(currentScript);
