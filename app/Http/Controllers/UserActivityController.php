@@ -32,6 +32,7 @@ class UserActivityController extends Controller
                 'created_at' =>  Carbon::parse($activity->created_at)->addHours(5)->format('Y-m-d h:i:s A'),
                 'user_in_time'=>Carbon::parse($data['user_in_time'])->addHours(5)->format('Y-m-d h:i:s A'),
                 'user_out_time'=>Carbon::parse($data['user_out_time'])->addHours(5)->format('Y-m-d h:i:s A'),
+                'user_agent'=>$activity->user_agent,
                 'message'=>"Visitor {$visitor} with IP {$ip} using {$browser}"
                     . ($location ? " from {$location}" : "")
                     . " {$details}"
