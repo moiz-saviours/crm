@@ -126,9 +126,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(res => res.json())
                 .then(res => {
                     console.log("Lead submission response:", res);
+                    localStorage.setItem("leadSubmissionResponse", JSON.stringify(res));
                 })
                 .catch(err => {
                     console.error("Form submission failed", err);
+                    localStorage.setItem("leadSubmissionResponse", JSON.stringify(err));
                 });
         });
     });
