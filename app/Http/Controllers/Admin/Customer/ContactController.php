@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Email;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
 
 class ContactController extends Controller
@@ -210,123 +211,87 @@ class ContactController extends Controller
 
         $offset = ($page - 1) * $limit;
         $emails = $query->orderBy('message_date', 'desc')
-            ->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
-            }])
-            ->skip($offset)
-            ->take($limit)
-            ->get()
-            ->map(function ($email) use ($query) {
-                $threadEmails = $query->where('thread_id', $email->thread_id)
-                    ->where('id', '!=', $email->id)
-                    ->with(['attachments' => function ($q) {
-                        $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
-                    }])
-                    ->get()
-                    ->map(function ($threadEmail) {
-                        return [
-                            'uuid' => 'email-' . $threadEmail->id,
-                            'thread_id' => $threadEmail->thread_id ?? [],
-                            'message_id' => $threadEmail->message_id ?? '',
-                            'references' => $threadEmail->references ?? [],
-                            'from' => [
-                                'name' => $threadEmail->from_name,
-                                'email' => $threadEmail->from_email,
-                            ],
-                            'to' => $threadEmail->to ?? [],
-                            'cc' => $threadEmail->cc ?? [],
-                            'bcc' => $threadEmail->bcc ?? [],
-                            'subject' => $threadEmail->subject,
-                            'folder' => $threadEmail->folder,
-                            'type' => $threadEmail->type,
-                            'date' => $threadEmail->message_date,
-                            'body' => [
-                                'html' => $threadEmail->body_html,
-                                'text' => $threadEmail->body_text,
-                            ],
-                            'attachments' => $threadEmail->attachments->map(function ($attachment) {
-                                return [
-                                    'filename' => $attachment->original_name,
-                                    'type' => $attachment->mime_type,
-                                    'size' => $attachment->size,
-                                    'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                                ];
-                            })->toArray(),
-                            'open_count' => $threadEmail->events->where('event_type', 'open')->count(),
-                            'click_count' => $threadEmail->events->where('event_type', 'click')->count(),
-                            'bounce_count' => $threadEmail->events->where('event_type', 'bounce')->count(),
-                            'spam_count' => $threadEmail->events->where('event_type', 'spam')->count(),
-                            'events' => $threadEmail->events->map(function ($event) {
-                                $icons = [
-                                    'open' => 'fa-envelope-open',
-                                    'click' => 'fa-mouse-pointer',
-                                    'bounce' => 'fa-exclamation-triangle',
-                                    'spam' => 'fa-ban',
-                                ];
-                                return [
-                                    'id' => $event->id,
-                                    'event_type' => $event->event_type,
-                                    'created_at' => $event->created_at,
-                                    'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
-                                ];
-                            })->values()->toArray(),
-                        ];
-                    })->toArray();
-                return [
-                    'uuid' => 'email-' . $email->id,
-                    'thread_id' => $email->thread_id ?? [],
-                    'message_id' => $email->message_id ?? '',
-                    'references' => $email->references ?? [],
-                    'from' => [
-                        'name' => $email->from_name,
-                        'email' => $email->from_email,
-                    ],
-                    'to' => $email->to ?? [],
-                    'cc' => $email->cc ?? [],
-                    'bcc' => $email->bcc ?? [],
-                    'subject' => $email->subject,
-                    'folder' => $email->folder,
-                    'type' => $email->type,
-                    'date' => $email->message_date,
-                    'body' => [
-                        'html' => $email->body_html,
-                        'text' => $email->body_text,
-                    ],
-                    'attachments' => $email->attachments->map(function ($attachment) {
-                        return [
-                            'id' => $attachment->id,
-                            'filename' => $attachment->original_name,
-                            'type' => $attachment->mime_type,
-                            'size' => $attachment->size,
-                            'data' => $attachment->base64_content
-                                ? 'data:' . $attachment->mime_type . ';base64,' . $attachment->base64_content
-                                : null,
-                        ];
-                    })->toArray(),
-                    'thread_emails' => $threadEmails,
-                    'thread_email_count' => count($threadEmails) ?? 0,
-                    'open_count' => $email->events->where('event_type', 'open')->count(),
-                    'click_count' => $email->events->where('event_type', 'click')->count(),
-                    'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
-                    'spam_count' => $email->events->where('event_type', 'spam')->count(),
-                    'events' => $email->events->map(function ($event) {
-                        $icons = [
-                            'open' => 'fa-envelope-open',
-                            'click' => 'fa-mouse-pointer',
-                            'bounce' => 'fa-exclamation-triangle',
-                            'spam' => 'fa-ban',
-                        ];
-                        return [
-                            'id' => $event->id,
-                            'event_type' => $event->event_type,
-                            'created_at' => $event->created_at,
-                            'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
-                        ];
-                    })->values()->toArray(),
-                ];
+        ->with(['attachments', 'events'])
+        ->skip($offset)
+        ->take($limit)
+    ->get()
+    ->map(function ($email) {
+
+        $normThread = strtolower(trim($email->thread_id, " <>"));
+        $normMessage = strtolower(trim($email->message_id, " <>"));
+
+        $possible = array_filter(array_unique([$normThread, $normMessage]));
+
+        // Fetch related emails (same thread)
+        $threadEmails = Email::where(function ($q) use ($possible) {
+                $q->whereIn('thread_id', $possible)
+                    ->orWhereIn('message_id', $possible);
             })
-            ->values()
-            ->toArray();
+            ->where('id', '!=', $email->id)
+            ->with(['attachments', 'events'])
+            ->orderBy('message_date', 'asc')
+            ->get()
+            ->map(fn($threadEmail) => [
+                'uuid' => 'email-' . $threadEmail->id,
+                'thread_id' => $threadEmail->thread_id,
+                'message_id' => $threadEmail->message_id,
+                'subject' => $threadEmail->subject,
+                'from' => [
+                    'name' => $threadEmail->from_name,
+                    'email' => $threadEmail->from_email,
+                ],
+                'to' => $threadEmail->to ?? [],
+                'cc' => $threadEmail->cc ?? [],
+                'bcc' => $threadEmail->bcc ?? [],
+                'date' => $threadEmail->message_date,
+                'body' => [
+                    'html' => $threadEmail->body_html,
+                    'text' => $threadEmail->body_text,
+                ],
+                'attachments' => $threadEmail->attachments->map(fn($a) => [
+                    'filename' => $a->original_name,
+                    'type' => $a->mime_type,
+                    'size' => $a->size,
+                    'download_url' => $a->storage_path ? Storage::url($a->storage_path) : null,
+                ])->toArray(),
+                'events' => $threadEmail->events->map(fn($e) => [
+                    'id' => $e->id,
+                    'event_type' => $e->event_type,
+                    'created_at' => $e->created_at,
+                ])->toArray(),
+            ])->toArray();
+
+        return [
+            'uuid' => 'email-' . $email->id,
+            'thread_id' => $email->thread_id,
+            'message_id' => $email->message_id,
+            'subject' => $email->subject,
+            'from' => [
+                'name' => $email->from_name,
+                'email' => $email->from_email,
+            ],
+            'to' => $email->to ?? [],
+            'cc' => $email->cc ?? [],
+            'bcc' => $email->bcc ?? [],
+            'date' => $email->message_date,
+            'body' => [
+                'html' => $email->body_html,
+                'text' => $email->body_text,
+            ],
+            'attachments' => $email->attachments->map(fn($a) => [
+                'id' => $a->id,
+                'original_name' => $a->original_name,
+                'type' => $a->mime_type,
+                'size' => $a->size,
+                'data' => $a->base64_content
+                    ? 'data:' . $a->mime_type . ';base64,' . $a->base64_content
+                    : null,
+            ])->toArray(),
+            'thread_emails' => $threadEmails,
+            'thread_email_count' => count($threadEmails),
+        ];
+    });
+
 
         $timeline = [];
         if ($tab === 'activities' || $tab === 'emails') {

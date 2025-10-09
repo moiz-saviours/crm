@@ -27,6 +27,9 @@ class EmailAttachment extends Model
         'content_id',
         'is_inline',
         'base64_content',
+        'storage_name',
+        'storage_path',
+        'extension',
     ];
     /**
      * Relationships

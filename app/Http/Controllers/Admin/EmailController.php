@@ -223,9 +223,22 @@ class EmailController extends Controller
             'count' => count($emails),
         ];
     }
-
+private function getExtensionFromMimeType(string $mimeType): string
+{
+    $extensions = [
+        'application/pdf' => 'pdf',
+        'application/msword' => 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'application/zip' => 'zip',
+    ];
+    return $extensions[strtolower($mimeType)] ?? 'bin';
+}
     public function sendEmail(Request $request): JsonResponse
     {
+
+
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
             'email_content' => 'required|string',
@@ -241,13 +254,13 @@ class EmailController extends Controller
             'to.min' => 'No valid recipients specified.',
             'to.*.email' => 'One or more recipients are not valid email addresses.',
         ]);
-
+        
         $emailContent = $validated['email_content'] ?? '';
         $totalImageSize = 0;
-
+        
         // Find all base64 images in the email content
         preg_match_all('/data:image\/[^;]+;base64,([A-Za-z0-9+\/=]+)/', $emailContent, $matches);
-
+        
         foreach ($matches[1] as $base64String) {
             $decoded = base64_decode($base64String, true);
             if ($decoded !== false) {
@@ -316,18 +329,25 @@ class EmailController extends Controller
 
             // Create a message-id for this outgoing email
             $appDomain = parse_url(config('app.url'), PHP_URL_HOST) ?: (explode('@', $fromEmail)[1] ?? 'localhost');
-            $messageId = '<' . (string) Str::uuid() . '@' . $appDomain . '>';
+            // Generate a clean UUID for message ID (no domain)
+            $messageId = (string) Str::uuid();
 
-            // Choose thread_id
+            // --- choose thread id ---
             if (!empty($threadFromRequest)) {
                 $threadId = $threadFromRequest;
             } elseif (!empty($inReplyToRequest)) {
-                // Try to find parent and reuse its thread_id
-                $parent = Email::where('message_id', $inReplyToRequest)->first();
-                $threadId = $parent ? $parent->thread_id : md5($validated['subject'] . $fromEmail . time());
+                $parent = Email::where('message_id', trim($inReplyToRequest))->first();
+                if ($parent) {
+                    $threadId = $parent->thread_id ?? $parent->message_id;
+                } else {
+                    $threadId = trim($inReplyToRequest);
+                }
             } else {
-                $threadId = md5($validated['subject'] . $fromEmail . time());
+                // New email → use this message-id as thread id
+                $threadId = $messageId;
             }
+
+
 
             // Build references header
             $references = $referencesRequest;
@@ -439,35 +459,64 @@ class EmailController extends Controller
                 'sent_at' => null, // Set after successful send
             ]);
 
-      // Store attachments as base64
-$storedAttachments = [];
+            // Store attachments based on size
+            $storedAttachments = [];
 
-if ($request->hasFile('attachments')) {
-    foreach ($request->file('attachments') as $file) {
-        $originalName = $file->getClientOriginalName();
-        $mimeType     = $file->getMimeType();
-        $size         = $file->getSize();
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $mimeType = $file->getMimeType();
+                    $size = $file->getSize();
+                    $extension = $file->getClientOriginalExtension() ?: $this->getExtensionFromMimeType($mimeType);
 
-        // Read file content and encode as base64
-        $base64Data = base64_encode(file_get_contents($file->getRealPath()));
+                    // Calculate size in MB
+                    $sizeInMb = $size / (1024 * 1024);
 
-        $storedAttachments[] = [
-            'original_name' => $originalName,
-            'size'          => $size,
-            'mime_type'     => $mimeType,
-            'base64'        => $base64Data,
-        ];
+                    $attachmentAttributes = [
+                        'email_id' => $email->id,
+                        'original_name' => $originalName,
+                        'mime_type' => $mimeType,
+                        'size' => $size,
+                        'extension' => $extension,
+                    ];
 
-        // Store attachment record in DB
-        EmailAttachment::create([
-            'email_id'      => $email->id,
-            'original_name' => $originalName,
-            'mime_type'     => $mimeType,
-            'size'          => $size,
-            'base64_data'   => $base64Data,  // 👈 needs `base64_data` column (LONGTEXT recommended)
-        ]);
-    }
-}
+                    if ($sizeInMb > 2) {
+                        // Store as file if > 2MB
+                        $storageName = 'attachments/' . uniqid('email_' . $email->id . '_') . '.' . $extension;
+                        try {
+                            Storage::disk('public')->put($storageName, file_get_contents($file->getRealPath()));
+                            $attachmentAttributes['storage_name'] = $storageName;
+                            $attachmentAttributes['storage_path'] = Storage::disk('public')->path($storageName);
+                            $storedAttachments[] = $attachmentAttributes + ['content' => file_get_contents($file->getRealPath())];
+                            Log::info("Stored attachment {$originalName} as file: {$storageName}");
+                        } catch (\Exception $e) {
+                            Log::error('Failed to store attachment as file', [
+                                'email_id' => $email->id,
+                                'original_name' => $originalName,
+                                'error' => $e->getMessage(),
+                            ]);
+                            continue;
+                        }
+                    } else {
+                        // Store as base64 in database if ≤ 2MB
+                        $attachmentAttributes['base64_content'] = base64_encode(file_get_contents($file->getRealPath()));
+                        $storedAttachments[] = $attachmentAttributes + ['content' => file_get_contents($file->getRealPath())];
+                        Log::info("Stored attachment {$originalName} as base64 in database");
+                    }
+                    // Store attachment record in DB
+                    try {
+                        EmailAttachment::create($attachmentAttributes);
+                        Log::info("Attachment {$originalName} saved successfully for email #{$email->id}");
+                    } catch (\Exception $e) {
+                        Log::error('Failed to save attachment to database', [
+                            'email_id' => $email->id,
+                            'original_name' => $originalName,
+                            'error' => $e->getMessage(),
+                        ]);
+                        continue;
+                    }
+                }
+            }
 
 
             // Wrap URLs for tracking
@@ -491,13 +540,17 @@ if ($request->hasFile('attachments')) {
             $mailer->Subject = $subject;
             $mailer->isHTML(true);
 
-            // Set Message-ID / In-Reply-To / References headers
-            $mailer->addCustomHeader('Message-ID', $messageId);
+            $mailer->addCustomHeader('Message-ID', "<{$messageId}>");
             if (!empty($inReplyToRequest)) {
-                $mailer->addCustomHeader('In-Reply-To', $inReplyToRequest);
+                $mailer->addCustomHeader('In-Reply-To', "<{$inReplyToRequest}>");
             }
             if (!empty($references)) {
-                $mailer->addCustomHeader('References', $references);
+                // normalize space-separated list, wrap each in <>
+                $refList = collect(explode(' ', $references))
+                    ->filter()
+                    ->map(fn($r) => '<' . trim($r, '<> ') . '>')
+                    ->implode(' ');
+                $mailer->addCustomHeader('References', $refList);
             }
 
             // Add tracking pixel to the mail body
@@ -518,22 +571,29 @@ if ($request->hasFile('attachments')) {
 
             // Add attachments
             foreach ($storedAttachments as $attachment) {
-                $filePath = storage_path('app/public/' . $attachment['storage_path']);
-                if (file_exists($filePath)) {
+                if (isset($attachment['storage_path']) && Storage::disk('public')->exists($attachment['storage_name'])) {
+                    // File-based attachment
                     $mailer->addAttachment(
-                        $filePath,
+                        $attachment['storage_path'],
                         $attachment['original_name'],
-                        'base64',
+                        'binary',
+                        $attachment['mime_type']
+                    );
+                } elseif (isset($attachment['base64_content'])) {
+                    // Base64 attachment
+                    $mailer->addStringAttachment(
+                        base64_decode($attachment['base64_content']),
+                        $attachment['original_name'],
+                        'binary',
                         $attachment['mime_type']
                     );
                 } else {
-                    Log::warning('Attachment file not found', [
-                        'path' => $filePath,
+                    Log::warning('Attachment data not found', [
+                        'email_id' => $email->id,
                         'original_name' => $attachment['original_name'],
                     ]);
                 }
             }
-
             // Send email
             $mailer->send();
 
@@ -667,15 +727,41 @@ if ($request->hasFile('attachments')) {
         return $sender->pseudo_name ?? explode('@', $defaultEmail)[0];
     }
 
-        public function download($id)
+public function download($id)
     {
-        $attachment = EmailAttachment::findOrFail($id);
+        try {
+            $attachment = EmailAttachment::findOrFail($id);
 
-        $decoded = base64_decode($attachment->base64_data);
+            // Check if attachment is stored as a file
+            if ($attachment->storage_path && Storage::disk('public')->exists($attachment->storage_name)) {
+                return Storage::disk('public')->download(
+                    $attachment->storage_name,
+                    $attachment->original_name,
+                    ['Content-Type' => $attachment->mime_type]
+                );
+            }
 
-        return Response::make($decoded, 200, [
-            'Content-Type'        => $attachment->mime_type,
-            'Content-Disposition' => 'attachment; filename="' . $attachment->original_name . '"',
-        ]);
+            // Check if attachment is stored as base64
+            if ($attachment->base64_content) {
+                $decoded = base64_decode($attachment->base64_content);
+                if ($decoded === false) {
+                    return response()->json(['error' => 'Failed to decode attachment data'], 500);
+                }
+
+                return Response::make($decoded, 200, [
+                    'Content-Type' => $attachment->mime_type ?? 'application/octet-stream',
+                    'Content-Disposition' => 'attachment; filename="' . ($attachment->original_name ?? 'attachment.' . $attachment->extension) . '"',
+                ]);
+            }
+
+            return response()->json(['error' => 'Attachment data not found'], 404);
+        } catch (\Exception $e) {
+            \Log::error('Attachment Download Error', [
+                'attachment_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'Failed to download attachment'], 500);
+        }
     }
+
 }
