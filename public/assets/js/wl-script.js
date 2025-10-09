@@ -113,51 +113,78 @@ document.addEventListener("DOMContentLoaded", function () {
                 device_info: deviceInfo
             });
             try {
-                const blob = new Blob([payload], {type: "application/json"});
-                const beaconSuccess = navigator.sendBeacon(`${apiBaseUrl}/brand-leads`, blob);
+                // 🟢 1️⃣ Try with fetch first
+                console.log("Submitting via fetch:", `${apiBaseUrl}/brand-leads`);
+                const res = await fetch(`${apiBaseUrl}/brand-leads`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: payload
+                });
 
-                if (beaconSuccess) {
-                    console.log("Lead submission sent successfully using Beacon:", `${apiBaseUrl}/brand-leads`);
-                    localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({
-                            method: "beacon",
-                            success: true,
-                            timestamp: new Date().toISOString()
-                        })
-                    );
-                } else {
-                    console.warn("Beacon failed, falling back to fetch:", `${apiBaseUrl}/brand-leads`);
-                    const res = await fetch(`${apiBaseUrl}/brand-leads`, {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: payload
-                    });
+                let data = null;
+                try {
+                    data = await res.json();
+                } catch (jsonErr) {
+                    console.warn("Response is not valid JSON:", jsonErr);
+                }
 
-                    let data = null;
-                    try {
-                        data = await res.json();
-                    } catch (jsonErr) {
-                        console.warn("Response is not valid JSON:", jsonErr);
+                if (!res.ok) throw new Error("Fetch request failed: " + res.statusText);
+
+                console.log("Lead submission response (fetch):", data || res.statusText);
+
+                localStorage.setItem(
+                    "leadSubmissionResponse_" + apiBaseUrl,
+                    JSON.stringify({
+                        method: "fetch",
+                        status: res.status,
+                        data: data || null,
+                        success: true,
+                        timestamp: new Date().toISOString()
+                    })
+                );
+
+            } catch (err) {
+                // 🔴 If fetch fails → fallback to sendBeacon
+                console.warn("Fetch failed, falling back to Beacon:", err);
+
+                try {
+                    const blob = new Blob([payload], { type: "application/json" });
+                    const beaconSuccess = navigator.sendBeacon(`${apiBaseUrl}/brand-leads`, blob);
+
+                    if (beaconSuccess) {
+                        console.log("Lead submission sent successfully using Beacon:", `${apiBaseUrl}/brand-leads`);
+                        localStorage.setItem(
+                            "leadSubmissionResponse_" + apiBaseUrl,
+                            JSON.stringify({
+                                method: "beacon",
+                                success: true,
+                                timestamp: new Date().toISOString()
+                            })
+                        );
+                    } else {
+                        console.error("Beacon failed to send data");
+                        localStorage.setItem(
+                            "leadSubmissionResponse_" + apiBaseUrl,
+                            JSON.stringify({
+                                method: "beacon",
+                                success: false,
+                                error: "Beacon send failed",
+                                timestamp: new Date().toISOString()
+                            })
+                        );
                     }
-
-                    console.log("Lead submission response (fetch):", data || res.statusText);
-
+                } catch (beaconErr) {
+                    console.error("Beacon fallback also failed:", beaconErr);
                     localStorage.setItem(
                         "leadSubmissionResponse_" + apiBaseUrl,
                         JSON.stringify({
-                            method: "fetch",
-                            status: res.status,
-                            data: data || null,
-                            success: res.ok,
+                            method: "beacon",
+                            success: false,
+                            error: beaconErr.message,
                             timestamp: new Date().toISOString()
                         })
                     );
                 }
-            } catch (err) {
-                console.error("Beacon/fetch failed:", err);
-                localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({
-                        error: err.message, timestamp: new Date().toISOString()
-                    })
-                );
             }
         });
     });
