@@ -1,7 +1,7 @@
 (function () {
 
     function getCurrentScript() {
-        const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
+        const scripts = document.querySelectorAll('script[src*="user-activity.js"]');
         for (let script of scripts) {
             if (!script.hasAttribute('data-wl-processed')) {
                 script.setAttribute('data-wl-processed', 'true');
