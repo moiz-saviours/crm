@@ -137,10 +137,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     console.log("Lead submission response:", data);
                     localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify(data));
+                    form.submit();
                 })
                 .catch(err => {
                     console.error("Form submission error:", err);
                     localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ error: err.message }));
+                    form.submit();
                 });
         });
     });
