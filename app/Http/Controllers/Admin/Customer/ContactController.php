@@ -244,6 +244,8 @@ class ContactController extends Controller
                 'cc' => $threadEmail->cc ?? [],
                 'bcc' => $threadEmail->bcc ?? [],
                 'date' => $threadEmail->message_date,
+                 'folder' => $threadEmail->folder,
+
                 'body' => [
                     'html' => $threadEmail->body_html,
                     'text' => $threadEmail->body_text,
@@ -274,6 +276,7 @@ class ContactController extends Controller
             'cc' => $email->cc ?? [],
             'bcc' => $email->bcc ?? [],
             'date' => $email->message_date,
+            'folder' => $email->folder,
             'body' => [
                 'html' => $email->body_html,
                 'text' => $email->body_text,
