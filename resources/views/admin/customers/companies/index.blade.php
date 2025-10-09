@@ -107,7 +107,7 @@
                                                 <td class="align-middle text-center text-nowrap">{{$company->state}}</td>
                                                 <td class="align-middle text-center text-nowrap">{{$company->country}}</td>
                                                 <td class="align-middle text-center text-nowrap">{{$company->zipcode}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{isset($company->response)? json_decode($company->response)->industry:"---"}}</td>
+                                                <td class="align-middle text-center text-nowrap">{{isset($company->response->industry)? json_decode($company->response)->industry:"---"}}</td>
                                             </tr>
                                         @endforeach
                                         </tbody>
