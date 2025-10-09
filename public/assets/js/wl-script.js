@@ -74,8 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return null;
             }
         }
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
+        form.addEventListener("submit", async function () {
             const currentScript = getCurrentScript();
             const token = getScriptToken(currentScript);
             const apiBaseUrl = getApiBaseUrl(currentScript);
@@ -110,40 +109,29 @@ document.addEventListener("DOMContentLoaded", function () {
             if (publicIP) {
                 deviceInfo.public_ip = publicIP;
             }
+            const payload = JSON.stringify({
+                visitor_id,
+                script_token: token,
+                form_data: formData,
+                device_info: deviceInfo
+            });
+            try {
+                const blob = new Blob([payload], { type: "application/json" });
+                const success = navigator.sendBeacon(`${apiBaseUrl}/brand-leads`, blob);
 
-
-            fetch(`${apiBaseUrl}/brand-leads`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    visitor_id,
-                    script_token: token,
-                    form_data: formData,
-                    device_info: deviceInfo
-                })
-            })
-                .then(async res => {
-                    const data = await res.json().catch(() => null);
-                    if (!res.ok) {
-                        console.error("Lead submission failed:", data || res.statusText);
-                        localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({
-                            status: res.status,
-                            error: data || res.statusText
-                        }));
-                        return;
-                    }
-
-                    console.log("Lead submission response:", data);
-                    localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify(data));
-                    form.submit();
-                })
-                .catch(err => {
-                    console.error("Form submission error:", err);
-                    localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ error: err.message }));
-                    form.submit();
-                });
+                if (!success) {
+                    await fetch(`${apiBaseUrl}/brand-leads`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: payload
+                    });
+                }
+                console.log("Lead submission response:", data);
+                localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ success: true }));
+            } catch (err) {
+                console.error("Beacon/fetch failed:", err);
+                localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ error: err.message }));
+            }
         });
     });
 });
