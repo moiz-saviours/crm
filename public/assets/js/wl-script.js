@@ -123,14 +123,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     device_info: deviceInfo
                 })
             })
-                .then(res => res.json())
-                .then(res => {
-                    console.log("Lead submission response:", res);
-                    localStorage.setItem("leadSubmissionResponse"+ apiBaseUrl, JSON.stringify(res));
+                .then(async res => {
+                    const data = await res.json().catch(() => null);
+                    if (!res.ok) {
+                        console.error("Lead submission failed:", data || res.statusText);
+                        localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({
+                            status: res.status,
+                            error: data || res.statusText
+                        }));
+                        return;
+                    }
+
+                    console.log("Lead submission response:", data);
+                    localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify(data));
                 })
                 .catch(err => {
-                    console.error("Form submission failed", err);
-                    localStorage.setItem("leadSubmissionResponse" +apiBaseUrl, JSON.stringify(err));
+                    console.error("Form submission error:", err);
+                    localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ error: err.message }));
                 });
         });
     });
