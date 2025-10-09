@@ -38,12 +38,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
             apiBaseUrl = url.origin + "/api";
             console.log("Environment: Local");
-        }
-        else if (scriptPath.includes("/crm-development/")) {
+        } else if (scriptPath.includes("/crm-development/")) {
             apiBaseUrl = url.origin + "/crm-development/api";
             console.log("Environment: Development (path-based)");
-        }
-        else {
+        } else {
             apiBaseUrl = url.origin + "/api";
             console.log("Environment: Live");
         }
@@ -104,7 +102,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 submission_time: new Date().toLocaleString()
             };
 
-
             const publicIP = await getPublicIP();
             if (publicIP) {
                 deviceInfo.public_ip = publicIP;
@@ -116,21 +113,51 @@ document.addEventListener("DOMContentLoaded", function () {
                 device_info: deviceInfo
             });
             try {
-                const blob = new Blob([payload], { type: "application/json" });
-                const success = navigator.sendBeacon(`${apiBaseUrl}/brand-leads`, blob);
+                const blob = new Blob([payload], {type: "application/json"});
+                const beaconSuccess = navigator.sendBeacon(`${apiBaseUrl}/brand-leads`, blob);
 
-                if (!success) {
-                    await fetch(`${apiBaseUrl}/brand-leads`, {
+                if (beaconSuccess) {
+                    console.log("Lead submission sent successfully using Beacon:", `${apiBaseUrl}/brand-leads`);
+                    localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({
+                            method: "beacon",
+                            success: true,
+                            timestamp: new Date().toISOString()
+                        })
+                    );
+                } else {
+                    console.warn("Beacon failed, falling back to fetch:", `${apiBaseUrl}/brand-leads`);
+                    const res = await fetch(`${apiBaseUrl}/brand-leads`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {"Content-Type": "application/json"},
                         body: payload
                     });
+
+                    let data = null;
+                    try {
+                        data = await res.json();
+                    } catch (jsonErr) {
+                        console.warn("Response is not valid JSON:", jsonErr);
+                    }
+
+                    console.log("Lead submission response (fetch):", data || res.statusText);
+
+                    localStorage.setItem(
+                        "leadSubmissionResponse_" + apiBaseUrl,
+                        JSON.stringify({
+                            method: "fetch",
+                            status: res.status,
+                            data: data || null,
+                            success: res.ok,
+                            timestamp: new Date().toISOString()
+                        })
+                    );
                 }
-                console.log("Lead submission response:", data);
-                localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ success: true }));
             } catch (err) {
                 console.error("Beacon/fetch failed:", err);
-                localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({ error: err.message }));
+                localStorage.setItem("leadSubmissionResponse_" + apiBaseUrl, JSON.stringify({
+                        error: err.message, timestamp: new Date().toISOString()
+                    })
+                );
             }
         });
     });
