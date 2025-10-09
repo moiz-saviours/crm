@@ -18,7 +18,7 @@
 
         const url = new URL(currentScript.src);
         let apiBaseUrl = "";
-        const hostname = window.location.hostname;
+        const hostname = url.hostname;
         const scriptPath = url.pathname;
 
         if (hostname === 'localhost' || hostname === '127.0.0.1') {

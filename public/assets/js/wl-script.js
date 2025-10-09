@@ -32,16 +32,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const url = new URL(currentScript.src);
         let apiBaseUrl = "";
-        const hostname = window.location.hostname;
+        const hostname = url.hostname;
         const scriptPath = url.pathname;
 
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
             apiBaseUrl = url.origin + "/api";
             console.log("Environment: Local");
-        }
-        else if (hostname.includes('dev.') || hostname.includes('development.') || hostname.includes('staging.')) {
-            apiBaseUrl = url.origin + "/crm-development/api";
-            console.log("Environment: Development");
         }
         else if (scriptPath.includes("/crm-development/")) {
             apiBaseUrl = url.origin + "/crm-development/api";
