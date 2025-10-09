@@ -318,6 +318,7 @@
             .profile_actions p {
                 font-size: 0.75rem;
                 color: gray;
+                font-size: 8px;
             }
 
             .email-child-wrapper {
@@ -699,7 +700,7 @@
                 display: flex;
                 align-items: center;
                 border-bottom: 1px solid #ddd;
-                padding: 20px 13px;
+                padding: 20px 0px;
                 flex-wrap: nowrap;
                 margin: 10px 0px;
                 justify-content: space-around;
@@ -941,7 +942,7 @@
             .new-profile-email-wrapper {
                 display: flex;
                 gap: 7px;
-                font-size: 9px;
+                font-size: 11px;
             }
 
             .new-profile-parent-wrapper {
@@ -1450,6 +1451,48 @@
             #show-more-container {
                 display: none;
             }
+            /* GLOBAL TOOLTIP STYLES */
+            .custom-tooltip .tooltip-inner {
+                background-color: #ffffff;
+                color: #333333;
+                border: 1px solid #dee2e6;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                max-width: 400px !important;
+                min-width: 300px;
+                text-align: left !important;
+                padding: 15px;
+            }
+
+            .custom-tooltip .tooltip-arrow {
+                display: none;
+            }
+
+
+            .custom-tooltip-content p {
+                margin: 8px 0;
+                line-height: 1.4;
+                font-size: 13px;
+                color: #333;
+                text-align: left;
+            }
+
+            .tooltip {
+                --bs-tooltip-max-width: 400px;
+            }
+
+            /* Style for toggle tooltip icon */
+            .toggle-tooltip-icon {
+                transition: color 0.2s ease;
+            }
+
+            .toggle-tooltip-icon:hover {
+                color: #495057 !important;
+            }
+
+            /* Ensure click-triggered tooltips stay on top */
+            .custom-tooltip {
+                z-index: 9999;
+            }
         </style>
     @endpush
     <div class="new-class-hide-scroll">
@@ -1507,12 +1550,22 @@
                                                     justify-content: center;
                                                 }
                                             </style>
-                                            <div class="email_sec">
-                                                <p id="customerEmail">{{ $customer_contact->email }}</p>
-                                                <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
-                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="Copy email to clipboard"></i>
-                                            </div>
+<div class="email_sec d-flex align-items-center gap-2 email-truncate-container">
+    <p class="mb-0  customerEmail"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="{{ $customer_contact->email }}">
+       {{ Str::limit($customer_contact->email, 18) }}
+    </p>
+    <i class="fa fa-clone prof-edit-icons copyEmail"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="Copy email to clipboard"
+       data-email="{{ $customer_contact->email }}"></i>
+</div>
+
+
+
                                         </div>
                                         <div>
 
@@ -2137,27 +2190,51 @@
 
             // Copy Clipboard Email
 
-            $(document).ready(function() {
-                // Initialize Bootstrap tooltips
-                $('[data-bs-toggle="tooltip"]').tooltip();
+$(document).ready(function() {
+    // Initialize all Bootstrap tooltips with global custom class
+    $('[data-bs-toggle="tooltip"]').tooltip({
+        sanitize: false,
+        customClass: 'custom-tooltip'
+    });
 
-                $(document).on('click', '.copyEmail', async function() {
-                    try {
-                        let emailText = $("#customerEmail").text().trim();
-                        await navigator.clipboard.writeText(emailText);
-
-                        // Change tooltip to "Copied!" and show it
-                        $(this).attr('data-bs-original-title', 'Copied!').tooltip('show');
-
-                        // Reset tooltip text after 2 seconds
-                        setTimeout(() => {
-                            $(this).attr('data-bs-original-title', 'Copy to clipboard');
-                        }, 2000);
-                    } catch (err) {
-                        console.error('Clipboard copy failed:', err);
-                    }
-                });
+        // Handle click-triggered tooltips to close when clicking elsewhere
+    $(document).on('click', function(e) {
+        // Close all click-triggered tooltips when clicking outside
+        if (!$(e.target).closest('.toggle-tooltip-icon').length) {
+            $('.toggle-tooltip-icon').each(function() {
+                const tooltip = bootstrap.Tooltip.getInstance(this);
+                if (tooltip) {
+                    tooltip.hide();
+                }
             });
+        }
+    });
+
+    // Copy email functionality
+    $(document).on('click', '.copyEmail', async function() {
+        const $icon = $(this);
+        const email = $icon.data('email');
+        
+        try {
+            await navigator.clipboard.writeText(email);
+            
+            // Show success feedback
+            $icon
+                .attr('data-bs-original-title', 'Copied!')
+                .tooltip('show');
+            
+            // Reset after 2 seconds
+            setTimeout(() => {
+                $icon.attr('data-bs-original-title', 'Copy email to clipboard');
+            }, 2000);
+            
+        } catch (err) {
+            console.error('Copy failed:', err);
+        }
+    });
+});
+
+
         </script>
 
         {{-- // --}}
@@ -2552,21 +2629,6 @@
         </script>
 
 <script>
-    // Thread toggle (vanilla JS, unchanged)
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.toggle-thread-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const threadContainer = document.getElementById(targetId);
-                if (threadContainer) {
-                    threadContainer.style.display = threadContainer.style.display === 'none' ? 'block' : 'none';
-                    this.textContent = threadContainer.style.display === 'none' ?
-                        `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
-                        `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
-                }
-            });
-        });
-    });
 
     // jQuery-based email and activity toggling
     $(document).ready(function() {

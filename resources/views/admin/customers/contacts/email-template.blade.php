@@ -1338,6 +1338,7 @@
                 
                 const formData = new FormData();
                 formData.append('email_content', emailContent.value);
+
                 formData.append('subject', document.getElementById('emailSubject').value);
 
                 const fields = ['to', 'cc', 'bcc'].map(n => document.querySelector(`[name="${n}"]`));

@@ -25,7 +25,22 @@
     $bccList = $parseEmails($item['data']['bcc'] ?? []);
 @endphp
 
-<h2 class="email-tooltip-wrapper tooltip-wrapper toggle-email-header" style="cursor:pointer;">
+<h2 class="toggle-email-header" 
+    style="cursor:pointer;"
+    data-bs-toggle="tooltip" 
+    data-bs-html="true"
+    data-bs-placement="top"
+    data-bs-custom-class="custom-tooltip"
+    title="
+        <div class='custom-tooltip-content'>
+            <p>Subject: {{ $item['data']['subject'] ?? '(No Subject)' }}</p>
+            <p>From: {{ $fromName ?: '(No Name)' }} ({{ $fromEmail ?: 'Unknown Email' }})</p>
+            @if(!empty($toList))<p>To: {{ $toList }}</p>@endif
+            @if(!empty($ccList))<p>CC: {{ $ccList }}</p>@endif
+            @if(!empty($bccList))<p>BCC: {{ $bccList }}</p>@endif
+            <p>Date: {{ !empty($item['data']['date']) ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A') : 'Unknown Date' }}</p>
+        </div>
+    ">
     {{-- Subject --}}
     Email - <strong>{{ \Illuminate\Support\Str::limit($item['data']['subject'] ?? '(No Subject)', 30) }}</strong>
 
@@ -33,34 +48,6 @@
     <span class="user_cont">
         from {{ $fromName ?: $fromEmail ?: '' }}
     </span>
-
-    {{-- Tooltip Card --}}
-    <div class="email-tooltip-card tooltip-card">
-        <p>Subject: {{ $item['data']['subject'] ?? '(No Subject)' }}</p>
-
-        <p>From:
-            {{ $fromName ?: '(No Name)' }}
-            ({{ $fromEmail ?: 'Unknown Email' }})
-        </p>
-
-        @if(!empty($toList))
-            <p>to: {{ $toList }}</p>
-        @endif
-
-        @if(!empty($ccList))
-            <p>cc: {{ $ccList }}</p>
-        @endif
-
-        @if(!empty($bccList))
-            <p>bcc: {{ $bccList }}</p>
-        @endif
-
-        <p>Date:
-            {{ !empty($item['data']['date'])
-                ? \Carbon\Carbon::parse($item['data']['date'])->format('M d, Y h:i A')
-                : 'Unknown Date' }}
-        </p>
-    </div>
 </h2><br>
 
 
@@ -68,86 +55,88 @@
 
 
 
-<div class="user_toggle tooltip-wrapper">
-    {{-- Inline Short Display --}}
-    <p class="user_cont mb-0 to-inline">
-        to:
-        {{
-            \Illuminate\Support\Str::limit(
-                collect(
-                    is_string($item['data']['to'])
-                        ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
-                        : $item['data']['to'],
+<div class="user_toggle">
+    <div class="d-flex align-items-center gap-1">
+        {{-- Inline Short Display --}}
+        <p class="user_cont mb-0 to-inline">
+            to:
+            {{
+                \Illuminate\Support\Str::limit(
+                    collect(
+                        is_string($item['data']['to'])
+                            ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                            : $item['data']['to'],
+                    )
+                    ->map(fn($r) => is_array($r)
+                        ? ($r['email'] ?? ($r['name'] ?? ''))
+                        : $r
+                    )
+                    ->implode(', '),
+                    50, // show ~1.5 addresses
+                    '...'
                 )
-                ->map(fn($r) => is_array($r)
-                    ? ($r['email'] ?? ($r['name'] ?? ''))
-                    : $r
-                )
-                ->implode(', '),
-                50, // show ~1.5 addresses
-                '...'
-            )
-        }}
-    </p>
+            }}
+        </p>
+
+        {{-- <i class="fa fa-caret-down toggle-tooltip-icon"
+           style="cursor: pointer; font-size: 14px; color: #6c757d;"
+           data-bs-toggle="tooltip" 
+           data-bs-html="true"
+           data-bs-placement="top"
+           data-bs-trigger="click"
+           data-bs-custom-class="custom-tooltip"
+           title="
+            <div class='custom-tooltip-content'>
+                <p>From: {{ $item['data']['from']['email'] ?? '' }}</p>
+                <p>To: {{
+                    collect(
+                        is_string($item['data']['to'])
+                            ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
+                            : $item['data']['to'],
+                    )
+                    ->map(fn($r) => is_array($r)
+                        ? ($r['email'] ?? ($r['name'] ?? ''))
+                        : $r
+                    )
+                    ->implode(', ')
+                }}</p>
+                @if(!empty($item['data']['cc']))
+                    <p>CC: {{
+                        collect(
+                            is_string($item['data']['cc'])
+                                ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
+                                : $item['data']['cc'],
+                        )
+                        ->map(fn($r) => is_array($r)
+                            ? ($r['email'] ?? ($r['name'] ?? ''))
+                            : $r
+                        )
+                        ->implode(', ')
+                    }}</p>
+                @endif
+                @if(!empty($item['data']['bcc']))
+                    <p>BCC: {{
+                        collect(
+                            is_string($item['data']['bcc'])
+                                ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
+                                : $item['data']['bcc'],
+                        )
+                        ->map(fn($r) => is_array($r)
+                            ? ($r['email'] ?? ($r['name'] ?? ''))
+                            : $r
+                        )
+                        ->implode(', ')
+                    }}</p>
+                @endif
+            </div>
+        "></i> --}}
+
+        
+    </div>
 
     <div class="email-folder">
         <span class="folder-dot" style="color: #28a745;">&bull;</span>
         <span class="folder-name">{{ ucfirst($item['data']['folder'] ?? '') }}</span>
-    </div>
-    {{-- Tooltip with Full Info --}}
-    <div class="tooltip-card">
-        <p>From:
-            {{ $item['data']['from']['email'] ?? '' }}
-        </p>
-
-        <p>to:
-            {{
-                collect(
-                    is_string($item['data']['to'])
-                        ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
-                        : $item['data']['to'],
-                )
-                ->map(fn($r) => is_array($r)
-                    ? ($r['email'] ?? ($r['name'] ?? ''))
-                    : $r
-                )
-                ->implode(', ')
-            }}
-        </p>
-
-        @if(!empty($item['data']['cc']))
-            <p>cc:
-                {{
-                    collect(
-                        is_string($item['data']['cc'])
-                            ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
-                            : $item['data']['cc'],
-                    )
-                    ->map(fn($r) => is_array($r)
-                        ? ($r['email'] ?? ($r['name'] ?? ''))
-                        : $r
-                    )
-                    ->implode(', ')
-                }}
-            </p>
-        @endif
-
-        @if(!empty($item['data']['bcc']))
-            <p>bcc:
-                {{
-                    collect(
-                        is_string($item['data']['bcc'])
-                            ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
-                            : $item['data']['bcc'],
-                    )
-                    ->map(fn($r) => is_array($r)
-                        ? ($r['email'] ?? ($r['name'] ?? ''))
-                        : $r
-                    )
-                    ->implode(', ')
-                }}
-            </p>
-        @endif
     </div>
 </div>
 
@@ -352,41 +341,7 @@
                                 @endif
                             </p>
 
-                            <!-- Custom Tooltip (unchanged) -->
-                            <div class="tooltip-card">
-                                <p>from: {{ $item['data']['from']['email'] ?? '' }}</p>
-                                <p>to:
-                                    {{ collect(
-                                        is_string($item['data']['to'])
-                                            ? json_decode($item['data']['to'], true) ?? [$item['data']['to']]
-                                            : $item['data']['to'],
-                                    )
-                                    ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-                                    ->implode(', ') }}
-                                </p>
-                                @if(!empty($item['data']['cc']))
-                                    <p>cc:
-                                        {{ collect(
-                                            is_string($item['data']['cc'])
-                                                ? json_decode($item['data']['cc'], true) ?? [$item['data']['cc']]
-                                                : $item['data']['cc'],
-                                        )
-                                        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-                                        ->implode(', ') }}
-                                    </p>
-                                @endif
-                                @if(!empty($item['data']['bcc']))
-                                    <p>bcc:
-                                        {{ collect(
-                                            is_string($item['data']['bcc'])
-                                                ? json_decode($item['data']['bcc'], true) ?? [$item['data']['bcc']]
-                                                : $item['data']['bcc'],
-                                        )
-                                        ->map(fn($r) => is_array($r) ? ($r['email'] ?? ($r['name'] ?? '')) : $r)
-                                        ->implode(', ') }}
-                                    </p>
-                                @endif
-                            </div>
+           
                         </div>
                         <div class="folder-name">
                             <span class="folder-dot" style="color: #28a745;">&bull;</span>
@@ -418,36 +373,38 @@
             {!! $isHtmlEmpty ? nl2br($item['data']['body']['text'] ?? '') : $htmlContent !!}
         </div>
 
-        @if (!empty($item['data']['attachments']))
-            <div class="attachments-section mb-4">
-                <h6><i class="fa fa-paperclip"></i> Attachments ({{ count($item['data']['attachments']) }})
-                </h6>
-                <div class="attachments-list">
-
-                    @foreach ($item['data']['attachments'] as $attachment)
-                        <div class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
-                            <div class="me-2 text-muted fs-5"><i class="fa fa-file-o"></i></div>
-                            <div class="flex-grow-1">
-                                <div class="fw-medium">{{ $attachment['original_name'] ?? 'Unknown File' }}
-                                </div>
-                                <div class="text-muted small">
-                                    Type: {{ strtoupper($attachment['mime_type'] ?? 'unknown') }}
-                                    @if (!empty($attachment['size']))
-                                        | Size: {{ number_format($attachment['size'] / 1024, 1) }} KB
-                                    @endif
-                                </div>
-                            </div>
-                            <div>
-                                <a href="{{ route('admin.customer.contact.attachments.download', $attachment['id']) }}"
-                                    class="btn btn-sm btn-outline-primary">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
-                            </div>
+     @if (!empty($item['data']['attachments']))
+    <div class="attachments-section mb-4">
+        <h6><i class="fa fa-paperclip"></i> Attachments ({{ count($item['data']['attachments']) }})</h6>
+        <div class="attachments-list">
+            @foreach ($item['data']['attachments'] as $attachment)
+                <div class="attachment-item d-flex align-items-center mb-2 p-2 border rounded bg-white">
+                    <div class="me-2 text-muted fs-5">
+                        <i class="fa {{ $attachment['mime_type'] && Str::startsWith($attachment['mime_type'], 'image/') ? 'fa-file-image-o' : 'fa-file-o' }}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-medium">{{ $attachment['original_name'] ?? 'Unknown File' }}</div>
+                        <div class="text-muted small">
+                            Type: {{ strtoupper($attachment['mime_type'] ?? 'UNKNOWN') }}
+                            @if (!empty($attachment['size']))
+                                | Size: {{ number_format($attachment['size'] / 1024, 1) }} KB
+                            @endif
+                            @if ($attachment['mime_type'] && Str::startsWith($attachment['mime_type'], 'image/'))
+                                | <a href="{{ route('admin.customer.contact.attachments.preview', $attachment['id']) }}" target="_blank">Preview</a>
+                            @endif
                         </div>
-                    @endforeach
+                    </div>
+                    <div>
+                        <a href="{{ route('admin.customer.contact.attachments.download', $attachment['id']) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fa fa-download"></i> Download
+                        </a>
+                    </div>
                 </div>
-            </div>
-        @endif
+            @endforeach
+        </div>
+    </div>
+@endif
         @if (isset($item['data']['thread_email_count']) && $item['data']['thread_email_count'] > 0)
             <div class="comment-active_head">
                 <div>
