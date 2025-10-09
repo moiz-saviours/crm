@@ -1,7 +1,7 @@
 <!-- Add the email section with loader, refresh button, and fetch emails button -->
 <style>
     .contentdisplaytwo {
-        background-color: #fff !important;
+        background: linear-gradient(135deg, #e0f7fa, #ffffff) !important;
         border: none !important;
         padding: 0 20px;
     }
@@ -93,7 +93,7 @@
 }
 
 
-        
+
 </style>
 <div class="email-threading-row" style="margin-bottom: 15px;">
     <p class="activities-seprater d-none"> Thread email replies </p>
