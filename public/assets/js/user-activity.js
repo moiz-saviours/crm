@@ -1,12 +1,14 @@
 (function () {
 
     function getCurrentScript() {
-        let currentScript = document.currentScript;
-        if (!currentScript) {
-            const scripts = document.querySelectorAll('script[src*="user-activity.js"]');
-            currentScript = scripts[scripts.length - 1] || null;
+        const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
+        for (let script of scripts) {
+            if (!script.hasAttribute('data-wl-processed')) {
+                script.setAttribute('data-wl-processed', 'true');
+                return script;
+            }
         }
-        return currentScript;
+        return scripts[scripts.length - 1] || null;
     }
     function getApiBaseUrl(currentScript) {
         if (!currentScript) {
