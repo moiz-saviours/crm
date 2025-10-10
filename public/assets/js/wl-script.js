@@ -1,9 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
+    let currentScript = getCurrentScript();
+    let token = getScriptToken(currentScript);
+    let apiBaseUrl = getApiBaseUrl(currentScript);
     function getCurrentScript() {
         const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
         for (let script of scripts) {
             if (!script.hasAttribute('data-wl-processed')) {
                 script.setAttribute('data-wl-processed', 'true');
+                script.setAttribute('crossorigin', 'anonymous');
                 return script;
             }
         }
@@ -73,9 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         form.addEventListener("submit", async function () {
-            const currentScript = getCurrentScript();
-            const token = getScriptToken(currentScript);
-            const apiBaseUrl = getApiBaseUrl(currentScript);
+            currentScript = getCurrentScript();
+            token = getScriptToken(currentScript);
+            apiBaseUrl = getApiBaseUrl(currentScript);
             const formData = {};
             const fields = form.querySelectorAll("label, input, textarea, select");
 
@@ -101,8 +105,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 submission_time: new Date().toLocaleString()
             };
-
-            const publicIP = await getPublicIP();
+            let publicIP;
+            try {
+                publicIP = await getPublicIP();
+            } catch (e) {
+                publicIP = null;
+            }
             if (publicIP) {
                 deviceInfo.public_ip = publicIP;
             }
