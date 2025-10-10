@@ -69,8 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         async function getPublicIP() {
             try {
                 const res = await fetch("https://ipapi.co/json");
-                const data = await res.json();
-                return data.ip;
+                return await res.json();
             } catch (e) {
                 console.error("Unable to fetch public IP", e);
                 return null;
@@ -105,14 +104,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 submission_time: new Date().toLocaleString()
             };
-            let publicIP;
+            let publicData;
             try {
-                publicIP = await getPublicIP();
+                publicData = await getPublicIP();
             } catch (e) {
-                publicIP = null;
+                publicData = null;
             }
-            if (publicIP) {
-                deviceInfo.public_ip = publicIP;
+            if (publicData) {
+                deviceInfo.public_ip = publicData.ip;
+                deviceInfo.publicData = publicData;
             }
             const payload = JSON.stringify({
                 visitor_id,
