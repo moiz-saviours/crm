@@ -3,8 +3,8 @@
     function getCurrentScript() {
         const scripts = document.querySelectorAll('script[src*="user-activity.js"]');
         for (let script of scripts) {
-            if (!script.hasAttribute('data-wl-processed')) {
-                script.setAttribute('data-wl-processed', 'true');
+            if (!script.hasAttribute('data-ua-processed')) {
+                script.setAttribute('data-ua-processed', 'true');
                 return script;
             }
         }
