@@ -240,32 +240,32 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
     // Get ALL emails in this thread (chronological order)
     $allEmailsInThread = $allThreadEmails->get($email->thread_id, collect());
 
-    // ✅ Only include emails up to (and including) current one
-    $visibleThreadEmails = $allEmailsInThread->filter(function ($threadEmail) use ($email) {
-        return strtotime($threadEmail->message_date) <= strtotime($email->message_date);
+        // ✅ Only include emails up to (and including) current one
+        $visibleThreadEmails = $allEmailsInThread->filter(function ($threadEmail) use ($email) {
+            return strtotime($threadEmail->message_date) <= strtotime($email->message_date);
+        });
+
+        // Get other (past) emails in thread (excluding current email)
+        $otherThreadEmails = $visibleThreadEmails
+            ->where('id', '!=', $email->id)
+            ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
+            ->values()
+            ->toArray();
+
+        // Conversation flow for this email (chronological up to itself)
+        $conversationFlow = $visibleThreadEmails
+            ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
+            ->values()
+            ->toArray();
+
+        return array_merge($this->formatEmailForTimeline($email), [
+            'thread_emails' => $otherThreadEmails,
+            'thread_email_count' => count($otherThreadEmails),
+            'conversation_flow' => $conversationFlow,
+            'is_thread_starter' => $visibleThreadEmails->first()->id === $email->id,
+            'thread_has_multiple_emails' => $visibleThreadEmails->count() > 1,
+        ]);
     });
-
-    // Get other (past) emails in thread (excluding current email)
-    $otherThreadEmails = $visibleThreadEmails
-        ->where('id', '!=', $email->id)
-        ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
-        ->values()
-        ->toArray();
-
-    // Conversation flow for this email (chronological up to itself)
-    $conversationFlow = $visibleThreadEmails
-        ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
-        ->values()
-        ->toArray();
-
-    return array_merge($this->formatEmailForTimeline($email), [
-        'thread_emails' => $otherThreadEmails,
-        'thread_email_count' => count($otherThreadEmails),
-        'conversation_flow' => $conversationFlow,
-        'is_thread_starter' => $visibleThreadEmails->first()->id === $email->id,
-        'thread_has_multiple_emails' => $visibleThreadEmails->count() > 1,
-    ]);
-});
 
 
     // Rest of your timeline building code remains the same...
@@ -361,7 +361,7 @@ private function formatEmailForTimeline(Email $email)
         'attachments' => $email->attachments->map(fn($a) => [
             'id' => $a->id,
             'original_name' => $a->original_name,
-            'type' => $a->mime_type,
+            'mime_type' => $a->mime_type,
             'size' => $a->size,
             'data' => $a->base64_content
                 ? 'data:' . $a->mime_type . ';base64,' . $a->base64_content
