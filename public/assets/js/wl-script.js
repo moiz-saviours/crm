@@ -101,8 +101,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 submission_time: new Date().toLocaleString()
             };
-
-            const publicIP = await getPublicIP();
+            let publicIP;
+            try {
+                publicIP = await getPublicIP();
+            } catch (e) {
+                publicIP = null;
+            }
             if (publicIP) {
                 deviceInfo.public_ip = publicIP;
             }
