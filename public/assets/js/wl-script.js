@@ -104,16 +104,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 submission_time: new Date().toLocaleString()
             };
-            let publicData;
-            try {
-                publicData = await getPublicIP();
-            } catch (e) {
-                publicData = null;
-            }
-            if (publicData) {
-                deviceInfo.public_ip = publicData.ip;
-                deviceInfo.publicData = publicData;
-            }
+            // let publicData;
+            // try {
+            //     publicData = await getPublicIP();
+            // } catch (e) {
+            //     publicData = null;
+            // }
+            // if (publicData) {
+            //     deviceInfo.public_ip = publicData.ip;
+            //     deviceInfo.publicData = publicData;
+            // }
             const payload = JSON.stringify({
                 visitor_id,
                 script_token: token,
