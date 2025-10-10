@@ -1,7 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let currentScript = getCurrentScript();
-    let token = getScriptToken(currentScript);
-    let apiBaseUrl = getApiBaseUrl(currentScript);
     function getCurrentScript() {
         const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
         for (let script of scripts) {
