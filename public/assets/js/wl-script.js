@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+    let currentScript = getCurrentScript();
+    let token = getScriptToken(currentScript);
+    let apiBaseUrl = getApiBaseUrl(currentScript);
     function getCurrentScript() {
         const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
         for (let script of scripts) {
@@ -74,9 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         form.addEventListener("submit", async function () {
-            const currentScript = getCurrentScript();
-            const token = getScriptToken(currentScript);
-            const apiBaseUrl = getApiBaseUrl(currentScript);
+            currentScript = getCurrentScript();
+            token = getScriptToken(currentScript);
+            apiBaseUrl = getApiBaseUrl(currentScript);
             const formData = {};
             const fields = form.querySelectorAll("label, input, textarea, select");
 
