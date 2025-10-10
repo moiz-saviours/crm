@@ -1,3 +1,13 @@
+<style>
+    .activity-title {
+        color: var(--bs-primary);
+        font-weight: 500;
+    }
+    a {
+        text-decoration: none;
+        text-underline: none;
+    }
+</style>
 <div class="activ_head">
     <div class="search-containers">
         <form id="search-form" style="margin:0;">
@@ -66,14 +76,16 @@
         </div>
         <div class="tab-pane fade show active" id="activities-container" role="tabpanel" aria-labelledby="act-tab">
             <div>
-                <div>
-                    <p class="recent-filters"> Filter by:
-                        <span class="activities-seprater">Filter activity
-                                  ({{ !empty($timeline) && count($timeline) > 0 ? count($timeline) : 0 }}/{{ !empty($timeline) && count($timeline) > 0 ? count($timeline) : 0 }})</span>
-                    </p>
-                </div>
-                <p class="date-by-order"> May 2021</p>
                 <div class="recent-activities">
+                    <div class="timeline-header">
+                        <p class="recent-filters">
+                            Filter by:
+                            <span class="activities-seprater">
+                                Filter activity ({{ count($timeline) }}/{{ count($timeline) }})
+                            </span>
+                        </p>
+                    </div>
+                        <p class="date-by-order"> May 2021</p>
                     <div class="card-box">
                         @include('admin.customers.contacts.timeline.partials.activity')
                     </div>
