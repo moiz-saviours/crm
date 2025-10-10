@@ -24,217 +24,45 @@ use Illuminate\Support\Facades\Config;
 use App\Mail\OutgoingEmail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Response;
+
 class EmailController extends Controller
 {
-    public function getEmails($customerEmail, $folder = "all", $page = 1, $limit = 100)
+
+
+
+    private function getExtensionFromMimeType(string $mimeType): string
     {
-        // Existing getEmails method remains unchanged
-        $user = Auth::guard('admin')->user();
-        $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
-            ->where('imap_type', 'imap')
-            ->pluck('pseudo_email')
-            ->toArray();
-
-        $query = Email::with('events');
-        if ($folder == 'inbox') {
-            $query->where('from_email', $customerEmail)
-                ->where(function ($q) use ($auth_pseudo_emails) {
-                    foreach ($auth_pseudo_emails as $email) {
-                        $q->orWhereJsonContains('to', ['email' => $email])
-                            ->orWhereJsonContains('cc', ['email' => $email])
-                            ->orWhereJsonContains('bcc', ['email' => $email]);
-                    }
-                });
-        } elseif ($folder == 'sent') {
-            $query->whereIn('from_email', $auth_pseudo_emails);
-        } elseif ($folder == 'drafts') {
-            $query->where('folder', 'drafts')
-                ->whereIn('from_email', $auth_pseudo_emails);
-        } elseif ($folder == 'spam') {
-            $query->where('folder', 'spam')
-                ->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                    $q->where('from_email', $customerEmail)
-                        ->orWhereIn('from_email', $auth_pseudo_emails);
-                });
-        } elseif ($folder == 'trash') {
-            $query->where('folder', 'trash');
-        } elseif ($folder == 'archive') {
-            $query->where('folder', 'archive');
-        } else {
-            $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                $q->where('from_email', $customerEmail)
-                    ->orWhereJsonContains('to', ['email' => $customerEmail])
-                    ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-
-                if (!empty($auth_pseudo_emails)) {
-                    $q->orWhere(function ($sub) use ($customerEmail, $auth_pseudo_emails) {
-                        $sub->where('from_email', $customerEmail)
-                            ->where(function ($nested) use ($auth_pseudo_emails) {
-                                foreach ($auth_pseudo_emails as $addr) {
-                                    $nested->orWhereJsonContains('to', ['email' => $addr])
-                                        ->orWhereJsonContains('cc', ['email' => $addr])
-                                        ->orWhereJsonContains('bcc', ['email' => $addr]);
-                                }
-                            });
-                        $sub->orWhere(function ($nested) use ($customerEmail, $auth_pseudo_emails) {
-                            $nested->whereIn('from_email', $auth_pseudo_emails)
-                                ->where(function ($nn) use ($customerEmail) {
-                                    $nn->orWhereJsonContains('to', ['email' => $customerEmail])
-                                        ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                                        ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-                                });
-                        });
-                    });
-                }
-            });
-        }
-
-        if ($folder !== 'all') {
-            $query->where('folder', $folder);
-        }
-
-        $offset = ($page - 1) * $limit;
-
-        $emails = $query->orderBy('message_date', 'desc')
-            ->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
-            }])
-            ->skip($offset)
-            ->take($limit)
-            ->get()
-            ->map(function ($email) use ($query) {
-                $threadEmails = $query->where('thread_id', $email->thread_id)
-                    ->where('id', '!=', $email->id)
-                    ->with(['attachments' => function ($q) {
-                        $q->select('id', 'email_id', 'original_name', 'size', 'mime_type', 'base64_content');
-                    }])
-                    ->get()
-                    ->map(function ($threadEmail) {
-                        return [
-                            'uuid' => 'email-' . $threadEmail->id,
-                            'thread_id' => $threadEmail->thread_id ?? [],
-                            'message_id' => $threadEmail->message_id ?? '',
-                            'references' => $threadEmail->references ?? [],
-                            'from' => [
-                                'name' => $threadEmail->from_name,
-                                'email' => $threadEmail->from_email,
-                            ],
-                            'to' => $threadEmail->to ?? [],
-                            'cc' => $threadEmail->cc ?? [],
-                            'bcc' => $threadEmail->bcc ?? [],
-                            'subject' => $threadEmail->subject,
-                            'folder' => $threadEmail->folder,
-                            'type' => $threadEmail->type,
-                            'date' => $threadEmail->message_date,
-                            'body' => [
-                                'html' => $threadEmail->body_html,
-                                'text' => $threadEmail->body_text,
-                            ],
-                            'attachments' => $threadEmail->attachments->map(function ($attachment) {
-                                return [
-                                    'filename' => $attachment->original_name,
-                                    'type' => $attachment->mime_type,
-                                    'size' => $attachment->size,
-                                    'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                                ];
-                            })->toArray(),
-                            'open_count' => $threadEmail->events->where('event_type', 'open')->count(),
-                            'click_count' => $threadEmail->events->where('event_type', 'click')->count(),
-                            'bounce_count' => $threadEmail->events->where('event_type', 'bounce')->count(),
-                            'spam_count' => $threadEmail->events->where('event_type', 'spam')->count(),
-                            'events' => $threadEmail->events->map(function ($event) {
-                                $icons = [
-                                    'open' => 'fa-envelope-open',
-                                    'click' => 'fa-mouse-pointer',
-                                    'bounce' => 'fa-exclamation-triangle',
-                                    'spam' => 'fa-ban',
-                                ];
-                                return [
-                                    'id' => $event->id,
-                                    'event_type' => $event->event_type,
-                                    'created_at' => $event->created_at,
-                                    'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
-                                ];
-                            })->values()->toArray(),
-                        ];
-                    })->toArray();
-                return [
-                    'uuid' => 'email-' . $email->id,
-                    'thread_id' => $email->thread_id ?? [],
-                    'message_id' => $email->message_id ?? '',
-                    'references' => $email->references ?? [],
-                    'from' => [
-                        'name' => $email->from_name,
-                        'email' => $email->from_email,
-                    ],
-                    'to' => $email->to ?? [],
-                    'cc' => $email->cc ?? [],
-                    'bcc' => $email->bcc ?? [],
-                    'subject' => $email->subject,
-                    'folder' => $email->folder,
-                    'type' => $email->type,
-                    'date' => $email->message_date,
-                    'body' => [
-                        'html' => $email->body_html,
-                        'text' => $email->body_text,
-                    ],
-                    'attachments' => $email->attachments->map(function ($attachment) {
-                        return [
-                            'id' => $attachment->id,
-                            'filename' => $attachment->original_name,
-                            'type' => $attachment->mime_type,
-                            'size' => $attachment->size,
-                            'data' => $attachment->base64_content
-                                ? 'data:' . $attachment->mime_type . ';base64,' . $attachment->base64_content
-                                : null,
-                        ];
-                    })->toArray(),
-                    'thread_emails' => $threadEmails,
-                    'thread_email_count' => count($threadEmails) ?? 0,
-                    'open_count' => $email->events->where('event_type', 'open')->count(),
-                    'click_count' => $email->events->where('event_type', 'click')->count(),
-                    'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
-                    'spam_count' => $email->events->where('event_type', 'spam')->count(),
-                    'events' => $email->events->map(function ($event) {
-                        $icons = [
-                            'open' => 'fa-envelope-open',
-                            'click' => 'fa-mouse-pointer',
-                            'bounce' => 'fa-exclamation-triangle',
-                            'spam' => 'fa-ban',
-                        ];
-                        return [
-                            'id' => $event->id,
-                            'event_type' => $event->event_type,
-                            'created_at' => $event->created_at,
-                            'icon' => $icons[$event->event_type] ?? 'fa-info-circle',
-                        ];
-                    })->values()->toArray(),
-                ];
-            })
-            ->values()
-            ->toArray();
-
-        return [
-            'emails' => $emails,
-            'page' => $page,
-            'limit' => $limit,
-            'count' => count($emails),
+        $extensions = [
+            'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'application/zip' => 'zip',
         ];
+        return $extensions[strtolower($mimeType)] ?? 'bin';
     }
-private function getExtensionFromMimeType(string $mimeType): string
-{
-    $extensions = [
-        'application/pdf' => 'pdf',
-        'application/msword' => 'doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'application/zip' => 'zip',
-    ];
-    return $extensions[strtolower($mimeType)] ?? 'bin';
-}
+    private function normalizeMsgId($id)
+    {
+        if (empty($id)) {
+            return null;
+        }
+
+        $normalized = trim($id, " <>\t\n\r");
+
+        // If it contains @, extract the UUID part (your sent emails use UUIDs)
+        if (str_contains($normalized, '@')) {
+            $parts = explode('@', $normalized);
+            $uuidPart = $parts[0];
+
+            // Check if it's a valid UUID
+            if (Str::isUuid($uuidPart)) {
+                return $uuidPart;
+            }
+        }
+
+        return $normalized;
+    }
     public function sendEmail(Request $request): JsonResponse
     {
 
@@ -254,13 +82,13 @@ private function getExtensionFromMimeType(string $mimeType): string
             'to.min' => 'No valid recipients specified.',
             'to.*.email' => 'One or more recipients are not valid email addresses.',
         ]);
-        
+
         $emailContent = $validated['email_content'] ?? '';
         $totalImageSize = 0;
-        
+
         // Find all base64 images in the email content
         preg_match_all('/data:image\/[^;]+;base64,([A-Za-z0-9+\/=]+)/', $emailContent, $matches);
-        
+
         foreach ($matches[1] as $base64String) {
             $decoded = base64_decode($base64String, true);
             if ($decoded !== false) {
@@ -288,7 +116,7 @@ private function getExtensionFromMimeType(string $mimeType): string
         }
 
 
-        
+
 
         try {
             $sender = $this->findSender($validated['from']);
@@ -330,29 +158,55 @@ private function getExtensionFromMimeType(string $mimeType): string
             // Create a message-id for this outgoing email
             $appDomain = parse_url(config('app.url'), PHP_URL_HOST) ?: (explode('@', $fromEmail)[1] ?? 'localhost');
             // Generate a clean UUID for message ID (no domain)
-            $messageId = (string) Str::uuid();
+            $messageId = (string) Str::uuid() . '@' . (parse_url(config('app.url'), PHP_URL_HOST) ?? 'localhost');
 
+            // --- choose thread id ---
             // --- choose thread id ---
             if (!empty($threadFromRequest)) {
                 $threadId = $threadFromRequest;
             } elseif (!empty($inReplyToRequest)) {
-                $parent = Email::where('message_id', trim($inReplyToRequest))->first();
+                // Normalize the in_reply_to to match your database format
+                $normalizedInReplyTo = $this->normalizeMsgId(trim($inReplyToRequest));
+                $parent = Email::where('message_id', $normalizedInReplyTo)->first();
+
                 if ($parent) {
-                    $threadId = $parent->thread_id ?? $parent->message_id;
+                    $threadId = $parent->thread_id;
+                    Log::info('Found parent email for threading', [
+                        'parent_id' => $parent->id,
+                        'parent_message_id' => $parent->message_id,
+                        'thread_id' => $threadId
+                    ]);
                 } else {
-                    $threadId = trim($inReplyToRequest);
+                    // If parent not found, use the in_reply_to as thread ID
+                    $threadId = $normalizedInReplyTo;
+                    Log::warning('Parent email not found for in_reply_to, using it as thread ID', [
+                        'in_reply_to' => $normalizedInReplyTo
+                    ]);
                 }
             } else {
                 // New email → use this message-id as thread id
-                $threadId = $messageId;
+                $threadId = $this->normalizeMsgId($messageId);
             }
 
 
 
             // Build references header
-            $references = $referencesRequest;
+            // Build references header
+            $references = '';
+            if (!empty($referencesRequest)) {
+                $references = is_array($referencesRequest) ? implode(' ', $referencesRequest) : $referencesRequest;
+            }
+
             if (!empty($inReplyToRequest)) {
-                $references = trim(($referencesRequest ? $referencesRequest . ' ' : '') . $inReplyToRequest);
+                $normalizedInReplyTo = $this->normalizeMsgId(trim($inReplyToRequest));
+                $references = trim(($references ? $references . ' ' : '') . $normalizedInReplyTo);
+
+                // Also ensure the parent's references are included
+                $parent = Email::where('message_id', $normalizedInReplyTo)->first();
+                if ($parent && !empty($parent->references)) {
+                    $parentRefs = $parent->references;
+                    $references = trim("{$parentRefs} {$references}");
+                }
             }
 
             // Handle reply: Fetch original email and concatenate with new content
@@ -727,7 +581,7 @@ private function getExtensionFromMimeType(string $mimeType): string
         return $sender->pseudo_name ?? explode('@', $defaultEmail)[0];
     }
 
-public function download($id)
+    public function download($id)
     {
         try {
             $attachment = EmailAttachment::findOrFail($id);
@@ -763,5 +617,4 @@ public function download($id)
             return response()->json(['error' => 'Failed to download attachment'], 500);
         }
     }
-
 }

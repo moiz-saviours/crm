@@ -135,223 +135,236 @@ class ContactController extends Controller
      */
 
 
-    protected function getTimeline($customerEmail, $folder = "all", $page = 1, $limit = 10, $tab = 'activities')
-    {
-        $customerContact = CustomerContact::where('email', $customerEmail)->first();
-        if (!$customerContact) {
-            return ['timeline' => [], 'page' => $page, 'limit' => $limit, 'count' => 0];
-        }
+protected function getTimeline($customerEmail, $folder = "all", $page = 1, $limit = 10, $tab = 'activities')
+{
+    $customerContact = CustomerContact::where('email', $customerEmail)->first();
+    if (!$customerContact) {
+        return ['timeline' => [], 'page' => $page, 'limit' => $limit, 'count' => 0];
+    }
 
-        $customerContact->load('notes', 'lead.activities');
-        $user = Auth::guard('admin')->user();
-        $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
-            ->where('morph_type', get_class($user))
-            ->where('imap_type', 'imap')
-            ->pluck('pseudo_email')
-            ->toArray();
+    $customerContact->load('notes', 'lead.activities');
+    $user = Auth::guard('admin')->user();
+    $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
+        ->where('morph_type', get_class($user))
+        ->where('imap_type', 'imap')
+        ->pluck('pseudo_email')
+        ->toArray();
 
-        $query = Email::with('events');
-        if ($folder == 'inbox') {
-            $query->where('from_email', $customerEmail)
-                ->where(function ($q) use ($auth_pseudo_emails) {
-                    foreach ($auth_pseudo_emails as $email) {
-                        $q->orWhereJsonContains('to', ['email' => $email])
-                            ->orWhereJsonContains('cc', ['email' => $email])
-                            ->orWhereJsonContains('bcc', ['email' => $email]);
-                    }
-                });
-        } elseif ($folder == 'sent') {
-            $query->whereIn('from_email', $auth_pseudo_emails);
-        } elseif ($folder == 'drafts') {
-            $query->where('folder', 'drafts')
-                ->whereIn('from_email', $auth_pseudo_emails);
-        } elseif ($folder == 'spam') {
-            $query->where('folder', 'spam')
-                ->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                    $q->where('from_email', $customerEmail)
-                        ->orWhereIn('from_email', $auth_pseudo_emails);
-                });
-        } elseif ($folder == 'trash') {
-            $query->where('folder', 'trash');
-        } elseif ($folder == 'archive') {
-            $query->where('folder', 'archive');
-        } else {
-            $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
-                $q->where('from_email', $customerEmail)
-                    ->orWhereJsonContains('to', ['email' => $customerEmail])
-                    ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-
-                if (!empty($auth_pseudo_emails)) {
-                    $q->orWhere(function ($sub) use ($customerEmail, $auth_pseudo_emails) {
-                        $sub->where('from_email', $customerEmail)
-                            ->where(function ($nested) use ($auth_pseudo_emails) {
-                                foreach ($auth_pseudo_emails as $addr) {
-                                    $nested->orWhereJsonContains('to', ['email' => $addr])
-                                        ->orWhereJsonContains('cc', ['email' => $addr])
-                                        ->orWhereJsonContains('bcc', ['email' => $addr]);
-                                }
-                            });
-                        $sub->orWhere(function ($nested) use ($customerEmail, $auth_pseudo_emails) {
-                            $nested->whereIn('from_email', $auth_pseudo_emails)
-                                ->where(function ($nn) use ($customerEmail) {
-                                    $nn->orWhereJsonContains('to', ['email' => $customerEmail])
-                                        ->orWhereJsonContains('cc', ['email' => $customerEmail])
-                                        ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
-                                });
-                        });
-                    });
+    $query = Email::with('events');
+    
+    // Your existing folder logic (keep this as is)
+    if ($folder == 'inbox') {
+        $query->where('from_email', $customerEmail)
+            ->where(function ($q) use ($auth_pseudo_emails) {
+                foreach ($auth_pseudo_emails as $email) {
+                    $q->orWhereJsonContains('to', ['email' => $email])
+                        ->orWhereJsonContains('cc', ['email' => $email])
+                        ->orWhereJsonContains('bcc', ['email' => $email]);
                 }
             });
-        }
+    } elseif ($folder == 'sent') {
+        $query->whereIn('from_email', $auth_pseudo_emails);
+    } elseif ($folder == 'drafts') {
+        $query->where('folder', 'drafts')
+            ->whereIn('from_email', $auth_pseudo_emails);
+    } elseif ($folder == 'spam') {
+        $query->where('folder', 'spam')
+            ->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+                $q->where('from_email', $customerEmail)
+                    ->orWhereIn('from_email', $auth_pseudo_emails);
+            });
+    } elseif ($folder == 'trash') {
+        $query->where('folder', 'trash');
+    } elseif ($folder == 'archive') {
+        $query->where('folder', 'archive');
+    } else {
+        $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+            $q->where('from_email', $customerEmail)
+                ->orWhereJsonContains('to', ['email' => $customerEmail])
+                ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
 
-        if ($folder !== 'all') {
-            $query->where('folder', $folder);
-        }
+            if (!empty($auth_pseudo_emails)) {
+                $q->orWhere(function ($sub) use ($customerEmail, $auth_pseudo_emails) {
+                    $sub->where('from_email', $customerEmail)
+                        ->where(function ($nested) use ($auth_pseudo_emails) {
+                            foreach ($auth_pseudo_emails as $addr) {
+                                $nested->orWhereJsonContains('to', ['email' => $addr])
+                                    ->orWhereJsonContains('cc', ['email' => $addr])
+                                    ->orWhereJsonContains('bcc', ['email' => $addr]);
+                            }
+                        });
+                    $sub->orWhere(function ($nested) use ($customerEmail, $auth_pseudo_emails) {
+                        $nested->whereIn('from_email', $auth_pseudo_emails)
+                            ->where(function ($nn) use ($customerEmail) {
+                                $nn->orWhereJsonContains('to', ['email' => $customerEmail])
+                                    ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+                            });
+                    });
+                });
+            }
+        });
+    }
 
-        $offset = ($page - 1) * $limit;
-        $emails = $query->orderBy('message_date', 'desc')
+    if ($folder !== 'all') {
+        $query->where('folder', $folder);
+    }
+
+    $offset = ($page - 1) * $limit;
+    
+    // Get the main emails for pagination - LATEST MESSAGES FIRST
+    $emails = $query->clone()
         ->with(['attachments', 'events'])
+        ->orderBy('message_date', 'desc') // Latest messages first
         ->skip($offset)
         ->take($limit)
-    ->get()
-    ->map(function ($email) {
+        ->get();
 
-        $normThread = strtolower(trim($email->thread_id, " <>"));
-        $normMessage = strtolower(trim($email->message_id, " <>"));
+    // Get all thread IDs from the paginated emails
+    $threadIds = $emails->pluck('thread_id')
+        ->filter()
+        ->unique()
+        ->values()
+        ->toArray();
 
-        $possible = array_filter(array_unique([$normThread, $normMessage]));
+    // Get ALL emails for these thread IDs (for thread context)
+    $allThreadEmails = Email::whereIn('thread_id', $threadIds)
+        ->with(['attachments', 'events'])
+        ->orderBy('message_date', 'asc') // Chronological order within threads
+        ->get()
+        ->groupBy('thread_id');
 
-        // Fetch related emails (same thread)
-        $threadEmails = Email::where(function ($q) use ($possible) {
-                $q->whereIn('thread_id', $possible)
-                    ->orWhereIn('message_id', $possible);
-            })
-            ->where('id', '!=', $email->id)
-            ->with(['attachments', 'events'])
-            ->orderBy('message_date', 'asc')
-            ->get()
-            ->map(fn($threadEmail) => [
-                'uuid' => 'email-' . $threadEmail->id,
-                'thread_id' => $threadEmail->thread_id,
-                'message_id' => $threadEmail->message_id,
-                'subject' => $threadEmail->subject,
-                'from' => [
-                    'name' => $threadEmail->from_name,
-                    'email' => $threadEmail->from_email,
-                ],
-                'to' => $threadEmail->to ?? [],
-                'cc' => $threadEmail->cc ?? [],
-                'bcc' => $threadEmail->bcc ?? [],
-                'date' => $threadEmail->message_date,
-                 'folder' => $threadEmail->folder,
+    // Format emails with thread context
+$formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
+    // Get ALL emails in this thread (chronological order)
+    $allEmailsInThread = $allThreadEmails->get($email->thread_id, collect());
 
-                'body' => [
-                    'html' => $threadEmail->body_html,
-                    'text' => $threadEmail->body_text,
-                ],
-                'attachments' => $threadEmail->attachments->map(fn($a) => [
-                    'filename' => $a->original_name,
-                    'type' => $a->mime_type,
-                    'size' => $a->size,
-                    'download_url' => $a->storage_path ? Storage::url($a->storage_path) : null,
-                ])->toArray(),
-                'events' => $threadEmail->events->map(fn($e) => [
-                    'id' => $e->id,
-                    'event_type' => $e->event_type,
-                    'created_at' => $e->created_at,
-                ])->toArray(),
-            ])->toArray();
-
-        return [
-            'uuid' => 'email-' . $email->id,
-            'thread_id' => $email->thread_id,
-            'message_id' => $email->message_id,
-            'subject' => $email->subject,
-            'from' => [
-                'name' => $email->from_name,
-                'email' => $email->from_email,
-            ],
-            'to' => $email->to ?? [],
-            'cc' => $email->cc ?? [],
-            'bcc' => $email->bcc ?? [],
-            'date' => $email->message_date,
-            'folder' => $email->folder,
-            'body' => [
-                'html' => $email->body_html,
-                'text' => $email->body_text,
-            ],
-            'attachments' => $email->attachments->map(fn($a) => [
-                'id' => $a->id,
-                'original_name' => $a->original_name,
-                'type' => $a->mime_type,
-                'size' => $a->size,
-                'data' => $a->base64_content
-                    ? 'data:' . $a->mime_type . ';base64,' . $a->base64_content
-                    : null,
-            ])->toArray(),
-            'thread_emails' => $threadEmails,
-            'thread_email_count' => count($threadEmails),
-        ];
+    // ✅ Only include emails up to (and including) current one
+    $visibleThreadEmails = $allEmailsInThread->filter(function ($threadEmail) use ($email) {
+        return strtotime($threadEmail->message_date) <= strtotime($email->message_date);
     });
 
+    // Get other (past) emails in thread (excluding current email)
+    $otherThreadEmails = $visibleThreadEmails
+        ->where('id', '!=', $email->id)
+        ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
+        ->values()
+        ->toArray();
 
-        $timeline = [];
-        if ($tab === 'activities' || $tab === 'emails') {
-            foreach ($emails as $email) {
-                $timeline[] = [
-                    'type' => 'email',
-                    'date' => $email['date'],
-                    'data' => $email,
-                ];
-            }
+    // Conversation flow for this email (chronological up to itself)
+    $conversationFlow = $visibleThreadEmails
+        ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
+        ->values()
+        ->toArray();
+
+    return array_merge($this->formatEmailForTimeline($email), [
+        'thread_emails' => $otherThreadEmails,
+        'thread_email_count' => count($otherThreadEmails),
+        'conversation_flow' => $conversationFlow,
+        'is_thread_starter' => $visibleThreadEmails->first()->id === $email->id,
+        'thread_has_multiple_emails' => $visibleThreadEmails->count() > 1,
+    ]);
+});
+
+
+    // Rest of your timeline building code remains the same...
+    $timeline = [];
+    if ($tab === 'activities' || $tab === 'emails') {
+        foreach ($formattedEmails as $email) {
+            $timeline[] = [
+                'type' => 'email',
+                'date' => $email['date'],
+                'data' => $email,
+            ];
         }
-        if ($tab === 'activities' || $tab === 'notes') {
-            foreach ($customerContact->notes as $note) {
-                $timeline[] = [
-                    'type' => 'note',
-                    'date' => $note->created_at,
-                    'data' => $note,
-                ];
-            }
+    }
+    if ($tab === 'activities' || $tab === 'notes') {
+        foreach ($customerContact->notes as $note) {
+            $timeline[] = [
+                'type' => 'note',
+                'date' => $note->created_at,
+                'data' => $note,
+            ];
         }
-        if ($tab === 'activities') {
-            if ($customerContact->lead && $customerContact->lead->activities) {
-                foreach ($customerContact->lead->activities as $activity) {
-                    $decoded = json_decode($activity->event_data);
-                    $activity->data = $decoded;
-                    if ($activity->event_type === 'conversion') {
-                        $timeline[] = [
-                            'type' => 'conversion',
-                            'date' => $activity->created_at,
-                            'data' => $activity,
-                        ];
-                    } else {
-                        $timeline[] = [
-                            'type' => 'activity',
-                            'date' => $activity->created_at,
-                            'data' => $activity,
-                        ];
-                    }
+    }
+    if ($tab === 'activities') {
+        if ($customerContact->lead && $customerContact->lead->activities) {
+            foreach ($customerContact->lead->activities as $activity) {
+                $decoded = json_decode($activity->event_data);
+                $activity->data = $decoded;
+                if ($activity->event_type === 'conversion') {
+                    $timeline[] = [
+                        'type' => 'conversion',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                } else {
+                    $timeline[] = [
+                        'type' => 'activity',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
                 }
             }
         }
-
-        usort($timeline, function ($a, $b) {
-            return strtotime($b['date']) - strtotime($a['date']);
-        });
-
-        $offset = ($page - 1) * $limit;
-        $paginatedTimeline = array_slice($timeline, $offset, $limit);
-
-        return [
-            'customer_contact' => $customerContact,
-            'timeline' => $paginatedTimeline,
-            'page' => $page,
-            'limit' => $limit,
-            'count' => count($paginatedTimeline),
-        ];
     }
+
+    // Sort entire timeline by date (latest first)
+    usort($timeline, function ($a, $b) {
+        return strtotime($b['date']) - strtotime($a['date']);
+    });
+
+    $paginatedTimeline = array_slice($timeline, 0, $limit);
+
+    return [
+        'customer_contact' => $customerContact,
+        'timeline' => $paginatedTimeline,
+        'page' => $page,
+        'limit' => $limit,
+        'count' => count($paginatedTimeline),
+    ];
+}
+
+/**
+ * Format email for timeline display
+ */
+private function formatEmailForTimeline(Email $email)
+{
+    return [
+        'uuid' => 'email-' . $email->id,
+        'thread_id' => $email->thread_id,
+        'message_id' => $email->message_id,
+        'subject' => $email->subject,
+        'from' => [
+            'name' => $email->from_name,
+            'email' => $email->from_email,
+        ],
+        'to' => $email->to ?? [],
+        'cc' => $email->cc ?? [],
+        'bcc' => $email->bcc ?? [],
+        'date' => $email->message_date,
+        'folder' => $email->folder,
+        'body' => [
+            'html' => $email->body_html,
+            'text' => $email->body_text,
+        ],
+        'attachments' => $email->attachments->map(fn($a) => [
+            'id' => $a->id,
+            'original_name' => $a->original_name,
+            'type' => $a->mime_type,
+            'size' => $a->size,
+            'data' => $a->base64_content
+                ? 'data:' . $a->mime_type . ';base64,' . $a->base64_content
+                : null,
+        ])->toArray(),
+        'events' => $email->events->map(fn($e) => [
+            'id' => $e->id,
+            'event_type' => $e->event_type,
+            'created_at' => $e->created_at,
+        ])->toArray(),
+    ];
+}
 
     public function refresh(Request $request)
     {
