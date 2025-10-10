@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const visitor_id = getVisitorId();
         async function getPublicIP() {
             try {
-                const res = await fetch("https://api.ipify.org?format=json");
+                const res = await fetch("https://ipapi.co/json");
                 const data = await res.json();
                 return data.ip;
             } catch (e) {
