@@ -1361,6 +1361,7 @@
                 AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response.success) {
+                            console.log('success', response);
                             // Reset subject
                             document.getElementById('emailSubject').value = "";
 
@@ -1374,7 +1375,7 @@
                             const bccField = document.querySelector('[name="bcc"]');
                             if (ccField) ccField.value = "";
                             if (bccField) bccField.value = "";
-
+                            window.refreshTimeline();
                             resetEmailTemplatePosition();
 
                         } else {

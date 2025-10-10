@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 use Illuminate\Support\Str;
+
 class FetchEmails extends Command
 {
     protected $signature = 'emails:fetch {--limit=10} {--account=*} {--new-only} {--address=*}';
@@ -220,7 +221,32 @@ class FetchEmails extends Command
             $this->processEmail($account, $folder, $emailNumber);
         }
     }
+    /**
+     * Extract threading headers from raw email headers
+     */
+    private function extractThreadingHeaders($rawHeaders)
+    {
+        $threadingHeaders = [
+            'in_reply_to' => null,
+            'references' => null
+        ];
 
+        if (empty($rawHeaders)) {
+            return $threadingHeaders;
+        }
+
+        // Extract In-Reply-To header
+        if (preg_match('/In-Reply-To:\s*(.*)/i', $rawHeaders, $matches)) {
+            $threadingHeaders['in_reply_to'] = trim($matches[1]);
+        }
+
+        // Extract References header
+        if (preg_match('/References:\s*(.*)/i', $rawHeaders, $matches)) {
+            $threadingHeaders['references'] = trim($matches[1]);
+        }
+
+        return $threadingHeaders;
+    }
     private function processEmail(UserPseudoRecord $account, string $folder, int $emailNumber)
     {
         try {
@@ -271,14 +297,24 @@ class FetchEmails extends Command
             }
 
             $overview = @imap_fetch_overview($this->imapConnection, $emailNumber)[0] ?? null;
+
+            // Get raw headers for threading information
+            $rawHeaders = @imap_fetchheader($this->imapConnection, $emailNumber);
+            $threadingHeaders = $this->extractThreadingHeaders($rawHeaders);
+
+            $this->line("Threading headers found - In-Reply-To: " . ($threadingHeaders['in_reply_to'] ?? 'None') . ", References: " . ($threadingHeaders['references'] ?? 'None'));
+
+            // Normalize message ID for duplicate check
+            $normalizedMessageId = $this->normalizeMsgId($overview->message_id ?? '');
+
             if (!$overview) {
                 $this->warn("Skipping email #{$emailNumber}: No overview data");
                 return;
             }
 
             if (
-                isset($overview->message_id) &&
-                Email::where('message_id', $overview->message_id)
+                $normalizedMessageId &&
+                Email::where('message_id', $normalizedMessageId)
                 ->where('pseudo_record_id', $account->id)
                 ->exists()
             ) {
@@ -325,8 +361,10 @@ class FetchEmails extends Command
 
             $email = Email::create([
                 'pseudo_record_id' => $account->id,
-                'thread_id' => $this->generateThreadId($headers),
-                'message_id' => $overview->message_id ?? null,
+                'thread_id' => $this->generateThreadId($headers, $decodedSubject),
+                'message_id' => $normalizedMessageId,
+                'in_reply_to' => $this->normalizeMsgId($threadingHeaders['in_reply_to'] ?? null),
+                'references' => $threadingHeaders['references'] ?? null,
                 'from_email' => $headers->from[0]->mailbox . '@' . $headers->from[0]->host,
                 'from_name' => $headers->from[0]->personal ?? null,
                 'to' => $this->parseAddresses($headers->to ?? null),
@@ -401,133 +439,112 @@ class FetchEmails extends Command
         return $body;
     }
 
-private function processAttachments(int $emailNumber, $structure, Email $email): int
-{
-    $attachmentCount = 0;
-    if (!isset($structure->parts) || empty($structure->parts)) {
-        $this->line("No parts found in structure for email #{$emailNumber}");
-        return $attachmentCount;
-    }
-
-    foreach ($structure->parts as $partNumber => $part) {
-        // Check if the part is a valid attachment (has disposition of ATTACHMENT or INLINE)
-        if (!isset($part->ifdisposition) || !isset($part->disposition) || !in_array(strtoupper($part->disposition), ['ATTACHMENT', 'INLINE'])) {
-            $this->line("Skipping part #{$partNumber} for email #{$emailNumber}: Not an attachment");
-            continue;
+    private function processAttachments(int $emailNumber, $structure, Email $email): int
+    {
+        $attachmentCount = 0;
+        if (!isset($structure->parts) || empty($structure->parts)) {
+            $this->line("No parts found in structure for email #{$emailNumber}");
+            return $attachmentCount;
         }
 
-        $attachmentCount++;
-        $this->line("Processing attachment part #{$partNumber} for email #{$emailNumber}");
+        foreach ($structure->parts as $partNumber => $part) {
+            // Check if the part is a valid attachment (has disposition of ATTACHMENT or INLINE)
+            if (!isset($part->ifdisposition) || !isset($part->disposition) || !in_array(strtoupper($part->disposition), ['ATTACHMENT', 'INLINE'])) {
+                $this->line("Skipping part #{$partNumber} for email #{$emailNumber}: Not an attachment");
+                continue;
+            }
 
-        // Get attachment details
-        $filename = $this->getAttachmentName($part);
-        $filename = $filename ?: "attachment-{$partNumber}." . $this->getExtension($part);
-        $mimeType = $this->getMimeType($part);
-        // Safely handle content_id
-        $contentId = isset($part->ifid) && isset($part->id) && is_string($part->id) ? trim($part->id, '<>') : null;
-        $isInline = strtoupper($part->disposition) === 'INLINE';
+            $attachmentCount++;
+            $this->line("Processing attachment part #{$partNumber} for email #{$emailNumber}");
 
-        // Fetch attachment data
-        $attachmentData = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber + 1);
-        if (!$attachmentData) {
-            $this->warn("Failed to fetch attachment data for part #{$partNumber} in email #{$emailNumber}");
-            continue;
-        }
+            // Get attachment details
+            $filename = $this->getAttachmentName($part);
+            $filename = $filename ?: "attachment-{$partNumber}." . $this->getExtension($part);
+            $mimeType = $this->getMimeType($part);
+            // Safely handle content_id
+            $contentId = isset($part->ifid) && isset($part->id) && is_string($part->id) ? trim($part->id, '<>') : null;
+            $isInline = strtoupper($part->disposition) === 'INLINE';
 
-        // Decode attachment data based on encoding
-        switch ($part->encoding) {
-            case 3: // BASE64
-                $attachmentData = base64_decode($attachmentData);
-                break;
-            case 4: // QUOTED-PRINTABLE
-                $attachmentData = quoted_printable_decode($attachmentData);
-                break;
-            default:
-                // No additional decoding needed
-                break;
-        }
+            // Fetch attachment data
+            $attachmentData = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber + 1);
+            if (!$attachmentData) {
+                $this->warn("Failed to fetch attachment data for part #{$partNumber} in email #{$emailNumber}");
+                continue;
+            }
 
-        if ($attachmentData === false || $attachmentData === null) {
-            $this->warn("Failed to decode attachment data for part #{$partNumber} in email #{$emailNumber}");
-            continue;
-        }
+            // Decode attachment data based on encoding
+            switch ($part->encoding) {
+                case 3: // BASE64
+                    $attachmentData = base64_decode($attachmentData);
+                    break;
+                case 4: // QUOTED-PRINTABLE
+                    $attachmentData = quoted_printable_decode($attachmentData);
+                    break;
+                default:
+                    // No additional decoding needed
+                    break;
+            }
 
-        // Calculate attachment size (in bytes)
-        $size = strlen($attachmentData);
-        $sizeInMb = $size / (1024 * 1024); // Convert to MB
+            if ($attachmentData === false || $attachmentData === null) {
+                $this->warn("Failed to decode attachment data for part #{$partNumber} in email #{$emailNumber}");
+                continue;
+            }
 
-        // Prepare attachment attributes
-        $attachmentAttributes = [
-            'email_id' => $email->id,
-            'original_name' => $filename,
-            'mime_type' => $mimeType,
-            'size' => $size,
-            'content_id' => $contentId,
-            'is_inline' => $isInline,
-            'extension' => pathinfo($filename, PATHINFO_EXTENSION) ?: $this->getExtension($part),
-        ];
+            // Calculate attachment size (in bytes)
+            $size = strlen($attachmentData);
+            $sizeInMb = $size / (1024 * 1024); // Convert to MB
 
-        // Handle attachment storage based on size
-        if ($sizeInMb > 2) {
-            // Store as file if > 2MB
-            $storageName = 'attachments/' . uniqid('email_' . $email->id . '_') . '.' . $attachmentAttributes['extension'];
+            // Prepare attachment attributes
+            $attachmentAttributes = [
+                'email_id' => $email->id,
+                'original_name' => $filename,
+                'mime_type' => $mimeType,
+                'size' => $size,
+                'content_id' => $contentId,
+                'is_inline' => $isInline,
+                'extension' => pathinfo($filename, PATHINFO_EXTENSION) ?: $this->getExtension($part),
+            ];
+
+            // Handle attachment storage based on size
+            if ($sizeInMb > 2) {
+                // Store as file if > 2MB
+                $storageName = 'attachments/' . uniqid('email_' . $email->id . '_') . '.' . $attachmentAttributes['extension'];
+                try {
+                    Storage::disk('public')->put($storageName, $attachmentData);
+                    $attachmentAttributes['storage_name'] = $storageName;
+                    $attachmentAttributes['storage_path'] = Storage::disk('public')->path($storageName);
+                    $this->line("Stored attachment {$filename} as file: {$storageName}");
+                } catch (\Exception $e) {
+                    $this->error("Failed to store attachment {$filename} as file: {$e->getMessage()}");
+                    Log::error('Attachment Storage Error', [
+                        'email_id' => $email->id,
+                        'part' => $partNumber,
+                        'error' => $e->getMessage(),
+                    ]);
+                    continue;
+                }
+            } else {
+                // Store as base64 in database if <= 2MB
+                $attachmentAttributes['base64_content'] = base64_encode($attachmentData);
+                $this->line("Stored attachment {$filename} as base64 in database");
+            }
+
+            // Save attachment record
             try {
-                Storage::disk('public')->put($storageName, $attachmentData);
-                $attachmentAttributes['storage_name'] = $storageName;
-                $attachmentAttributes['storage_path'] = Storage::disk('public')->path($storageName);
-                $this->line("Stored attachment {$filename} as file: {$storageName}");
+                EmailAttachment::create($attachmentAttributes);
+                $this->comment("Attachment {$filename} saved successfully for email #{$emailNumber}");
             } catch (\Exception $e) {
-                $this->error("Failed to store attachment {$filename} as file: {$e->getMessage()}");
-                Log::error('Attachment Storage Error', [
+                $this->error("Failed to save attachment {$filename}: {$e->getMessage()}");
+                Log::error('Attachment Save Error', [
                     'email_id' => $email->id,
                     'part' => $partNumber,
                     'error' => $e->getMessage(),
                 ]);
                 continue;
             }
-        } else {
-            // Store as base64 in database if <= 2MB
-            $attachmentAttributes['base64_content'] = base64_encode($attachmentData);
-            $this->line("Stored attachment {$filename} as base64 in database");
         }
 
-        // Save attachment record
-        try {
-            EmailAttachment::create($attachmentAttributes);
-            $this->comment("Attachment {$filename} saved successfully for email #{$emailNumber}");
-        } catch (\Exception $e) {
-            $this->error("Failed to save attachment {$filename}: {$e->getMessage()}");
-            Log::error('Attachment Save Error', [
-                'email_id' => $email->id,
-                'part' => $partNumber,
-                'error' => $e->getMessage(),
-            ]);
-            continue;
-        }
-    }
-
-    return $attachmentCount;
-}
-
-    private function getAttachmentFilename($part)
-    {
-        if (isset($part->dparameters)) {
-            foreach ($part->dparameters as $param) {
-                if (strtolower($param->attribute) == 'filename') {
-                    return $param->value;
-                }
-            }
-        }
-
-        if (isset($part->parameters)) {
-            foreach ($part->parameters as $param) {
-                if (strtolower($param->attribute) == 'name') {
-                    return $param->value;
-                }
-            }
-        }
-
-        return null;
+        return $attachmentCount;
     }
 
     private function parseDate($date)
@@ -544,41 +561,104 @@ private function processAttachments(int $emailNumber, $structure, Email $email):
     }
 
 
-private function normalizeMsgId($id)
-{
-    return trim($id, " <>\t\n\r");
-}
-
-private function generateThreadId($headers)
-{
-    // Prefer In-Reply-To
-    if (!empty($headers->in_reply_to)) {
-        $inReplyTo = $this->normalizeMsgId($headers->in_reply_to);
-        $parent = Email::where('message_id', $inReplyTo)->first();
-        if ($parent) {
-            return $parent->thread_id ?? $parent->message_id;
+    private function normalizeMsgId($id)
+    {
+        if (empty($id)) {
+            return null;
         }
-    }
 
-    // Fallback: last reference in References chain
-    if (!empty($headers->references)) {
-        $refs = preg_split('/\s+/', trim($headers->references));
-        $refs = array_filter($refs);
-        $lastRef = $this->normalizeMsgId(end($refs));
-        $parent = Email::where('message_id', $lastRef)->first();
-        if ($parent) {
-            return $parent->thread_id ?? $parent->message_id;
+        $normalized = trim($id, " <>\t\n\r");
+
+        // If it contains @, extract the UUID part (your sent emails use UUIDs)
+        if (str_contains($normalized, '@')) {
+            $parts = explode('@', $normalized);
+            $uuidPart = $parts[0];
+
+            // Check if it's a valid UUID
+            if (\Illuminate\Support\Str::isUuid($uuidPart)) {
+                return $uuidPart;
+            }
         }
+
+        return $normalized;
     }
 
-    // No parent → use this message’s own message-id (plain uuid)
-    if (!empty($headers->message_id)) {
-        return $this->normalizeMsgId($headers->message_id);
+    private function generateThreadId($headers, $subject = '')
+    {
+        // Get raw headers for threading information
+        $emailNumber = $headers->Msgno ?? 0; // Get the email number from headers
+        $rawHeaders = @imap_fetchheader($this->imapConnection, $emailNumber);
+        $threadingHeaders = $this->extractThreadingHeaders($rawHeaders);
+
+        $messageId = $this->normalizeMsgId($headers->message_id ?? '');
+        $inReplyTo = $this->normalizeMsgId($threadingHeaders['in_reply_to'] ?? '');
+        $references = $threadingHeaders['references'] ?? '';
+
+        $this->line("Threading analysis - Message ID: {$messageId}, In-Reply-To: {$inReplyTo}, References: {$references}, Subject: {$subject}");
+
+        // 1. Check In-Reply-To header
+        if ($inReplyTo) {
+            $this->line("Checking In-Reply-To: {$inReplyTo}");
+
+            $parent = Email::where('message_id', $inReplyTo)->first();
+            if ($parent) {
+                $this->line("Found parent via In-Reply-To: {$parent->thread_id}");
+                return $parent->thread_id;
+            }
+        }
+
+        // 2. Check References header (all references)
+        if (!empty($references)) {
+            $refs = preg_split('/\s+/', trim($references));
+            $refs = array_filter($refs);
+
+            $this->line("Checking References: " . implode(', ', $refs));
+
+            // Check all references from newest to oldest
+            foreach (array_reverse($refs) as $ref) {
+                $normalizedRef = $this->normalizeMsgId($ref);
+                $this->line("Checking reference: {$normalizedRef}");
+
+                $parent = Email::where('message_id', $normalizedRef)->first();
+                if ($parent) {
+                    $this->line("Found parent via References: {$parent->thread_id}");
+                    return $parent->thread_id;
+                }
+            }
+        }
+
+        // 3. Subject-based threading
+        $cleanSubject = $this->cleanSubject($subject);
+        if ($cleanSubject) {
+            $this->line("Trying subject-based threading: {$cleanSubject}");
+
+            $existingThread = Email::where('subject', 'like', '%' . $cleanSubject . '%')
+                ->orWhere('subject', 'like', '%Re: ' . $cleanSubject . '%')
+                ->orWhere('subject', 'like', '%Fwd: ' . $cleanSubject . '%')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($existingThread) {
+                $this->line("Found thread via subject: {$existingThread->thread_id}");
+                return $existingThread->thread_id;
+            }
+        }
+
+        // 4. Fallback to message ID
+        $finalThreadId = $messageId ?: (string) \Illuminate\Support\Str::uuid();
+        $this->line("Using fallback thread ID: {$finalThreadId}");
+
+        return $finalThreadId;
     }
 
-    // Fallback UUID
-    return (string) Str::uuid();
-}
+    private function cleanSubject($subject)
+    {
+        if (empty($subject)) return '';
+
+        // Remove common prefixes and trim
+        $clean = preg_replace('/^(Re:|Fwd:|FW:)\s*/i', '', $subject);
+        return trim($clean);
+    }
 
 
 
@@ -657,45 +737,45 @@ private function generateThreadId($headers)
         }
     }
 
- private function getAttachmentName($part): ?string
-{
-    if (isset($part->ifdparameters) && $part->dparameters) {
-        foreach ($part->dparameters as $param) {
-            if (strtolower($param->attribute) === 'filename') {
-                return $param->value;
+    private function getAttachmentName($part): ?string
+    {
+        if (isset($part->ifdparameters) && $part->dparameters) {
+            foreach ($part->dparameters as $param) {
+                if (strtolower($param->attribute) === 'filename') {
+                    return $param->value;
+                }
             }
         }
-    }
-    if (isset($part->ifparameters) && $part->parameters) {
-        foreach ($part->parameters as $param) {
-            if (strtolower($param->attribute) === 'name') {
-                return $param->value;
+        if (isset($part->ifparameters) && $part->parameters) {
+            foreach ($part->parameters as $param) {
+                if (strtolower($param->attribute) === 'name') {
+                    return $param->value;
+                }
             }
         }
+        return null;
     }
-    return null;
-}
 
-private function getMimeType($part): string
-{
-    $type = $part->type ?? 0;
-    $types = ['text', 'multipart', 'message', 'application', 'audio', 'image', 'video', 'other'];
-    $primary = $types[$type] ?? 'application';
-    $subtype = $part->subtype ?? 'octet-stream';
-    return strtolower("{$primary}/{$subtype}");
-}
+    private function getMimeType($part): string
+    {
+        $type = $part->type ?? 0;
+        $types = ['text', 'multipart', 'message', 'application', 'audio', 'image', 'video', 'other'];
+        $primary = $types[$type] ?? 'application';
+        $subtype = $part->subtype ?? 'octet-stream';
+        return strtolower("{$primary}/{$subtype}");
+    }
 
-private function getExtension($part): string
-{
-    $mimeType = $this->getMimeType($part);
-    $extensions = [
-        'application/pdf' => 'pdf',
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'text/plain' => 'txt',
-        'application/msword' => 'doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-    ];
-    return $extensions[$mimeType] ?? 'bin';
-}
+    private function getExtension($part): string
+    {
+        $mimeType = $this->getMimeType($part);
+        $extensions = [
+            'application/pdf' => 'pdf',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'text/plain' => 'txt',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+        ];
+        return $extensions[$mimeType] ?? 'bin';
+    }
 }

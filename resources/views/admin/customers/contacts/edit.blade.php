@@ -2404,7 +2404,7 @@ $(document).ready(function() {
                 const customerEmail = "{{ $customer_contact->email }}";
                 let folder = 'all';
                 let currentPage = {{ $page }};
-                const limit = 10;
+                const limit = 50;
                 const noEmailsPlaceholder = document.querySelector('.no-emails-placeholder');
 
                 const tabs = document.querySelectorAll('.nav-link.customize');
@@ -2419,6 +2419,19 @@ $(document).ready(function() {
                         refreshTimeline(true); // append
                     });
                 }
+
+                window.updateFilterActivityCount = function (count, total_count) {
+                    // Only target the .activities-seprater inside .recent-activities
+                    const filterSpan = document.querySelector('#activities-container .activities-seprater');
+
+                    console.log('Updating filter inside .recent-activities:', count, total_count, filterSpan);
+
+                    if (filterSpan) {
+                        filterSpan.textContent = `Filter activity (${count}/${total_count})`;
+                    } else {
+                        console.warn('⚠️ .recent-activities .activities-seprater not found');
+                    }
+                };
 
                 // Get the active tab
                 function getActiveTab() {
@@ -2435,7 +2448,7 @@ $(document).ready(function() {
                 }
 
                 // Fetch Timeline (Refresh)
-               function refreshTimeline(append = false) {
+                window.refreshTimeline = function (append = false) {
                     const activeTab = getActiveTab();
                     const section = document.getElementById(`${activeTab}-section`) || timelineSection;
                     if (timelineLoader) timelineLoader.style.display = 'block';
@@ -2483,13 +2496,16 @@ $(document).ready(function() {
                         } else if (section) {
                             section.innerHTML = html;
                         }
+                        updateFilterActivityCount(data.count, data.total_count);
+
 
                         if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
                         // Show/hide "Show More" button based on available items
                         if (showMoreContainer) {
-                            showMoreContainer.style.display = (data.count >= data.limit) ? 'block' : 'none';
+                            showMoreContainer.style.display = (data.count >= data.total_count) ? 'block' : 'none';
                         }
                         toastr.success("Timeline loaded successfully.");
+
                     })
                     .catch(err => {
                         if (timelineLoader) timelineLoader.style.display = 'none';
@@ -2507,6 +2523,7 @@ $(document).ready(function() {
                     refreshButton.addEventListener('click', function() {
                         currentPage = 1;
                         refreshTimeline(false); // reload first page
+                        
                     });
                 }
 
