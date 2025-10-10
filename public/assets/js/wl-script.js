@@ -66,15 +66,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     forms.forEach(form => {
         const visitor_id = getVisitorId();
-        async function getPublicIP() {
-            try {
-                const res = await fetch("https://ipapi.co/json");
-                return await res.json();
-            } catch (e) {
-                console.error("Unable to fetch public IP", e);
-                return null;
-            }
-        }
         form.addEventListener("submit", async function () {
             currentScript = getCurrentScript();
             token = getScriptToken(currentScript);
@@ -104,16 +95,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 submission_time: new Date().toLocaleString()
             };
-            // let publicData;
-            // try {
-            //     publicData = await getPublicIP();
-            // } catch (e) {
-            //     publicData = null;
-            // }
-            // if (publicData) {
-            //     deviceInfo.public_ip = publicData.ip;
-            //     deviceInfo.publicData = publicData;
-            // }
             const payload = JSON.stringify({
                 visitor_id,
                 script_token: token,
