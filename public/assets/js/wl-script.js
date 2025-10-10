@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let script of scripts) {
             if (!script.hasAttribute('data-wl-processed')) {
                 script.setAttribute('data-wl-processed', 'true');
+                script.setAttribute('crossorigin', 'anonymous');
                 return script;
             }
         }
