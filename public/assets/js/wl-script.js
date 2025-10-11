@@ -143,13 +143,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const PENDING_SUBMISSIONS_KEY = "pending_lead_submissions";
     const SUBMITTED_IDS_KEY = "submitted_lead_ids";
     const activeScriptInfo = getActiveScriptInfo();
-    if (activeScriptInfo) {
-        console.log('WL Script: Active instance running from:', activeScriptInfo.src);
-        const allScripts = document.querySelectorAll('script[src*="wl-script.js"]');
-        allScripts.forEach(script => {
-            script.setAttribute('data-wl-processed', 'true');
-        });
-    }
+    // if (activeScriptInfo) {
+    //     console.log('WL Script: Active instance running from:', activeScriptInfo.src);
+    //     const allScripts = document.querySelectorAll('script[src*="wl-script.js"]');
+    //     allScripts.forEach(script => {
+    //         script.setAttribute('data-wl-processed', 'true');
+    //     });
+    // }
     function getActiveScriptInfo() {
         const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
         let activeScript = null;
