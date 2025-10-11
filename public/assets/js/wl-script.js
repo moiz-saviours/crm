@@ -452,10 +452,6 @@ document.addEventListener("DOMContentLoaded", function () {
     forms.forEach(form => {
         form.addEventListener("submit", async function (e) {
 
-            if (window.__wlScriptRunning === false) {
-                console.log('WL Script: Another instance took over, stopping execution');
-                return;
-            }
             const visitor_id = getVisitorId();
             const formData = {};
 
@@ -501,11 +497,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     cleanupOldSubmissions();
-    sendStoredSubmissions();
+
+    if (window.__wlScriptRunning === true) {
+        sendStoredSubmissions();
+        window.__wlScriptRunning = false;
+    }
 
     document.addEventListener('visibilitychange', function () {
         if (!document.hidden) {
-            sendStoredSubmissions();
-        }
+            if (window.__wlScriptRunning === true) {
+                sendStoredSubmissions();
+                window.__wlScriptRunning = false;
+            }        }
     });
 });
