@@ -452,6 +452,10 @@ document.addEventListener("DOMContentLoaded", function () {
     forms.forEach(form => {
         form.addEventListener("submit", async function (e) {
 
+            if (window.__wlScriptRunning === false) {
+                console.log('WL Script: Another instance took over, stopping execution');
+                return;
+            }
             const visitor_id = getVisitorId();
             const formData = {};
 
