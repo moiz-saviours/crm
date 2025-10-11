@@ -1012,6 +1012,14 @@
             z-index: 2;
             display: none;
         }
+        .quoted-history {
+            padding-right:20px !important ;
+            text-align: left !important;
+        }
+        button.show-quoted-btn.btn.btn-sm.btn-outline-secondary {
+            padding: 6px 18px;
+            margin: 8px 30px;
+        }
 
     </style>
 @endpush
@@ -1119,7 +1127,7 @@
                     <div class="email-sending-box">
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles">From</p>
-                            <p class="email-sender-name" style="min-width: 550px;">
+                            <p class="email-sender-name" style="min-width: 520px;">
                                 <select name="from_email" class="form-select form-control from_email"
                                         style="width: auto; display: inline-block;border:none;">
                                     @foreach($pseudo_emails as $item)
@@ -1160,8 +1168,8 @@
                         </div>
 
                         <!-- Quoted history (non-editable) -->
-                        <div class="quoted-history-container position-relative">
-                            <button class="show-quoted-btn btn btn-sm btn-outline-secondary mx-3" type="button" title="Show quoted">
+                        <div class="quoted-history-container">
+                            <button class="show-quoted-btn btn btn-sm btn-outline-secondary " type="button" title="Show quoted">
                                 ...
                             </button>
 
@@ -1335,7 +1343,7 @@
                     return;
                 }
                 //validation end
-                
+
                 const formData = new FormData();
                 formData.append('email_content', emailContent.value);
 
