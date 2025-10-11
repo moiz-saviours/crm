@@ -251,10 +251,7 @@ class EmailController extends Controller
             if (!empty($forwardIdRequest)) {
                 $originalEmail = Email::where('message_id', $forwardIdRequest)->first();
                 if ($originalEmail) {
-                    // Preserve original plain text content exactly as it is
-                    $originalBodyHtml = $originalEmail->body_html;
-                    $originalBodyText = $originalEmail->body_text;
-
+                    $originalBody = $originalEmail->body_html ?: $originalEmail->body_text;
                     $originalFrom = $originalEmail->from_name ?: $originalEmail->from_email;
                     $originalDate = $originalEmail->message_date->format('D, M d, Y \a\t H:i:s');
 
@@ -265,14 +262,17 @@ class EmailController extends Controller
                     $quotedBody .= "Sent: {$originalDate}<br>";
                     $quotedBody .= "To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "<br>";
                     $quotedBody .= "Subject: {$originalEmail->subject}</p>";
-                    $quotedBody .= $originalBodyHtml ?: nl2br(e($originalBodyText));
+                    $quotedBody .= $originalBody;
                     $quotedBody .= "</div>";
 
-                    // Concatenate forwarded section with current content
+                    // Concatenate new content with quoted original content
                     $emailContent = $emailContent . $quotedBody;
 
-                    // Preserve the original plain text body for body_text (unaltered)
-                    $textContent = $originalBodyText;
+                    // Text version for AltBody
+                    $textQuotedBody = "\n\n----- Forwarded Message -----\n";
+                    $textQuotedBody .= "> From: {$originalFrom}\n> Sent: {$originalDate}\n> To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "\n> Subject: {$originalEmail->subject}\n\n";
+                    $textQuotedBody .= strip_tags($originalBody);
+                    $textContent = strip_tags($emailContent) . $textQuotedBody;
 
                     // Add "Fwd:" prefix if missing
                     if (!str_starts_with(strtolower($subject), 'fwd:')) {

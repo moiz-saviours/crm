@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class FetchEmails extends Command
 {
-    protected $signature = 'emails:fetch {--limit=10} {--account=*} {--new-only} {--address=*}';
+    protected $signature = 'emails:fetch {--limit=100} {--account=*} {--new-only} {--address=*}';
     protected $description = 'Fetch emails from IMAP accounts';
 
     private $imapConnection;
@@ -21,6 +21,7 @@ class FetchEmails extends Command
 
     public function handle()
     {
+        ini_set('max_execution_time', 300);
         $startTime = microtime(true);
         $this->info('Starting email fetch process...');
 

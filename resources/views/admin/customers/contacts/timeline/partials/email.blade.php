@@ -87,13 +87,16 @@
                 @endphp
 
                 @if ($emails->isEmpty())
-                    <div class="text-center py-4 no-emails-placeholder">
-                        <i class="fa fa-envelope-open text-muted" style="font-size: 32px;"></i>
-                        <p class="mt-2 text-muted">No emails available yet.</p>
-                        <small class="text-secondary">
-                            Once you send or receive emails, they’ll appear here.
-                        </small>
+                    <div id="emails-section">
+                        <div class="text-center py-4 no-emails-placeholder">
+                            <i class="fa fa-envelope-open text-muted" style="font-size: 32px;"></i>
+                            <p class="mt-2 text-muted">No emails available yet.</p>
+                            <small class="text-secondary">
+                                Once you send or receive emails, they’ll appear here.
+                            </small>
+                        </div>
                     </div>
+
                 @else
                     {{-- Static header --}}
                     @include('admin.customers.contacts.timeline.static-content.email')

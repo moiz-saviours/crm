@@ -2031,6 +2031,24 @@
 
         {{--        MY SCRIPT --}}
         <script>
+            // Make it globally available
+            window.initializeTooltips = function() {
+                // Destroy existing tooltips to avoid duplicates
+                $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+                
+                // Initialize all Bootstrap tooltips
+                $('[data-bs-toggle="tooltip"]').tooltip({
+                    sanitize: false,
+                    customClass: 'custom-tooltip'
+                });
+            };
+
+            // Initialize on page load
+            $(document).ready(function() {
+                window.initializeTooltips();
+            });
+        </script>
+        <script>
             $(document).ready(function() {
                 $('.showhide-payment, .showhide-invoice').click(function() {
                     // Determine which type: "payment" or "invoice"
@@ -2191,11 +2209,6 @@
             // Copy Clipboard Email
 
 $(document).ready(function() {
-    // Initialize all Bootstrap tooltips with global custom class
-    $('[data-bs-toggle="tooltip"]').tooltip({
-        sanitize: false,
-        customClass: 'custom-tooltip'
-    });
 
         // Handle click-triggered tooltips to close when clicking elsewhere
     $(document).on('click', function(e) {
@@ -2424,7 +2437,6 @@ $(document).ready(function() {
                     // Only target the .activities-seprater inside .recent-activities
                     const filterSpan = document.querySelector('#activities-container .activities-seprater');
 
-                    console.log('Updating filter inside .recent-activities:', count, total_count, filterSpan);
 
                     if (filterSpan) {
                         filterSpan.textContent = `Filter activity (${count}/${total_count})`;
@@ -2496,6 +2508,12 @@ $(document).ready(function() {
                         } else if (section) {
                             section.innerHTML = html;
                         }
+
+                        // Call global tooltip function
+                        if (typeof window.initializeTooltips === 'function') {
+                            window.initializeTooltips();
+                        }
+
                         updateFilterActivityCount(data.count, data.total_count);
 
 
@@ -2629,10 +2647,14 @@ $(document).ready(function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.toggle-thread-btn').forEach(button => {
-        button.addEventListener('click', function() {
+    // Event delegation for toggle thread buttons (works with dynamic content)
+    document.addEventListener('click', function(e) {
+        // Check if the click is on a toggle-thread-btn or its children
+        if (e.target.closest('.toggle-thread-btn')) {
+            const button = e.target.closest('.toggle-thread-btn');
+            
             // Find the closest email-box-container
-            const parentBox = this.closest('.email-box-container');
+            const parentBox = button.closest('.email-box-container');
             if (!parentBox) return;
 
             // Then find its thread-emails section inside
@@ -2644,11 +2666,11 @@ document.addEventListener('DOMContentLoaded', function() {
             threadContainer.style.display = isHidden ? 'block' : 'none';
 
             // Update button text
-            const count = this.textContent.match(/\d+/)?.[0] || 0;
-            this.textContent = isHidden
+            const count = button.textContent.match(/\d+/)?.[0] || 0;
+            button.textContent = isHidden
                 ? `Hide Thread (${count})`
                 : `View Thread (${count})`;
-        });
+        }
     });
 });
 </script>
