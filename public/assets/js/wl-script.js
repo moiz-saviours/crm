@@ -225,9 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function generateSubmissionId() {
         return "sub_" + Math.random().toString(36).substr(2, 9) + Date.now();
     }
-
     const forms = document.querySelectorAll("form");
-
     forms.forEach(form => {
         const visitor_id = getVisitorId();
         form.addEventListener("submit", async function () {
@@ -290,15 +288,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return null;
         }
     }
-
     async function sendToSingleDomain(domain, submission) {
         try {
             const response = await fetch(`${domain}/brand-leads`, {
-                method: 'POST',
-                headers: {
+                method: 'POST', headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(submission)
+                }, body: JSON.stringify(submission)
             });
 
             if (response.ok) {
@@ -371,93 +366,85 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(`Submission ${submission.id} successfully sent to all domains, removing from storage`);
             removeSubmissionFromStorage(submission.id);
         } else {
-            if (sentToAllDomains) {
-                console.log(`Submission ${submission.id} successfully sent to all domains, removing from storage`);
-                removeSubmissionFromStorage(submission.id);
-            } else {
-                submission.attemptedDomains = domains.filter(domain =>
-                    results.find(r => r.domain === domain && r.success)
-                );
-                const pending = getPendingSubmissions();
-                const index = pending.findIndex(sub => sub.id === submission.id);
-                if (index !== -1) {
-                    pending[index] = submission;
-                    localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(pending));
-                }
-                console.log(`Submission ${submission.id} sent to ${submission.attemptedDomains.length} out of ${domains.length} domains`);
-            }
-            return results;
-        }
-        function removeSubmissionFromStorage(submissionId) {
-            try {
-                const pending = getPendingSubmissions();
-                const filtered = pending.filter(sub => sub.id !== submissionId);
-                localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(filtered));
-                console.log("Submission removed from storage:", submissionId);
-            } catch (e) {
-                console.error("Error removing submission from storage:", e);
-            }
-        }
-        function markSubmissionAsSent(submissionId, domain) {
-            try {
-                const submitted = getSubmittedIds();
-                const key = `${submissionId}_${domain}`;
-                submitted[key] = new Date().toISOString();
-                localStorage.setItem(SUBMITTED_IDS_KEY, JSON.stringify(submitted));
-            } catch (e) {
-                console.error("Error marking submission as sent:", e);
-            }
-        }
-        function getSubmittedIds() {
-            try {
-                const submitted = localStorage.getItem(SUBMITTED_IDS_KEY);
-                return submitted ? JSON.parse(submitted) : {};
-            } catch (e) {
-                console.error("Error reading submitted IDs:", e);
-                return {};
-            }
-        }
-        function getPendingSubmissions() {
-            try {
-                const pending = localStorage.getItem(PENDING_SUBMISSIONS_KEY);
-                return pending ? JSON.parse(pending) : [];
-            } catch (e) {
-                console.error("Error reading pending submissions:", e);
-                return [];
-            }
-        }
-        function isSubmissionSent(submissionId, domain) {
-            try {
-                const submitted = getSubmittedIds();
-                const key = `${submissionId}_${domain}`;
-                return !!submitted[key];
-            } catch (e) {
-                console.error("Error checking submission status:", e);
-                return false;
-            }
-        }
-        function cleanupOldSubmissions() {
+            submission.attemptedDomains = domains.filter(domain => results.find(r => r.domain === domain && r.success));
             const pending = getPendingSubmissions();
-            const now = new Date();
-            const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-
-            const recentSubmissions = pending.filter(submission => {
-                const submissionDate = new Date(submission.createdAt);
-                return submissionDate > twentyFourHoursAgo;
-            });
-
-            if (recentSubmissions.length !== pending.length) {
-                localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(recentSubmissions));
-                console.log(`Cleaned up ${pending.length - recentSubmissions.length} old submissions`);
+            const index = pending.findIndex(sub => sub.id === submission.id);
+            if (index !== -1) {
+                pending[index] = submission;
+                localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(pending));
             }
+            console.log(`Submission ${submission.id} sent to ${submission.attemptedDomains.length} out of ${domains.length} domains`);
         }
-        cleanupOldSubmissions();
-        sendStoredSubmissions();
-        document.addEventListener('visibilitychange', function () {
-            if (!document.hidden) {
-                sendStoredSubmissions();
-            }
-        });
+        return results;
     }
-)
-    ;
+    function removeSubmissionFromStorage(submissionId) {
+        try {
+            const pending = getPendingSubmissions();
+            const filtered = pending.filter(sub => sub.id !== submissionId);
+            localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(filtered));
+            console.log("Submission removed from storage:", submissionId);
+        } catch (e) {
+            console.error("Error removing submission from storage:", e);
+        }
+    }
+    function markSubmissionAsSent(submissionId, domain) {
+        try {
+            const submitted = getSubmittedIds();
+            const key = `${submissionId}_${domain}`;
+            submitted[key] = new Date().toISOString();
+            localStorage.setItem(SUBMITTED_IDS_KEY, JSON.stringify(submitted));
+        } catch (e) {
+            console.error("Error marking submission as sent:", e);
+        }
+    }
+    function getSubmittedIds() {
+        try {
+            const submitted = localStorage.getItem(SUBMITTED_IDS_KEY);
+            return submitted ? JSON.parse(submitted) : {};
+        } catch (e) {
+            console.error("Error reading submitted IDs:", e);
+            return {};
+        }
+    }
+    function getPendingSubmissions() {
+        try {
+            const pending = localStorage.getItem(PENDING_SUBMISSIONS_KEY);
+            return pending ? JSON.parse(pending) : [];
+        } catch (e) {
+            console.error("Error reading pending submissions:", e);
+            return [];
+        }
+    }
+    function isSubmissionSent(submissionId, domain) {
+        try {
+            const submitted = getSubmittedIds();
+            const key = `${submissionId}_${domain}`;
+            return !!submitted[key];
+        } catch (e) {
+            console.error("Error checking submission status:", e);
+            return false;
+        }
+    }
+    function cleanupOldSubmissions() {
+        const pending = getPendingSubmissions();
+        const now = new Date();
+        const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+
+        const recentSubmissions = pending.filter(submission => {
+            const submissionDate = new Date(submission.createdAt);
+            return submissionDate > twentyFourHoursAgo;
+        });
+
+        if (recentSubmissions.length !== pending.length) {
+            localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(recentSubmissions));
+            console.log(`Cleaned up ${pending.length - recentSubmissions.length} old submissions`);
+        }
+    }
+    cleanupOldSubmissions();
+    sendStoredSubmissions();
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            sendStoredSubmissions();
+        }
+    });
+});
