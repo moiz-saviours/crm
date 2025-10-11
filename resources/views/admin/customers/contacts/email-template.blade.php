@@ -1338,6 +1338,13 @@
                     valid = false;
                 }
 
+                // Check total email content size including base64 images
+                const totalSize = new Blob([emailContent.value]).size;
+                if (totalSize > 1048576) {
+                    toastr.error("Total email content including images should not exceed 1 MB.");
+                    valid = false;
+                }
+
                 // Stop if required fields invalid
                 if (!valid) {
                     return;

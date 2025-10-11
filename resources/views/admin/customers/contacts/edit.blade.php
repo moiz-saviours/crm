@@ -2627,23 +2627,32 @@ $(document).ready(function() {
             });
         </script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.toggle-thread-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const targetId = this.getAttribute('data-target');
-                        const threadContainer = document.getElementById(targetId);
-                        if (threadContainer) {
-                            threadContainer.style.display = threadContainer.style.display === 'none' ?
-                                'block' : 'none';
-                            this.textContent = threadContainer.style.display === 'none' ?
-                                `View Thread (${this.textContent.match(/\d+/)?.[0] || 0})` :
-                                `Hide Thread (${this.textContent.match(/\d+/)?.[0] || 0})`;
-                        }
-                    });
-                });
-            });
-        </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.toggle-thread-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Find the closest email-box-container
+            const parentBox = this.closest('.email-box-container');
+            if (!parentBox) return;
+
+            // Then find its thread-emails section inside
+            const threadContainer = parentBox.querySelector('.thread-emails');
+            if (!threadContainer) return;
+
+            // Toggle visibility
+            const isHidden = threadContainer.style.display === 'none' || threadContainer.style.display === '';
+            threadContainer.style.display = isHidden ? 'block' : 'none';
+
+            // Update button text
+            const count = this.textContent.match(/\d+/)?.[0] || 0;
+            this.textContent = isHidden
+                ? `Hide Thread (${count})`
+                : `View Thread (${count})`;
+        });
+    });
+});
+</script>
+
 
 <script>
 

@@ -25,7 +25,7 @@
     $bccList = $parseEmails($item['data']['bcc'] ?? []);
 @endphp
 
-<h2 class="toggle-email-header" 
+<h2 class="toggle-email-header"
     style="cursor:pointer;"
     data-bs-toggle="tooltip" 
     data-bs-html="true"
@@ -354,24 +354,21 @@
     </div>
 
 
-    <div class="user-cont-hide">
-        <div class="user_cont user-cont-hide">
-            @php
-                $htmlContent = $item['data']['body']['html'] ?? '';
-                $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
-                $previewContent = $isHtmlEmpty
-                    ? $item['data']['body']['text'] ?? ''
-                    : strip_tags($htmlContent);
-                $previewContent = Str::limit($previewContent, 100, '...');
-            @endphp
-            {{-- <p>{!! nl2br(e($previewContent)) !!}</p> --}}
-        </div>
+<div class="user-cont-hide">
+    <div class="user_cont user-cont-hide">
+        @php
+            $htmlContent = $item['data']['body']['html'] ?? '';
+            $isHtmlEmpty = empty(trim(strip_tags($htmlContent)));
+            $previewContent = Str::limit(strip_tags($htmlContent), 100, '...');
+        @endphp
+        {{-- <p>{!! nl2br(e($previewContent)) !!}</p> --}}
     </div>
+</div>
 
     <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
-        <div class="user_cont user-email-template">
-            {!! $isHtmlEmpty ? nl2br($item['data']['body']['text'] ?? '') : $htmlContent !!}
-        </div>
+    <div class="user_cont user-email-template">
+        {!! $htmlContent !!}
+    </div>
 
      @if (!empty($item['data']['attachments']))
     <div class="attachments-section mb-4">
@@ -404,7 +401,7 @@
             @endforeach
         </div>
     </div>
-@endif
+    @endif
         @if (isset($item['data']['thread_email_count']) && $item['data']['thread_email_count'] > 0)
             <div class="comment-active_head">
                 <div>

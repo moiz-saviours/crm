@@ -188,9 +188,6 @@ class EmailController extends Controller
                 $threadId = $this->normalizeMsgId($messageId);
             }
 
-
-
-            // Build references header
             // Build references header
             $references = '';
             if (!empty($referencesRequest)) {
@@ -254,40 +251,39 @@ class EmailController extends Controller
             if (!empty($forwardIdRequest)) {
                 $originalEmail = Email::where('message_id', $forwardIdRequest)->first();
                 if ($originalEmail) {
-                    // Get the original email's body (prefer HTML if available, fallback to text)
-                    $originalBody = $originalEmail->body_html ?: $originalEmail->body_text;
+                    // Preserve original plain text content exactly as it is
+                    $originalBodyHtml = $originalEmail->body_html;
+                    $originalBodyText = $originalEmail->body_text;
+
                     $originalFrom = $originalEmail->from_name ?: $originalEmail->from_email;
                     $originalDate = $originalEmail->message_date->format('D, M d, Y \a\t H:i:s');
 
-                    // Format the original email as a quoted forward
+                    // Build forwarded section in HTML
                     $quotedBody = "<br><br><div style='border-left: 2px solid #ccc; padding-left: 10px;'>";
                     $quotedBody .= "<p>----- Forwarded Message -----<br>";
                     $quotedBody .= "From: {$originalFrom}<br>";
                     $quotedBody .= "Sent: {$originalDate}<br>";
                     $quotedBody .= "To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "<br>";
                     $quotedBody .= "Subject: {$originalEmail->subject}</p>";
-                    $quotedBody .= $originalBody;
+                    $quotedBody .= $originalBodyHtml ?: nl2br(e($originalBodyText));
                     $quotedBody .= "</div>";
 
-                    // Concatenate new content with quoted original content
+                    // Concatenate forwarded section with current content
                     $emailContent = $emailContent . $quotedBody;
 
-                    // Text version for AltBody
-                    $textQuotedBody = "\n\n----- Forwarded Message -----\n";
-                    $textQuotedBody .= "> From: {$originalFrom}\n> Sent: {$originalDate}\n> To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "\n> Subject: {$originalEmail->subject}\n\n";
-                    $textQuotedBody .= strip_tags($originalBody);
-                    $textContent = strip_tags($emailContent) . $textQuotedBody;
+                    // Preserve the original plain text body for body_text (unaltered)
+                    $textContent = $originalBodyText;
 
-                    // Add "Fwd:" prefix to subject if not already present
+                    // Add "Fwd:" prefix if missing
                     if (!str_starts_with(strtolower($subject), 'fwd:')) {
                         $subject = 'Fwd: ' . $subject;
                     }
                 } else {
-                    // Log if original email not found
                     Log::warning('Original email not found for forward_id', [
                         'forward_id' => $forwardIdRequest,
                     ]);
                 }
+
             }
 
             // Store email record
