@@ -151,8 +151,8 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    if (!window.__wlScriptRunning) {
-        console.log('WL Script: Another instance is running, stopping this instance');
+    if (window.__wlScriptRunning === false) {
+        console.log('WL Script: Another instance took over, stopping execution');
         return;
     }
 
@@ -355,6 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(`Found ${uniqueDomains.length} unique domains from ${scripts.length} scripts`);
         return uniqueDomains;
     }
+
     async function sendToSingleDomain(domain, submission) {
         try {
             const response = await fetch(`${domain}/brand-leads`, {
@@ -380,7 +381,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function sendSubmissionToDomains(submission, domains) {
         const results = [];
+
         for (const domain of domains) {
+
             if (isSubmissionSent(submission.id, domain)) {
                 console.log(`Submission ${submission.id} already sent to ${domain}, skipping`);
                 continue;
@@ -397,9 +400,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const sentToAnyDomain = results.some(result => result.success);
 
         if (sentToAnyDomain) {
+
             submission.attemptedDomains = domains.filter(domain =>
                 results.find(r => r.domain === domain && r.success)
             );
+
             const pending = getPendingSubmissions();
             const index = pending.findIndex(sub => sub.id === submission.id);
             if (index !== -1) {
@@ -413,43 +418,23 @@ document.addEventListener("DOMContentLoaded", function () {
         return results;
     }
 
-    async function sendSubmissionToDomains(submission, domains) {
-        const results = [];
+    async function sendStoredSubmissions() {
+        const pending = getPendingSubmissions();
+        if (pending.length === 0) return;
 
-        for (const domain of domains) {
+        console.log(`Found ${pending.length} pending submissions to send`);
 
-            if (isSubmissionSent(submission.id, domain)) {
-                console.log(`Submission ${submission.id} already sent to ${domain}, skipping`);
-                continue;
-            }
-
-            const success = await sendToSingleDomain(domain, submission);
-            results.push({domain, success});
-
-            if (success) {
-                markSubmissionAsSent(submission.id, domain);
-            }
+        const workingDomains = getAllUniqueDomains();
+        if (workingDomains.length === 0) {
+            console.log("No domains found, keeping submissions for later");
+            return;
         }
 
-        const sentToAnyDomain = results.some(result => result.success);
+        for (const submission of pending) {
+            await sendSubmissionToDomains(submission, workingDomains);
 
-        if (sentToAnyDomain) {
-
-            submission.attemptedDomains = domains.filter(domain =>
-                results.find(r => r.domain === domain && r.success)
-            );
-
-            const pending = getPendingSubmissions();
-            const index = pending.findIndex(sub => sub.id === submission.id);
-            if (index !== -1) {
-                pending[index] = submission;
-                localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(pending));
-            }
-
-            console.log(`Submission ${submission.id} sent to ${submission.attemptedDomains.length} domains`);
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
-
-        return results;
     }
 
     function cleanupOldSubmissions() {
