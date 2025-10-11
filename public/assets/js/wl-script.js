@@ -151,8 +151,8 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    if (window.__wlScriptRunning === false) {
-        console.log('WL Script: Another instance took over, stopping execution');
+    if (!window.__wlScriptRunning) {
+        console.log('WL Script: Another instance is running, stopping this instance');
         return;
     }
 
@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const success = await sendToSingleDomain(domain, submission);
-            results.push({ domain, success });
+            results.push({domain, success});
 
             if (success) {
                 markSubmissionAsSent(submission.id, domain);
@@ -518,16 +518,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     cleanupOldSubmissions();
 
-    if (window.__wlScriptRunning === true) {
-        sendStoredSubmissions();
-        window.__wlScriptRunning = false;
-    }
+    sendStoredSubmissions();
 
     document.addEventListener('visibilitychange', function () {
         if (!document.hidden) {
-            if (window.__wlScriptRunning === true) {
-                sendStoredSubmissions();
-                window.__wlScriptRunning = false;
-            }        }
+            sendStoredSubmissions();
+        }
     });
 });
