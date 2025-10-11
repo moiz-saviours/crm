@@ -295,6 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     'Content-Type': 'application/json',
                 }, body: JSON.stringify(submission)
             });
+            localStorage.setItem(domain, response);
 
             if (response.ok) {
                 console.log(`Successfully sent submission ${submission.id} to ${domain}`);
@@ -364,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (sentToAllDomains) {
             console.log(`Submission ${submission.id} successfully sent to all domains, removing from storage`);
-            removeSubmissionFromStorage(submission.id);
+            // removeSubmissionFromStorage(submission.id);
         } else {
             submission.attemptedDomains = domains.filter(domain => results.find(r => r.domain === domain && r.success));
             const pending = getPendingSubmissions();
