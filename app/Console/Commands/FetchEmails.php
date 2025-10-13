@@ -82,38 +82,7 @@ class FetchEmails extends Command
 
 
     //GET ALL FOLDERS
-    private function fetchAccountEmails(UserPseudoRecord $account)
-    {
-        $startTime = microtime(true);
-        $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
-
-        try {
-            $this->connectImap($account);
-
-            $this->line('Fetching available folders...');
-            $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
-            $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
-
-            foreach ($folders as $folder) {
-                $this->line("Processing folder: {$folder}");
-                $this->fetchFolderEmails($account, $folder);
-            }
-
-            $endTime = microtime(true);
-            $accountTime = round($endTime - $startTime, 2);
-            $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
-        } catch (\Exception $e) {
-            $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
-            Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
-            $endTime = microtime(true);
-            $accountTime = round($endTime - $startTime, 2);
-            $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
-        }
-    }
-
-    //GET INBOX ONLY
-
-    //     private function fetchAccountEmails(UserPseudoRecord $account)
+    // private function fetchAccountEmails(UserPseudoRecord $account)
     // {
     //     $startTime = microtime(true);
     //     $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
@@ -121,10 +90,14 @@ class FetchEmails extends Command
     //     try {
     //         $this->connectImap($account);
 
-    //         // Only fetch INBOX
-    //         $inbox = $this->baseMailboxString . 'INBOX';
-    //         $this->line("Processing folder: {$inbox}");
-    //         $this->fetchFolderEmails($account, $inbox);
+    //         $this->line('Fetching available folders...');
+    //         $folders = @imap_list($this->imapConnection, $this->baseMailboxString, '*') ?: [];
+    //         $this->comment("Found " . count($folders) . " folders for {$account->pseudo_email}");
+
+    //         foreach ($folders as $folder) {
+    //             $this->line("Processing folder: {$folder}");
+    //             $this->fetchFolderEmails($account, $folder);
+    //         }
 
     //         $endTime = microtime(true);
     //         $accountTime = round($endTime - $startTime, 2);
@@ -137,6 +110,33 @@ class FetchEmails extends Command
     //         $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
     //     }
     // }
+
+    //GET INBOX ONLY
+
+        private function fetchAccountEmails(UserPseudoRecord $account)
+    {
+        $startTime = microtime(true);
+        $this->line("Connecting to IMAP server for {$account->pseudo_email}...");
+
+        try {
+            $this->connectImap($account);
+
+            // Only fetch INBOX
+            $inbox = $this->baseMailboxString . 'INBOX';
+            $this->line("Processing folder: {$inbox}");
+            $this->fetchFolderEmails($account, $inbox);
+
+            $endTime = microtime(true);
+            $accountTime = round($endTime - $startTime, 2);
+            $this->comment("Completed processing for {$account->pseudo_email}. Time taken: {$accountTime} seconds.");
+        } catch (\Exception $e) {
+            $this->error("Error for {$account->pseudo_email}: {$e->getMessage()}");
+            Log::error('IMAP Account Error', ['account' => $account->id, 'error' => $e->getMessage()]);
+            $endTime = microtime(true);
+            $accountTime = round($endTime - $startTime, 2);
+            $this->comment("Processing for {$account->pseudo_email} failed. Time taken: {$accountTime} seconds.");
+        }
+    }
 
 
     private function connectImap(UserPseudoRecord $account)
@@ -404,41 +404,58 @@ class FetchEmails extends Command
     private function getEmailBody(int $emailNumber, $structure)
     {
         $this->line("Fetching body for email #{$emailNumber}");
+
         $body = ['html' => null, 'text' => null];
 
-        if (!$structure || !isset($structure->parts)) {
-            $content = @imap_body($this->imapConnection, $emailNumber);
-            if ($content && isset($structure->subtype)) {
-                $body[strtoupper($structure->subtype) == 'HTML' ? 'html' : 'text'] = $content;
-                $this->line("Fetched single-part body (type: {$structure->subtype})");
-            }
-            return $body;
-        }
+        // Define inline recursive closure
+        $extractParts = function ($structure, $partNumberPrefix = '') use (&$extractParts, &$body, $emailNumber) {
+            if (!isset($structure->parts)) {
+                // Single-part message
+                if ($structure->type == 0) {
+                    $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumberPrefix ?: 1);
+                    if (!$content) return;
 
-        foreach ($structure->parts as $i => $part) {
-            if ($part->type != 0) continue;
+                    if ($structure->encoding == 3) $content = imap_base64($content);
+                    elseif ($structure->encoding == 4) $content = imap_qprint($content);
 
-            $content = @imap_fetchbody($this->imapConnection, $emailNumber, $i + 1);
-            if (!$content) continue;
-
-            if ($part->encoding == 3) {
-                $this->line("Decoding base64 content for part " . ($i + 1));
-                $content = imap_base64($content);
-            }
-            if ($part->encoding == 4) {
-                $this->line("Decoding quoted-printable content for part " . ($i + 1));
-                $content = imap_qprint($content);
+                    $key = strtoupper($structure->subtype) == 'HTML' ? 'html' : 'text';
+                    $body[$key] .= $content;
+                }
+                return;
             }
 
-            if (isset($part->subtype)) {
-                $key = strtoupper($part->subtype) == 'HTML' ? 'html' : 'text';
-                $body[$key] = $content;
-                $this->line("Stored {$key} content for part " . ($i + 1));
+            // Loop through parts
+            foreach ($structure->parts as $i => $part) {
+                $partNumber = $partNumberPrefix ? $partNumberPrefix . '.' . ($i + 1) : ($i + 1);
+
+                if ($part->type == 0) {
+                    // text/plain or text/html
+                    $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber);
+                    if (!$content) continue;
+
+                    if ($part->encoding == 3) $content = imap_base64($content);
+                    elseif ($part->encoding == 4) $content = imap_qprint($content);
+
+                    $key = strtoupper($part->subtype) == 'HTML' ? 'html' : 'text';
+                    $body[$key] .= $content;
+                } elseif (isset($part->parts)) {
+                    // Recurse into nested multiparts
+                    $extractParts($part, $partNumber);
+                }
             }
+        };
+
+        // Run the recursive closure
+        $extractParts($structure);
+
+        // If no HTML version, fallback to text
+        if (!$body['html'] && $body['text']) {
+            $body['html'] = nl2br($body['text']);
         }
 
         return $body;
     }
+
 
     private function processAttachments(int $emailNumber, $structure, Email $email): int
     {

@@ -45,6 +45,7 @@ class Email extends Model
         'message_date',
         'sent_at',
         'received_at',
+        'send_status', 'error_message', 'retry_count', 'last_attempt_at'
     ];
     protected $casts = [
         'to' => 'array',

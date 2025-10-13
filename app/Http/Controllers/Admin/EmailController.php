@@ -308,6 +308,7 @@ class EmailController extends Controller
                 'message_date' => now(),
                 'sent_at' => null, // Set after successful send
             ]);
+            $email->update(['send_status' => 'pending']);
 
             // Store attachments based on size
             $storedAttachments = [];
@@ -448,7 +449,13 @@ class EmailController extends Controller
             $mailer->send();
 
             // Mark sent_at and update DB
-            $email->update(['sent_at' => now()]);
+            $email->update([
+                'sent_at' => now(),
+                'send_status' => 'sent',
+                'error_message' => null,
+                'last_attempt_at' => now(),
+            ]);
+
             Log::info('Email sent successfully', [
                 'email_id' => $email->id,
                 'from' => $fromEmail,
@@ -475,12 +482,78 @@ class EmailController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
+
+            // 🔴 Update failed email record if it exists
+            if (isset($email) && $email instanceof \App\Models\Email) {
+                $email->update([
+                    'send_status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                    'last_attempt_at' => now(),
+                    'retry_count' => $email->retry_count + 1,
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to send email. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+    }
+
+    public function retryEmail($id): JsonResponse
+    {
+        $email = Email::where('id', $id)->firstOrFail();
+
+        // Reset status
+        $email->update([
+            'send_status' => 'pending',
+            'error_message' => null,
+            'last_attempt_at' => now(),
+        ]);
+
+        try {
+            // Build a fake Request instance with required data
+            $request = new Request([
+                'subject' => $email->subject,
+                'email_content' => $email->body_html ?? $email->body_text,
+                'to' => collect($email->to)->pluck('email')->toArray(), // assuming JSON column with objects
+                'cc' => collect($email->cc)->pluck('email')->toArray(),
+                'bcc' => collect($email->bcc)->pluck('email')->toArray(),
+                'from' => $email->from_email,
+            ]);
+
+            // Reuse sendEmail logic
+            $response = $this->sendEmail($request);
+
+            // If success
+            $email->update([
+                'send_status' => 'sent',
+                'retry_count' => $email->retry_count + 1,
+                'sent_at' => now(),
+            ]);
+
+            return response()->json(['message' => 'Email resent successfully.']);
+        } catch (Exception $e) {
+            Log::error('Email retry failed', [
+                'email_id' => $email->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $email->update([
+                'send_status' => 'failed',
+                'error_message' => $e->getMessage(),
+                'retry_count' => $email->retry_count + 1,
+                'last_attempt_at' => now(),
+            ]);
+
+            return response()->json([
+                'message' => 'Retry failed: ' . $e->getMessage(),
             ], 500);
         }
     }
+
 
     /**
      * Fetch Recipients names for email addresses

@@ -2779,6 +2779,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         </script>
+<script>
+$(document).on('click', '.retry-email-link', function () {
+    const emailId = $(this).data('id');
+    const $link = $(this);
+    const $emailBox = $link.closest('.email-box-container');
+
+    // Disable retry link temporarily
+    $link.text('Retrying...').css('pointer-events', 'none');
+
+    $.ajax({
+        url: "{{ route('admin.customer.contact.retry.email', '') }}/" + emailId,
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (res) {
+            toastr.success(res.message || 'Email resent successfully.');
+
+            // The "Sent" block HTML
+            const sentBlock = `
+                <div class="email-folder d-flex align-items-center mt-1">
+                    <span class="folder-dot me-1" style="color: #28a745;">&bull;</span>
+                    <span class="folder-name text-capitalize">Sent</span>
+                </div>
+            `;
+
+            // Find and replace *each* alert-danger block with the Sent badge
+            $emailBox.find('.alert.alert-danger').each(function () {
+                const $alert = $(this);
+                $alert.after(sentBlock); // add sent after alert
+                $alert.remove(); // then remove alert
+            });
+
+            // If no alerts found (failsafe), append in both key sections
+            if (!$emailBox.find('.email-folder').length) {
+                // Append in header part if exists
+                const $header = $emailBox.find('.user_profile_text').first();
+                if ($header.length) $header.append(sentBlock);
+
+                // Append in body part if exists
+                const $body = $emailBox.find('.contentdisplaytwo').first();
+                if ($body.length) $body.prepend(sentBlock);
+            }
+
+            // Re-enable link
+            $link.text('Try Again').css('pointer-events', 'auto');
+        },
+        error: function (xhr) {
+            const msg = xhr.responseJSON?.message || 'Retry failed. Please try again later.';
+            toastr.error(msg);
+            $link.text('Try Again').css('pointer-events', 'auto');
+        }
+    });
+});
+</script>
+
+
+
 
     @endpush
 @endsection

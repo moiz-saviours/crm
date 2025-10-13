@@ -261,6 +261,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                     ->name('timeline.refresh');
                 Route::get('/timeline/fetch-remote', [AdminCustomerContactController::class, 'fetchRemote'])
                     ->name('timeline.fetch-remote');
+                Route::post('/retry/email/{id}', [AdminEmailController::class, 'retryEmail'])->name('retry.email');
             });
         });
         /** Companies Routes */

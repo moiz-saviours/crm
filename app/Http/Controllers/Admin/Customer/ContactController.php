@@ -340,7 +340,18 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
  */
 private function formatEmailForTimeline(Email $email)
 {
+        // Count engagement events
+    $openCount = $email->events->where('event_type', 'open')->count();
+    $clickCount = $email->events->where('event_type', 'click')->count();
+
+    // Determine if engagement events exist
+    $hasEngagement = ($openCount > 0 || $clickCount > 0);
+
+    // Hide send status if engagement events exist
+    $displaySendStatus = !$hasEngagement;
+
     return [
+        'id' => $email->id,
         'uuid' => 'email-' . $email->id,
         'thread_id' => $email->thread_id,
         'message_id' => $email->message_id,
@@ -353,7 +364,14 @@ private function formatEmailForTimeline(Email $email)
         'cc' => $email->cc ?? [],
         'bcc' => $email->bcc ?? [],
         'date' => $email->message_date,
+        'type' => $email->type,
         'folder' => $email->folder,
+        'send_status' => $email->send_status,
+        'open_count' => $openCount,
+        'click_count' => $clickCount,
+        'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
+        'spam_count' => $email->events->where('event_type', 'spam')->count(),
+        'show_send_status' => $displaySendStatus, // 👈 new field for blade check
         'body' => [
             'html' => $email->body_html,
             'text' => $email->body_text,
