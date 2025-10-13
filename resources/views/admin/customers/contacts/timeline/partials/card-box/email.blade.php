@@ -224,6 +224,25 @@
 
         </div>
         {{-- Body preview --}}
+        <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
+            @if(isset($item['data']['subject']))
+                @if(str_starts_with(strtolower($item['data']['subject']), 're:'))
+                    <span style="color: #666; font-style: italic;">
+                        Re: {{ \Illuminate\Support\Str::limit(trim(substr($item['data']['subject'], 3)), 80, '...') }}
+                    </span>
+                @elseif(str_starts_with(strtolower($item['data']['subject']), 'fwd:'))
+                    <span style="color: #666; font-style: italic;">
+                        Fwd: {{ \Illuminate\Support\Str::limit(trim(substr($item['data']['subject'], 4)), 80, '...') }}
+                    </span>
+                @else
+                    <span style="color: #333; font-weight: 500;">
+                        {{ \Illuminate\Support\Str::limit($item['data']['subject'], 80, '...') }}
+                    </span>
+                @endif
+            @else
+                <span style="color: #999; font-style: italic;">No subject</span>
+            @endif
+        </p>
     </div>
 
     <div>
