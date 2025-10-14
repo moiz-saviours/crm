@@ -1131,22 +1131,27 @@
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles">From</p>
                             <p class="email-sender-name" style="min-width: 520px;">
-                                <select name="from_email" class="form-select form-control from_email"
-                                        style="width: auto; display: inline-block;border:none;">
-                                    @foreach($pseudo_emails as $item)
-                                        <option value="{{ $item['email'] }}"
-                                                data-name="{{ $item['name'] }}"
-                                                data-company="{{ $item['company'] }}"
-                                            {{ $loop->first ? 'selected' : '' }}>
-                                            {{ $item['name'] }} ({{ $item['email'] }})
-                                        </option>
-                                    @endforeach
-                                </select>
+                                @if($pseudo_emails->isNotEmpty())
+                                    <select name="from_email" class="form-select form-control from_email"
+                                            style="width: auto; display: inline-block; border: none;">
+                                        @foreach($pseudo_emails as $item)
+                                            <option value="{{ $item['email'] }}"
+                                                    data-name="{{ $item['name'] }}"
+                                                    data-company="{{ $item['company'] }}"
+                                                {{ $loop->first ? 'selected' : '' }}>
+                                                {{ $item['name'] }} ({{ $item['email'] }})
+                                            </option>
+                                        @endforeach
+                                    </select>
 
-                                <span id="from_company">
+                                    <span id="from_company">
                                         from {{ $pseudo_emails->first()['company'] ?? 'Unknown' }}
-                                </span>
+                                    </span>
+                                @else
+                                    <span class="text-muted fst-italic">No sender email available</span>
+                                @endif
                             </p>
+
 
                         </div>
                         <div class="email-child-wrapper">
@@ -1201,7 +1206,7 @@
 
                 </div>
 
-                <div class="email-footer-div ">
+                <div class="email-footer-div">
                     <button class="email-footer-btn" id="sendEmailBtn">Send</button>
                     <button class="email-footer-btn close-btn gap-2">Cancel</button>
                 </div>
@@ -1323,8 +1328,8 @@
 
                 let valid = true;
 
-                // From validation
-                if (!fromEl.value.trim()) {
+                // Form validation
+                if (!fromEl || !fromEl.value.trim()) {
                     toastr.error("From email is required.");
                     valid = false;
                 }

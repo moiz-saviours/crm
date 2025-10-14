@@ -2032,19 +2032,31 @@
         {{--        MY SCRIPT --}}
         <script>
             // Make it globally available
-            window.initializeTooltips = function() {
-                // Destroy existing tooltips to avoid duplicates
-                $('[data-bs-toggle="tooltip"]').tooltip('dispose');
-                
-                // Initialize all Bootstrap tooltips
-                $('[data-bs-toggle="tooltip"]').tooltip({
-                    sanitize: false,
-                    customClass: 'custom-tooltip'
-                });
+            window.initializeTooltips = function (context = document) {
+                try {
+                    document.querySelectorAll('.tooltip.show, .tooltip.fade').forEach(t => t.remove());
+
+                    const tooltipElements = context.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+                    tooltipElements.forEach(el => {
+                        const instance = bootstrap.Tooltip.getInstance(el);
+                        if (instance) instance.dispose();
+
+                        new bootstrap.Tooltip(el, {
+                            sanitize: false,
+                            customClass: 'custom-tooltip',
+                            html: true,
+                            boundary: 'window',
+                            container: 'body' 
+                        });
+                    });
+
+                } catch (error) {
+                    console.error("❌ Tooltip initialization error:", error);
+                }
             };
 
-            // Initialize on page load
-            $(document).ready(function() {
+            document.addEventListener('DOMContentLoaded', function() {
                 window.initializeTooltips();
             });
         </script>
@@ -2511,7 +2523,7 @@ $(document).ready(function() {
 
                         // Call global tooltip function
                         if (typeof window.initializeTooltips === 'function') {
-                            window.initializeTooltips();
+                            window.initializeTooltips(section);
                         }
 
                         updateFilterActivityCount(data.count, data.total_count);

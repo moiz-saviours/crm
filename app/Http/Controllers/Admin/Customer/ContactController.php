@@ -527,32 +527,41 @@ private function formatEmailForTimeline(Email $email)
             $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
             return $brand ?? $domain;
         };
-        $auth_pseudo_emails = [];
-        if (auth()->user()->pseudo_email) {
-            $auth_pseudo_emails[] = [
-                'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
-                'email' => auth()->user()->pseudo_email,
-                'company' => $resolveCompany(auth()->user()->pseudo_email),
-            ];
-        }
-        $userPseudoEmails = User::whereNotNull('pseudo_email')
-            ->get(['id', 'pseudo_name', 'pseudo_email'])
-            ->map(fn($user) => [
-                'name' => $user->pseudo_name ?? 'Unknown Sender',
-                'email' => $user->pseudo_email,
-                'company' => $resolveCompany($user->pseudo_email),
-            ]);
-        $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+        // $auth_pseudo_emails = [];
+        // if (auth()->user()->pseudo_email) {
+        //     $auth_pseudo_emails[] = [
+        //         'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+        //         'email' => auth()->user()->pseudo_email,
+        //         'company' => $resolveCompany(auth()->user()->pseudo_email),
+        //     ];
+        // }
+        // $userPseudoEmails = User::whereNotNull('pseudo_email')
+        //     ->get(['id', 'pseudo_name', 'pseudo_email'])
+        //     ->map(fn($user) => [
+        //         'name' => $user->pseudo_name ?? 'Unknown Sender',
+        //         'email' => $user->pseudo_email,
+        //         'company' => $resolveCompany($user->pseudo_email),
+        //     ]);
+        // $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+        //     ->map(fn($pseudo) => [
+        //         'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+        //         'email' => $pseudo->pseudo_email,
+        //         'company' => $resolveCompany($pseudo->pseudo_email),
+        //     ]);
+        // $pseudo_emails = collect($auth_pseudo_emails)
+        //     ->merge($userPseudoEmails)
+        //     ->merge($extraPseudoEmails)
+        //     ->unique('email')
+        //     ->values();
+
+        $pseudo_emails = auth()->user()
+            ->pseudo_records()
+            ->get(['pseudo_name', 'pseudo_email'])
             ->map(fn($pseudo) => [
                 'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
                 'email' => $pseudo->pseudo_email,
                 'company' => $resolveCompany($pseudo->pseudo_email),
             ]);
-        $pseudo_emails = collect($auth_pseudo_emails)
-            ->merge($userPseudoEmails)
-            ->merge($extraPseudoEmails)
-            ->unique('email')
-            ->values();
         $emailsResponse = $this->getTimeline($customer_contact->email, 'all', 1, 50, 'activities');
         $timeline = $emailsResponse['timeline'] ?? [];
         $page = (int)request()->get('page', 1);

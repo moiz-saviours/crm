@@ -504,9 +504,9 @@ class EmailController extends Controller
 
     public function retryEmail($id): JsonResponse
     {
-        $email = Email::where('id', $id)->firstOrFail();
+        $email = Email::findOrFail($id);
 
-        // Reset status
+        // Reset status before retrying
         $email->update([
             'send_status' => 'pending',
             'error_message' => null,
@@ -514,27 +514,49 @@ class EmailController extends Controller
         ]);
 
         try {
-            // Build a fake Request instance with required data
+            // Prepare request for sendEmail()
             $request = new Request([
                 'subject' => $email->subject,
                 'email_content' => $email->body_html ?? $email->body_text,
-                'to' => collect($email->to)->pluck('email')->toArray(), // assuming JSON column with objects
+                'to' => collect($email->to)->pluck('email')->toArray(),
                 'cc' => collect($email->cc)->pluck('email')->toArray(),
                 'bcc' => collect($email->bcc)->pluck('email')->toArray(),
                 'from' => $email->from_email,
             ]);
 
-            // Reuse sendEmail logic
+            // Call sendEmail() and capture JsonResponse
             $response = $this->sendEmail($request);
 
-            // If success
-            $email->update([
-                'send_status' => 'sent',
-                'retry_count' => $email->retry_count + 1,
-                'sent_at' => now(),
-            ]);
+            // Extract data and status from JsonResponse
+            $data = $response->getData(true);
+            $status = $response->getStatusCode();
 
-            return response()->json(['message' => 'Email resent successfully.']);
+            // Check for success or error
+            if ($status >= 200 && $status < 300 && !empty($data['success'])) {
+                $email->update([
+                    'send_status' => 'sent',
+                    'retry_count' => $email->retry_count + 1,
+                    'sent_at' => now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Email resent successfully.',
+                ]);
+            } else {
+                // Update as failed if sendEmail() returned an error
+                $email->update([
+                    'send_status' => 'failed',
+                    'error_message' => $data['error'] ?? 'Unknown error',
+                    'retry_count' => $email->retry_count + 1,
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Retry failed: ' . ($data['error'] ?? 'Unknown error'),
+                ], 500);
+            }
+
         } catch (Exception $e) {
             Log::error('Email retry failed', [
                 'email_id' => $email->id,
@@ -549,6 +571,7 @@ class EmailController extends Controller
             ]);
 
             return response()->json([
+                'success' => false,
                 'message' => 'Retry failed: ' . $e->getMessage(),
             ], 500);
         }

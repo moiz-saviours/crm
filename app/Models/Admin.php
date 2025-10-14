@@ -64,4 +64,8 @@ class Admin extends Authenticatable
         $this->attributes['dob'] = $date;
         $this->attributes['age'] = $date ? $date->age : null;
     }
+    public function pseudo_records()
+    {
+        return $this->morphMany(UserPseudoRecord::class, 'morph');
+    }
 }
