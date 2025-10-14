@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('leads', function (Blueprint $table) {
             $table->string('visitor_id')->nullable()->after('id');
+            $table->longText('raw_data')->nullable()->after('device_info')->default(null);
+
         });
     }
 
@@ -23,6 +25,8 @@ return new class extends Migration
     {
         Schema::table('leads', function (Blueprint $table) {
             $table->dropColumn('visitor_id');
+            $table->dropColumn('raw_data');
+
         });
     }
 };
