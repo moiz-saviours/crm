@@ -991,6 +991,9 @@
     position: relative;
     margin-top: 10px;
 }
+.quoted-history-container img {
+    max-width: 300px !important;
+}
         .show-quoted-btn {
             background: #f0f0f0; /* light highlight */
             border: 1px solid #ccc;
