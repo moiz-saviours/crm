@@ -1399,13 +1399,16 @@
                             if (ccField) ccField.value = "";
                             if (bccField) bccField.value = "";
                             window.refreshTimeline();
-                            resetEmailTemplatePosition();
+                            window.resetEmailTemplatePosition();
+                     
 
                         } else {
                             // toastr.error(response.message || "Failed to send email");
                         }
                     })
                     .catch(error => {
+                        window.refreshTimeline();
+                        window.resetEmailTemplatePosition();
                         console.error('Error:', error);
                         // toastr.error("Something went wrong while sending email!");
                     });
@@ -1415,7 +1418,7 @@
 
         // dynamic function for reset position
 
-        function resetEmailTemplatePosition() {
+        window.resetEmailTemplatePosition = function (context = document) {
             const emailTemplate = document.querySelector('#emailTemplate');
             if (emailTemplate) {
                 emailTemplate.classList.remove('open');
@@ -1516,7 +1519,7 @@
                     if (ccField) ccField.value = "";
                     if (bccField) bccField.value = "";
 
-                    resetEmailTemplatePosition();
+                    window.resetEmailTemplatePosition();
 
                 });
             });
