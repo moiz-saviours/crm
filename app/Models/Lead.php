@@ -37,6 +37,7 @@ class Lead extends Model
         'lead_response',
         'device_info',
         'visitor_id',
+        'raw_data',
     ];
 
     public function brand(): \Illuminate\Database\Eloquent\Relations\BelongsTo
