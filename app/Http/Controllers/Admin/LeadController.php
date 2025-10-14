@@ -287,112 +287,281 @@ class LeadController extends Controller
     }
 
 
+//    public function storeFromScript(Request $request)
+//    {
+//        $userAgent = $request->userAgent();
+//
+//        // Default device info
+//        $deviceInfo = [
+//            'user_agent' => $userAgent,
+//            'browser_name' => $this->getBrowserName($userAgent),
+//        ];
+//        $deviceInfo['visitor_id'] = $request->visitor_id ?? null;
+//
+//        try {
+//            $userIp = $request->input('device_info.public_ip')
+//                ?? $request->header('CF-Connecting-IP')
+//                ?? $request->ip();
+//
+//
+//            $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
+//            if ($ipapiRes->successful()) {
+//                $location = $ipapiRes->json();
+//
+//                $deviceInfo = array_merge($deviceInfo, [
+//                    'ip' => $location['query'] ?? null,
+//                    'city' => $location['city'] ?? null,
+//                    'state' => $location['regionName'] ?? null,
+//                    'zipcode' => $location['zip'] ?? null,
+//                    'country' => $location['country'] ?? null,
+//                    'latitude' => $location['lat'] ?? null,
+//                    'longitude'=> $location['lon'] ?? null,
+//                ]);
+//
+//                if (!empty($location['lat']) && !empty($location['lon'])) {
+//                    $url = "https://nominatim.openstreetmap.org/reverse?lat={$location['lat']}&lon={$location['lon']}&format=json&accept-language=en";
+//
+//                    $revGeo = Http::withHeaders([
+//                        'User-Agent' => 'MyLaravelApp/1.0 (mydomain.com)'
+//                    ])->get($url);
+//
+//                    if ($revGeo->successful()) {
+//                        $revData = $revGeo->json();
+//                        $deviceInfo['address'] = $revData['display_name'] ?? null;
+//                        if (empty($deviceInfo['zipcode']) && isset($revData['address']['postcode'])) {
+//                            $deviceInfo['zipcode'] = $revData['address']['postcode'];
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (\Exception $ex) {
+//            $deviceInfo['location_error'] = 'Unable to fetch location';
+//        }
+//
+//        $formData = collect($request->form_data)
+//            ->mapWithKeys(function ($value, $key) {
+//                return [strtolower($key) => $value];
+//            })
+//            ->toArray();
+//
+//        $fieldMapping = [
+//            'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
+//            'email' => ['email'],
+//            'phone' => ['tel','tele','number','num','phone','telephone','your-phone','phone-number','phonenumber'],
+//            'note' => ['message','msg','desc','description','note'],
+//        ];
+//
+//        $dataToSave = [];
+//        foreach ($fieldMapping as $column => $possibleFields) {
+//            foreach ($possibleFields as $field) {
+//                if (isset($formData[$field])) {
+//                    $dataToSave[$column] = $formData[$field];
+//                    break;
+//                }
+//            }
+//        }
+//
+//
+//        try {
+//            $brand = Brand::all()->firstWhere('script_token', $request->script_token);
+//            if (!$brand) {
+//                return response()->json(['error' => 'Invalid script token.'], 404);
+//            }
+//
+//            $lead = Lead::create([
+//                'brand_key' => $brand->brand_key,
+//                'lead_status_id' => 1,
+//                'name' => $dataToSave['name'] ?? "",
+//                'email' => $dataToSave['email'] ?? "",
+//                'phone' => $dataToSave['phone'] ?? "",
+//                'note' => $dataToSave['note'] ?? "",
+//                'lead_response' => json_encode($request->form_data),
+//                'device_info' => json_encode($deviceInfo),
+//                'city' => $deviceInfo['city'] ?? "",
+//                'state' => $deviceInfo['state'] ?? "",
+//                'zipcode' => $deviceInfo['zipcode'] ?? "",
+//                'country' => $deviceInfo['country'] ?? "",
+//                'address' => $deviceInfo['address'] ?? "",
+//                'visitor_id' => $deviceInfo['visitor_id'] ?? "",
+//            ]);
+//
+//            return response()->json([
+//                'message' => 'Lead saved successfully!',
+//                'lead_id' => $lead->id,
+//                'device_info' => $deviceInfo
+//            ]);
+//        } catch (\Exception $e) {
+//            return response()->json([
+//                'error' => $e->getMessage()
+//            ], 500);
+//        }
+//    }
+
     public function storeFromScript(Request $request)
     {
-        $userAgent = $request->userAgent();
-
-        // Default device info
-        $deviceInfo = [
-            'user_agent' => $userAgent,
-            'browser_name' => $this->getBrowserName($userAgent),
-        ];
-        $deviceInfo['visitor_id'] = $request->visitor_id ?? null;
-
         try {
-            $userIp = $request->input('device_info.public_ip')
-                ?? $request->header('CF-Connecting-IP')
-                ?? $request->ip();
-
-
-            $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
-            if ($ipapiRes->successful()) {
-                $location = $ipapiRes->json();
-
-                $deviceInfo = array_merge($deviceInfo, [
-                    'ip' => $location['query'] ?? null,
-                    'city' => $location['city'] ?? null,
-                    'state' => $location['regionName'] ?? null,
-                    'zipcode' => $location['zip'] ?? null,
-                    'country' => $location['country'] ?? null,
-                    'latitude' => $location['lat'] ?? null,
-                    'longitude'=> $location['lon'] ?? null,
-                ]);
-
-                if (!empty($location['lat']) && !empty($location['lon'])) {
-                    $url = "https://nominatim.openstreetmap.org/reverse?lat={$location['lat']}&lon={$location['lon']}&format=json&accept-language=en";
-
-                    $revGeo = Http::withHeaders([
-                        'User-Agent' => 'MyLaravelApp/1.0 (mydomain.com)'
-                    ])->get($url);
-
-                    if ($revGeo->successful()) {
-                        $revData = $revGeo->json();
-                        $deviceInfo['address'] = $revData['display_name'] ?? null;
-                        if (empty($deviceInfo['zipcode']) && isset($revData['address']['postcode'])) {
-                            $deviceInfo['zipcode'] = $revData['address']['postcode'];
-                        }
-                    }
-                }
+            /** ----------------------------------------------------------------
+             * STEP 0: Handle navigator.sendBeacon() raw JSON payload
+             * ----------------------------------------------------------------*/
+            $rawInput = $request->getContent();
+            $decoded = json_decode($rawInput, true);
+            if (is_array($decoded)) {
+                $request->merge($decoded);
             }
-        } catch (\Exception $ex) {
-            $deviceInfo['location_error'] = 'Unable to fetch location';
-        }
 
-        $formData = collect($request->form_data)
-            ->mapWithKeys(function ($value, $key) {
-                return [strtolower($key) => $value];
-            })
-            ->toArray();
+            \Log::info('StoreFromScript Incoming:', ['data' => $request->all()]);
 
-        $fieldMapping = [
-            'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
-            'email' => ['email'],
-            'phone' => ['tel','tele','number','num','phone','telephone','your-phone','phone-number','phonenumber'],
-            'note' => ['message','msg','desc','description','note'],
-        ];
-
-        $dataToSave = [];
-        foreach ($fieldMapping as $column => $possibleFields) {
-            foreach ($possibleFields as $field) {
-                if (isset($formData[$field])) {
-                    $dataToSave[$column] = $formData[$field];
-                    break;
-                }
-            }
-        }
-
-
-        try {
+            /** ----------------------------------------------------------------
+             * STEP 1: Validate brand token & create raw record
+             * ----------------------------------------------------------------*/
             $brand = Brand::all()->firstWhere('script_token', $request->script_token);
             if (!$brand) {
                 return response()->json(['error' => 'Invalid script token.'], 404);
             }
 
+            // Save raw data first
             $lead = Lead::create([
                 'brand_key' => $brand->brand_key,
                 'lead_status_id' => 1,
-                'name' => $dataToSave['name'] ?? "",
-                'email' => $dataToSave['email'] ?? "",
-                'phone' => $dataToSave['phone'] ?? "",
-                'note' => $dataToSave['note'] ?? "",
-                'lead_response' => json_encode($request->form_data),
-                'device_info' => json_encode($deviceInfo),
-                'city' => $deviceInfo['city'] ?? "",
-                'state' => $deviceInfo['state'] ?? "",
-                'zipcode' => $deviceInfo['zipcode'] ?? "",
-                'country' => $deviceInfo['country'] ?? "",
-                'address' => $deviceInfo['address'] ?? "",
-                'visitor_id' => $deviceInfo['visitor_id'] ?? "",
+                'raw_data' => json_encode($request->all()),
             ]);
 
-            return response()->json([
-                'message' => 'Lead saved successfully!',
-                'lead_id' => $lead->id,
-                'device_info' => $deviceInfo
+            $leadId = $lead->id;
+
+            /** ----------------------------------------------------------------
+             * STEP 2: Prepare device info
+             * ----------------------------------------------------------------*/
+            $userAgent = $request->userAgent();
+            $deviceInfo = [
+                'user_agent' => $userAgent,
+                'browser_name' => $this->getBrowserName($userAgent),
+                'visitor_id' => $request->visitor_id ?? null,
+            ];
+
+            try {
+                // Step 1: Try to detect automatically
+                $userIp = $request->server('HTTP_X_FORWARDED_FOR')
+                    ?? $request->server('REMOTE_ADDR')
+                    ?? $request->ip();
+
+                // Step 2: If running on localhost, fetch public IP from API
+                if (in_array($userIp, ['127.0.0.1', '::1'])) {
+                    try {
+                        $ipResponse = Http::timeout(5)->get('https://api64.ipify.org?format=json');
+                        if ($ipResponse->successful()) {
+                            $userIp = $ipResponse->json()['ip'];
+                        }
+                    } catch (\Exception $e) {
+                        \Log::warning('Unable to fetch public IP on localhost', ['error' => $e->getMessage()]);
+                    }
+                }
+
+                \Log::info('Detected IP Automatically:', ['ip' => $userIp]);
+
+                // Step 3: Fetch location info from IP
+                $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
+                if ($ipapiRes->successful()) {
+                    $location = $ipapiRes->json();
+
+                    $deviceInfo = array_merge($deviceInfo, [
+                        'ip' => $location['query'] ?? null,
+                        'city' => $location['city'] ?? null,
+                        'state' => $location['regionName'] ?? null,
+                        'zipcode' => $location['zip'] ?? null,
+                        'country' => $location['country'] ?? null,
+                        'latitude' => $location['lat'] ?? null,
+                        'longitude' => $location['lon'] ?? null,
+                    ]);
+
+                    if (!empty($location['lat']) && !empty($location['lon'])) {
+                        $url = "https://nominatim.openstreetmap.org/reverse?lat={$location['lat']}&lon={$location['lon']}&format=json&accept-language=en";
+
+                        $revGeo = Http::withHeaders([
+                            'User-Agent' => 'MyLaravelApp/1.0 (mydomain.com)'
+                        ])->get($url);
+
+                        if ($revGeo->successful()) {
+                            $revData = $revGeo->json();
+                            $deviceInfo['address'] = $revData['display_name'] ?? null;
+                            if (empty($deviceInfo['zipcode']) && isset($revData['address']['postcode'])) {
+                                $deviceInfo['zipcode'] = $revData['address']['postcode'];
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $ex) {
+                $deviceInfo['location_error'] = 'Unable to fetch location';
+            }
+
+
+            /** ----------------------------------------------------------------
+             * STEP 3: Map form data to proper fields
+             * ----------------------------------------------------------------*/
+            $formData = collect($request->form_data ?? [])
+                ->mapWithKeys(fn($value, $key) => [strtolower($key) => $value])
+                ->toArray();
+
+            $fieldMapping = [
+                'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
+                'email' => ['email'],
+                'phone' => ['tel','tele','number','num','phone','telephone','your-phone','phone-number','phonenumber'],
+                'note' => ['message','msg','desc','description','note'],
+            ];
+
+            $dataToSave = [];
+            foreach ($fieldMapping as $column => $possibleFields) {
+                foreach ($possibleFields as $field) {
+                    if (isset($formData[$field])) {
+                        $dataToSave[$column] = $formData[$field];
+                        break;
+                    }
+                }
+            }
+
+            /** ----------------------------------------------------------------
+             * STEP 4: Update record with processed data
+             * ----------------------------------------------------------------*/
+            $lead->update([
+                'name' => $dataToSave['name'] ?? '',
+                'email' => $dataToSave['email'] ?? '',
+                'phone' => $dataToSave['phone'] ?? '',
+                'note' => $dataToSave['note'] ?? '',
+                'lead_response' => json_encode($request->form_data),
+                'device_info' => json_encode($deviceInfo),
+                'city' => $deviceInfo['city'] ?? '',
+                'state' => $deviceInfo['state'] ?? '',
+                'zipcode' => $deviceInfo['zipcode'] ?? '',
+                'country' => $deviceInfo['country'] ?? '',
+                'address' => $deviceInfo['address'] ?? '',
+                'visitor_id' => $deviceInfo['visitor_id'] ?? '',
             ]);
-        } catch (\Exception $e) {
+
+            if (!empty($lead->email)) {
+                $existingContact = CustomerContact::where('email', $lead->email)->first();
+
+                if ($existingContact) {
+                    $lead->update([
+                        'cus_contact_key' => $existingContact->special_key,
+                    ]);
+
+                    \Log::info('Lead auto-linked to existing customer', [
+                        'lead_id' => $lead->id,
+                        'cus_contact_key' => $existingContact->special_key,
+                    ]);
+                }
+            }
+            /** ----------------------------------------------------------------
+             * STEP 5: Final response
+             * ----------------------------------------------------------------*/
             return response()->json([
-                'error' => $e->getMessage()
+                'message' => 'Lead stored and updated successfully!',
+                'lead_id' => $leadId,
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('StoreFromScript Error:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
