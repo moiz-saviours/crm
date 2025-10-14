@@ -2522,7 +2522,7 @@ $(document).ready(function() {
                         if (showMoreContainer) {
                             showMoreContainer.style.display = (data.count >= data.total_count) ? 'block' : 'none';
                         }
-                        {{-- toastr.success("Timeline loaded successfully."); --}}
+                        toastr.success("Timeline loaded successfully.");
 
                     })
                     .catch(err => {
