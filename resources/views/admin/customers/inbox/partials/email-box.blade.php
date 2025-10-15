@@ -14,10 +14,10 @@
         </div>
     </div>
     <div class="p-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="profile-description">Owner</span>
         </div>
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
             <div class="user-info-dropdown">
                 <div class="user-info d-flex align-items-center" id="userDropdownToggle"
                      role="button" aria-expanded="false">
@@ -96,20 +96,119 @@
             {{--                    </div>--}}
             {{--                </div>--}}
             {{--            </div>--}}
-            <h5 class="mb-3">{{ Str::limit($email->subject, 30, '...') }}</h5>
+            <p class="mb-2 "><b>{{ Str::limit($email->subject, 30, '...') }}</b></p>
         </div>
         <div class="email-reply-wrapper">
+            <div
+                data-test-id="dashed-label"
+                class="date-separator-wrapper">
+                <div
+                    data-test-id="dash-left"
+                    class="date-line-segment"
+                ></div>
+
+                <div class="date-label-badge">
+                    <p class="date-label-text">October 9</p>
+                </div>
+
+                <div
+                    data-test-id="dash-right"
+                    class="date-line-segment"
+                ></div>
+            </div>
             <div class="d-flex align-items-start email-reply-block">
-                <i class="fas fa-user-circle profile-icon me-4"></i>
+                <i class="fas fa-user-circle  me-2" style="font-size: 20px"></i>
                 <div class="flex-grow-1">
-                    <p class="email-from mb-0">
+                    <div
+                        class="d-flex justify-content-between align-items-start email-header-row"
+                    >
+                    <p class="email-from mb-0 d-flex align-items-center">
                         <b>{{ $email->from_name }}</b>
-                        <span class="text-muted small">{{ $email->message_date->format('g:i A') }}</span>
-                        <span class="ms-4 last-span text-bold">
+                        <span class="small ms-2">{{ $email->message_date->format('g:i A') }}</span>
+                        <span class="emailbox-trigger ms-4 last-span text-bold">
                               Email
                               <i class="fas fa-caret-down ms-2 last-span-icon"></i>
                             </span>
                     </p>
+                    <div class="d-flex align-items-center icon-actions gap-2" >
+                                <span class="icon-wrapper-two" ><i
+                                        class="fas fa-reply"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="reply"
+                                        data-bs-custom-class="custom-blue-tooltip"
+                                    ></i
+                                    ></span>
+                        <span class="icon-wrapper-two" ><i
+                                class="fas fa-reply-all"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Reply all"
+                                data-bs-custom-class="custom-blue-tooltip"
+                            ></i
+                            ></span>
+                        <span class="icon-wrapper-two" ><i
+                                class="fas fa-forward"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Forward"
+                                data-bs-custom-class="custom-blue-tooltip"
+                            ></i
+                            ></span>
+                        <span class="icon-wrapper-two" ><i
+                                class="fas fa-ellipsis-v"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Message Action"
+                                data-bs-custom-class="custom-blue-tooltip"
+                            ></i
+                            ></span>
+                    </div>
+                    </div>
+                    <div class="emailbox-container shadow-sm">
+                        <div class="emailbox-arrow"></div>
+                        <div class="emailbox-content">
+                            <div class="emailbox-row">
+                                <span class="emailbox-label">From:</span>
+                                <span class="emailbox-value" id="fromText"
+                                >hasnat.khan@stellers.org</span
+                                >
+                                <i
+                                    class="fas fa-copy emailbox-copy"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Copy"
+                                    data-bs-custom-class="custom-blue-tooltip"
+                                ></i>
+                            </div>
+                            <div class="emailbox-row">
+                                <span class="emailbox-label">To:</span>
+                                <span class="emailbox-value" id="toText"
+                                >Hasnat Developer
+                                    &lt;hasnat.developer@pivotbookwriting.com&gt;</span
+                                >
+                                <i
+                                    class="fas fa-copy emailbox-copy"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Copy"
+                                    data-bs-custom-class="custom-blue-tooltip"
+                                ></i>
+                            </div>
+                            <div class="emailbox-row">
+                                <span class="emailbox-label">Date:</span>
+                                <span class="emailbox-value" id="dateText"
+                                >Thu, Oct 9, 2025 4:28 PM</span
+                                >
+                            </div>
+                            <div class="emailbox-row">
+                                <span class="emailbox-label">Subject:</span>
+                                <span class="emailbox-value" id="subjectText"
+                                >10MB PDF</span
+                                >
+                            </div>
+                        </div>
+                    </div>
                     <p class="mb-0 email-to text-muted small">
                         To: @php
                             $toDisplay = $email->from_email; // fallback
@@ -139,6 +238,8 @@
                     <p class="email-body mt-2">
                         {{ $email->body }}
                     </p>
+
+
                 </div>
             </div>
         </div>
