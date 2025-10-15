@@ -59,7 +59,7 @@
     </div>
     <hr/>
 
-    <div id="sortable-container-1">
+    <div class="sortable-container-main">
         <!-- About Contact -->
         <div class="sortable-item">
             <div class="custom-sidebar-header collapsed" data-bs-toggle="collapse"
