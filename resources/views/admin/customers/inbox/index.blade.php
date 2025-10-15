@@ -11,8 +11,8 @@
                 <div class="row custom-my-row">
                     <!-- Page 1 Start -->
                     <!-- Left Sidebar (col-md-2) -->
-                    <div class="col-md-2 p-0" id="leftSidebar">
-                        <div class="bg-white left-sidebar-custom d-flex flex-column p-3 main-content-col"
+                    <div class="col-md-2 " id="leftSidebar">
+                        <div class="bg-white left-sidebar-custom d-flex flex-column p-2 main-content-col"
                              id="left-sidebar">
 
                             <!-- Header Icons -->
@@ -28,10 +28,44 @@
 
                             <!-- User Status -->
                             <div class="main-heading mb-2 sidebar-label">
-                                <i class="fas fa-circle me-1" style="color: #10b981"></i>
+                                <i
+                                    class="fas fa-circle me-2"
+                                    style="color: rgb(0, 189, 165); font-size: small"
+                                ></i>
                                 You're available
-                                <i class="fas fa-caret-down ms-1"></i>
+                                <i class="userbox-trigger fas fa-caret-down ms-1"></i>
                             </div>
+                            <!-- Toggle Icon -->
+
+
+                            <!-- Popover Box -->
+                            <div class="userbox-container">
+                                <ul class="userbox-list">
+
+                                    <li class="userbox-item">
+                                        <div class="userbox-profile">
+                                            <div class="userbox-avatar"><i class="fas fa-user"></i></div>
+                                            <div class="userbox-name">Hasnat Khan</div>
+                                        </div>
+                                    </li>
+
+                                    <li class="userbox-item">
+                                        <h3 class="userbox-title">Automate Status</h3>
+                                        <a href="#" class="userbox-link">
+                                            <i class="fas fa-cog"></i> Manage working hours and out of office
+                                        </a>
+                                    </li>
+
+                                    <li class="userbox-item">
+                                        <h3 class="userbox-title">Update Status</h3>
+                                        <p class="userbox-status-btn">
+                                            <span class="userbox-status-dot online"></span> Set as available
+                                        </p>
+                                    </li>
+
+                                </ul>
+                            </div>
+
                             <hr class="border-bottom-dark my-2 sidebar-label"/>
 
                             <!-- Tabs in Left Sidebar -->
@@ -162,9 +196,17 @@
                         <div class="main-content-col" id="email-content">
                             <div class="d-flex justify-content-between align-items-center p-3 uppper-part">
                                 <div id="action-container" class="d-flex align-items-center">
-                                    <label class="custom-checkbox me-2">
-                                        <input type="checkbox" id="main-checkbox">
-                                        <span class="check-icon"></span>
+                                    <label class="my-custom-check-box">
+                                        <input type="checkbox" id="main-checkbox" />
+                                        <span class="checkmark">
+                        <svg
+                            role="presentation"
+                            viewBox="0 0 14 14"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M 2 6 L12 6 L12 9 L2 9 L2 6 z"></path>
+                        </svg>
+                      </span>
                                     </label>
                                     <div id="default-actions" class="d-flex">
                                         <button class="open-btn ms-2">Open</button>
@@ -190,7 +232,7 @@
                             </div>
                             <div class="tab-content" id="inbox-tab-content">
                                 <!-- Unassigned Tab Pane -->
-                                <div class="tab-pane fade show active" id="unassigned-pane" role="tabpanel"
+                                <div class="custom-tab-pane tab-pane fade show active" id="unassigned-pane" role="tabpanel"
                                      aria-labelledby="unassigned-tab">
                                     <div class="list-group" id="email-list-unassigned" role="tablist">
                                         <!-- Static Start -->
@@ -2411,6 +2453,20 @@
                         }
                     });
                 }
+            });
+
+            /////////////// available dropdown/////////////////
+            $(document).ready(function() {
+                $(".userbox-trigger").click(function() {
+                    $(".userbox-container").fadeToggle(150);
+                });
+
+                // Close when clicking outside
+                $(document).click(function(e) {
+                    if (!$(e.target).closest('.userbox-container, .userbox-trigger').length) {
+                        $(".userbox-container").fadeOut(150);
+                    }
+                });
             });
         </script>
     @endpush
