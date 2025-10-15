@@ -1023,6 +1023,9 @@
             padding: 6px 18px;
             margin: 8px 30px;
         }
+        .card_sec .card {
+            box-shadow: none !important
+        }
 
     </style>
 @endpush
@@ -1207,9 +1210,26 @@
                 </div>
 
                 <div class="email-footer-div">
-                    <button class="email-footer-btn" id="sendEmailBtn">Send</button>
-                    <button class="email-footer-btn close-btn gap-2">Cancel</button>
+                    <!-- Buttons -->
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="email-footer-btn" id="sendEmailBtn">Send</button>
+                        <button class="email-footer-btn close-btn">Cancel</button>
+                        <input type="file" id="emailAttachment" name="attachments[]" multiple hidden>
+                        <label for="emailAttachment" style="cursor: pointer; display: inline-flex; align-items: center;">
+                            <i class="fa fa-paperclip fa-lg"></i>
+                        </label>
+                    </div>
+                    <!-- Attachment input and icon -->
+                    <div class="d-flex align-items-center mt-2">
+                        <!-- Attachment preview -->
+                        <div id="attachmentPreview" class="row mt-2 w-100"></div>
+                    </div>
                 </div>
+
+
+
+
+
             </div>
 
         </div>
@@ -1325,7 +1345,11 @@
                 const subjectEl = document.getElementById('emailSubject');
                 const fromEl = document.querySelector('[name="from_email"]');
                 const toEl = document.querySelector('[name="to"]');
+                const attachmentInputs = document.querySelectorAll('input[name="attachments[]"]');
+                const attachmentInput = document.getElementById('emailAttachment');
+                const attachmentPreview = document.getElementById('attachmentPreview');
 
+                let totalAttachmentSize = 0;
                 let valid = true;
 
                 // Form validation
@@ -1353,6 +1377,20 @@
                     valid = false;
                 }
 
+                attachmentInputs.forEach(input => {
+                    if (input.files && input.files.length > 0) {
+                        Array.from(input.files).forEach(file => {
+                            totalAttachmentSize += file.size;
+                        });
+                    }
+                });
+
+                if (totalAttachmentSize > 10 * 1024 * 1024) { 
+                    toastr.error("Total attachment size must not exceed 10 MB.");
+                    valid = false;
+                }
+
+
                 // Stop if required fields invalid
                 if (!valid) {
                     return;
@@ -1371,6 +1409,11 @@
                     formData.append(`${['to', 'cc', 'bcc'][i]}[]`, email)
                 ));
 
+                if (attachmentInput && attachmentInput.files.length > 0) {
+                    for (const file of attachmentInput.files) {
+                        formData.append('attachments[]', file);
+                    }
+                }
 
                 formData.append('from', document.querySelector('[name="from_email"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
@@ -1398,9 +1441,13 @@
                             const bccField = document.querySelector('[name="bcc"]');
                             if (ccField) ccField.value = "";
                             if (bccField) bccField.value = "";
+                            
+                            allFiles = [];
+                            attachmentInput.value = "";
+                            attachmentPreview.innerHTML = "";
+                            
                             window.refreshTimeline();
                             window.resetEmailTemplatePosition();
-                     
 
                         } else {
                             // toastr.error(response.message || "Failed to send email");
@@ -1540,5 +1587,92 @@ document.addEventListener("click", function (e) {
         btn.textContent = isVisible ? "..." : "Hide";
     }
 });
+</script>
+<script>
+    const attachmentInput = document.getElementById('emailAttachment');
+    const attachmentPreview = document.getElementById('attachmentPreview');
+
+    let allFiles = []; // keep track of all selected files
+
+    function getFileIcon(fileName) {
+        const ext = fileName.split('.').pop().toLowerCase();
+        switch (ext) {
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'svg':
+                return '<i class="fa fa-file-image fa-lg text-primary"></i>';
+            case 'pdf':
+                return '<i class="fa fa-file-pdf fa-lg text-danger"></i>';
+            case 'doc':
+            case 'docx':
+                return '<i class="fa fa-file-word fa-lg text-primary"></i>';
+            case 'xls':
+            case 'xlsx':
+                return '<i class="fa fa-file-excel fa-lg text-success"></i>';
+            case 'zip':
+            case 'rar':
+            case '7z':
+                return '<i class="fa fa-file-archive fa-lg text-warning"></i>';
+            case 'txt':
+                return '<i class="fa fa-file-alt fa-lg text-secondary"></i>';
+            default:
+                return '<i class="fa fa-file fa-lg text-muted"></i>';
+        }
+    }
+
+    // Add new attachments
+    attachmentInput.addEventListener('change', function () {
+        const newFiles = Array.from(this.files);
+        allFiles = allFiles.concat(newFiles); // merge old + new
+        renderAttachmentPreview();
+    });
+
+    // Remove attachment
+    attachmentPreview.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-attachment');
+        if (!removeBtn) return;
+
+        const idx = parseInt(removeBtn.dataset.index);
+        allFiles.splice(idx, 1); // remove from allFiles
+        renderAttachmentPreview();
+    });
+
+    // Render attachments preview
+    function renderAttachmentPreview() {
+        attachmentPreview.innerHTML = ''; // clear preview
+
+        const dt = new DataTransfer(); // to update input.files
+        allFiles.forEach((file, index) => {
+            dt.items.add(file);
+
+            const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+            const fileIcon = getFileIcon(file.name);
+
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-6 mb-2';
+
+            colDiv.innerHTML = `
+                <div class="card_sec">
+                    <div class="card p-2 d-flex align-items-center justify-content-between" style="flex-direction: row;">
+                        <span class="me-2">${fileIcon}</span>
+                        <div class="flex-grow-1 text-truncate" title="${file.name}">
+                            ${file.name} (${fileSize})
+                        </div>
+                        <span class="text-danger ms-2 remove-attachment" data-index="${index}" style="cursor:pointer;">
+                            <i class="fa fa-times"></i>
+                        </span>
+                    </div>   
+                </div>
+            `;
+
+            attachmentPreview.appendChild(colDiv);
+        });
+
+        // Update input files
+        attachmentInput.files = dt.files;
+    }
 </script>
 @endpush
