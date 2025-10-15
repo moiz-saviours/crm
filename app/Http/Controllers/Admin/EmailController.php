@@ -77,7 +77,7 @@ class EmailController extends Controller
             'cc.*' => 'email',
             'bcc' => 'sometimes|array',
             'bcc.*' => 'email',
-            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png,zip,mp4,mov,avi|max:10240',
         ], [
             'to.min' => 'No valid recipients specified.',
             'to.*.email' => 'One or more recipients are not valid email addresses.',
