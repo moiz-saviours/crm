@@ -507,7 +507,6 @@ class InvoiceController extends Controller
             return response()->json(['error' => 'An error occurred while updating the record', 'message' => $e->getMessage()], 500);
         }
     }
-// Add this method to your controller
     private function getGatewayCounts($invoice)
     {
         $m = $invoice->invoice_merchants->pluck('merchant_type')->map(fn($t) => strtolower($t))->toArray();
@@ -604,7 +603,10 @@ class InvoiceController extends Controller
                     'agent:id,name',
                     'customer_contact:id,name,special_key',
                 ])
-                ->get();
+                ->get()->map(function ($invoice) {
+                    $invoice->gateway_counts = $this->getGatewayCounts($invoice);
+                    return $invoice;
+                });
 
             // Format created_at into readable date
             $invoices->each(function($invoice) {
