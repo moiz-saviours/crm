@@ -54,7 +54,7 @@
             }
 
             .custom-tabs-row-scroll {
-                padding-bottom: 50px;
+                padding-bottom: 150px;
                 height: 80vh;
                 /* Makes sure it takes up full height of the viewport */
                 overflow-y: auto;
@@ -2429,7 +2429,7 @@ $(document).ready(function() {
                 const customerEmail = "{{ $customer_contact->email }}";
                 let folder = 'all';
                 let currentPage = {{ $page }};
-                const limit = 50;
+                const limit = {{$limit}};
                 const noEmailsPlaceholder = document.querySelector('.no-emails-placeholder');
 
                 const tabs = document.querySelectorAll('.nav-link.customize');
@@ -2445,13 +2445,13 @@ $(document).ready(function() {
                     });
                 }
 
-                window.updateFilterActivityCount = function (count, total_count) {
+                window.updateFilterActivityCount = function (total_count) {
                     // Only target the .activities-seprater inside .recent-activities
                     const filterSpan = document.querySelector('#activities-container .activities-seprater');
 
 
                     if (filterSpan) {
-                        filterSpan.textContent = `Filter activity (${count}/${total_count})`;
+                        filterSpan.textContent = `Filter activity (3/${total_count})`;
                     } else {
                         console.warn('⚠️ .recent-activities .activities-seprater not found');
                     }
@@ -2526,14 +2526,17 @@ $(document).ready(function() {
                             window.initializeTooltips(section);
                         }
 
-                        updateFilterActivityCount(data.count, data.total_count);
+                        updateFilterActivityCount(data.total_count);
 
 
                         if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
                         // Show/hide "Show More" button based on available items
+                        const shownItems = currentPage * limit;
                         if (showMoreContainer) {
-                            showMoreContainer.style.display = (data.count >= data.total_count) ? 'block' : 'none';
+                            showMoreContainer.style.display = (shownItems < data.total_count) ? 'block' : 'none';
                         }
+
+
                         // toastr.success("Timeline loaded successfully.");
 
                     })
@@ -2846,7 +2849,6 @@ $(document).on('click', '.retry-email-link', function () {
     });
 });
 </script>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

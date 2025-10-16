@@ -136,7 +136,7 @@ class ContactController extends Controller
      */
 
 
-protected function getTimeline($customerEmail, $folder = "all", $page = 1, $limit = 50, $tab = 'activities')
+protected function getTimeline($customerEmail, $folder = "all", $page, $limit, $tab = 'activities')
 {
     $customerContact = CustomerContact::where('email', $customerEmail)->first();
     if (!$customerContact) {
@@ -213,7 +213,6 @@ protected function getTimeline($customerEmail, $folder = "all", $page = 1, $limi
     }
 
     $offset = ($page - 1) * $limit;
-    
     // Get the main emails for pagination - LATEST MESSAGES FIRST
     $emails = $query->clone()
         ->with(['attachments', 'events'])
@@ -267,7 +266,6 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
             'thread_has_multiple_emails' => $visibleThreadEmails->count() > 1,
         ]);
     });
-
 
     // Rest of your timeline building code remains the same...
     $total_count = 
@@ -323,7 +321,9 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
         return strtotime($b['date']) - strtotime($a['date']);
     });
 
-    $paginatedTimeline = array_slice($timeline, 0, $limit);
+    // ✅ Correct pagination slice
+    $offset = ($page - 1) * $limit;
+    $paginatedTimeline = array_slice($timeline, $offset, $limit);
 
     return [
         'customer_contact' => $customerContact,
@@ -332,7 +332,7 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
         'limit' => $limit,
         'count' => count($paginatedTimeline),
         "{$tab}_total" => count($timeline),  // total items in this tab
-        'total_count' => $total_count, 
+        'total_count' => $total_count,
     ];
 }
 
@@ -441,8 +441,7 @@ private function formatEmailForTimeline(Email $email)
             $folder = $request->query('folder', 'all');
             $tab = $request->query('tab', 'activities');
             $page = (int) $request->query('page', 1);
-            $limit = (int) $request->query('limit', 50);
-
+            $limit = (int) $request->query('limit', 10);
             if (empty($customerEmail)) {
                 return response()->json(['error' => 'Customer email is required'], 400);
             }
@@ -568,6 +567,9 @@ private function formatEmailForTimeline(Email $email)
             $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
             return $brand ?? $domain;
         };
+        $page = (int)request()->get('page', 1);
+        $limit = (int)request()->get('limit', default: 10);
+        
         // $auth_pseudo_emails = [];
         // if (auth()->user()->pseudo_email) {
         //     $auth_pseudo_emails[] = [
@@ -603,10 +605,9 @@ private function formatEmailForTimeline(Email $email)
                 'email' => $pseudo->pseudo_email,
                 'company' => $resolveCompany($pseudo->pseudo_email),
             ]);
-        $emailsResponse = $this->getTimeline($customer_contact->email, 'all', 1, 50, 'activities');
+        $emailsResponse = $this->getTimeline($customer_contact->email, 'all', $page, $limit, 'activities');
         $timeline = $emailsResponse['timeline'] ?? [];
-        $page = (int)request()->get('page', 1);
-        $limit = 50;
+        $total_count = $emailsResponse['total_count'] ?? 0;
         $imapError = null;
         return view('admin.customers.contacts.edit', compact(
             'customer_contact',
@@ -617,7 +618,8 @@ private function formatEmailForTimeline(Email $email)
             'page',
             'limit',
             'imapError',
-            'timeline'
+            'timeline',
+            'total_count'
         ));
     }
 

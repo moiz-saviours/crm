@@ -81,7 +81,7 @@
                         <p class="recent-filters">
                             Filter by:
                             <span class="activities-seprater">
-                                Filter activity ({{ count($timeline) }}/{{ count($timeline) }})
+                                Filter activity (3/{{ (int)$total_count }})
                             </span>
                         </p>
                     </div>
