@@ -329,44 +329,9 @@ class FetchEmails extends Command
 
             $this->line("Creating email record for #{$emailNumber}");
 
-            // Process HTML body
-            $inlinedHtml = null;
+            // Just store the raw HTML as-is, we'll process it when displaying
             if (!empty($body['html'])) {
-                $this->line("Processing HTML body, length: " . strlen($body['html']));
-                
-                // If HTML is very short but text is long, use text to create better HTML
-                if ($body['text'] && strlen($body['html']) < 500 && strlen($body['text']) > 1000) {
-                    $this->line("HTML seems too short, creating enhanced HTML from text");
-                    $inlinedHtml = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
-                    $paragraphs = preg_split('/\n\s*\n/', $body['text']);
-                    foreach ($paragraphs as $paragraph) {
-                        $paragraph = trim($paragraph);
-                        if (!empty($paragraph)) {
-                            $inlinedHtml .= '<p style="margin-bottom: 1em;">' . nl2br(htmlspecialchars($paragraph)) . '</p>';
-                        }
-                    }
-                    $inlinedHtml .= '</div>';
-                } else {
-                    // Use the original HTML with CSS inlining
-                    $cssToInlineStyles = new CssToInlineStyles();
-                    $inlinedHtml = $cssToInlineStyles->convert($body['html']);
-                    $this->line("Applied inline CSS to HTML body");
-                }
-
-                // Clean up the HTML (simpler approach)
-                $patterns = [
-                    '/<!DOCTYPE[^>]*>/i',
-                    '/<html[^>]*>/i',
-                    '/<\/html>/i',
-                    '/<head[^>]*>.*?<\/head>/is',
-                    '/<title[^>]*>.*?<\/title>/is',
-                    '/<meta[^>]*>/i',
-                    '/<body[^>]*>/i',
-                    '/<\/body>/i',
-                ];
-                
-                $inlinedHtml = preg_replace($patterns, '', $inlinedHtml);
-                $this->line("Cleaned HTML, final length: " . strlen($inlinedHtml));
+                $this->line("Storing raw HTML body, length: " . strlen($body['html']));
             }
 
             // Decode the subject if it's MIME-encoded
@@ -392,7 +357,7 @@ class FetchEmails extends Command
                 'to' => $this->parseAddresses($headers->to ?? null),
                 'cc' => $this->parseAddresses($headers->cc ?? null),
                 'subject' => $decodedSubject,
-                'body_html' => $inlinedHtml ?? $body['html'] ?? null,
+                'body_html' => $body['html'] ?? null,  // Store raw HTML directly
                 'body_text' => $body['text'] ?? null,
                 'imap_uid' => @imap_uid($this->imapConnection, $emailNumber),
                 'imap_folder' => $folder,
@@ -500,56 +465,10 @@ class FetchEmails extends Command
                         htmlspecialchars($body['text']) . '</pre>';
         }
 
-        // If we have HTML but it's very short compared to text, there might be missing parts
-        if ($body['html'] && $body['text'] && (strlen($body['html']) < strlen($body['text']) / 2)) {
-            $this->warn("HTML body seems incomplete. HTML: " . strlen($body['html']) . " chars, TEXT: " . strlen($body['text']) . " chars");
-            
-            // Try alternative method to fetch full body
-            $fullBody = $this->getFullBodyAlternative($emailNumber);
-            if ($fullBody && strlen($fullBody) > strlen($body['html'])) {
-                $this->line("Using alternative method for HTML body");
-                $body['html'] = $fullBody;
-            }
-        }
 
         return $body;
     }
 
-    private function getFullBodyAlternative(int $emailNumber)
-    {
-        $this->line("Trying alternative body fetch for email #{$emailNumber}");
-        
-        // Method 1: Try to get the entire body as HTML
-        $fullBody = @imap_body($this->imapConnection, $emailNumber);
-        if ($fullBody) {
-            // Check if it contains HTML tags
-            if (strpos($fullBody, '<html') !== false || strpos($fullBody, '<div') !== false) {
-                $this->line("Found HTML content in full body");
-                return $fullBody;
-            }
-        }
-        
-        // Method 2: Try different sections
-        $sectionsToTry = ['1', '2', '1.1', '1.2', '2.1', '2.2'];
-        foreach ($sectionsToTry as $section) {
-            $content = @imap_fetchbody($this->imapConnection, $emailNumber, $section);
-            if ($content && strpos($content, '<html') !== false) {
-                $this->line("Found HTML content in section $section");
-                
-                // Decode if needed
-                $structure = @imap_bodystruct($this->imapConnection, $emailNumber, $section);
-                if ($structure && $structure->encoding == 3) {
-                    $content = imap_base64($content);
-                } elseif ($structure && $structure->encoding == 4) {
-                    $content = imap_qprint($content);
-                }
-                
-                return $content;
-            }
-        }
-        
-        return null;
-    }
 
 
     private function processAttachments(int $emailNumber, $structure, Email $email): int

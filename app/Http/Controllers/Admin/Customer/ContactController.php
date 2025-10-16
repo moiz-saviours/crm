@@ -22,6 +22,7 @@ use App\Models\Email;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 
 class ContactController extends Controller
@@ -338,6 +339,47 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
 /**
  * Format email for timeline display
  */
+
+private function processHtmlForDisplay($html, $text = null)
+{
+    // If no HTML but we have text, create basic HTML from text
+    if (!$html && $text) {
+        return '<div class="email-text-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; white-space: pre-wrap;">' . 
+               htmlspecialchars($text) . '</div>';
+    }
+    
+    if (!$html) {
+        return '<p>No content</p>';
+    }
+    
+    // Apply CSS inlining for display
+    try {
+        $cssToInlineStyles = new CssToInlineStyles();
+        $inlinedHtml = $cssToInlineStyles->convert($html);
+    } catch (\Exception $e) {
+        // If CSS inlining fails, use original HTML
+        $inlinedHtml = $html;
+    }
+    
+    // Remove unwanted tags for display
+    $patterns = [
+        '/<!DOCTYPE[^>]*>/i',
+        '/<html[^>]*>/i',
+        '/<\/html>/i',
+        '/<head[^>]*>.*?<\/head>/is',
+        '/<title[^>]*>.*?<\/title>/is',
+        '/<meta[^>]*>/i',
+    ];
+    
+    $cleanedHtml = preg_replace($patterns, '', $inlinedHtml);
+    
+    // Extract body content if exists, otherwise use the whole thing
+    if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $cleanedHtml, $matches)) {
+        return $matches[1];
+    }
+    
+    return $cleanedHtml;
+}
 private function formatEmailForTimeline(Email $email)
 {
         // Count engagement events
@@ -373,7 +415,7 @@ private function formatEmailForTimeline(Email $email)
         'spam_count' => $email->events->where('event_type', 'spam')->count(),
         'show_send_status' => $displaySendStatus, // 👈 new field for blade check
         'body' => [
-            'html' => $email->body_html,
+            'html' => $this->processHtmlForDisplay($email->body_html, $email->body_text),
             'text' => $email->body_text,
         ],
         'attachments' => $email->attachments->map(fn($a) => [
