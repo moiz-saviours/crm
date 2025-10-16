@@ -232,6 +232,7 @@
 
         @if(!empty($bodyPreview))
             <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
+                {{ \Illuminate\Support\Str::limit($bodyPreview, 65, '...') }}
             </p>
         @endif
     </div>
