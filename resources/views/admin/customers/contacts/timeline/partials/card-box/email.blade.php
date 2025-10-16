@@ -448,7 +448,7 @@
     </div>
 </div>
 
-    <div class="contentdisplaytwo {{ $item['data']['uuid'] }}" style="display: none;">
+    <div class="contentdisplaytwo mt-3 {{ $item['data']['uuid'] }}" style="display: none;">
     <div class="user_cont user-email-template">
         {!! $htmlContent !!}
     </div>

@@ -329,23 +329,44 @@ class FetchEmails extends Command
 
             $this->line("Creating email record for #{$emailNumber}");
 
-            // Process HTML body with CssToInlineStyles and strip unwanted tags
+            // Process HTML body
             $inlinedHtml = null;
             if (!empty($body['html'])) {
-                $cssToInlineStyles = new CssToInlineStyles();
-                $inlinedHtml = $cssToInlineStyles->convert($body['html']);
-                $this->line("Applied inline CSS to HTML body for email #{$emailNumber}");
-
-                // Use DOMDocument to strip DOCTYPE, html, head, meta, and title tags
-                $doc = new \DOMDocument();
-                @$doc->loadHTML($inlinedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-                $bodyTag = $doc->getElementsByTagName('body')->item(0);
-                if ($bodyTag) {
-                    $inlinedHtml = $doc->saveHTML($bodyTag);
-                    $this->line("Stripped DOCTYPE, html, head, meta, and title tags for email #{$emailNumber}");
+                $this->line("Processing HTML body, length: " . strlen($body['html']));
+                
+                // If HTML is very short but text is long, use text to create better HTML
+                if ($body['text'] && strlen($body['html']) < 500 && strlen($body['text']) > 1000) {
+                    $this->line("HTML seems too short, creating enhanced HTML from text");
+                    $inlinedHtml = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">';
+                    $paragraphs = preg_split('/\n\s*\n/', $body['text']);
+                    foreach ($paragraphs as $paragraph) {
+                        $paragraph = trim($paragraph);
+                        if (!empty($paragraph)) {
+                            $inlinedHtml .= '<p style="margin-bottom: 1em;">' . nl2br(htmlspecialchars($paragraph)) . '</p>';
+                        }
+                    }
+                    $inlinedHtml .= '</div>';
                 } else {
-                    $this->warn("No body tag found in HTML for email #{$emailNumber}, keeping inlined HTML");
+                    // Use the original HTML with CSS inlining
+                    $cssToInlineStyles = new CssToInlineStyles();
+                    $inlinedHtml = $cssToInlineStyles->convert($body['html']);
+                    $this->line("Applied inline CSS to HTML body");
                 }
+
+                // Clean up the HTML (simpler approach)
+                $patterns = [
+                    '/<!DOCTYPE[^>]*>/i',
+                    '/<html[^>]*>/i',
+                    '/<\/html>/i',
+                    '/<head[^>]*>.*?<\/head>/is',
+                    '/<title[^>]*>.*?<\/title>/is',
+                    '/<meta[^>]*>/i',
+                    '/<body[^>]*>/i',
+                    '/<\/body>/i',
+                ];
+                
+                $inlinedHtml = preg_replace($patterns, '', $inlinedHtml);
+                $this->line("Cleaned HTML, final length: " . strlen($inlinedHtml));
             }
 
             // Decode the subject if it's MIME-encoded
@@ -404,56 +425,130 @@ class FetchEmails extends Command
     private function getEmailBody(int $emailNumber, $structure)
     {
         $this->line("Fetching body for email #{$emailNumber}");
-
         $body = ['html' => null, 'text' => null];
 
-        // Define inline recursive closure
+        // Define inline recursive closure with better multipart handling
         $extractParts = function ($structure, $partNumberPrefix = '') use (&$extractParts, &$body, $emailNumber) {
-            if (!isset($structure->parts)) {
-                // Single-part message
-                if ($structure->type == 0) {
-                    $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumberPrefix ?: 1);
-                    if (!$content) return;
-
-                    if ($structure->encoding == 3) $content = imap_base64($content);
-                    elseif ($structure->encoding == 4) $content = imap_qprint($content);
-
-                    $key = strtoupper($structure->subtype) == 'HTML' ? 'html' : 'text';
-                    $body[$key] .= $content;
+            // Check if this is a multipart structure
+            if (isset($structure->parts)) {
+                $this->line("Processing multipart: " . ($structure->subtype ?? 'unknown') . " at part $partNumberPrefix");
+                
+                // Handle different multipart types
+                $multipartType = isset($structure->subtype) ? strtoupper($structure->subtype) : 'MIXED';
+                
+                foreach ($structure->parts as $i => $part) {
+                    $partNumber = $partNumberPrefix ? $partNumberPrefix . '.' . ($i + 1) : ($i + 1);
+                    $extractParts($part, $partNumber);
                 }
                 return;
             }
 
-            // Loop through parts
-            foreach ($structure->parts as $i => $part) {
-                $partNumber = $partNumberPrefix ? $partNumberPrefix . '.' . ($i + 1) : ($i + 1);
-
-                if ($part->type == 0) {
-                    // text/plain or text/html
-                    $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber);
-                    if (!$content) continue;
-
-                    if ($part->encoding == 3) $content = imap_base64($content);
-                    elseif ($part->encoding == 4) $content = imap_qprint($content);
-
-                    $key = strtoupper($part->subtype) == 'HTML' ? 'html' : 'text';
-                    $body[$key] .= $content;
-                } elseif (isset($part->parts)) {
-                    // Recurse into nested multiparts
-                    $extractParts($part, $partNumber);
+            // Handle single part
+            if ($structure->type == 0) {
+                // Text or HTML part
+                $partNumber = $partNumberPrefix ?: '1';
+                $this->line("Fetching part $partNumber - Type: " . ($structure->subtype ?? 'unknown'));
+                
+                $content = @imap_fetchbody($this->imapConnection, $emailNumber, $partNumber);
+                if ($content === false || $content === '') {
+                    $this->line("No content for part $partNumber");
+                    return;
                 }
+
+                // Decode content based on encoding
+                if ($structure->encoding == 3) {
+                    $content = imap_base64($content);
+                } elseif ($structure->encoding == 4) {
+                    $content = imap_qprint($content);
+                } elseif ($structure->encoding == 1) {
+                    $content = imap_8bit($content);
+                } elseif ($structure->encoding == 2) {
+                    $content = imap_binary($content);
+                }
+
+                $subtype = strtoupper($structure->subtype ?? 'TEXT');
+                
+                if ($subtype == 'HTML') {
+                    $body['html'] = ($body['html'] ?? '') . $content;
+                    $this->line("Added HTML content from part $partNumber, length: " . strlen($content));
+                } elseif ($subtype == 'PLAIN') {
+                    $body['text'] = ($body['text'] ?? '') . $content;
+                    $this->line("Added TEXT content from part $partNumber, length: " . strlen($content));
+                } else {
+                    // Default to text for unknown text subtypes
+                    $body['text'] = ($body['text'] ?? '') . $content;
+                    $this->line("Added content as TEXT from part $partNumber, length: " . strlen($content));
+                }
+            } elseif ($structure->type == 1) {
+                // Nested multipart - should be handled by the parts check above
+                $this->line("Found type=1 without parts at $partNumberPrefix");
             }
         };
 
         // Run the recursive closure
         $extractParts($structure);
 
-        // If no HTML version, fallback to text
+        // Debug output
+        $this->line("Body extraction results:");
+        $this->line("- HTML: " . ($body['html'] ? strlen($body['html']) . ' characters' : 'NULL'));
+        $this->line("- TEXT: " . ($body['text'] ? strlen($body['text']) . ' characters' : 'NULL'));
+
+        // If we have text but no HTML, create basic HTML from text
         if (!$body['html'] && $body['text']) {
-            $body['html'] = nl2br($body['text']);
+            $this->line("Converting text to HTML since no HTML body found");
+            $body['html'] = '<pre style="white-space: pre-wrap; font-family: sans-serif;">' . 
+                        htmlspecialchars($body['text']) . '</pre>';
+        }
+
+        // If we have HTML but it's very short compared to text, there might be missing parts
+        if ($body['html'] && $body['text'] && (strlen($body['html']) < strlen($body['text']) / 2)) {
+            $this->warn("HTML body seems incomplete. HTML: " . strlen($body['html']) . " chars, TEXT: " . strlen($body['text']) . " chars");
+            
+            // Try alternative method to fetch full body
+            $fullBody = $this->getFullBodyAlternative($emailNumber);
+            if ($fullBody && strlen($fullBody) > strlen($body['html'])) {
+                $this->line("Using alternative method for HTML body");
+                $body['html'] = $fullBody;
+            }
         }
 
         return $body;
+    }
+
+    private function getFullBodyAlternative(int $emailNumber)
+    {
+        $this->line("Trying alternative body fetch for email #{$emailNumber}");
+        
+        // Method 1: Try to get the entire body as HTML
+        $fullBody = @imap_body($this->imapConnection, $emailNumber);
+        if ($fullBody) {
+            // Check if it contains HTML tags
+            if (strpos($fullBody, '<html') !== false || strpos($fullBody, '<div') !== false) {
+                $this->line("Found HTML content in full body");
+                return $fullBody;
+            }
+        }
+        
+        // Method 2: Try different sections
+        $sectionsToTry = ['1', '2', '1.1', '1.2', '2.1', '2.2'];
+        foreach ($sectionsToTry as $section) {
+            $content = @imap_fetchbody($this->imapConnection, $emailNumber, $section);
+            if ($content && strpos($content, '<html') !== false) {
+                $this->line("Found HTML content in section $section");
+                
+                // Decode if needed
+                $structure = @imap_bodystruct($this->imapConnection, $emailNumber, $section);
+                if ($structure && $structure->encoding == 3) {
+                    $content = imap_base64($content);
+                } elseif ($structure && $structure->encoding == 4) {
+                    $content = imap_qprint($content);
+                }
+                
+                return $content;
+            }
+        }
+        
+        return null;
     }
 
 
