@@ -33,8 +33,8 @@
     data-bs-custom-class="custom-tooltip"
     title="
         <div class='custom-tooltip-content'>
-            <p>Subject: {{ $item['data']['subject'] ?? '(No Subject)' }}</p>
-            <p>From: {{ $fromName ?: '(No Name)' }} ({{ $fromEmail ?: 'Unknown Email' }})</p>
+            <p>Subject: {{ $item['data']['subject'] ?? '' }}</p>
+            <p>From: {{ $fromName ?: '' }} ({{ $fromEmail ?: '' }})</p>
             @if(!empty($toList))<p>To: {{ $toList }}</p>@endif
             @if(!empty($ccList))<p>CC: {{ $ccList }}</p>@endif
             @if(!empty($bccList))<p>BCC: {{ $bccList }}</p>@endif
@@ -42,7 +42,7 @@
         </div>
     ">
     {{-- Subject --}}
-    Email - <strong>{{ \Illuminate\Support\Str::limit($item['data']['subject'] ?? '(No Subject)', 30) }}</strong>
+    Email - <strong>{{ \Illuminate\Support\Str::limit($item['data']['subject'] ?? '', 30) }}</strong>
 
     {{-- From (inline) --}}
     <span class="user_cont">
@@ -224,25 +224,16 @@
 
         </div>
         {{-- Body preview --}}
-        <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
-            @if(isset($item['data']['subject']))
-                @if(str_starts_with(strtolower($item['data']['subject']), 're:'))
-                    <span style="color: #666; font-style: italic;">
-                        Re: {{ \Illuminate\Support\Str::limit(trim(substr($item['data']['subject'], 3)), 80, '...') }}
-                    </span>
-                @elseif(str_starts_with(strtolower($item['data']['subject']), 'fwd:'))
-                    <span style="color: #666; font-style: italic;">
-                        Fwd: {{ \Illuminate\Support\Str::limit(trim(substr($item['data']['subject'], 4)), 80, '...') }}
-                    </span>
-                @else
-                    <span style="color: #333; font-weight: 500;">
-                        {{ \Illuminate\Support\Str::limit($item['data']['subject'], 80, '...') }}
-                    </span>
-                @endif
-            @else
-                <span style="color: #999; font-style: italic;">No subject</span>
-            @endif
-        </p>
+        @php
+            $bodyText = trim(strip_tags($item['data']['body']['text'] ?? ''));
+            $bodyHtml = trim(strip_tags($item['data']['body']['html'] ?? ''));
+            $bodyPreview = $bodyText ?: $bodyHtml;
+        @endphp
+
+        @if(!empty($bodyPreview))
+            <p class="user_toggle" style="margin-top: 4px; color: #555; font-size: 13px;padding:0px 18px;">
+            </p>
+        @endif
     </div>
 
     <div>
