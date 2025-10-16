@@ -1,3 +1,4 @@
+<div id="notes-section">
 <div class="email-threading-row">
     <button class="threading-email-btn-two" data-bs-toggle="modal" data-bs-target="#addNoteModal">
         Create Notes
@@ -66,3 +67,4 @@
         You can even @mention a teammate if you need to.
     </p>
 @endif
+</div>

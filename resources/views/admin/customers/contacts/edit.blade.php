@@ -2848,6 +2848,265 @@ $(document).on('click', '.retry-email-link', function () {
 </script>
 
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.querySelector('.search-inputs');
+    
+    // Initialize searchable data attributes on all content
+    initializeSearchableData();
+    
+    if (searchForm && searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterContent(this.value.trim().toLowerCase());
+        });
+        
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterContent(searchInput.value.trim().toLowerCase());
+        });
+    }
+    
+    // Initialize data attributes for searchable content
+    function initializeSearchableData() {
+        // Add data attributes to all searchable elements
+        document.querySelectorAll('[data-searchable]').forEach(element => {
+            element.removeAttribute('data-searchable');
+        });
+        
+        // Activities section
+        const activitiesSection = document.getElementById('activities-section');
+        if (activitiesSection) {
+            activitiesSection.querySelectorAll('.data-highlights, .email-box-container, .card-box').forEach(card => {
+                card.setAttribute('data-searchable', 'true');
+                card.setAttribute('data-search-content', extractSearchContent(card));
+            });
+        }
+        
+        // Notes section
+        const notesSection = document.getElementById('notes-section');
+        if (notesSection) {
+            notesSection.querySelectorAll('.data-highlights').forEach(card => {
+                card.setAttribute('data-searchable', 'true');
+                card.setAttribute('data-search-content', extractSearchContent(card));
+            });
+        }
+        
+        // Emails section
+        const emailsSection = document.getElementById('emails-section');
+        if (emailsSection) {
+            emailsSection.querySelectorAll('.email-box-container').forEach(card => {
+                card.setAttribute('data-searchable', 'true');
+                card.setAttribute('data-search-content', extractSearchContent(card));
+            });
+        }
+    }
+    
+    // Extract all searchable text from an element
+    function extractSearchContent(element) {
+        const content = [];
+        
+        // Get all text content, excluding interactive elements
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode: function(node) {
+                    // Skip script, style, and hidden elements
+                    if (node.parentElement.tagName === 'SCRIPT' || 
+                        node.parentElement.tagName === 'STYLE' ||
+                        node.parentElement.style.display === 'none' ||
+                        node.parentElement.classList.contains('d-none')) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            },
+            false
+        );
+        
+        let textNode;
+        while (textNode = walker.nextNode()) {
+            const text = textNode.textContent.trim();
+            if (text && text.length > 1) { // Ignore single characters/whitespace
+                content.push(text.toLowerCase());
+            }
+        }
+        
+        return content.join(' ');
+    }
+    
+    function filterContent(searchTerm) {
+        const activeTab = getActiveTab();
+        console.log('Active tab:', activeTab);
+        
+        // Re-initialize data in case content changed
+        initializeSearchableData();
+        
+        // Filter based on active tab container
+        const container = getActiveTabContainer(activeTab);
+        if (!container) return;
+        
+        filterContainer(container, searchTerm);
+    }
+    
+    function getActiveTab() {
+        const activeTab = document.querySelector('.nav-link.customize.active');
+        return activeTab ? activeTab.getAttribute('data-tab') : 'activities';
+    }
+    
+    function getActiveTabContainer(tab) {
+        const containers = {
+            'activities': document.getElementById('activities-section'),
+            'notes': document.getElementById('notes-section'),
+            'emails': document.getElementById('emails-section')
+        };
+        return containers[tab] || containers['activities'];
+    }
+    
+    function filterContainer(container, searchTerm) {
+        const searchableElements = container.querySelectorAll('[data-searchable="true"]');
+        let hasVisibleResults = false;
+        
+        searchableElements.forEach(element => {
+            const searchContent = element.getAttribute('data-search-content') || '';
+            
+            if (searchTerm === '' || searchContent.includes(searchTerm)) {
+                element.style.display = '';
+                hasVisibleResults = true;
+                
+                // Show associated month headers
+                showAssociatedMonthHeader(element);
+            } else {
+                element.style.display = 'none';
+                
+                // Hide month headers if needed
+                hideAssociatedMonthHeader(element);
+            }
+        });
+        
+        // Handle empty states
+        handleEmptyStates(container, hasVisibleResults, searchTerm);
+        
+        // Show no results message
+        showNoResultsMessage(!hasVisibleResults && searchTerm !== '', container);
+    }
+    
+    function showAssociatedMonthHeader(element) {
+        const monthHeader = element.previousElementSibling;
+        if (monthHeader && monthHeader.classList.contains('date-by-order')) {
+            monthHeader.style.display = '';
+        }
+    }
+    
+    function hideAssociatedMonthHeader(element) {
+        const monthHeader = element.previousElementSibling;
+        if (monthHeader && monthHeader.classList.contains('date-by-order')) {
+            setTimeout(() => hideMonthHeaderIfNoVisibleContent(monthHeader), 0);
+        }
+    }
+    
+    function hideMonthHeaderIfNoVisibleContent(monthHeader) {
+        let hasVisibleContent = false;
+        let nextElement = monthHeader.nextElementSibling;
+        
+        while (nextElement && !nextElement.classList.contains('date-by-order')) {
+            if (nextElement.style.display !== 'none' && 
+                nextElement.hasAttribute('data-searchable')) {
+                hasVisibleContent = true;
+                break;
+            }
+            nextElement = nextElement.nextElementSibling;
+        }
+        
+        if (!hasVisibleContent) {
+            monthHeader.style.display = 'none';
+        }
+    }
+    
+    function handleEmptyStates(container, hasVisibleResults, searchTerm) {
+        // Handle email empty placeholder
+        const noEmailsPlaceholder = container.querySelector('.no-emails-placeholder');
+        if (noEmailsPlaceholder) {
+            noEmailsPlaceholder.style.display = (searchTerm === '' && !hasVisibleResults) ? '' : 'none';
+        }
+        
+        // Handle notes empty state
+        const notePara = container.querySelector('.note-para');
+        if (notePara) {
+            notePara.style.display = (searchTerm === '' && !hasVisibleResults) ? '' : 'none';
+        }
+    }
+    
+    function showNoResultsMessage(show, container) {
+        let noResultsMsg = container.querySelector('#no-results-message');
+        
+        if (show && !noResultsMsg) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'alert alert-info mt-3';
+            noResultsMsg.textContent = 'No content found matching your search.';
+            container.appendChild(noResultsMsg);
+        } else if (!show && noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+    
+    // Observe DOM changes for dynamic content
+    function initializeMutationObserver() {
+        const observer = new MutationObserver(function(mutations) {
+            let shouldReinitialize = false;
+            
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldReinitialize = true;
+                }
+            });
+            
+            if (shouldReinitialize) {
+                setTimeout(initializeSearchableData, 100);
+                // Re-apply current filter
+                const searchInput = document.querySelector('.search-inputs');
+                if (searchInput && searchInput.value) {
+                    filterContent(searchInput.value.trim().toLowerCase());
+                }
+            }
+        });
+        
+        // Observe all relevant containers
+        const containers = [
+            document.getElementById('activities-section'),
+            document.getElementById('notes-section'), 
+            document.getElementById('emails-section')
+        ].filter(Boolean);
+        
+        containers.forEach(container => {
+            observer.observe(container, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
+    
+    // Initialize tab listeners
+    function initializeTabListeners() {
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.nav-link.customize')) {
+                setTimeout(() => {
+                    const searchInput = document.querySelector('.search-inputs');
+                    if (searchInput) {
+                        filterContent(searchInput.value.trim().toLowerCase());
+                    }
+                }, 100);
+            }
+        });
+    }
+    
+    // Initialize everything
+    initializeTabListeners();
+    initializeMutationObserver();
+});
+</script>
 
 
     @endpush
