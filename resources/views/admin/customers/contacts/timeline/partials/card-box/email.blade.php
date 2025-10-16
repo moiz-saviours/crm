@@ -134,8 +134,7 @@
 
         
     </div>
-
-@if($item['data']['type'] !== 'incoming')
+@if($item['data']['type'] == 'outgoing')
     @if(($item['data']['send_status'] ?? '') === 'failed')
         {{-- Delivery Failed Message --}}
         <div class="alert alert-danger d-flex align-items-center justify-content-between py-2 px-3 mt-2 mb-0 shadow-sm">
@@ -157,18 +156,13 @@
 
         {{-- Show send status only if no open or click event --}}
         @unless($hasOpenEvent || $hasClickEvent)
-            <div class="email-folder d-flex align-items-center mt-1">
-                <span class="folder-dot me-1"
-                      style="color: 
-                          {{ ($item['data']['send_status'] ?? '') === 'sent' ? '#28a745' : 
-                             (($item['data']['send_status'] ?? '') === 'pending' ? '#ffc107' : '#6c757d') }};">
-                    &bull;
-                </span>
-                <span class="folder-name text-capitalize">
-                    {{ ($item['data']['send_status'] ?? '') === 'sent' ? 'Sent' : 
-                       (($item['data']['send_status'] ?? '') === 'pending' ? 'Sending…' : 'Queued') }}
-                </span>
-            </div>
+        <div class="email-folder d-flex align-items-center mt-1">
+            @if(($item['data']['send_status'] ?? '') === 'sent')
+                <span class="folder-dot me-1" style="color: #28a745;">&bull;</span>
+                <span class="folder-name text-capitalize">Sent</span>
+            @endif
+        </div>
+
         @endunless
     @endif
 @endif
@@ -396,7 +390,7 @@
 
            
                         </div>
-@if($item['data']['type'] !== 'incoming')
+@if($item['data']['type'] == 'outgoing')
     @if(($item['data']['send_status'] ?? '') === 'failed')
         <div class="alert alert-danger d-flex align-items-center justify-content-between py-2 px-3 mt-2 mb-0 shadow-sm">
             <div>
@@ -413,16 +407,10 @@
         {{-- Only show send status if no open or click event exists --}}
         @if($item['data']['show_send_status'])
             <div class="email-folder d-flex align-items-center mt-2">
-                <span class="folder-dot me-1"
-                      style="color: 
-                          {{ ($item['data']['send_status'] ?? '') === 'sent' ? '#28a745' : 
-                             (($item['data']['send_status'] ?? '') === 'pending' ? '#ffc107' : '#6c757d') }};">
-                    &bull;
-                </span>
-                <span class="folder-name text-capitalize">
-                    {{ ($item['data']['send_status'] ?? '') === 'sent' ? 'Sent' : 
-                       (($item['data']['send_status'] ?? '') === 'pending' ? 'Sending…' : 'Queued') }}
-                </span>
+                @if(($item['data']['send_status'] ?? '') === 'sent')
+                    <span class="folder-dot me-1" style="color: #28a745;">&bull;</span>
+                    <span class="folder-name text-capitalize">Sent</span>
+                @endif
             </div>
         @endif
     @endif

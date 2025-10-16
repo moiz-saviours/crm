@@ -344,12 +344,11 @@ private function processHtmlForDisplay($html, $text = null)
 {
     // If no HTML but we have text, create basic HTML from text
     if (!$html && $text) {
-        return '<div class="email-text-content" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; white-space: pre-wrap;">' . 
-               htmlspecialchars($text) . '</div>';
+        return nl2br(htmlspecialchars($text));
     }
     
     if (!$html) {
-        return '<p>No content</p>';
+        return 'No content';
     }
     
     // Apply CSS inlining for display
