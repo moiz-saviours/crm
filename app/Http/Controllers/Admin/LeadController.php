@@ -208,23 +208,24 @@ class LeadController extends Controller
             if (!$customer_contact) {
                 return response()->json(['errors' => 'The Customer key does not exist.']);
             }
-            $lead->update([
+            $updateData = [
                 'brand_key' => $request->input('brand_key'),
                 'team_key' => $request->input('team_key'),
-//                'cus_contact_key' => $customer_contact->special_key,
                 'lead_status_id' => $request->input('lead_status_id'),
                 'name' => $request->input('name'),
-//                'email' => $request->input('email'),
                 'phone' => $request->input('phone'),
                 'address' => $request->input('address'),
                 'city' => $request->input('city'),
                 'state' => $request->input('state'),
                 'country' => $request->input('country'),
                 'zipcode' => $request->input('zipcode'),
-//                'ip_address' => $request->input('ip_address'),
                 'note' => $request->input('note'),
                 'status' => $request->input('status'),
-            ]);
+            ];
+            if (is_null($lead->email) && $request->filled('email')) {
+                $updateData['email'] = $request->input('email');
+            }
+            $lead->update($updateData);
             DB::commit();
             $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
@@ -601,7 +602,6 @@ class LeadController extends Controller
             $deviceInfo = json_decode($lead->device_info, true);
 
             $existingContact = CustomerContact::where('email', $lead->email)->first();
-
             if ($existingContact) {
                 $customer_contact = $existingContact;
             }
@@ -633,7 +633,7 @@ class LeadController extends Controller
             }
 
             $lead->update($lead_data);
-
+            $lead->load('customer_contact:id,special_key,name','leadStatus:id,name');
             UserActivity::create([
                 'event_type'  => 'conversion',
                 'visitor_id' => $lead->visitor_id,
@@ -652,7 +652,7 @@ class LeadController extends Controller
                 'message' => $existingContact
                     ? 'Lead attached to existing Customer successfully!'
                     : 'Lead converted to Customer successfully!',
-                'data' => $customer_contact
+                'data' => $lead
             ]);
         } catch (\Exception $e) {
             return response()->json([
