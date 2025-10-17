@@ -42,9 +42,8 @@
                 @include('admin.customers.contacts.timeline.partials.card-box.conversion')
             @endif
         @endforeach
-        
-        @else
-            <p class="text-muted">No notes or emails found.</p>
-        @endif
 </div>
 
+    @else
+        <p class="text-muted">No notes or emails found.</p>
+    @endif

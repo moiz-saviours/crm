@@ -1505,7 +1505,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <div class="row">
+                    <div class="row ">
                         <div class="col-lg-3">
 
                             <div class="sidebarr">
@@ -1550,19 +1550,19 @@
                                                     justify-content: center;
                                                 }
                                             </style>
-                                            <div class="email_sec d-flex align-items-center gap-2 email-truncate-container">
-                                                <p class="mb-0  customerEmail"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="{{ $customer_contact->email }}">
-                                                {{ Str::limit($customer_contact->email, 18) }}
-                                                </p>
-                                                <i class="fa fa-clone prof-edit-icons copyEmail"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="Copy email to clipboard"
-                                                data-email="{{ $customer_contact->email }}"></i>
-                                            </div>
+<div class="email_sec d-flex align-items-center gap-2 email-truncate-container">
+    <p class="mb-0  customerEmail"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="{{ $customer_contact->email }}">
+       {{ Str::limit($customer_contact->email, 18) }}
+    </p>
+    <i class="fa fa-clone prof-edit-icons copyEmail"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="Copy email to clipboard"
+       data-email="{{ $customer_contact->email }}"></i>
+</div>
 
 
 
