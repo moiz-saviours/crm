@@ -1,9 +1,9 @@
-<div id="notes-section">
-<div class="email-threading-row">
+<div class="email-threading-row px-2">
     <button class="threading-email-btn-two" data-bs-toggle="modal" data-bs-target="#addNoteModal">
         Create Notes
     </button>
 </div>
+<div id="notes-section" class="px-2">
 @if ($customer_contact->notes->count() > 0)
     @php $lastMonth = null; @endphp
     @foreach ($customer_contact->notes->sortByDesc('created_at') as $noteKey => $note)

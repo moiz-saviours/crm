@@ -18,12 +18,22 @@
         </form>
     </div>
     <div class="d-flex ms-auto" style="gap: 10px;">
-        <button id="refresh-emails" class="btn btn-primary fetching-buttons">
-            Refresh
+        <button id="refresh-emails" 
+                class="btn btn-primary fetching-buttons" 
+                data-bs-toggle="tooltip" 
+                data-bs-placement="top" 
+                title="Click to refresh the data">
+            <i class="fas fa-sync-alt"></i>
         </button>
-        <button id="fetch-emails" class="btn btn-primary fetching-buttons">
-            Fetch Remote
+
+        <button id="fetch-emails" 
+                class="btn btn-primary fetching-buttons" 
+                data-bs-toggle="tooltip" 
+                data-bs-placement="top" 
+                title="Fetch emails from remote server">
+            <i class="fas fa-cloud-download-alt"></i>
         </button>
+
         <div class="dropdown">
             <button class="new-activity-dropdown btn-secondary dropdown-toggle" type="button"
                     id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -90,7 +100,7 @@
                         @include('admin.customers.contacts.timeline.partials.activity')
                     </div>
                 </div>
-                <div class="data-highlights">
+                {{-- <div class="data-highlights">
                     <div class="data-top-heading-header">
                         <h2>Life Cycle</h2>
                         <p>12/03/2024 4:48 PM GMT+5</p>
@@ -102,7 +112,7 @@
                                   <i class="fa fa-external-link" aria-hidden="true"></i>
                               </span>
                     </p>
-                </div>
+                </div> --}}
 
                 {{-- <div class="recent-activities">
 
