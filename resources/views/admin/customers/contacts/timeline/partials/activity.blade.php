@@ -25,7 +25,7 @@
     }
 </style>
 
-<div id="activities-section">
+<div id="activities-section" class="px-2">
     @if (!empty($timeline) && count($timeline) > 0)
         {{-- @include('admin.customers.contacts.timeline.static-content.email') --}}
     <!-- Loader -->

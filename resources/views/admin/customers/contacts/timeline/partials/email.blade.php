@@ -52,7 +52,7 @@
 
 
 </style>
-<div class="email-threading-row" style="margin-bottom: 15px;">
+<div class="email-threading-row px-2">
     <p class="activities-seprater d-none"> Thread email replies </p>
 
     <button class="threading-email-btn-one d-none">
@@ -81,7 +81,7 @@
 
             <!-- Email Content -->
 
-            <div class="card-box" id="email-content-section">
+            <div class="card-box px-2" id="email-content-section">
                 @php
                     $emails = collect($timeline)->where('type', 'email');
                 @endphp
@@ -99,7 +99,9 @@
 
                 @else
                     {{-- Static header --}}
-                    @include('admin.customers.contacts.timeline.static-content.email')
+                    {{-- @include('admin.customers.contacts.timeline.static-content.email') --}}
+                    {{-- End Static header --}}
+
                     <div id="emails-section">
                         {{-- Render emails with same `$item` structure --}}
                         @foreach ($timeline as $item)

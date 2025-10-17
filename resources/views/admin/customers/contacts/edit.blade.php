@@ -50,7 +50,7 @@
                 padding-left: 15px;
                 font-size: 1.063rem;
                 color: var(--bs-primary);
-                padding-top: 10px
+                /* padding-top: 10px */
             }
 
             .custom-tabs-row-scroll {
