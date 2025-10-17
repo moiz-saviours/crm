@@ -403,6 +403,8 @@
                     if (res?.success) {
                         toastr.success(res?.message || 'Lead converted successfully.');
                         const lead = res.data;
+                        const customer_contact = res.customer_contact;
+                        const lead_status = res.lead_status;
                         $(`#tr-${lead.id} .convertBtn`).removeClass('convertBtn').addClass('disabled').removeAttr('data-id');
                         const index = table.row($('#tr-' + lead.id)).index();
                         const rowData = table.row(index).data();
