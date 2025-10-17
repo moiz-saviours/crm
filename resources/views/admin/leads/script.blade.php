@@ -78,16 +78,27 @@
                 buttons: exportButtons,
                 order: [[1, 'desc']],
                 responsive: false,
+                autoWidth: true,
                 scrollX: true,
-                scrollY:  ($(window).height() - 350),
+                scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
-                columnDefs: [
-                    {
-                        orderable: false,
-                        className: 'select-checkbox',
-                        targets: 0
-                    },
+                columnDefs: [{
+                    orderable: false,
+                    targets: 0,
+                    className: 'select-checkbox',
+                    render: DataTable.render.select(),
+                },
+                    {width: '10%', targets: 0},  // checkbox or icon column
+                    {width: '30%', targets: 1},  // NAME
+                    {width: '10%', targets: 2},  // BRAND
+                    {width: '15%', targets: 3},  // TEAM
+                    {width: '7%', targets: 4},  // CREATED DATE
+                    {width: '5%', targets: 5},  // LEAD STATUS
+                    {width: '6%', targets: 6},  // COUNTRY
+                    {width: '5%', targets: 7},  // MESSAGE (usually longer)
+                    {width: '5%', targets: 8},  // STATUS
+                    {width: '7%', targets: 9},  // ACTION buttons
                 ],
                 select: {
                     style: 'os',
@@ -169,12 +180,6 @@
                                 team,
                                 customer_contact,
                                 name,
-                                email,
-                                phone,
-                                address,
-                                city,
-                                state,
-                                zipcode,
                                 country,
                                 lead_status,
                                 note,
@@ -185,43 +190,40 @@
                             );
 
                             const index = table.rows().count() + 1;
+                            const converted = lead_status != 'Converted' && !customer_contact;
                             const columns = `
-                                <td class="align-middle text-center text-nowrap"></td>
-                                <td class="align-middle text-center text-nowrap">${index}</td>
-                                <td class="align-middle text-center text-nowrap">
-                                    ${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a><br> ${brand.brand_key}` : '---'}
+                                <td class="align-middle text-left text-nowrap"></td>
+                                <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}</td>
+                                <td class="align-middle text-left text-nowrap">
+                                    ${brand ? `<a href="{{route('admin.brand.index')}}">${makeAcronym(brand.name)}</a>` : ''}
                                 </td>
-                                <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a><br> ${team.team_key}` : '---'}</td>
-                                <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : '---'}</td>
-                                <td class="align-middle text-center text-nowrap">${name}</td>
-                                <td class="align-middle text-center text-nowrap">${email}</td>
-                                <td class="align-middle text-center text-nowrap">${phone}</td>
-                                <td class="align-middle text-center text-nowrap">${address}</td>
-                                <td class="align-middle text-center text-nowrap">${city}</td>
-                                <td class="align-middle text-center text-nowrap">${state}</td>
-                                <td class="align-middle text-center text-nowrap">${zipcode}</td>
-                                <td class="align-middle text-center text-nowrap">${country}</td>
-                                <td class="align-middle text-center text-nowrap">${lead_status ? lead_status?.name : ""}</td>
-                                <td class="align-middle text-center text-nowrap">${note}</td>
-                                <td class="align-middle text-center text-nowrap">${date}</td>
-                                <td class="align-middle text-center text-nowrap">
+                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : ''}</td>
+                                <td class="align-middle text-left text-nowrap">${date}</td>
+                                <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
+                                <td class="align-middle text-left text-nowrap">${country}</td>
+                                <td class="align-middle text-left text-nowrap">${note}</td>
+                                <td class="align-middle text-left text-nowrap">
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
-                                <td class="align-middle text-center table-actions">
+                                <td class="align-middle text-left table-actions">
                                     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
+                                            title="Convert to Customer">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
                                 </td>
-                        `;
+                                `;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
                             $('#manage-form')[0].reset();
                             $('#formContainer').removeClass('open')
                         }
                     })
-                    .catch(error => console.error('An error occurred while updating the record.',error));
+                    .catch(error => console.error('An error occurred while updating the record.', error));
             } else {
                 const url = $(this).attr('action');
                 AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
@@ -233,12 +235,6 @@
                                 team,
                                 customer_contact,
                                 name,
-                                email,
-                                phone,
-                                address,
-                                city,
-                                state,
-                                zipcode,
                                 country,
                                 lead_status,
                                 note,
@@ -251,80 +247,81 @@
                             const index = table.row($('#tr-' + id)).index();
                             const rowData = table.row(index).data();
 
+                            // Column 2: Name
+                            if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`) {
+                                table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`).draw();
+                            }
                             // Column 3: Brand
-                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`) {
-                                table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a>` : ''}`) {
+                                table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}">${makeAcronym(brand.name)}</a>` : ''}`).draw();
                             }
 
                             // Column 4: Team
-                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a><br> ${team.team_key}` : '---'}`) {
-                                table.cell(index, 3).data(`${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a><br> ${team.team_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : ''}`) {
+                                table.cell(index, 3).data(`${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : ''}`).draw();
                             }
 
-                            // Column 5: Customer Contact
-                            if (decodeHtml(rowData[4]) !== `${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : '---'}`) {
-                                table.cell(index, 4).data(`${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : '---'}`).draw();
+                            // Column 5: Created Date
+                            if (decodeHtml(rowData[4]) !== date) {
+                                table.cell(index, 4).data(date).draw();
                             }
 
-                            // Column 6: Name
-                            if (decodeHtml(rowData[5]) !== name) {
-                                table.cell(index, 5).data(name).draw();
+                            // Column 6: Lead Status
+                            if (decodeHtml(rowData[5]) !== lead_status.name) {
+                                table.cell(index, 5).data(lead_status.name).draw();
                             }
 
-                            // Column 7: Email
-                            if (decodeHtml(rowData[6]) !== email) {
-                                table.cell(index, 6).data(email).draw();
+                            // Column 7: Country
+                            if (decodeHtml(rowData[6]) !== country) {
+                                table.cell(index, 6).data(country).draw();
                             }
 
-                            // Column 8: Phone
-                            if (decodeHtml(rowData[7]) !== phone) {
-                                table.cell(index, 7).data(phone).draw();
+                            // Column 8: Note
+                            if (decodeHtml(rowData[7]) !== note) {
+                                table.cell(index, 7).data(note).draw();
                             }
 
-                            // Column 9: Address
-                            if (decodeHtml(rowData[8]) !== address) {
-                                table.cell(index, 8).data(address).draw();
-                            }
-
-                            // Column 10: City
-                            if (decodeHtml(rowData[9]) !== city) {
-                                table.cell(index, 9).data(city).draw();
-                            }
-
-                            // Column 11: State
-                            if (decodeHtml(rowData[10]) !== state) {
-                                table.cell(index, 10).data(state).draw();
-                            }
-
-                            // Column 12: Zipcode
-                            if (decodeHtml(rowData[11]) !== zipcode) {
-                                table.cell(index, 11).data(zipcode).draw();
-                            }
-
-                            // Column 13: Country
-                            if (decodeHtml(rowData[12]) !== country) {
-                                table.cell(index, 12).data(country).draw();
-                            }
-
-                            // Column 14: Lead Status
-                            if (decodeHtml(rowData[13]) !== lead_status.name) {
-                                table.cell(index, 13).data(lead_status.name).draw();
-                            }
-
-                            // Column 15: Note
-                            if (decodeHtml(rowData[14]) !== note) {
-                                table.cell(index, 14).data(note).draw();
-                            }
-
-                            // Column 16: Created Date
-                            if (decodeHtml(rowData[15]) !== date) {
-                                table.cell(index, 15).data(date).draw();
-                            }
-
-                            // Column 17: Status
+                            // Column 9: Status
                             const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
-                            if (decodeHtml(rowData[16]) !== statusHtml) {
-                                table.cell(index, 16).data(statusHtml).draw();
+                            if (decodeHtml(rowData[8]) !== statusHtml) {
+                                table.cell(index, 8).data(statusHtml).draw();
+                            }
+                            // Column 10: Actions - Update Convert Button
+                            const actionsCell = table.cell(index, 9);
+                            const currentActions = $(actionsCell.node());
+
+                            const convertBtn = currentActions.find('.btn-success');
+                            const isConvertible = lead_status.name == 'Converted' && customer_contact;
+
+                            if (convertBtn.length) {
+                                if (isConvertible) {
+                                    convertBtn.removeClass('convertBtn')
+                                        .addClass('disabled')
+                                        .removeAttr('data-id')
+                                        .prop('disabled', true);
+                                } else {
+                                    convertBtn.removeClass('disabled')
+                                        .addClass('convertBtn')
+                                        .attr('data-id', id)
+                                        .prop('disabled', false);
+                                }
+
+                                table.cell(index, 9).data(currentActions.html()).draw();
+                            } else {
+                                const converted = lead_status.name != 'Converted' && !customer_contact;
+                                const actionsHtml = `
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
+                                            title="Convert to Customer">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                `;
+                                table.cell(index, 9).data(actionsHtml).draw();
                             }
                             $('#manage-form')[0].reset();
                             $('#image-display').attr('src', null);
@@ -343,7 +340,7 @@
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
                     const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status ? "checked" : ""} data-bs-toggle="toggle">`;
-                    table.cell(rowIndex, 16).data(statusHtml).draw();
+                    table.cell(rowIndex, 8).data(statusHtml).draw();
                 })
                 .catch(() => {
                     statusCheckbox.prop('checked', !status);
@@ -395,29 +392,26 @@
 
             const url = `{{ route('admin.lead.convert', '') }}/${leadId}`;
 
-            convertLeadToCustomer(leadId, url, $btn);
+            convertLeadToCustomer(url, $btn);
         });
 
-        function convertLeadToCustomer(leadId, url, $btn) {
+        function convertLeadToCustomer(url, $btn) {
             $btn.prop('disabled', true).addClass('disabled');
 
-            AjaxRequestPromise(url, null, 'POST', { useToastr: false })
+            AjaxRequestPromise(url, null, 'POST', {useToastr: false})
                 .then(res => {
                     if (res?.success) {
                         toastr.success(res?.message || 'Lead converted successfully.');
-
-                        $(`#tr-${leadId} .convertBtn`).remove();
-
-                        $(`#tr-${leadId} td[data-field="leadStatus"]`).text('Converted');
-
-                        const customer_contact = res.data;
-                        const contactTd = `
-            <td class="align-middle text-center text-nowrap">
-                ${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : '---'}
-            </td>
-        `;
-                        $(`#tr-${leadId} td[data-field="customer_contact"]`).replaceWith(contactTd);
-
+                        const lead = res.data;
+                        $(`#tr-${lead.id} .convertBtn`).removeClass('convertBtn').addClass('disabled').removeAttr('data-id');
+                        const index = table.row($('#tr-' + lead.id)).index();
+                        const rowData = table.row(index).data();
+                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`) {
+                            table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`).draw();
+                        }
+                        if (decodeHtml(rowData[5]) !== 'Converted') {
+                            table.cell(index, 5).data(lead_status.name).draw();
+                        }
                     } else {
                         toastr.error(res?.message || 'Conversion failed.');
                         $btn.prop('disabled', false).removeClass('disabled');
@@ -428,6 +422,17 @@
                     toastr.error(msg);
                     $btn.prop('disabled', false).removeClass('disabled');
                 });
+        }
+
+        function makeAcronym(text) {
+            if (!text) return "";
+            const words = text.trim().split(/\s+/);
+            let acronym = words.map(word => word.charAt(0).toUpperCase()).join('');
+            const lastWord = words[words.length - 1];
+            if (lastWord.toLowerCase().endsWith('s')) {
+                acronym += 's';
+            }
+            return acronym;
         }
 
     });
