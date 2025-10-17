@@ -78,13 +78,18 @@
                 type="button" role="tab" aria-controls="meetings" aria-selected="false">Meetings
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="chats" data-bs-toggle="tab" data-bs-target="#chats-container"
+                type="button" role="tab" aria-controls="chats" aria-selected="false">Chats
+        </button>
+    </li>
 </ul>
 
-    <div class="tab-content custom-tabs-row-scroll" id="myTabContent">
+    <div class="tab-content " id="myTabContent">
         <div id="timeline-loader" style="display: none; text-align: center; padding: 20px;">
             <i class="fa fa-spinner fa-spin" style="font-size: 24px;"></i> Loading...
         </div>
-        <div class="tab-pane fade show active" id="activities-container" role="tabpanel" aria-labelledby="act-tab">
+        <div class="tab-pane fade custom-tabs-row-scroll show active" id="activities-container" role="tabpanel" aria-labelledby="act-tab">
             <div>
                 <div class="recent-activities">
                     <div class="timeline-header">
@@ -245,20 +250,23 @@
                                                   </div> --}}
             </div>
         </div>
-        <div class="tab-pane fade" id="notes-container" role="tabpanel" aria-labelledby="notes-tab">
+        <div class="tab-pane fade custom-tabs-row-scroll" id="notes-container" role="tabpanel" aria-labelledby="notes-tab">
             @include('admin.customers.contacts.timeline.partials.note')
         </div>
-        <div class="tab-pane fade" id="emails-container" role="tabpanel" aria-labelledby="email-tab">
+        <div class="tab-pane fade custom-tabs-row-scroll" id="emails-container" role="tabpanel" aria-labelledby="email-tab">
             @include('admin.customers.contacts.timeline.partials.email')
         </div>
-        <div class="tab-pane fade" id="calls-container" role="tabpanel" aria-labelledby="call-tab">
+        <div class="tab-pane fade custom-tabs-row-scroll" id="calls-container" role="tabpanel" aria-labelledby="call-tab">
             @include('admin.customers.contacts.timeline.static-content.call')
         </div>
-        <div class="tab-pane fade" id="tasks-container" role="tabpanel" aria-labelledby="task-tab">
+        <div class="tab-pane fade custom-tabs-row-scroll" id="tasks-container" role="tabpanel" aria-labelledby="task-tab">
             @include('admin.customers.contacts.timeline.static-content.task')
         </div>
-        <div class="tab-pane fade" id="meetings-container" role="tabpanel" aria-labelledby="meeting-tab">
+        <div class="tab-pane fade custom-tabs-row-scroll" id="meetings-container" role="tabpanel" aria-labelledby="meeting-tab">
             @include('admin.customers.contacts.timeline.static-content.meeting')
+        </div>
+        <div class="tab-pane fade" id="chats-container" role="tabpanel" aria-labelledby="chat-tab">
+            @include('admin.customers.contacts.timeline.partials.chat')
         </div>
         <div id="show-more-container" class="text-center mt-3" style="display: {{ count($timeline) >= $limit ? 'block' : 'none' }};">
             <button id="show-more-btn" class="btn btn-outline-primary btn-sm">
