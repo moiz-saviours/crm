@@ -25,12 +25,18 @@ class LeadController extends Controller
     /**
      * Display a listing of the leads.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $tab = $request->get('tab', 'all');
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $leads = Lead::with('customer_contact')->get();
+        $leads = Lead::with('customer_contact');
+//        if ($tab === 'my') {
+//            $leads->where('assigned_to', auth()->id());
+//        }
+        $leads = $leads->get();
+
         return view('admin.leads.index', compact('leads', 'brands', 'teams', 'customer_contacts'));
     }
 

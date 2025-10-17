@@ -931,12 +931,36 @@
                                 currency,
                                 status,
                                 due_date,
-                                date
+                                date,
+                                gateway_counts,
                             } = invoice;
                             index++;
+                            const gatewayCountsHtml = `
+                                ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Authorize : </span>
+                                    <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
+                                </div>` : ''}
+                                ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Edp : </span>
+                                    <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
+                                </div>` : ''}
+                                ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Stripe : </span>
+                                    <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
+                                </div>` : ''}
+                                ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
+                                <div style="display:flex;justify-content:space-between;gap:10px;">
+                                    <span>Paypal : </span>
+                                    <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
+                                </div>` : ''}
+                            `;
                             const columns = `
                         <td class="align-middle text-center text-nowrap"></td>
                         <td class="align-middle text-center text-nowrap">${index}</td>
+                        <td class="align-middle text-center text-nowrap">${gatewayCountsHtml}</td>
                         <td class="align-middle text-center text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
