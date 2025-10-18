@@ -14,7 +14,7 @@
         border-radius: 3px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        height: 600px;
+        height: 400px;
         display: flex;
         flex-direction: column;
     }
@@ -70,9 +70,16 @@
 
     .message-bubble {
         max-width: 70%;
-        padding: 12px 15px;
+        padding: 5px 15px;
         border-radius: 3px;
         position: relative;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
     }
 
     .received .message-bubble {
@@ -90,7 +97,6 @@
     .message-sender {
         font-weight: 600;
         font-size: 0.85rem;
-        margin-bottom: 5px;
     }
 
     .received .message-sender {
@@ -103,14 +109,12 @@
 
     .message-time {
         font-size: 0.7rem;
-        text-align: right;
-        margin-top: 5px;
         opacity: 0.7;
     }
 
     .chat-input-container {
         border-top: 1px solid var(--light-gray);
-        padding: 15px;
+        padding: 4px;
         background-color: white;
     }
 
@@ -122,7 +126,7 @@
 
     .editor-toolbar {
         display: flex;
-        padding: 8px 10px;
+        padding: 2px 10px;
         border-bottom: 1px solid var(--light-gray);
         background-color: #f8f9fa;
     }
@@ -132,7 +136,7 @@
         border: none;
         color: var(--gray-color);
         margin-right: 10px;
-        font-size: 0.9rem;
+        font-size: 0.6rem;
         cursor: pointer;
         transition: color 0.2s;
     }
@@ -147,14 +151,15 @@
         padding: 12px 15px;
         resize: none;
         min-height: 60px;
+        max-height: 120px; /* Optional: set max height */
         outline: none;
         font-family: inherit;
+        overflow-y: auto; /* Show scrollbar when needed */
     }
-
     .editor-actions {
         display: flex;
         justify-content: space-between;
-        padding: 10px 15px;
+        padding: 2px 15px;
         background-color: #f8f9fa;
     }
 
@@ -168,7 +173,7 @@
         color: var(--gray-color);
         margin-right: 15px;
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 0.6rem;
     }
 
     .attachment-btn:hover {
@@ -180,7 +185,7 @@
         color: white;
         border: none;
         border-radius: 3px;
-        padding: 6px 20px;
+        padding: 3px 15px;
         font-weight: 500;
         transition: background-color 0.2s;
     }
@@ -253,10 +258,33 @@
     font-weight: 600;
     margin-right: 12px;
     }
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin: 0 8px;
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+}
+.received {
+    align-items: flex-start;
+}
+
+.sent {
+    align-items: flex-end;
+}
 </style>
 <div class="chat-container">
     <!-- Chat Header -->
-    <div class="chat-header">
+    <div class="chat-header d-none">
         <div class="customer-info">
             <div class="customer-avatar">JD</div>
             <div>
@@ -275,8 +303,9 @@
     <!-- Chat Messages -->
     <div class="chat-messages">
         <div class="message received">
+            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="JD">JD</div>
             <div class="message-bubble">
-                <div class="message-sender">John Doe</div>
                 <div>Hi there! I wanted to follow up on my order #ORD-789. Has it shipped yet?</div>
                 <div class="message-time">10:15 AM</div>
             </div>
@@ -284,16 +313,18 @@
 
         <div class="message sent">
             <div class="message-bubble">
-                <div class="message-sender">You</div>
                 <div>Hello John! I've checked your order and it was shipped yesterday. You should receive a
                     tracking number soon.</div>
                 <div class="message-time">10:18 AM</div>
             </div>
+            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="ME">ME</div>
         </div>
 
         <div class="message received">
+            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="JD">JD</div>
             <div class="message-bubble">
-                <div class="message-sender">John Doe</div>
                 <div>That's great to hear! I've also attached the screenshot of the issue I mentioned in my
                     last email.</div>
                 <div class="message-time">10:22 AM</div>
@@ -302,16 +333,18 @@
 
         <div class="message sent">
             <div class="message-bubble">
-                <div class="message-sender">You</div>
                 <div>Thanks for sending that over. I can see the issue now. Our team is working on a fix and
                     we'll update you by tomorrow.</div>
                 <div class="message-time">10:25 AM</div>
             </div>
+            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="ME">ME</div>
         </div>
 
         <div class="message received">
+            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="JD">JD</div>
             <div class="message-bubble">
-                <div class="message-sender">John Doe</div>
                 <div>Perfect! Also, I wanted to ask about the warranty on the product I purchased.</div>
                 <div class="message-time">10:30 AM</div>
             </div>
@@ -319,7 +352,7 @@
     </div>
 
     <!-- Attachment Preview -->
-    <div class="attachment-preview">
+    <div class="attachment-preview d-none">
         <div class="attachment-item">
             <i class="fas fa-file-pdf"></i>
             warranty-info.pdf
@@ -376,41 +409,63 @@
         const attachImageBtn = document.querySelector('.attachment-btn:nth-child(2)');
 
         // Function to add a new message
-        function addMessage(content, isSent = true) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+function addMessage(content, isSent = true) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+    
+    // Add avatar with Bootstrap tooltip
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = isSent ? 'ME' : 'JD';
+    avatar.setAttribute('data-bs-toggle', 'tooltip');
+    avatar.setAttribute('data-bs-placement', 'top');
+    avatar.setAttribute('title', isSent ? 'You' : 'John Doe');
+    
+    const messageBubble = document.createElement('div');
+    messageBubble.className = 'message-bubble';
 
-            const messageBubble = document.createElement('div');
-            messageBubble.className = 'message-bubble';
+    // Create header with time only (no username)
+    const messageHeader = document.createElement('div');
+    messageHeader.className = 'message-header';
 
-            const senderDiv = document.createElement('div');
-            senderDiv.className = 'message-sender';
-            senderDiv.textContent = isSent ? 'You' : 'John Doe';
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'message-time';
+    const now = new Date();
+    timeDiv.textContent = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-            const contentDiv = document.createElement('div');
-            contentDiv.textContent = content;
+    // Add time to header
+    messageHeader.appendChild(timeDiv);
 
-            const timeDiv = document.createElement('div');
-            timeDiv.className = 'message-time';
-            const now = new Date();
-            timeDiv.textContent = now.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+    const contentDiv = document.createElement('div');
+    contentDiv.textContent = content;
 
-            messageBubble.appendChild(senderDiv);
-            messageBubble.appendChild(contentDiv);
-            messageBubble.appendChild(timeDiv);
-            messageDiv.appendChild(messageBubble);
+    // Add header and content to bubble
+    messageBubble.appendChild(messageHeader);
+    messageBubble.appendChild(contentDiv);
 
-            chatMessages.appendChild(messageDiv);
+    // Arrange elements based on sent/received
+    if (isSent) {
+        messageDiv.appendChild(messageBubble);
+        messageDiv.appendChild(avatar);
+    } else {
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageBubble);
+    }
+    
+    chatMessages.appendChild(messageDiv);
 
-            // Scroll to bottom
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Initialize Bootstrap tooltip for the new avatar
+    new bootstrap.Tooltip(avatar);
 
-            // Clear textarea
-            messageTextarea.value = '';
-        }
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Clear textarea
+    messageTextarea.value = '';
+}
 
         // Send message on button click
         sendButton.addEventListener('click', function() {
@@ -534,5 +589,25 @@
                 }
             });
         }
+
+        // Auto-expand textarea based on content
+        messageTextarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            
+            // Optional: Limit max height and show scrollbar
+            if (this.scrollHeight > 120) {
+                this.style.height = '120px';
+                this.style.overflowY = 'auto';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
+        });
+
+        // Reset height when message is sent
+        sendButton.addEventListener('click', function() {
+            messageTextarea.style.height = '60px';
+            messageTextarea.style.overflowY = 'hidden';
+        });
     });
 </script>

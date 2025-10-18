@@ -42,7 +42,7 @@
             }
 
             .nav-tabs.newtabs-space {
-                margin-bottom: 34px;
+                margin-bottom: 8px;
             }
 
             .date-by-order {
