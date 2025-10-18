@@ -66,12 +66,12 @@
         }));
 
         /** Initializing Datatable */
-        // if ($('.initTable').length) {
-        //     $('.initTable').each(function (index) {
-        //         initializeDatatable($(this), index)
-        //     })
-        // }
-        // var table;
+            // if ($('.initTable').length) {
+            //     $('.initTable').each(function (index) {
+            //         initializeDatatable($(this), index)
+            //     })
+            // }
+            // var table;
 
         var dataTables = [];
 
@@ -79,6 +79,16 @@
             $('.initTable').each(function (index) {
                 dataTables[index] = initializeDatatable($(this), index);
             });
+        }
+
+        function getColumnIndex(table, headerText) {
+            const headers = table.find('thead th');
+            for (let i = 0; i < headers.length; i++) {
+                if ($(headers[i]).text().trim().toLowerCase() === headerText.toLowerCase()) {
+                    return i;
+                }
+            }
+            return 1;
         }
         function initializeDatatable(table_div, index) {
             console.log(`Initializing table: ${table_div.attr('id')} - Instance: ${index}`);
@@ -92,7 +102,7 @@
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
                 buttons: exportButtons,
-                order: [[1, 'desc']],
+                order: [[getColumnIndex(table_div, 'CREATED AT'), 'desc']],
                 responsive: false,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
@@ -104,6 +114,16 @@
                         className: 'select-checkbox',
                         targets: 0
                     },
+                    {
+                        targets: getColumnIndex(table_div, 'CREATED AT'),
+                        type: 'date',
+                        render: function (data, type, row) {
+                            if (type === 'sort') {
+                                return $(this).data('order') || data;
+                            }
+                            return data;
+                        }
+                    }
                 ],
                 select: {
                     style: 'os',
@@ -239,56 +259,57 @@
                                 currency,
                                 status,
                                 due_date,
+                                created_at,
                                 date,
                             } = response.data;
                             const index = table.rows().count() + 1;
                             const columns = `
-                        <td class="align-middle text-center text-nowrap"></td>
-                        <td class="align-middle text-center text-nowrap">${index}</td>
-                        <td class="align-middle space-between text-nowrap" style="text-align: left;">
-                            <div style="display:flex;justify-content:space-between;gap:10px;">
-                                <span>Authorize : </span>
-                                <span>0-0</span>
-                            </div>
-                            <div style="display:flex;justify-content:space-between;gap:10px;">
-                                <span>Edp : </span>
-                                <span>0-0</span>
-                            </div>
-                            <div style="display:flex;justify-content:space-between;gap:10px;">
-                                <span>Stripe : </span>
-                                <span>0-0</span>
-                            </div>
-                            <div style="display:flex;justify-content:space-between;gap:10px;">
-                                <span>Paypal : </span>
-                                <span>0-0</span>
-                            </div>
-                        </td>
-                        <td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                        <td class="align-middle text-center text-nowrap"></td>` +
+                                // <td class="align-middle text-center text-nowrap">${index}</td>
+                                // <td class="align-middle space-between text-nowrap" style="text-align: left;">
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Authorize : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Edp : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Stripe : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Paypal : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                // </td>
+                                `<td class="align-middle text-center text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
                         <td class="align-middle text-center text-nowrap">
-                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}
+                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}</td>
+                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
-                        <td class="align-middle space-between text-nowrap" style="text-align: left;">
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Amount:</span>
-                                <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Tax:</span>
-                                <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Tax Amount:</span>
-                                <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">`+
+                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            //     <span style="width: 120px;">Amount:</span>
+                            //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                            // </div>
+                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            //     <span style="width: 120px;">Tax:</span>
+                            //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                            // </div>
+                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            //     <span style="width: 120px;">Tax Amount:</span>
+                            //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                            // </div>
+                            `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                 <span style="width: 120px;">Total Amount:</span>
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
@@ -297,7 +318,7 @@
                             ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
                         </td>
                         <td class="align-middle text-center text-nowrap">${due_date}</td>
-                        <td class="align-middle text-center text-nowrap">${date}</td>
+                        <td class="align-middle text-center text-nowrap" data-order="${created_at}">${date}</td>
                         <td class="align-middle text-center table-actions">
                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                             data-id="${id}"
@@ -306,8 +327,8 @@
                                                             title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
                             ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
-                                '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
-                                : ''}
+                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
+                                    : ''}
                         </td>`;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
 
@@ -334,6 +355,7 @@
                                 status,
                                 due_date,
                                 date,
+                                created_at,
                                 payment_attachments,
                                 gateway_counts,
                             } = response.data;
@@ -350,35 +372,35 @@
                                     }
                                 }, 0);
                             }
-                            const gatewayCountsHtml = `
-                                ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Authorize : </span>
-                                    <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
-                                </div>` : ''}
-                                ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Edp : </span>
-                                    <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
-                                </div>` : ''}
-                                ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Stripe : </span>
-                                    <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
-                                </div>` : ''}
-                                ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Paypal : </span>
-                                    <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
-                                </div>` : ''}
-                            `;
-                            if (decodeHtml(rowData[2]) !== gatewayCountsHtml) {
-                                table.cell(index, 2).data(gatewayCountsHtml).draw();
-                            }
+                            // const gatewayCountsHtml = `
+                            //     ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Authorize : </span>
+                            //         <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Edp : </span>
+                            //         <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Stripe : </span>
+                            //         <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Paypal : </span>
+                            //         <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
+                            //     </div>` : ''}
+                            // `;
+                            // if (decodeHtml(rowData[2]) !== gatewayCountsHtml) {
+                            //     table.cell(index, 2).data(gatewayCountsHtml).draw();
+                            // }
                             // Update columns in the table dynamically
                             // Column 3: Invoice Number & Invoice Key
-                            if (decodeHtml(rowData[3]) !== `${invoice_number}<br>${invoice_key}`) {
-                                table.cell(index, 3).data(`
+                            if (decodeHtml(rowData[1]) !== `${invoice_number}<br>${invoice_key}`) {
+                                table.cell(index, 1).data(`
                                     <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
@@ -387,60 +409,68 @@
                             }
 
                             // Column 4: Brand
-                            if (decodeHtml(rowData[4]) !== `${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`) {
-                                table.cell(index, 4).data(`${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}`) {
+                                table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}`).draw();
                             }
 
                             // Column 5: Team
-                            if (decodeHtml(rowData[5]) !== `${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`) {
-                                table.cell(index, 5).data(`${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}`) {
+                                table.cell(index, 3).data(`${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}`).draw();
                             }
 
                             // Column 6: Customer Contact
-                            if (decodeHtml(rowData[6]) !== `${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`) {
-                                table.cell(index, 6).data(`${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`).draw();
+                            if (decodeHtml(rowData[4]) !== `${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`) {
+                                table.cell(index, 4).data(`${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`).draw();
                             }
                             // Column 7: Agent
-                            if (decodeHtml(rowData[7]) !== `${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`) {
-                                table.cell(index, 7).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
+                            if (decodeHtml(rowData[5]) !== `${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`) {
+                                table.cell(index, 5).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
                             }
 
-                            const newContent = `
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Amount:</span>
-                                    <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Tax:</span>
-                                    <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Tax Amount:</span>
-                                    <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            const newContent = ``+
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Amount:</span>
+                                //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax:</span>
+                                //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax Amount:</span>
+                                //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                                // </div>
+                                `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                     <span style="width: 120px;">Total Amount:</span>
                                     <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                                 </div>`;
                             // Column 8: Amount
-                            if (decodeHtml(rowData[8]) !== newContent) {
-                                table.cell(index, 8).data(newContent).draw();
+                            if (decodeHtml(rowData[6]) !== newContent) {
+                                table.cell(index, 6).data(newContent).draw();
                             }
 
                             // Column 9: Status
 
                             const statusHtml = status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : '';
-                            if (decodeHtml(rowData[9]) !== statusHtml) {
-                                table.cell(index, 9).data(statusHtml).draw();
+                            if (decodeHtml(rowData[7]) !== statusHtml) {
+                                table.cell(index, 7).data(statusHtml).draw();
                             }
 
                             // Column 10: Due Date
-                            if (decodeHtml(rowData[10]) !== due_date) {
-                                table.cell(index, 10).data(due_date).draw();
+                            if (decodeHtml(rowData[8]) !== due_date) {
+                                table.cell(index, 8).data(due_date).draw();
                             }
                             // Column 11: Date
-                            if (decodeHtml(rowData[11]) !== date) {
-                                table.cell(index, 11).data(date).draw();
+                            if (decodeHtml(rowData[9]) !== date) {
+                                table.cell(index, 9).data(date).draw();
+
+                                const cell = table.cell(index, 9);
+                                const cellNode = cell.node();
+                                $(cellNode)
+                                    .data('order', created_at)
+                                    .html(date);
+
+                                table.draw();
                             }
                             // Column 12: Actions
                             let actionsHtml = '';
@@ -454,8 +484,8 @@
                                 actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
                                                 <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
                             }
-                            if (normalizeHtml(decodeHtml(rowData[12])) !== normalizeHtml(actionsHtml)) {
-                                table.cell(index, 12).data(actionsHtml).draw();
+                            if (normalizeHtml(decodeHtml(rowData[10])) !== normalizeHtml(actionsHtml)) {
+                                table.cell(index, 10).data(actionsHtml).draw();
                             }
                             $('#manage-form')[0].reset();
                             $('#formContainer').removeClass('open')
@@ -917,6 +947,16 @@
             }, 'GET', {useToastr: false})
                 .then(response => {
                     if (response && response.success && response.data) {
+                        if (response.actual_dates) {
+                            const actualStart = moment(response.actual_dates.start_date, 'YYYY-MM-DD h:mm:ss A');
+                            const actualEnd = moment(response.actual_dates.end_date, 'YYYY-MM-DD h:mm:ss A');
+                            $('#dateRangePicker').data('daterangepicker').setStartDate(actualStart);
+                            $('#dateRangePicker').data('daterangepicker').setEndDate(actualEnd);
+                            if (response.actual_dates.start_date !== dates.startDate.format('YYYY-MM-DD h:mm:ss A') ||
+                                response.actual_dates.end_date !== dates.endDate.format('YYYY-MM-DD h:mm:ss A')) {
+                                toastr.info('Date range adjusted to show available records');
+                            }
+                        }
                         response.data.forEach(function (invoice, index) {
                             const {
                                 id,
@@ -932,61 +972,74 @@
                                 status,
                                 due_date,
                                 date,
+                                created_at,
+                                payment_attachments,
                                 gateway_counts,
                             } = invoice;
                             index++;
-                            const gatewayCountsHtml = `
-                                ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Authorize : </span>
-                                    <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
-                                </div>` : ''}
-                                ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Edp : </span>
-                                    <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
-                                </div>` : ''}
-                                ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Stripe : </span>
-                                    <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
-                                </div>` : ''}
-                                ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
-                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                    <span>Paypal : </span>
-                                    <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
-                                </div>` : ''}
-                            `;
+                            let totalAttachments = 0;
+                            if (payment_attachments && payment_attachments.length > 0) {
+                                totalAttachments = payment_attachments.reduce((count, payment) => {
+                                    try {
+                                        const attachments = JSON.parse(payment.attachments);
+                                        return count + (attachments ? attachments.length : 0);
+                                    } catch (e) {
+                                        return count;
+                                    }
+                                }, 0);
+                            }
+                            // const gatewayCountsHtml = `
+                            //     ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Authorize : </span>
+                            //         <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Edp : </span>
+                            //         <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Stripe : </span>
+                            //         <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Paypal : </span>
+                            //         <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
+                            //     </div>` : ''}
+                            // `;
                             const columns = `
-                        <td class="align-middle text-center text-nowrap"></td>
-                        <td class="align-middle text-center text-nowrap">${index}</td>
-                        <td class="align-middle text-center text-nowrap">${gatewayCountsHtml}</td>
-                        <td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                        <td class="align-middle text-center text-nowrap"></td>` +
+                                // <td class="align-middle text-center text-nowrap">${index}</td>
+                                // <td class="align-middle text-center text-nowrap">${gatewayCountsHtml}</td>
+                                `<td class="align-middle text-center text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
                         <td class="align-middle text-center text-nowrap">
-                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}
+                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}</td>
+                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
-                        <td class="align-middle space-between text-nowrap" style="text-align: left;">
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Amount:</span>
-                                <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Tax:</span>
-                                <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Tax Amount:</span>
-                                <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">`+
+                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            //     <span style="width: 120px;">Amount:</span>
+                            //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                            // </div>
+                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            //     <span style="width: 120px;">Tax:</span>
+                            //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                            // </div>
+                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                            //     <span style="width: 120px;">Tax Amount:</span>
+                            //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                            // </div>
+                            `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                 <span style="width: 120px;">Total Amount:</span>
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
@@ -995,7 +1048,7 @@
                             ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
                         </td>
                         <td class="align-middle text-center text-nowrap">${due_date}</td>
-                        <td class="align-middle text-center text-nowrap">${date}</td>
+                        <td class="align-middle text-center text-nowrap" data-order="${created_at}">${date}</td>
                         <td class="align-middle text-center table-actions">
                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                             data-id="${id}"
@@ -1003,9 +1056,10 @@
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
                                                             title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
+                            ${payment_attachments && payment_attachments.length > 0 ? `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> ` : ''}
                             ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
-                                '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
-                                : ''}
+                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
+                                    : ''}
                         </td>`;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
                         })
