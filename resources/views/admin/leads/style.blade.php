@@ -10,6 +10,9 @@
     td.align-middle.text-center.text-nowrap.editable[data], td.align-middle.text-center.text-nowrap.editable {
         cursor: pointer;
     }
+    td {
+        padding: 4px 8px !important;
+    }
 
     .void {
         cursor: not-allowed;
