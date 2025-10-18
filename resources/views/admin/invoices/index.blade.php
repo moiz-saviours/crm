@@ -105,8 +105,8 @@
 
                                         <tr>
                                             <th></th>
-                                            <th class="align-middle text-center text-nowrap">SNO.</th>
-                                            <th class="align-middle text-center text-nowrap">ATTEMPT</th>
+{{--                                            <th class="align-middle text-center text-nowrap">SNO.</th>--}}
+{{--                                            <th class="align-middle text-center text-nowrap">ATTEMPT</th>--}}
                                             <th class="align-middle text-center text-nowrap">INVOICE #</th>
                                             <th class="align-middle text-center text-nowrap">BRAND</th>
                                             <th class="align-middle text-center text-nowrap">TEAM</th>
@@ -115,7 +115,7 @@
                                             <th class="align-middle text-center text-nowrap">AMOUNT</th>
                                             <th class="align-middle text-center text-nowrap">STATUS</th>
                                             <th class="align-middle text-center text-nowrap">DUE DATE</th>
-                                            <th class="align-middle text-center text-nowrap">CREATE DATE</th>
+                                            <th class="align-middle text-center text-nowrap">CREATED DATE</th>
                                             <th class="align-middle text-center text-nowrap tour-invoiceaction">ACTION
                                             </th>
                                         </tr>
@@ -124,29 +124,29 @@
                                         @foreach($invoices as $invoice)
                                             <tr id="tr-{{$invoice->id}}">
                                                 <td class="align-middle text-center text-nowrap"></td>
-                                                <td class="align-middle text-center text-nowrap"
-                                                    data-order="{{$loop->iteration}}">{{$loop->iteration}}</td>
-                                                <td class="align-middle space-between text-nowrap" style="text-align: left;">
-                                                    @php
-                                                        $m=$invoice->invoice_merchants->pluck('merchant_type')->map(fn($t)=>strtolower($t))->toArray();
-                                                        $s=['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];$f=['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];
-                                                        if($invoice->payment_transaction_logs){foreach($invoice->payment_transaction_logs as $l){$g=strtolower($l->gateway);$st=strtolower($l->status);if($g=='edp')$st=='success'?$s['edp']++:$f['edp']++;if(in_array($g,['authorize.net','authorize']))$st=='success'?$s['authorize']++:$f['authorize']++;if($g=='stripe')$st=='success'?$s['stripe']++:$f['stripe']++;if($g=='paypal')$st=='success'?$s['paypal']++:$f['paypal']++;}}
-                                                        if($invoice->status == 1 && $invoice->payment && array_sum($s) == 0){$pm=strtolower($invoice->payment->payment_method??'');if($pm=='edp')$s['edp']=1;if(in_array($pm,['authorize.net','authorize']))$s['authorize']=1;if($pm=='stripe')$s['stripe']=1;if($pm=='paypal')$s['paypal']=1;}
-                                                        $show=false;foreach(['authorize','edp','stripe','paypal'] as $t){if(in_array($t,$m)||$s[$t]>0||$f[$t]>0){$show=true;break;}}
-                                                    @endphp
-                                                    @if($show)
-                                                        @foreach(['authorize','edp','stripe','paypal'] as $t)
-                                                            @if(in_array($t,$m)||$s[$t]>0||$f[$t]>0)
-                                                                <div style="display:flex;justify-content:space-between;gap:10px;">
-                                                                    <span>{{ucfirst($t)}} : </span>
-                                                                    <span><span>{{$s[$t]}}</span>-<span class="text-danger">{{$f[$t]}}</span></span>
-                                                                </div>
-                                                            @endif
-                                                        @endforeach
-                                                    @else
-                                                        <div class="text-muted">No Gateway Found</div>
-                                                    @endif
-                                                </td>
+{{--                                                <td class="align-middle text-center text-nowrap"--}}
+{{--                                                    data-order="{{$loop->iteration}}">{{$loop->iteration}}</td>--}}
+{{--                                                <td class="align-middle space-between text-nowrap" style="text-align: left;">--}}
+{{--                                                    @php--}}
+{{--                                                        $m=$invoice->invoice_merchants->pluck('merchant_type')->map(fn($t)=>strtolower($t))->toArray();--}}
+{{--                                                        $s=['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];$f=['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];--}}
+{{--                                                        if($invoice->payment_transaction_logs){foreach($invoice->payment_transaction_logs as $l){$g=strtolower($l->gateway);$st=strtolower($l->status);if($g=='edp')$st=='success'?$s['edp']++:$f['edp']++;if(in_array($g,['authorize.net','authorize']))$st=='success'?$s['authorize']++:$f['authorize']++;if($g=='stripe')$st=='success'?$s['stripe']++:$f['stripe']++;if($g=='paypal')$st=='success'?$s['paypal']++:$f['paypal']++;}}--}}
+{{--                                                        if($invoice->status == 1 && $invoice->payment && array_sum($s) == 0){$pm=strtolower($invoice->payment->payment_method??'');if($pm=='edp')$s['edp']=1;if(in_array($pm,['authorize.net','authorize']))$s['authorize']=1;if($pm=='stripe')$s['stripe']=1;if($pm=='paypal')$s['paypal']=1;}--}}
+{{--                                                        $show=false;foreach(['authorize','edp','stripe','paypal'] as $t){if(in_array($t,$m)||$s[$t]>0||$f[$t]>0){$show=true;break;}}--}}
+{{--                                                    @endphp--}}
+{{--                                                    @if($show)--}}
+{{--                                                        @foreach(['authorize','edp','stripe','paypal'] as $t)--}}
+{{--                                                            @if(in_array($t,$m)||$s[$t]>0||$f[$t]>0)--}}
+{{--                                                                <div style="display:flex;justify-content:space-between;gap:10px;">--}}
+{{--                                                                    <span>{{ucfirst($t)}} : </span>--}}
+{{--                                                                    <span><span>{{$s[$t]}}</span>-<span class="text-danger">{{$f[$t]}}</span></span>--}}
+{{--                                                                </div>--}}
+{{--                                                            @endif--}}
+{{--                                                        @endforeach--}}
+{{--                                                    @else--}}
+{{--                                                        <div class="text-muted">No Gateway Found</div>--}}
+{{--                                                    @endif--}}
+{{--                                                </td>--}}
                                                 <td class="align-middle text-center text-nowrap text-sm invoice-cell">
                                                     <span
                                                         class="invoice-number">{{ $invoice->invoice_number }}</span><br>
@@ -160,7 +160,6 @@
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->brand))
                                                         <a href="{{route('admin.brand.index')}}?search={{$invoice->brand->name}}">{{ $invoice->brand->name }}</a>
-                                                        <br> {{ $invoice->brand->brand_key }}
                                                     @else
                                                         ---
                                                     @endif
@@ -168,7 +167,6 @@
                                                 <td class="align-middle text-center text-nowrap">
                                                     @if(isset($invoice->team))
                                                         <a href="{{route('admin.team.index')}}?search={{$invoice->team->name}}">{{ $invoice->team->name }}</a>
-                                                        <br> {{ $invoice->team->team_key }}
                                                     @else
                                                         ---
                                                     @endif
@@ -191,21 +189,21 @@
                                                 </td>
                                                 <td class="align-middle space-between text-nowrap"
                                                     style="text-align: left;">
-                                                    <div
-                                                        style="display: flex; justify-content: space-between; gap: 10px;">
-                                                        <span style="width: 120px; ">Amount:</span>
-                                                        <span>{{ $invoice->currency ." ". number_format($invoice->amount, 2, '.', '') }}</span>
-                                                    </div>
-                                                    <div
-                                                        style="display: flex; justify-content: space-between; gap: 10px;">
-                                                        <span style="width: 120px; ">Tax:</span>
-                                                        <span>{{ $invoice->tax_type == 'percentage' ? '%' : ($invoice->tax_type == 'fixed' ? $invoice->currency : '') }} {{ $invoice->tax_value ?? 0 }}</span>
-                                                    </div>
-                                                    <div
-                                                        style="display: flex; justify-content: space-between; gap: 10px;">
-                                                        <span style="width: 120px; ">Tax Amount:</span>
-                                                        <span>{{ $invoice->currency ." ". number_format($invoice->tax_amount, 2, '.', '') }}</span>
-                                                    </div>
+{{--                                                    <div--}}
+{{--                                                        style="display: flex; justify-content: space-between; gap: 10px;">--}}
+{{--                                                        <span style="width: 120px; ">Amount:</span>--}}
+{{--                                                        <span>{{ $invoice->currency ." ". number_format($invoice->amount, 2, '.', '') }}</span>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div--}}
+{{--                                                        style="display: flex; justify-content: space-between; gap: 10px;">--}}
+{{--                                                        <span style="width: 120px; ">Tax:</span>--}}
+{{--                                                        <span>{{ $invoice->tax_type == 'percentage' ? '%' : ($invoice->tax_type == 'fixed' ? $invoice->currency : '') }} {{ $invoice->tax_value ?? 0 }}</span>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div--}}
+{{--                                                        style="display: flex; justify-content: space-between; gap: 10px;">--}}
+{{--                                                        <span style="width: 120px; ">Tax Amount:</span>--}}
+{{--                                                        <span>{{ $invoice->currency ." ". number_format($invoice->tax_amount, 2, '.', '') }}</span>--}}
+{{--                                                    </div>--}}
                                                     <div
                                                         style="display: flex; justify-content: space-between; gap: 10px;">
                                                         <span style="width: 120px; ">Total Amount:</span>
@@ -224,7 +222,7 @@
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{Carbon\Carbon::parse($invoice->due_date)->format('Y-m-d')}}</td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-center text-nowrap" data-order="{{$invoice->created_at}}">
                                                     @if ($invoice->created_at->isToday())
                                                         Today
                                                         at {{ $invoice->created_at->timezone('GMT+5')->format('g:i A') }}
