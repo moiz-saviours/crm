@@ -76,7 +76,7 @@
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
                 buttons: exportButtons,
-                order: [[1, 'desc']],
+                order: [[4, 'desc']],
                 responsive: false,
                 autoWidth: true,
                 scrollX: true,
@@ -403,13 +403,13 @@
                     if (res?.success) {
                         toastr.success(res?.message || 'Lead converted successfully.');
                         const lead = res.data;
-                        const customer_contact = res.customer_contact;
-                        const lead_status = res.lead_status;
+                        const customer_contact = lead.customer_contact;
+                        const lead_status = lead.lead_status;
                         $(`#tr-${lead.id} .convertBtn`).removeClass('convertBtn').addClass('disabled').removeAttr('data-id');
                         const index = table.row($('#tr-' + lead.id)).index();
                         const rowData = table.row(index).data();
-                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`) {
-                            table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`).draw();
+                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : lead.name}`) {
+                            table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : lead.name}`).draw();
                         }
                         if (decodeHtml(rowData[5]) !== 'Converted') {
                             table.cell(index, 5).data(lead_status.name).draw();
