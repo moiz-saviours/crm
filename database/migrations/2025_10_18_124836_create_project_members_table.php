@@ -13,10 +13,19 @@ return new class extends Migration
     {
         Schema::create('project_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->morphs('memberable');
-            $table->string('role', 100)->nullable();
-            $table->boolean('is_active')->default(true);
+
+            $table->unsignedBigInteger('project_id')->nullable()->default(null);
+            $table->foreign('project_id')
+                ->references('id')
+                ->on('projects')
+                ->onDelete('NO ACTION');
+
+            $table->unsignedBigInteger('memberable_id')->nullable()->default(null);
+            $table->string('memberable_type')->nullable()->default(null);
+
+            $table->string('role', 100)->nullable()->default(null);
+            $table->boolean('is_active')->nullable()->default(true);
+
             $table->timestamps();
 
             $table->unique(
@@ -25,6 +34,7 @@ return new class extends Migration
             );
         });
     }
+
 
     /**
      * Reverse the migrations.

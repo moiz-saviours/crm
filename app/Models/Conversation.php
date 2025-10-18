@@ -11,8 +11,9 @@ class Conversation extends Model
         'senderable_type',
         'receiverable_id',
         'receiverable_type',
-        'status',
-        'last_message_id',
+        'conversation_status',
+        'last_message_id',,
+        'status'
     ];
 
     public function senderable()

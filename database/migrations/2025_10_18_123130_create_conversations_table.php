@@ -13,13 +13,28 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-            $table->morphs('senderable');
-            $table->morphs('receiverable');
-            $table->enum('status', ['pending', 'approved', 'rejected', 'blocked'])->default('pending');
-            $table->foreignId('last_message_id')->nullable()->constrained('messages')->nullOnDelete();
+
+            $table->unsignedBigInteger('senderable_id');
+            $table->string('senderable_type');
+
+            $table->unsignedBigInteger('receiverable_id');
+            $table->string('receiverable_type');
+
+            $table->enum('conversation_status', ['pending', 'approved', 'rejected', 'blocked'])
+                ->default('pending');
+
+            $table->unsignedBigInteger('last_message_id')->nullable()->default(null);
+
+            $table->boolean('status')->default(true);
+
+
             $table->timestamps();
+
+            $table->index(['senderable_id', 'senderable_type']);
+            $table->index(['receiverable_id', 'receiverable_type']);
         });
     }
+
 
     /**
      * Reverse the migrations.

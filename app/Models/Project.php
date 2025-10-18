@@ -17,7 +17,7 @@ class Project extends Model
         'value',
         'label',
         'theme_color',
-        'status',
+        'project_status',
         'bill_type',
         'is_progress',
         'total_rate',
@@ -29,7 +29,8 @@ class Project extends Model
         'is_notify',
         'progress',
         'created_morph_id',
-        'created_morph_type'
+        'created_morph_type',
+        'status',
     ];
 
     protected $casts = [

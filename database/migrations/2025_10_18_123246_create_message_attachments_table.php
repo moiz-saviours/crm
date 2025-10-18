@@ -11,16 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('message_attachments', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('message_id')->constrained()->cascadeOnDelete();
-        $table->string('file_name');
-        $table->string('file_path');
-        $table->string('file_type', 100)->nullable();
-        $table->unsignedBigInteger('file_size')->nullable();
-        $table->timestamps();
-    });
+        Schema::create('message_attachments', function (Blueprint $table) {
+            $table->id();
+
+            $table->unsignedBigInteger('message_id')->nullable()->default(null);
+            $table->foreign('message_id')
+                ->references('id')
+                ->on('messages')
+                ->onDelete('NO ACTION');
+
+            $table->string('file_name')->nullable()->default(null);
+            $table->string('file_path')->nullable()->default(null);
+            $table->string('file_type', 100)->nullable()->default(null);
+            $table->unsignedBigInteger('file_size')->nullable()->default(null);
+
+            $table->timestamps();
+        });
     }
+
 
     /**
      * Reverse the migrations.

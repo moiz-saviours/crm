@@ -17,9 +17,10 @@ class Message extends Model
         'reply_to',
         'content',
         'message_type',
-        'status',
+        'message_status',
         'is_edited',
-        'edited_at'
+        'edited_at',
+        'status'
     ];
 
     protected $casts = [

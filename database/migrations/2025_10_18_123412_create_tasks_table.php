@@ -13,14 +13,26 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
-            $table->string('special_key', 100)->unique();
-            $table->enum('status', ['isprogress', 'on hold', 'cancelled', 'finished'])->default('isprogress');
-            $table->string('label', 50)->nullable();
-            $table->text('description')->nullable();
+
+            $table->unsignedBigInteger('project_id')->nullable()->default(null);
+            $table->foreign('project_id')
+                ->references('id')
+                ->on('projects')
+                ->onDelete('NO ACTION');
+
+            $table->string('special_key', 100)->unique()->nullable()->default(null);
+
+            $table->enum('task_status', ['isprogress', 'on hold', 'cancelled', 'finished'])
+                ->default('isprogress');
+            $table->string('label', 50)->nullable()->default(null);
+
+            $table->text('description')->nullable()->default(null);
+            $table->boolean('status')->default(true);
+
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
