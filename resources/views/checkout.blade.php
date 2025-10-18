@@ -1582,10 +1582,16 @@ if (!empty($non_bank_methods)) {
     });
     async function handleAttachmentFormSubmit(form, uploadStatusElement, uploadButton) {
         const files = form.querySelector('input[type="file"]').files;
+        if (!files || !files.length || typeof files[Symbol.iterator] !== 'function') {
+            uploadStatusElement.innerHTML = '<div class="alert alert-danger">Please select valid files.</div>';
+            uploadButton.disabled = false;
+            return;
+        }
+        const filesArray = Array.from(files);
         uploadStatusElement.innerHTML = '';
         uploadButton.disabled = true;
 
-        if (files.length === 0) {
+        if (filesArray.length === 0) {
             uploadStatusElement.innerHTML = '<div class="alert alert-danger">Please select at least one file.</div>';
             uploadButton.disabled = false;
             return;
@@ -1594,7 +1600,7 @@ if (!empty($non_bank_methods)) {
         const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
         const maxSize = 10 * 1024 * 1024; // 10MB
 
-        for (const file of files) {
+        for (const file of filesArray) {
             if (!allowedTypes.includes(file.type)) {
                 uploadStatusElement.innerHTML = `<div class="alert alert-danger">Invalid file type (${file.name}). Only PDF/JPG/PNG allowed.</div>`;
                 uploadButton.disabled = false;
@@ -1611,7 +1617,7 @@ if (!empty($non_bank_methods)) {
         uploadStatusElement.innerHTML = '<div class="alert alert-info">Scanning files for security...</div>';
 
         try {
-            for (const file of files) {
+            for (const file of filesArray) {
                 if (file.type.startsWith('image/')) {
                     await new Promise((resolve) => {
                         const img = new Image();
@@ -1638,7 +1644,7 @@ if (!empty($non_bank_methods)) {
             const formData = new FormData(form);
             formData.append('invoice_number', `{{ $invoiceData['invoice_key'] }}`);
             formData.delete('file');
-            files.forEach((file, index) => {
+            filesArray.forEach((file, index) => {
                 formData.append(`files[${index}]`, file);
             });
 
