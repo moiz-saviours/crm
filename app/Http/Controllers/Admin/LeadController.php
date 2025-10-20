@@ -36,7 +36,6 @@ class LeadController extends Controller
 //            $leads->where('assigned_to', auth()->id());
 //        }
         $leads = $leads->get();
-
         return view('admin.leads.index', compact('leads', 'brands', 'teams', 'customer_contacts'));
     }
 
@@ -230,7 +229,9 @@ class LeadController extends Controller
             }
             $lead->update($updateData);
             DB::commit();
-            $lead->loadMissing('customer_contact:special_key,name', 'brand', 'team', 'leadStatus');
+            $lead->loadMissing(['customer_contact' => function ($query) {
+                $query->withTrashed();
+            }], 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
@@ -406,7 +407,6 @@ class LeadController extends Controller
 //            ], 500);
 //        }
 //    }
-
     public function storeFromScript(Request $request)
     {
         try {
@@ -418,9 +418,7 @@ class LeadController extends Controller
             if (is_array($decoded)) {
                 $request->merge($decoded);
             }
-
             \Log::info('StoreFromScript Incoming:', ['data' => $request->all()]);
-
             /** ----------------------------------------------------------------
              * STEP 1: Validate brand token & create raw record
              * ----------------------------------------------------------------*/
@@ -428,16 +426,13 @@ class LeadController extends Controller
             if (!$brand) {
                 return response()->json(['error' => 'Invalid script token.'], 404);
             }
-
             // Save raw data first
             $lead = Lead::create([
                 'brand_key' => $brand->brand_key,
                 'lead_status_id' => 1,
                 'raw_data' => json_encode($request->all()),
             ]);
-
             $leadId = $lead->id;
-
             /** ----------------------------------------------------------------
              * STEP 2: Prepare device info
              * ----------------------------------------------------------------*/
@@ -447,13 +442,11 @@ class LeadController extends Controller
                 'browser_name' => $this->getBrowserName($userAgent),
                 'visitor_id' => $request->visitor_id ?? null,
             ];
-
             try {
                 // Step 1: Try to detect automatically
                 $userIp = $request->server('HTTP_X_FORWARDED_FOR')
                     ?? $request->server('REMOTE_ADDR')
                     ?? $request->ip();
-
                 // Step 2: If running on localhost, fetch public IP from API
                 if (in_array($userIp, ['127.0.0.1', '::1'])) {
                     try {
@@ -465,14 +458,11 @@ class LeadController extends Controller
                         \Log::warning('Unable to fetch public IP on localhost', ['error' => $e->getMessage()]);
                     }
                 }
-
                 \Log::info('Detected IP Automatically:', ['ip' => $userIp]);
-
                 // Step 3: Fetch location info from IP
                 $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
                 if ($ipapiRes->successful()) {
                     $location = $ipapiRes->json();
-
                     $deviceInfo = array_merge($deviceInfo, [
                         'ip' => $location['query'] ?? null,
                         'city' => $location['city'] ?? null,
@@ -482,14 +472,11 @@ class LeadController extends Controller
                         'latitude' => $location['lat'] ?? null,
                         'longitude' => $location['lon'] ?? null,
                     ]);
-
                     if (!empty($location['lat']) && !empty($location['lon'])) {
                         $url = "https://nominatim.openstreetmap.org/reverse?lat={$location['lat']}&lon={$location['lon']}&format=json&accept-language=en";
-
                         $revGeo = Http::withHeaders([
                             'User-Agent' => 'MyLaravelApp/1.0 (mydomain.com)'
                         ])->get($url);
-
                         if ($revGeo->successful()) {
                             $revData = $revGeo->json();
                             $deviceInfo['address'] = $revData['display_name'] ?? null;
@@ -502,22 +489,18 @@ class LeadController extends Controller
             } catch (\Exception $ex) {
                 $deviceInfo['location_error'] = 'Unable to fetch location';
             }
-
-
             /** ----------------------------------------------------------------
              * STEP 3: Map form data to proper fields
              * ----------------------------------------------------------------*/
             $formData = collect($request->form_data ?? [])
                 ->mapWithKeys(fn($value, $key) => [strtolower($key) => $value])
                 ->toArray();
-
             $fieldMapping = [
-                'name' => ['fname','name','firstname','first-name','first_name','fullname','full_name','yourname','your-name'],
+                'name' => ['fname', 'name', 'firstname', 'first-name', 'first_name', 'fullname', 'full_name', 'yourname', 'your-name'],
                 'email' => ['email'],
-                'phone' => ['tel','tele','number','num','phone','telephone','your-phone','phone-number','phonenumber'],
-                'note' => ['message','msg','desc','description','note'],
+                'phone' => ['tel', 'tele', 'number', 'num', 'phone', 'telephone', 'your-phone', 'phone-number', 'phonenumber'],
+                'note' => ['message', 'msg', 'desc', 'description', 'note'],
             ];
-
             $dataToSave = [];
             foreach ($fieldMapping as $column => $possibleFields) {
                 foreach ($possibleFields as $field) {
@@ -527,7 +510,6 @@ class LeadController extends Controller
                     }
                 }
             }
-
             /** ----------------------------------------------------------------
              * STEP 4: Update record with processed data
              * ----------------------------------------------------------------*/
@@ -545,15 +527,12 @@ class LeadController extends Controller
                 'address' => $deviceInfo['address'] ?? '',
                 'visitor_id' => $deviceInfo['visitor_id'] ?? '',
             ]);
-
             if (!empty($lead->email)) {
                 $existingContact = CustomerContact::where('email', $lead->email)->first();
-
                 if ($existingContact) {
                     $lead->update([
                         'cus_contact_key' => $existingContact->special_key,
                     ]);
-
                     \Log::info('Lead auto-linked to existing customer', [
                         'lead_id' => $lead->id,
                         'cus_contact_key' => $existingContact->special_key,
@@ -575,7 +554,6 @@ class LeadController extends Controller
             ], 500);
         }
     }
-
 
     private function getBrowserName($userAgent)
     {
@@ -601,14 +579,11 @@ class LeadController extends Controller
     {
         try {
             $lead = Lead::findOrFail($id);
-
             $deviceInfo = json_decode($lead->device_info, true);
-
             $existingContact = CustomerContact::where('email', $lead->email)->first();
             if ($existingContact) {
                 $customer_contact = $existingContact;
-            }
-            else {
+            } else {
                 $customer_contact = new CustomerContact([
                     'brand_key' => $lead->brand_key,
                     'team_key' => null,
@@ -622,11 +597,8 @@ class LeadController extends Controller
                     'zipcode' => $lead->zipcode,
                     'ip_address' => $deviceInfo['ip'] ?? null,
                 ]);
-
                 $customer_contact->save();
             }
-
-
             $lead_status = LeadStatus::where('name', 'Converted')->first();
             $lead_data = [
                 'cus_contact_key' => $customer_contact->special_key,
@@ -634,22 +606,20 @@ class LeadController extends Controller
             if ($lead_status && $lead_status->id) {
                 $lead_data['lead_status_id'] = $lead_status->id;
             }
-
             $lead->update($lead_data);
-            $lead->load('customer_contact:id,special_key,name','leadStatus:id,name');
+            $lead->load('customer_contact:id,special_key,name', 'leadStatus:id,name');
             UserActivity::create([
-                'event_type'  => 'conversion',
+                'event_type' => 'conversion',
                 'visitor_id' => $lead->visitor_id,
-                'event_data'  => json_encode([
-                    'message'        => $existingContact
+                'event_data' => json_encode([
+                    'message' => $existingContact
                         ? "Lead attached to existing customer"
                         : "Lead converted to new customer",
-                    'customer_name'  => $customer_contact->name,
+                    'customer_name' => $customer_contact->name,
                     'customer_email' => $customer_contact->email,
-                    'converted_by'   => auth()->user()->name ?? 'System',
+                    'converted_by' => auth()->user()->name ?? 'System',
                 ]),
             ]);
-
             return response()->json([
                 'success' => true,
                 'message' => $existingContact
@@ -664,6 +634,4 @@ class LeadController extends Controller
             ], 500);
         }
     }
-
-
 }
