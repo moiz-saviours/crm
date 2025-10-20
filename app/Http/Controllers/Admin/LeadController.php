@@ -222,6 +222,9 @@ class LeadController extends Controller
                 'note' => $request->input('note'),
                 'status' => $request->input('status'),
             ];
+            if (is_null($lead->cus_contact_key) && $customer_contact->special_key) {
+                $updateData['cus_contact_key'] = $customer_contact->special_key;
+            }
             if (is_null($lead->email) && $request->filled('email')) {
                 $updateData['email'] = $request->input('email');
             }
