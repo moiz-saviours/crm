@@ -2940,8 +2940,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function filterContent(searchTerm) {
         const activeTab = getActiveTab();
-        console.log('Active tab:', activeTab);
-        
         // Re-initialize data in case content changed
         initializeSearchableData();
         
@@ -3093,6 +3091,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize tab listeners
     function initializeTabListeners() {
         document.addEventListener('click', function(e) {
+            const tab = getActiveTab();
+            //todo this is temporary logic
+            if (tab == 'chats' || tab == 'projects') {
+                const showMoreBtn = document.getElementById('show-more-btn');
+                if (showMoreBtn) {
+                    showMoreBtn.style.display = 'none';
+                }
+            }
+
             if (e.target.closest('.nav-link.customize')) {
                 setTimeout(() => {
                     const searchInput = document.querySelector('.search-inputs');
