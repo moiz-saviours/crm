@@ -237,7 +237,7 @@ class LeadController extends Controller
                 $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
             }
             $lead->date = $date;
-            return response()->json(['data' => $lead, 'success' => 'Record created successfully!']);
+            return response()->json(['data' => $lead, 'success' => 'Record updated successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while creating the record', 'message' => $e->getMessage()], 500);
