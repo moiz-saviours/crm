@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
-
+use App\Models\Conversation;
 
 class ContactController extends Controller
 {
@@ -570,6 +570,20 @@ private function formatEmailForTimeline(Email $email)
         $page = (int)request()->get('page', 1);
         $limit = (int)request()->get('limit', default: 10);
         
+        // ADD THIS: Get or create conversation with the customer contact
+        $conversation = Conversation::where([
+            'senderable_type' => get_class(auth()->user()),
+            'senderable_id' => auth()->id(),
+            'receiverable_type' => get_class($customer_contact),
+            'receiverable_id' => $customer_contact->id,
+        ])->orWhere([
+            'senderable_type' => get_class($customer_contact),
+            'senderable_id' => $customer_contact->id,
+            'receiverable_type' => get_class(auth()->user()),
+            'receiverable_id' => auth()->id(),
+        ])->first();
+
+        
         // $auth_pseudo_emails = [];
         // if (auth()->user()->pseudo_email) {
         //     $auth_pseudo_emails[] = [
@@ -619,7 +633,8 @@ private function formatEmailForTimeline(Email $email)
             'limit',
             'imapError',
             'timeline',
-            'total_count'
+            'total_count',
+            'conversation'
         ));
     }
 
