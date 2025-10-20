@@ -234,6 +234,7 @@ class LeadController extends Controller
                 $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
             }
             $lead->date = $date;
+            $lead->load('customer_contact:special_key,name');
             return response()->json(['data' => $lead, 'success' => 'Record created successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
