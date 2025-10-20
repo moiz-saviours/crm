@@ -264,7 +264,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                     ->name('timeline.fetch-remote');
                 Route::post('/retry/email/{id}', [AdminEmailController::class, 'retryEmail'])->name('retry.email');
                 Route::post('/messages', [AdminMessageController::class, 'store']);
-                Route::get('/conversations/{conversationId}/messages', [AdminMessageController::class, 'getConversationMessages']);
+                Route::get('/conversations/{conversationId}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversation.message');
                 Route::post('/conversations', [AdminMessageController::class, 'storeConversation'])->name('conversations.store');
             });
         });

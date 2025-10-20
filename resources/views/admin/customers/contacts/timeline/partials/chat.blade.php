@@ -305,7 +305,7 @@
             </div>
             Loading messages...
         </div>
-        
+
         <!-- Hidden no messages state -->
         <div class="d-none" id="noMessagesState">
             <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
@@ -367,7 +367,7 @@
             </div>
         </div>
     </div>
-    
+
 </div>
 <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
@@ -394,10 +394,10 @@
 
     function initializeChatWithConversation() {
         socket = io('{{ config('socketio.url') }}');
-        
+
         socket.emit('join_conversation', conversationId);
 
-        loadMessages();
+        loadMessages(conversationId);
         initializeChatFunctionality();
 
         socket.on('new_message', (data) => {
@@ -418,7 +418,7 @@
     function startNewConversation() {
         const btn = document.getElementById('startConversationBtn');
         const originalText = btn.innerHTML;
-        
+
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
 
@@ -437,9 +437,9 @@
         .then(data => {
             if (data.success) {
                 document.getElementById('noConversationState').style.display = 'none';
-                
+
                 document.getElementById('chatInputContainer').style.display = 'block';
-                
+
                 document.getElementById('chatMessages').innerHTML = `
                     <div class="text-center py-4 text-muted" id="loadingMessages">
                         <div class="spinner-border spinner-border-sm" role="status">
@@ -463,12 +463,13 @@
     }
 
     // Load messages via AJAX and render using partial
-    function loadMessages() {
-        fetch(`/admin/customer/contact/conversations/${conversationId}/messages`)
+    function loadMessages(conversationId) {
+        const route = `{{ route('admin.customer.contact.conversation.message', ':conversation_id') }}`.replace(':conversation_id', conversationId);
+        fetch(route)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('loadingMessages').style.display = 'none';
-                
+
                 if (data.messages && data.messages.length > 0) {
                     // Show messages
                     document.getElementById('chatMessages').innerHTML = data.html;
@@ -503,7 +504,7 @@
         if (noMessagesState && !noMessagesState.classList.contains('d-none')) {
             noMessagesState.classList.add('d-none');
         }
-        
+
         // Remove loading state if it's still there
         const loadingMessages = document.getElementById('loadingMessages');
         if (loadingMessages) {
