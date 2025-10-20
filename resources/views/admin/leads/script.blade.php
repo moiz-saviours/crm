@@ -248,8 +248,8 @@
                             const rowData = table.row(index).data();
 
                             // Column 2: Name
-                            if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`) {
-                                table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`).draw();
+                            if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`) {
+                                table.cell(index, 1).data(`${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`).draw();
                             }
                             // Column 3: Brand
                             if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : ''}`) {
@@ -408,8 +408,8 @@
                         $(`#tr-${lead.id} .convertBtn`).removeClass('convertBtn').addClass('disabled').removeAttr('data-id');
                         const index = table.row($('#tr-' + lead.id)).index();
                         const rowData = table.row(index).data();
-                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`) {
-                            table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`).draw();
+                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`) {
+                            table.cell(index, 1).data(`${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`).draw();
                         }
                         if (decodeHtml(rowData[5]) !== 'Converted') {
                             table.cell(index, 5).data(lead_status.name).draw();
@@ -435,6 +435,11 @@
                 acronym += 's';
             }
             return acronym;
+        }
+        function getEditRoute(route, id) {
+            if (!route) return '#';
+            if (!id) return route;
+            return route.replace(':id', id);
         }
 
     });

@@ -131,9 +131,9 @@ class LeadController extends Controller
             $lead->refresh();
             $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
-                $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
+                $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
-                $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . "GMT + 5";
+                $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
             }
             $lead->date = $date;
             return response()->json(['data' => $lead, 'success' => 'Record created successfully!']);
@@ -229,9 +229,9 @@ class LeadController extends Controller
             DB::commit();
             $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
-                $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . "GMT + 5";
+                $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
-                $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . "GMT + 5";
+                $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
             }
             $lead->date = $date;
             return response()->json(['data' => $lead, 'success' => 'Record created successfully!']);
