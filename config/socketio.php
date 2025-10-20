@@ -8,4 +8,6 @@ return [
     'options' => [
         'secure' => env('APP_ENV') === 'production',
     ],
+    'path' => env('SOCKETIO_PATH', '/socket.io'),
+    'transports' => explode(',', env('SOCKETIO_TRANSPORTS', 'websocket,polling')),
 ];
