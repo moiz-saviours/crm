@@ -507,33 +507,32 @@ class InvoiceController extends Controller
             return response()->json(['error' => 'An error occurred while updating the record', 'message' => $e->getMessage()], 500);
         }
     }
+
     private function getGatewayCounts($invoice)
     {
         $m = $invoice->invoice_merchants->pluck('merchant_type')->map(fn($t) => strtolower($t))->toArray();
-        $s = ['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];
-        $f = ['edp'=>0,'authorize'=>0,'stripe'=>0,'paypal'=>0];
-
-        if($invoice->payment_transaction_logs){
-            foreach($invoice->payment_transaction_logs as $l){
+        $s = ['edp' => 0, 'authorize' => 0, 'stripe' => 0, 'paypal' => 0];
+        $f = ['edp' => 0, 'authorize' => 0, 'stripe' => 0, 'paypal' => 0];
+        if ($invoice->payment_transaction_logs) {
+            foreach ($invoice->payment_transaction_logs as $l) {
                 $g = strtolower($l->gateway);
                 $st = strtolower($l->status);
-                if($g=='edp') $st=='success'?$s['edp']++:$f['edp']++;
-                if(in_array($g,['authorize.net','authorize'])) $st=='success'?$s['authorize']++:$f['authorize']++;
-                if($g=='stripe') $st=='success'?$s['stripe']++:$f['stripe']++;
-                if($g=='paypal') $st=='success'?$s['paypal']++:$f['paypal']++;
+                if ($g == 'edp') $st == 'success' ? $s['edp']++ : $f['edp']++;
+                if (in_array($g, ['authorize.net', 'authorize'])) $st == 'success' ? $s['authorize']++ : $f['authorize']++;
+                if ($g == 'stripe') $st == 'success' ? $s['stripe']++ : $f['stripe']++;
+                if ($g == 'paypal') $st == 'success' ? $s['paypal']++ : $f['paypal']++;
             }
         }
-
-        if($invoice->status == 1 && $invoice->payment && array_sum($s) == 0){
-            $pm = strtolower($invoice->payment->payment_method??'');
-            if($pm=='edp') $s['edp']=1;
-            if(in_array($pm,['authorize.net','authorize'])) $s['authorize']=1;
-            if($pm=='stripe') $s['stripe']=1;
-            if($pm=='paypal') $s['paypal']=1;
+        if ($invoice->status == 1 && $invoice->payment && array_sum($s) == 0) {
+            $pm = strtolower($invoice->payment->payment_method ?? '');
+            if ($pm == 'edp') $s['edp'] = 1;
+            if (in_array($pm, ['authorize.net', 'authorize'])) $s['authorize'] = 1;
+            if ($pm == 'stripe') $s['stripe'] = 1;
+            if ($pm == 'paypal') $s['paypal'] = 1;
         }
-
         return compact('s', 'f', 'm');
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -562,7 +561,6 @@ class InvoiceController extends Controller
         }
     }
 
-
     public function filterInvoice(Request $request)
     {
         $validated = $request->validate([
@@ -583,18 +581,15 @@ class InvoiceController extends Controller
                 'brand_key.string' => 'The brand key must be a valid string.',
             ]
         ]);
-
         try {
             $startDate = Carbon::createFromFormat('Y-m-d h:i:s A', $validated['start_date'], 'GMT+5')->setTimezone('UTC');
             $endDate = Carbon::createFromFormat('Y-m-d h:i:s A', $validated['end_date'], 'GMT+5')->setTimezone('UTC');
             $teamKey = $validated['team_key'] ?? 'all';
             $brandKey = $validated['brand_key'] ?? 'all';
-
-            $invoices = Invoice::select([
-                'id','invoice_number','invoice_key','brand_key','team_key','cus_contact_key','agent_type','agent_id',
-                'amount','tax_type','tax_value','tax_amount','total_amount','status','currency','due_date','created_at'
+            $baseQuery = fn() => Invoice::select([
+                'id', 'invoice_number', 'invoice_key', 'brand_key', 'team_key', 'cus_contact_key', 'agent_type', 'agent_id',
+                'amount', 'tax_type', 'tax_value', 'tax_amount', 'total_amount', 'status', 'currency', 'due_date', 'created_at'
             ])
-                ->whereBetween('created_at', [$startDate, $endDate])
                 ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
                 ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
                 ->with([
@@ -602,24 +597,41 @@ class InvoiceController extends Controller
                     'brand:id,name,brand_key',
                     'agent:id,name',
                     'customer_contact:id,name,special_key',
-                ])
-                ->get()->map(function ($invoice) {
-                    $invoice->gateway_counts = $this->getGatewayCounts($invoice);
-                    return $invoice;
-                });
-
-            // Format created_at into readable date
-            $invoices->each(function($invoice) {
+                ]);
+            $invoices = $baseQuery()->whereBetween('invoices.created_at', [$startDate, $endDate])->get();
+            $actualDates = [
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date']
+            ];
+            if ($invoices->isEmpty()) {
+                $lastRecordDate = Invoice::when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+                    ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
+                    ->latest('created_at')
+                    ->value('created_at');
+                if ($lastRecordDate) {
+                    $startDate = Carbon::parse($lastRecordDate)->startOfMonth();
+                    $endDate = Carbon::parse($lastRecordDate)->endOfMonth();
+                    $invoices = $baseQuery()->whereBetween('created_at', [$startDate, $endDate])->get();
+                    $actualDates = [
+                        'start_date' => $startDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
+                        'end_date' => $endDate->timezone('GMT+5')->format('Y-m-d h:i:s A')
+                    ];
+                }
+            }
+            $invoices = $invoices->map(function ($invoice) {
+                $invoice->gateway_counts = $this->getGatewayCounts($invoice);
                 if ($invoice->created_at->isToday()) {
                     $invoice->date = "Today at " . $invoice->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
                 } else {
                     $invoice->date = $invoice->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
                 }
+                return $invoice;
             });
-
+            $invoices->load('payment_attachments');
             return response()->json([
                 'success' => true,
                 'data' => $invoices,
+                'actual_dates' => $actualDates,
                 'count' => $invoices->count(),
             ]);
 
@@ -630,8 +642,4 @@ class InvoiceController extends Controller
             ], 500);
         }
     }
-
-
-
-
 }
