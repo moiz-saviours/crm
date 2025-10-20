@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-            $table->nullableMorphs('sender');
 
             $table->nullableMorphs('sender');
             $table->nullableMorphs('receiver');
