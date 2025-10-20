@@ -32,7 +32,7 @@ class Message extends Model
     {
         return $this->belongsTo(Conversation::class);
     }
-    public function senderable()
+    public function sender()
     {
         return $this->morphTo();
     }

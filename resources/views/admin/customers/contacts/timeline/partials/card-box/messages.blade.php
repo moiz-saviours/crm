@@ -1,9 +1,8 @@
 @php
-    $isSent = $message->senderable_id == auth()->id() && $message->senderable_type == get_class(auth()->user());
-    $avatarText = $isSent ? 'ME' : substr($message->senderable->name ?? 'U', 0, 2);
-    $avatarTitle = $isSent ? 'You' : ($message->senderable->name ?? 'User');
+    $isSent = $message->sender_id == auth()->id() && $message->sender_type == get_class(auth()->user());
+    $avatarText = $isSent ? 'ME' : substr($message->sender->name ?? 'U', 0, 2);
+    $avatarTitle = $isSent ? 'You' : ($message->sender->name ?? 'User');
 @endphp
-
 <div class="message {{ $isSent ? 'sent' : 'received' }}">
     @if(!$isSent)
     <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $avatarTitle }}">

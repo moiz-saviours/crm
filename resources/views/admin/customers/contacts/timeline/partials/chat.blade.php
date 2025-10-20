@@ -401,7 +401,7 @@
         initializeChatFunctionality();
 
         socket.on('new_message', (data) => {
-            if (data.senderable_id !== currentUser.id || data.senderable_type !== currentUser.type) {
+            if (data.sender_id !== currentUser.id || data.sender_type !== currentUser.type) {
                 addNewMessage(data.content, false, data);
             }
         });
@@ -429,6 +429,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
+                receiver_type: 'App\\Models\\CustomerContact',
                 receiver_id: {{ $customer_contact->id ?? 'null' }}
             })
         })
@@ -514,8 +515,8 @@
         messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
 
         // Avatar setup
-        const avatarText = isSent ? 'ME' : (messageData?.senderable?.name?.substring(0, 2) || 'U');
-        const avatarTitle = isSent ? 'You' : (messageData?.senderable?.name || 'User');
+        const avatarText = isSent ? 'ME' : (messageData?.sender?.name?.substring(0, 2) || 'U');
+        const avatarTitle = isSent ? 'You' : (messageData?.sender?.name || 'User');
 
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
@@ -618,8 +619,8 @@
                                 socket.emit('send_message', {
                                     content: message,
                                     conversation_id: conversationId,
-                                    senderable_type: currentUser.type,
-                                    senderable_id: currentUser.id,
+                                    sender_type: currentUser.type,
+                                    sender_id: currentUser.id,
                                     message_type: 'text'
                                 });
                             }

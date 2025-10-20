@@ -24,7 +24,7 @@ class MessageController extends Controller
             ], 404);
         }
 
-        $messages = Message::with(['senderable', 'attachments'])
+        $messages = Message::with(['sender', 'attachments'])
             ->where('conversation_id', $conversationId)
             ->orderBy('created_at', 'asc')
             ->get();
@@ -59,7 +59,7 @@ class MessageController extends Controller
         ]);
 
         // Load relationships for response
-        $message->load('attachments', 'senderable');
+        $message->load('attachments', 'sender');
 
         return response()->json([
             'success' => true,

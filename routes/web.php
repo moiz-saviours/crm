@@ -328,7 +328,7 @@ Route::post('/customer/chat/{customer_contact:special_key}/message', function (R
 
     return response()->json([
         'success' => true,
-        'message' => $message->load('senderable')
+        'message' => $message->load('sender')
     ]);
 });
 
@@ -347,7 +347,7 @@ Route::get('/customer/chat/{customer_contact:special_key}/messages', function (C
         return response()->json(['error' => 'Conversation not found'], 404);
     }
 
-    $messages = Message::with(['senderable'])
+    $messages = Message::with(['sender'])
         ->where('conversation_id', $conversation->id)
         ->orderBy('created_at', 'asc')
         ->get();
