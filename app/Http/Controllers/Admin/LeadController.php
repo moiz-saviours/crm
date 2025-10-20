@@ -227,14 +227,13 @@ class LeadController extends Controller
             }
             $lead->update($updateData);
             DB::commit();
-            $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
+            $lead->loadMissing('customer_contact:special_key,name', 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
                 $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
             }
             $lead->date = $date;
-            $lead->load('customer_contact:special_key,name');
             return response()->json(['data' => $lead, 'success' => 'Record created successfully!']);
         } catch (\Exception $e) {
             DB::rollBack();
