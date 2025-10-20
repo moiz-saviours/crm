@@ -437,8 +437,7 @@
             return acronym;
         }
         function getEditRoute(route, id) {
-            if (!route) return '#';
-            if (!id) return route;
+            if (!route || !id) return '#';
             return route.replace(':id', id);
         }
 
