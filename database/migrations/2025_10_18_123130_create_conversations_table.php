@@ -13,25 +13,18 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
+            $table->nullableMorphs('sender');
 
-            $table->unsignedBigInteger('senderable_id');
-            $table->string('senderable_type');
-
-            $table->unsignedBigInteger('receiverable_id');
-            $table->string('receiverable_type');
+            $table->nullableMorphs('receiver');
 
             $table->enum('conversation_status', ['pending', 'approved', 'rejected', 'blocked'])
                 ->default('pending');
 
             $table->unsignedBigInteger('last_message_id')->nullable()->default(null);
 
-            $table->boolean('status')->default(true);
-
-
+            $table->tinyInteger('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
+            $table->softDeletes();
             $table->timestamps();
-
-            $table->index(['senderable_id', 'senderable_type']);
-            $table->index(['receiverable_id', 'receiverable_type']);
         });
     }
 
