@@ -83,6 +83,11 @@
                 type="button" role="tab" aria-controls="chats" aria-selected="false">Chats
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="projects" data-bs-toggle="tab" data-bs-target="#projects-container"
+                type="button" role="tab" aria-controls="projects" aria-selected="false">Projects
+        </button>
+    </li>
 </ul>
 
     <div class="tab-content " id="myTabContent">
@@ -264,6 +269,9 @@
         </div>
         <div class="tab-pane fade custom-tabs-row-scroll" id="meetings-container" role="tabpanel" aria-labelledby="meeting-tab">
             @include('admin.customers.contacts.timeline.static-content.meeting')
+        </div>
+        <div class="tab-pane fade custom-tabs-row-scroll" id="projects-container" role="tabpanel" aria-labelledby="project-tab">
+            @include('admin.customers.contacts.timeline.partials.project')
         </div>
         <div class="tab-pane fade" id="chats-container" role="tabpanel" aria-labelledby="chat-tab">
             @include('admin.customers.contacts.timeline.partials.chat')
