@@ -262,4 +262,95 @@ Route::post('/emails/bounce', [App\Http\Controllers\EmailTrackingController::cla
 Route::post('/emails/delivery', [App\Http\Controllers\EmailTrackingController::class, 'trackDelivery'])->name('emails.track.delivery');
 Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController::class, 'trackSpamReport'])->name('emails.track.spam_report');
 
+//customer view for chatting
+use App\Models\Conversation;
+use App\Models\Message;
+use App\Models\CustomerContact;
 
+// Customer chat route - using customer special_key
+Route::get('/customer/chat/{customer_contact:special_key}', function (CustomerContact $customer_contact) {
+    // Find conversation for this customer
+    $conversation = Conversation::where(function($query) use ($customer_contact) {
+            $query->where('senderable_type', 'App\Models\CustomerContact')
+                  ->where('senderable_id', $customer_contact->id);
+        })->orWhere(function($query) use ($customer_contact) {
+            $query->where('receiverable_type', 'App\Models\CustomerContact')
+                  ->where('receiverable_id', $customer_contact->id);
+        })->first();
+
+    if (!$conversation) {
+        return view('customer-chat', [
+            'conversation' => null,
+            'customer' => $customer_contact,
+            'error' => 'No conversation found'
+        ]);
+    }
+
+    return view('customer-chat', [
+        'conversation' => $conversation,
+        'customer' => $customer_contact,
+        'error' => null
+    ]);
+})->name('customer.chat');
+
+// Handle customer messages - using customer special_key
+Route::post('/customer/chat/{customer_contact:special_key}/message', function (Request $request, CustomerContact $customer_contact) {
+    $request->validate([
+        'content' => 'required|string|max:5000',
+        'message_type' => 'sometimes|in:text,image,video,audio,file,system'
+    ]);
+
+    // Find conversation for this customer
+    $conversation = Conversation::where(function($query) use ($customer_contact) {
+            $query->where('senderable_type', 'App\Models\CustomerContact')
+                  ->where('senderable_id', $customer_contact->id);
+        })->orWhere(function($query) use ($customer_contact) {
+            $query->where('receiverable_type', 'App\Models\CustomerContact')
+                  ->where('receiverable_id', $customer_contact->id);
+        })->first();
+
+    if (!$conversation) {
+        return response()->json(['error' => 'Conversation not found'], 404);
+    }
+
+    // Create message from customer
+    $message = Message::create([
+        'conversation_id' => $conversation->id,
+        'senderable_type' => 'App\Models\CustomerContact',
+        'senderable_id' => $customer_contact->id,
+        'content' => $request->content,
+        'message_type' => $request->message_type ?? 'text',
+        'message_status' => 'sent'
+    ]);
+
+    // Update conversation last message
+    $conversation->update(['last_message_id' => $message->id]);
+
+    return response()->json([
+        'success' => true,
+        'message' => $message->load('senderable')
+    ]);
+});
+
+// Get conversation messages - using customer special_key
+Route::get('/customer/chat/{customer_contact:special_key}/messages', function (CustomerContact $customer_contact) {
+    // Find conversation for this customer
+    $conversation = Conversation::where(function($query) use ($customer_contact) {
+            $query->where('senderable_type', 'App\Models\CustomerContact')
+                  ->where('senderable_id', $customer_contact->id);
+        })->orWhere(function($query) use ($customer_contact) {
+            $query->where('receiverable_type', 'App\Models\CustomerContact')
+                  ->where('receiverable_id', $customer_contact->id);
+        })->first();
+
+    if (!$conversation) {
+        return response()->json(['error' => 'Conversation not found'], 404);
+    }
+
+    $messages = Message::with(['senderable'])
+        ->where('conversation_id', $conversation->id)
+        ->orderBy('created_at', 'asc')
+        ->get();
+
+    return response()->json($messages);
+});
