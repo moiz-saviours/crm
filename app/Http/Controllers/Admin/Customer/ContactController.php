@@ -574,12 +574,12 @@ private function formatEmailForTimeline(Email $email)
         $conversation = Conversation::where([
             'sender_type' => get_class(auth()->user()),
             'sender_id' => auth()->id(),
-            'receiver_type' => 'App\Models\CustomerContact',
+            'receiver_type' => get_class($customer_contact),
             'receiver_id' => $customer_contact->id,
         ])->orWhere([
             'sender_type' => get_class($customer_contact),
             'sender_id' => $customer_contact->id,
-            'receiver_type' => 'App\Models\CustomerContact',
+            'receiver_type' => get_class(auth()->user()),
             'receiver_id' => auth()->id(),
         ])->first();
 
