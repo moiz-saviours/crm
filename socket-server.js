@@ -1,12 +1,34 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
+const ENV = process.env.APP_ENV || 'local';
+const PORT = process.env.SOCKETIO_PORT || 6001;
+
+let allowedOrigins = [];
+let socketPath = '/socket.io/';
+switch (ENV) {
+    case 'production':
+        allowedOrigins = ['*'];
+        socketPath = '/socket.io/';
+        break;
+
+    case 'development':
+        allowedOrigins = ['*'];
+        socketPath = '/crm-development/socket.io/';
+        break;
+
+    default: // local
+        allowedOrigins = ['*'];
+        socketPath = '/socket.io/';
+        break;
+}
 const server = createServer();
 const io = new Server(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
-    }
+    },
+    path: socketPath,
 });
 
 // Store active conversations
@@ -65,8 +87,6 @@ io.on('connection', (socket) => {
         activeConversations.delete(socket.id);
     });
 });
-
-const PORT = process.env.SOCKETIO_PORT || 6001;
 server.listen(PORT, () => {
     console.log(`✅ Socket.IO server running on port ${PORT}`);
     console.log(`📍 http://localhost:${PORT}`);
