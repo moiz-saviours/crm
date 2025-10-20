@@ -393,7 +393,10 @@
     });
 
     function initializeChatWithConversation() {
-        socket = io('{{ config('socketio.url') }}');
+        socket = io('{{ config('socketio.url') }}',{
+            transports: ["websocket", "polling"],
+            path: '{{ config('socketio.path') }}',
+        });
 
         socket.emit('join_conversation', conversationId);
 
