@@ -1,16 +1,16 @@
 <style>
-        :root {
-            --primary-color: #1f2832;
-            --secondary-color: #1f2832;
-            --light-color: #fff;
-            --dark-color: #212529;
-            --success-color: #4cc9f0;
-            --gray-color: #6c757d;
-            --light-gray: #e9ecef;
-        }
+    :root {
+        --primary-color: #1f2832;
+        --secondary-color: #1f2832;
+        --light-color: #fff;
+        --dark-color: #212529;
+        --success-color: #4cc9f0;
+        --gray-color: #6c757d;
+        --light-gray: #e9ecef;
+    }
 
     .chat-container {
-        background-color: white;
+        /* background-color: white; */
         border-radius: 3px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         overflow: hidden;
@@ -52,7 +52,7 @@
         flex: 1;
         padding: 20px;
         overflow-y: auto;
-        background-color: var(--bs-card-color);
+        /* background-color: var(--bs-card-color); */
     }
 
     .message {
@@ -84,7 +84,7 @@
 
     .received .message-bubble {
         background-color: white;
-        border: 1px solid var(--bs-primary);;
+        /* border: 1px solid var(--bs-primary); */
         border-bottom-left-radius: 5px;
     }
 
@@ -115,7 +115,7 @@
     .chat-input-container {
         border-top: 1px solid var(--light-gray);
         padding: 4px;
-        background-color: white;
+        /* background-color: white; */
     }
 
     .message-editor {
@@ -151,11 +151,14 @@
         padding: 12px 15px;
         resize: none;
         min-height: 60px;
-        max-height: 120px; /* Optional: set max height */
+        max-height: 120px;
+        /* Optional: set max height */
         outline: none;
         font-family: inherit;
-        overflow-y: auto; /* Show scrollbar when needed */
+        overflow-y: auto;
+        /* Show scrollbar when needed */
     }
+
     .editor-actions {
         display: flex;
         justify-content: space-between;
@@ -197,7 +200,8 @@
     .attachment-preview {
         display: flex;
         padding: 10px 15px;
-        background-color: var(--bs-card-color);;
+        background-color: var(--bs-card-color);
+        ;
         border-top: 1px solid var(--light-gray);
     }
 
@@ -205,7 +209,8 @@
         display: flex;
         align-items: center;
         background-color: white;
-        border: 1px solid var(--bs-primary);;
+        border: 1px solid var(--bs-primary);
+        ;
         border-radius: 3px;
         padding: 5px 10px;
         margin-right: 10px;
@@ -247,126 +252,92 @@
     }
 
     .customer-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--bs-primary);;
-    font-weight: 600;
-    margin-right: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--bs-primary);
+        ;
+        font-weight: 600;
+        margin-right: 12px;
     }
-.message-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: var(--bs-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 600;
-    font-size: 0.8rem;
-    margin: 0 8px;
-    flex-shrink: 0;
-    cursor: pointer;
-    position: relative;
-}
-.received {
-    align-items: flex-start;
-}
 
-.sent {
-    align-items: flex-end;
-}
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--bs-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+        margin: 0 8px;
+        flex-shrink: 0;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .received {
+        align-items: flex-start;
+    }
+
+    .sent {
+        align-items: flex-end;
+    }
 </style>
 <div class="chat-container">
     <!-- Chat Header -->
     <div class="chat-header d-none">
-        <div class="customer-info">
-            <div class="customer-avatar">JD</div>
-            <div>
-                <h5>John Doe</h5>
-                <div class="chat-status">
-                    <span class="status-indicator"></span>
-                    <span>Online</span>
-                </div>
-            </div>
-        </div>
-        <div>
-            <span class="text-light">Customer ID: CUST-12345</span>
-        </div>
+        <!-- Your header content -->
     </div>
-
     <!-- Chat Messages -->
-    <div class="chat-messages">
-        <div class="message received">
-            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
-                    title="JD">JD</div>
-            <div class="message-bubble">
-                <div>Hi there! I wanted to follow up on my order #ORD-789. Has it shipped yet?</div>
-                <div class="message-time">10:15 AM</div>
+<div class="chat-messages" id="chatMessages">
+    @if(isset($conversation) && $conversation->id)
+        <!-- Messages will be loaded dynamically via AJAX -->
+        <div class="text-center py-4 text-muted" id="loadingMessages">
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading messages...</span>
+            </div>
+            Loading messages...
+        </div>
+        
+        <!-- Hidden no messages state -->
+        <div class="d-none" id="noMessagesState">
+            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+                <div class="mb-3">
+                    <i class="fas fa-comment-slash fa-3x text-muted"></i>
+                </div>
+                <h5 class="text-muted mb-3">No Messages Yet</h5>
+                <p class="text-muted mb-4">Send a message to start the conversation</p>
             </div>
         </div>
-
-        <div class="message sent">
-            <div class="message-bubble">
-                <div>Hello John! I've checked your order and it was shipped yesterday. You should receive a
-                    tracking number soon.</div>
-                <div class="message-time">10:18 AM</div>
+    @else
+        <!-- No conversation state -->
+        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4" id="noConversationState">
+            <div class="mb-3">
+                <i class="fas fa-comments fa-3x text-muted"></i>
             </div>
-            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
-                    title="ME">ME</div>
+            <h5 class="text-muted mb-3">No Conversation Started</h5>
+            <p class="text-muted mb-4">Start a new conversation to begin chatting</p>
+            <button class="btn btn-primary" id="startConversationBtn">
+                <i class="fas fa-plus me-2"></i>Start Chatting
+            </button>
         </div>
-
-        <div class="message received">
-            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
-                    title="JD">JD</div>
-            <div class="message-bubble">
-                <div>That's great to hear! I've also attached the screenshot of the issue I mentioned in my
-                    last email.</div>
-                <div class="message-time">10:22 AM</div>
-            </div>
-        </div>
-
-        <div class="message sent">
-            <div class="message-bubble">
-                <div>Thanks for sending that over. I can see the issue now. Our team is working on a fix and
-                    we'll update you by tomorrow.</div>
-                <div class="message-time">10:25 AM</div>
-            </div>
-            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
-                    title="ME">ME</div>
-        </div>
-
-        <div class="message received">
-            <div class="message-avatar" data-bs-toggle="tooltip" data-bs-placement="top"
-                    title="JD">JD</div>
-            <div class="message-bubble">
-                <div>Perfect! Also, I wanted to ask about the warranty on the product I purchased.</div>
-                <div class="message-time">10:30 AM</div>
-            </div>
-        </div>
-    </div>
+    @endif
+</div>
 
     <!-- Attachment Preview -->
-    <div class="attachment-preview d-none">
-        <div class="attachment-item">
-            <i class="fas fa-file-pdf"></i>
-            warranty-info.pdf
-            <span class="remove-attachment"><i class="fas fa-times"></i></span>
-        </div>
-        <div class="attachment-item">
-            <i class="fas fa-file-image"></i>
-            issue-screenshot.png
-            <span class="remove-attachment"><i class="fas fa-times"></i></span>
-        </div>
+    <div class="attachment-preview d-none" id="attachmentPreview">
+        <!-- Attachment preview will be shown here -->
     </div>
 
     <!-- Chat Input -->
-    <div class="chat-input-container">
+    <div class="chat-input-container" id="chatInputContainer" style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
         <div class="message-editor">
             <div class="editor-toolbar">
                 <button title="Bold"><i class="fas fa-bold"></i></button>
@@ -378,224 +349,306 @@
                 <button title="Insert Emoji"><i class="far fa-smile"></i></button>
             </div>
 
-            <textarea class="message-textarea" placeholder="Type your message here..."></textarea>
+            <textarea class="message-textarea" id="messageTextarea" placeholder="Type your message here..."></textarea>
 
             <div class="editor-actions">
                 <div class="attachment-options">
-                    <button class="attachment-btn" title="Attach File">
+                    <button class="attachment-btn" id="attachFileBtn" title="Attach File">
                         <i class="fas fa-paperclip"></i> Attach File
                     </button>
-                    <button class="attachment-btn" title="Insert Image">
+                    <button class="attachment-btn" id="attachImageBtn" title="Insert Image">
                         <i class="fas fa-image"></i> Image
                     </button>
                 </div>
 
-                <button class="send-btn">
+                <button class="send-btn" id="sendButton">
                     Send <i class="fas fa-paper-plane ms-1"></i>
                 </button>
             </div>
         </div>
     </div>
+    
 </div>
+<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+
 <script>
-    // Basic chat functionality
+    // Global variables
+    //todo need to handle customer id
+    const conversationId = {{ $conversation->id ?? 'null' }};
+    const currentUser = {
+        id: {{ auth()->id() }},
+        type: '{{ addslashes(get_class(auth()->user())) }}',
+        name: '{{ addslashes(auth()->user()->name) }}'
+    };
+
+    let socket = null;
+
+    // Initialize based on conversation existence
     document.addEventListener('DOMContentLoaded', function() {
-        const messageTextarea = document.querySelector('.message-textarea');
-        const sendButton = document.querySelector('.send-btn');
-        const chatMessages = document.querySelector('.chat-messages');
-        const attachmentPreview = document.querySelector('.attachment-preview');
-        const removeAttachmentButtons = document.querySelectorAll('.remove-attachment');
-        const attachFileBtn = document.querySelector('.attachment-btn:nth-child(1)');
-        const attachImageBtn = document.querySelector('.attachment-btn:nth-child(2)');
-
-        // Function to add a new message
-function addMessage(content, isSent = true) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-    
-    // Add avatar with Bootstrap tooltip
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = isSent ? 'ME' : 'JD';
-    avatar.setAttribute('data-bs-toggle', 'tooltip');
-    avatar.setAttribute('data-bs-placement', 'top');
-    avatar.setAttribute('title', isSent ? 'You' : 'John Doe');
-    
-    const messageBubble = document.createElement('div');
-    messageBubble.className = 'message-bubble';
-
-    // Create header with time only (no username)
-    const messageHeader = document.createElement('div');
-    messageHeader.className = 'message-header';
-
-    const timeDiv = document.createElement('div');
-    timeDiv.className = 'message-time';
-    const now = new Date();
-    timeDiv.textContent = now.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
+        if (conversationId) {
+            initializeChatWithConversation();
+        } else {
+            initializeNoConversationState();
+        }
     });
 
-    // Add time to header
-    messageHeader.appendChild(timeDiv);
+    function initializeChatWithConversation() {
+        socket = io('{{ config('socketio.url') }}');
+        
+        socket.emit('join_conversation', conversationId);
 
-    const contentDiv = document.createElement('div');
-    contentDiv.textContent = content;
+        loadMessages();
+        initializeChatFunctionality();
 
-    // Add header and content to bubble
-    messageBubble.appendChild(messageHeader);
-    messageBubble.appendChild(contentDiv);
-
-    // Arrange elements based on sent/received
-    if (isSent) {
-        messageDiv.appendChild(messageBubble);
-        messageDiv.appendChild(avatar);
-    } else {
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(messageBubble);
-    }
-    
-    chatMessages.appendChild(messageDiv);
-
-    // Initialize Bootstrap tooltip for the new avatar
-    new bootstrap.Tooltip(avatar);
-
-    // Scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Clear textarea
-    messageTextarea.value = '';
-}
-
-        // Send message on button click
-        sendButton.addEventListener('click', function() {
-            const message = messageTextarea.value.trim();
-            if (message) {
-                addMessage(message, true);
-
-                // Simulate a reply after a short delay
-                setTimeout(() => {
-                    const replies = [
-                        "Thanks for your message!",
-                        "I'll check on that and get back to you.",
-                        "That sounds good to me.",
-                        "Let me verify that information.",
-                        "I appreciate you reaching out."
-                    ];
-                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                    addMessage(randomReply, false);
-                }, 1000);
+        socket.on('new_message', (data) => {
+            if (data.senderable_id !== currentUser.id || data.senderable_type !== currentUser.type) {
+                addNewMessage(data.content, false, data);
             }
         });
+    }
 
-        // Send message on Enter key (but allow Shift+Enter for new line)
+    // When no conversation exists
+    function initializeNoConversationState() {
+        document.getElementById('startConversationBtn').addEventListener('click', function() {
+            startNewConversation();
+        });
+    }
+
+    // Start new conversation
+    function startNewConversation() {
+        const btn = document.getElementById('startConversationBtn');
+        const originalText = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+
+        fetch('{{ route("admin.customer.contact.conversations.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                receiverable_type: 'App\\Models\\CustomerContact',
+                receiverable_id: {{ $customer_contact->id ?? 'null' }}
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('noConversationState').style.display = 'none';
+                
+                document.getElementById('chatInputContainer').style.display = 'block';
+                
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="text-center py-4 text-muted" id="loadingMessages">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading messages...</span>
+                        </div>
+                        Loading messages...
+                    </div>
+                `;
+
+                window.location.reload();
+            } else {
+                throw new Error(data.message || 'Failed to create conversation');
+            }
+        })
+        .catch(error => {
+            console.error('Error creating conversation:', error);
+            alert('Failed to start conversation: ' + error.message);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+    }
+
+    // Load messages via AJAX and render using partial
+    function loadMessages() {
+        fetch(`/admin/customer/contact/conversations/${conversationId}/messages`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingMessages').style.display = 'none';
+                
+                if (data.messages && data.messages.length > 0) {
+                    // Show messages
+                    document.getElementById('chatMessages').innerHTML = data.html;
+                    initializeTooltips();
+                    scrollToBottom();
+                } else {
+                    // Show no messages state
+                    document.getElementById('noMessagesState').classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading messages:', error);
+                document.getElementById('loadingMessages').innerHTML =
+                    '<div class="text-danger">Failed to load messages</div>';
+            });
+    }
+
+    // Initialize Bootstrap tooltips for all avatars
+    function initializeTooltips() {
+        const avatars = document.querySelectorAll('.message-avatar');
+        avatars.forEach(avatar => {
+            new bootstrap.Tooltip(avatar);
+        });
+    }
+
+    // Add new message (for real-time and manual sending)
+    function addNewMessage(content, isSent = true, messageData = null) {
+        const chatMessages = document.getElementById('chatMessages');
+
+        // Hide no messages state if it's visible
+        const noMessagesState = document.getElementById('noMessagesState');
+        if (noMessagesState && !noMessagesState.classList.contains('d-none')) {
+            noMessagesState.classList.add('d-none');
+        }
+        
+        // Remove loading state if it's still there
+        const loadingMessages = document.getElementById('loadingMessages');
+        if (loadingMessages) {
+            loadingMessages.style.display = 'none';
+        }
+
+        // Create message element similar to Blade structure
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+
+        // Avatar setup
+        const avatarText = isSent ? 'ME' : (messageData?.senderable?.name?.substring(0, 2) || 'U');
+        const avatarTitle = isSent ? 'You' : (messageData?.senderable?.name || 'User');
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = avatarText;
+        avatar.setAttribute('data-bs-toggle', 'tooltip');
+        avatar.setAttribute('data-bs-placement', 'top');
+        avatar.setAttribute('title', avatarTitle);
+
+        // Message bubble
+        const messageBubble = document.createElement('div');
+        messageBubble.className = 'message-bubble';
+
+        // Content section
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.textContent = content;
+
+        // Footer section (time, status, etc.)
+        const messageFooter = document.createElement('div');
+        messageFooter.className = 'message-footer';
+
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        const messageTime = messageData ? new Date(messageData.created_at) : new Date();
+        timeDiv.textContent = messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        messageFooter.appendChild(timeDiv);
+
+        // Append content first, then footer
+        messageBubble.appendChild(contentDiv);
+        messageBubble.appendChild(messageFooter);
+
+        // Add attachments if any
+        if (messageData?.attachments && messageData.attachments.length > 0) {
+            const attachmentsDiv = document.createElement('div');
+            attachmentsDiv.className = 'message-attachments mt-2';
+
+            messageData.attachments.forEach(att => {
+                const attachmentItem = document.createElement('div');
+                attachmentItem.className = 'attachment-item small';
+                attachmentItem.innerHTML = `<i class="fas fa-file me-1"></i><span>${att.file_name}</span>`;
+                attachmentsDiv.appendChild(attachmentItem);
+            });
+
+            messageBubble.appendChild(attachmentsDiv);
+        }
+
+        // Arrange message structure (based on direction)
+        if (isSent) {
+            messageDiv.appendChild(messageBubble);
+            messageDiv.appendChild(avatar);
+        } else {
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageBubble);
+        }
+
+        chatMessages.appendChild(messageDiv);
+
+        // Tooltip for avatars
+        new bootstrap.Tooltip(avatar);
+
+        scrollToBottom();
+    }
+
+    // Initialize chat functionality
+    function initializeChatFunctionality() {
+        const messageTextarea = document.getElementById('messageTextarea');
+        const sendButton = document.getElementById('sendButton');
+
+        // Send message function
+        function sendMessage() {
+            const message = messageTextarea.value.trim();
+            if (message) {
+                // Add message locally immediately
+                addNewMessage(message, true);
+
+                // Send to Laravel backend via AJAX
+                fetch('/admin/customer/contact/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            content: message,
+                            conversation_id: conversationId,
+                            message_type: 'text'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Message sent:', data);
+                        if (data.success) {
+                            // Message sent successfully
+                            messageTextarea.value = '';
+                            messageTextarea.style.height = '60px';
+
+                            // Also send via Socket.io for real-time
+                            if (socket) {
+                                socket.emit('send_message', {
+                                    content: message,
+                                    conversation_id: conversationId,
+                                    senderable_type: currentUser.type,
+                                    senderable_id: currentUser.id,
+                                    message_type: 'text'
+                                });
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        alert('Failed to send message');
+                    });
+            }
+        }
+
+        // Send message on button click
+        sendButton.addEventListener('click', sendMessage);
+
+        // Send message on Enter key
         messageTextarea.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendButton.click();
+                sendMessage();
             }
         });
 
-        // Remove attachment
-        removeAttachmentButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                this.closest('.attachment-item').remove();
-
-                // Hide attachment preview if no attachments left
-                if (attachmentPreview.children.length === 0) {
-                    attachmentPreview.style.display = 'none';
-                }
-            });
-        });
-
-        // Formatting buttons (basic implementation)
-        const formattingButtons = document.querySelectorAll('.editor-toolbar button');
-        formattingButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // In a real implementation, this would apply formatting to selected text
-                alert('Formatting feature would be implemented in a full version');
-            });
-        });
-
-        // Attachment functionality
-        attachFileBtn.addEventListener('click', function() {
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = '.pdf,.doc,.docx,.txt';
-            fileInput.style.display = 'none';
-            document.body.appendChild(fileInput);
-
-            fileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    const file = this.files[0];
-                    addAttachment(file.name, 'file');
-                }
-                document.body.removeChild(fileInput);
-            });
-
-            fileInput.click();
-        });
-
-        attachImageBtn.addEventListener('click', function() {
-            const imageInput = document.createElement('input');
-            imageInput.type = 'file';
-            imageInput.accept = 'image/*';
-            imageInput.style.display = 'none';
-            document.body.appendChild(imageInput);
-
-            imageInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    const file = this.files[0];
-                    addAttachment(file.name, 'image');
-                }
-                document.body.removeChild(imageInput);
-            });
-
-            imageInput.click();
-        });
-
-        function addAttachment(filename, type) {
-            // Show attachment preview if hidden
-            if (attachmentPreview.style.display === 'none') {
-                attachmentPreview.style.display = 'flex';
-            }
-
-            const attachmentItem = document.createElement('div');
-            attachmentItem.className = 'attachment-item';
-
-            const icon = document.createElement('i');
-            icon.className = type === 'image' ? 'fas fa-file-image' : 'fas fa-file-pdf';
-
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = filename;
-
-            const removeBtn = document.createElement('span');
-            removeBtn.className = 'remove-attachment';
-            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-
-            attachmentItem.appendChild(icon);
-            attachmentItem.appendChild(nameSpan);
-            attachmentItem.appendChild(removeBtn);
-
-            attachmentPreview.appendChild(attachmentItem);
-
-            // Add event listener to the new remove button
-            removeBtn.addEventListener('click', function() {
-                attachmentItem.remove();
-
-                // Hide attachment preview if no attachments left
-                if (attachmentPreview.children.length === 0) {
-                    attachmentPreview.style.display = 'none';
-                }
-            });
-        }
-
-        // Auto-expand textarea based on content
+        // Auto-expand textarea
         messageTextarea.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
-            
-            // Optional: Limit max height and show scrollbar
+
             if (this.scrollHeight > 120) {
                 this.style.height = '120px';
                 this.style.overflowY = 'auto';
@@ -603,11 +656,11 @@ function addMessage(content, isSent = true) {
                 this.style.overflowY = 'hidden';
             }
         });
+    }
 
-        // Reset height when message is sent
-        sendButton.addEventListener('click', function() {
-            messageTextarea.style.height = '60px';
-            messageTextarea.style.overflowY = 'hidden';
-        });
-    });
+    // Scroll to bottom of chat
+    function scrollToBottom() {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 </script>
