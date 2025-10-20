@@ -28,15 +28,15 @@ io.on('connection', (socket) => {
             const messageData = {
                 id: Date.now(),
                 content: data.content,
-                senderable_type: data.senderable_type,
-                senderable_id: data.senderable_id,
+                sender_type: data.sender_type,
+                sender_id: data.sender_id,
                 conversation_id: data.conversation_id,
                 message_type: data.message_type || 'text',
                 status: 'sent',
                 created_at: new Date().toISOString(),
                 attachments: data.attachments || []
             };
-
+            console.log('New message:', messageData);
             // Broadcast to all users in the conversation
             io.to(`conversation_${data.conversation_id}`).emit('new_message', messageData);
             console.log('Message sent to conversation:', data.conversation_id);

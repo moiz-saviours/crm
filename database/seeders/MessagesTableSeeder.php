@@ -29,10 +29,10 @@ class MessagesTableSeeder extends Seeder
                     }
 
                     Conversation::create([
-                        'senderable_id' => $senderId,
-                        'senderable_type' => Admin::class,
-                        'receiverable_id' => $receiverId,
-                        'receiverable_type' => Admin::class,
+                        'sender_id' => $senderId,
+                        'sender_type' => Admin::class,
+                        'receiver_id' => $receiverId,
+                        'receiver_type' => Admin::class,
                         'conversation_status' => 'approved',
                         'status' => true,
                     ]);
@@ -49,8 +49,8 @@ class MessagesTableSeeder extends Seeder
 
                 $message = Message::create([
                     'conversation_id' => $conversation->id,
-                    'senderable_id' => $senderId,
-                    'senderable_type' => Admin::class,
+                    'sender_id' => $senderId,
+                    'sender_type' => Admin::class,
                     'content' => 'Admin message: ' . Str::random(20),
                     'message_type' => ['text', 'image', 'video', 'audio', 'file', 'system'][array_rand(['text', 'image', 'video', 'audio', 'file', 'system'])],
                     'message_status' => ['sent', 'delivered', 'seen', 'failed'][array_rand(['sent', 'delivered', 'seen', 'failed'])],

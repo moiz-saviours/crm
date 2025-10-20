@@ -16,11 +16,11 @@ class Conversation extends Model
         'status'
     ];
 
-    public function senderable()
+    public function sender()
     {
         return $this->morphTo();
     }
-    public function receiverable()
+    public function receiver()
     {
         return $this->morphTo();
     }
