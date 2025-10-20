@@ -170,7 +170,6 @@ class LeadController extends Controller
      */
     public function update(Request $request, Lead $lead)
     {
-        DB::beginTransaction();
         try {
             $validator = Validator::make($request->all(), [
                 'brand_key' => 'nullable|integer',
@@ -190,7 +189,8 @@ class LeadController extends Controller
             if ($validator->fails()) {
                 return response()->json(['errors' => $validator->errors()], 422);
             }
-            $customer_contact = CustomerContact::firstOrCreate(
+            DB::beginTransaction();
+            $customer_contact = CustomerContact::firstOrNew(
                 ['email' => $request->input('email')],
                 [
                     'brand_key' => $request->input('brand_key'),
