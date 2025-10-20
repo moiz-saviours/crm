@@ -230,7 +230,7 @@ class LeadController extends Controller
             $lead->update($updateData);
             DB::commit();
             $lead->loadMissing(['customer_contact' => function ($query) {
-                $query->withTrashed()->select('special_key', 'name');
+                $query->withTrashed()->select('id','special_key', 'name');
             }], 'brand', 'team', 'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
