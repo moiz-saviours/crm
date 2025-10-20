@@ -189,7 +189,7 @@ class LeadController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
             DB::beginTransaction();
-            $customer_contact = CustomerContact::firstOrNew(
+            $customer_contact = CustomerContact::withTrashed()->firstOrNew(
                 ['email' => $request->input('email')],
                 [
                     'brand_key' => $request->input('brand_key'),
