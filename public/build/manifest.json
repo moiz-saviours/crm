@@ -36,12 +36,12 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-D3FZ32Rz.css",
+    "file": "assets/app-CY8S3X91.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/Pages/Board.jsx": {
-    "file": "assets/Board-s8_BeQzu.js",
+    "file": "assets/Board-CA-1eY9z.js",
     "name": "Board",
     "src": "resources/js/Pages/Board.jsx",
     "isDynamicEntry": true,
@@ -51,7 +51,7 @@
     ]
   },
   "resources/js/Pages/BoardCard.jsx": {
-    "file": "assets/BoardCard-Dxn4nQiX.js",
+    "file": "assets/BoardCard-D6sanExb.js",
     "name": "BoardCard",
     "src": "resources/js/Pages/BoardCard.jsx",
     "isDynamicEntry": true,
@@ -61,7 +61,7 @@
     ]
   },
   "resources/js/Pages/BoardList.jsx": {
-    "file": "assets/BoardList-znlS8ihn.js",
+    "file": "assets/BoardList-CXZ5jiId.js",
     "name": "BoardList",
     "src": "resources/js/Pages/BoardList.jsx",
     "isDynamicEntry": true,
@@ -72,7 +72,7 @@
     ]
   },
   "resources/js/Pages/CardDetail.jsx": {
-    "file": "assets/CardDetail-DHkhk7fB.js",
+    "file": "assets/CardDetail-NVAYuxfE.js",
     "name": "CardDetail",
     "src": "resources/js/Pages/CardDetail.jsx",
     "isDynamicEntry": true,
@@ -85,7 +85,7 @@
     ]
   },
   "resources/js/Pages/Index.jsx": {
-    "file": "assets/Index-ByM1bQlb.js",
+    "file": "assets/Index-CcEPvjHk.js",
     "name": "Index",
     "src": "resources/js/Pages/Index.jsx",
     "isDynamicEntry": true,
@@ -110,7 +110,7 @@
     ]
   },
   "resources/js/react-app.jsx": {
-    "file": "assets/react-app-AFMcx8yv.js",
+    "file": "assets/react-app-Du2G3QDX.js",
     "name": "react-app",
     "src": "resources/js/react-app.jsx",
     "isEntry": true,
@@ -125,7 +125,7 @@
       "resources/js/Pages/Index.jsx"
     ],
     "css": [
-      "assets/react-app-DPHS2v6M.css"
+      "assets/react-app-BlE9MZzw.css"
     ],
     "assets": [
       "assets/fa-brands-400-D_cYUPeE.woff2",

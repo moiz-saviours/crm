@@ -1,4 +1,4 @@
-import{r as se,j as h}from"./react-app-AFMcx8yv.js";import $e from"./BoardCard-Dxn4nQiX.js";import"./bootstrap-BA2Cz7cT.js";/**!
+import{r as se,j as h}from"./react-app-Du2G3QDX.js";import $e from"./BoardCard-D6sanExb.js";import"./bootstrap-BA2Cz7cT.js";/**!
  * Sortable 1.15.6
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
