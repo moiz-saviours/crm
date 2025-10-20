@@ -271,11 +271,11 @@ use App\Models\CustomerContact;
 Route::get('/customer/chat/{customer_contact:special_key}', function (CustomerContact $customer_contact) {
     // Find conversation for this customer
     $conversation = Conversation::where(function($query) use ($customer_contact) {
-            $query->where('senderable_type', 'App\Models\CustomerContact')
-                  ->where('senderable_id', $customer_contact->id);
+            $query->where('sender_type', 'App\Models\CustomerContact')
+                  ->where('sender_id', $customer_contact->id);
         })->orWhere(function($query) use ($customer_contact) {
-            $query->where('receiverable_type', 'App\Models\CustomerContact')
-                  ->where('receiverable_id', $customer_contact->id);
+            $query->where('receiver_type', 'App\Models\CustomerContact')
+                  ->where('receiver_id', $customer_contact->id);
         })->first();
 
     if (!$conversation) {
@@ -302,11 +302,11 @@ Route::post('/customer/chat/{customer_contact:special_key}/message', function (R
 
     // Find conversation for this customer
     $conversation = Conversation::where(function($query) use ($customer_contact) {
-            $query->where('senderable_type', 'App\Models\CustomerContact')
-                  ->where('senderable_id', $customer_contact->id);
+            $query->where('sender_type', 'App\Models\CustomerContact')
+                  ->where('sender_id', $customer_contact->id);
         })->orWhere(function($query) use ($customer_contact) {
-            $query->where('receiverable_type', 'App\Models\CustomerContact')
-                  ->where('receiverable_id', $customer_contact->id);
+            $query->where('receiver_type', 'App\Models\CustomerContact')
+                  ->where('receiver_id', $customer_contact->id);
         })->first();
 
     if (!$conversation) {
@@ -316,8 +316,8 @@ Route::post('/customer/chat/{customer_contact:special_key}/message', function (R
     // Create message from customer
     $message = Message::create([
         'conversation_id' => $conversation->id,
-        'senderable_type' => 'App\Models\CustomerContact',
-        'senderable_id' => $customer_contact->id,
+        'sender_type' => 'App\Models\CustomerContact',
+        'sender_id' => $customer_contact->id,
         'content' => $request->content,
         'message_type' => $request->message_type ?? 'text',
         'message_status' => 'sent'
@@ -336,11 +336,11 @@ Route::post('/customer/chat/{customer_contact:special_key}/message', function (R
 Route::get('/customer/chat/{customer_contact:special_key}/messages', function (CustomerContact $customer_contact) {
     // Find conversation for this customer
     $conversation = Conversation::where(function($query) use ($customer_contact) {
-            $query->where('senderable_type', 'App\Models\CustomerContact')
-                  ->where('senderable_id', $customer_contact->id);
+            $query->where('sender_type', 'App\Models\CustomerContact')
+                  ->where('sender_id', $customer_contact->id);
         })->orWhere(function($query) use ($customer_contact) {
-            $query->where('receiverable_type', 'App\Models\CustomerContact')
-                  ->where('receiverable_id', $customer_contact->id);
+            $query->where('receiver_type', 'App\Models\CustomerContact')
+                  ->where('receiver_id', $customer_contact->id);
         })->first();
 
     if (!$conversation) {

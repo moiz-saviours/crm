@@ -12,8 +12,8 @@ class Message extends Model
 
     protected $fillable = [
         'conversation_id',
-        'senderable_id',
-        'senderable_type',
+        'sender_id',
+        'sender_type',
         'reply_to',
         'content',
         'message_type',

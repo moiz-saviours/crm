@@ -20,16 +20,16 @@ return new class extends Migration
                 ->on('projects')
                 ->onDelete('NO ACTION');
 
-            $table->unsignedBigInteger('memberable_id')->nullable()->default(null);
-            $table->string('memberable_type')->nullable()->default(null);
+            $table->nullableMorphs('member');
 
-            $table->string('role', 100)->nullable()->default(null);
+            $table->string('role')->nullable()->default(null);
             $table->boolean('is_active')->nullable()->default(true);
 
+            $table->softDeletes();
             $table->timestamps();
 
             $table->unique(
-                ['project_id', 'memberable_id', 'memberable_type'],
+                ['project_id'],
                 'unique_project_member'
             );
         });

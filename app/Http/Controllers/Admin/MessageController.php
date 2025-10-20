@@ -51,8 +51,8 @@ class MessageController extends Controller
         // Create message
         $message = Message::create([
             'conversation_id' => $request->conversation_id,
-            'senderable_type' => get_class(auth()->user()),
-            'senderable_id' => auth()->id(),
+            'sender_type' => get_class(auth()->user()),
+            'sender_id' => auth()->id(),
             'content' => $request->content,
             'message_type' => $request->message_type,
             'message_status' => 'sent'
@@ -72,16 +72,15 @@ class MessageController extends Controller
     {
         //todo need to handle agent can only send meesage to assign customer
         $request->validate([
-            'receiverable_type' => 'required|string',
-            'receiverable_id' => 'required|integer'
+            'receiver_id' => 'required|integer'
         ]);
 
         // Check if conversation already exists
         $existingConversation = Conversation::where([
-            'senderable_type' => get_class(auth()->user()),
-            'senderable_id' => auth()->id(),
-            'receiverable_type' => $request->receiverable_type,
-            'receiverable_id' => $request->receiverable_id,
+            'sender_type' => get_class(auth()->user()),
+            'sender_id' => auth()->id(),
+            'receiver_type' => 'App\Models\CustomerContact',
+            'receiver_id' => $request->receiver_id,
         ])->first();
 
         if ($existingConversation) {
@@ -94,10 +93,10 @@ class MessageController extends Controller
 
         // Create new conversation
         $conversation = Conversation::create([
-            'senderable_type' => get_class(auth()->user()),
-            'senderable_id' => auth()->id(),
-            'receiverable_type' => $request->receiverable_type,
-            'receiverable_id' => $request->receiverable_id,
+            'sender_type' => get_class(auth()->user()),
+            'sender_id' => auth()->id(),
+            'receiver_type' => 'App\Models\CustomerContact',
+            'receiver_id' => $request->receiver_id,
             'conversation_status' => 'approved'
         ]);
 

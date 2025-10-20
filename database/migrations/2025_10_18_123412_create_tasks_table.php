@@ -20,15 +20,16 @@ return new class extends Migration
                 ->on('projects')
                 ->onDelete('NO ACTION');
 
-            $table->string('special_key', 100)->unique()->nullable()->default(null);
+            $table->string('special_key')->unique()->nullable()->default(null);
 
             $table->enum('task_status', ['isprogress', 'on hold', 'cancelled', 'finished'])
                 ->default('isprogress');
-            $table->string('label', 50)->nullable()->default(null);
+            $table->string('label')->nullable()->default(null);
 
             $table->text('description')->nullable()->default(null);
-            $table->boolean('status')->default(true);
-
+            $table->nullableMorphs('creator');
+            $table->integer('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

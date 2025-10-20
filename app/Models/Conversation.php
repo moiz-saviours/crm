@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Conversation extends Model
 {
     protected $fillable = [
-        'senderable_id',
-        'senderable_type',
-        'receiverable_id',
-        'receiverable_type',
+        'sender_id',
+        'sender_type',
+        'receiver_id',
+        'receiver_type',
         'conversation_status',
         'last_message_id',
         'status'

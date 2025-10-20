@@ -429,8 +429,7 @@
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                receiverable_type: 'App\\Models\\CustomerContact',
-                receiverable_id: {{ $customer_contact->id ?? 'null' }}
+                receiver_id: {{ $customer_contact->id ?? 'null' }}
             })
         })
         .then(response => response.json())

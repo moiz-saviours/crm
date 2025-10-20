@@ -28,8 +28,8 @@ class Project extends Model
         'description',
         'is_notify',
         'progress',
-        'created_morph_id',
-        'created_morph_type',
+        'creator_id',
+        'creator_type',
         'status',
     ];
 

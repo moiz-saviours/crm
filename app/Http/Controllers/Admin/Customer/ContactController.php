@@ -572,15 +572,15 @@ private function formatEmailForTimeline(Email $email)
         
         // ADD THIS: Get or create conversation with the customer contact
         $conversation = Conversation::where([
-            'senderable_type' => get_class(auth()->user()),
-            'senderable_id' => auth()->id(),
-            'receiverable_type' => get_class($customer_contact),
-            'receiverable_id' => $customer_contact->id,
+            'sender_type' => get_class(auth()->user()),
+            'sender_id' => auth()->id(),
+            'receiver_type' => 'App\Models\CustomerContact',
+            'receiver_id' => $customer_contact->id,
         ])->orWhere([
-            'senderable_type' => get_class($customer_contact),
-            'senderable_id' => $customer_contact->id,
-            'receiverable_type' => get_class(auth()->user()),
-            'receiverable_id' => auth()->id(),
+            'sender_type' => get_class($customer_contact),
+            'sender_id' => $customer_contact->id,
+            'receiver_type' => 'App\Models\CustomerContact',
+            'receiver_id' => auth()->id(),
         ])->first();
 
         

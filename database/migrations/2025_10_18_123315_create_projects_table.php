@@ -48,11 +48,10 @@ return new class extends Migration
             $table->text('description')->nullable()->default(null);
             $table->boolean('is_notify')->nullable()->default(true);
 
-            $table->nullableMorphs('created_morph');
-            $table->boolean('status')->default(true);
-
+            $table->nullableMorphs('creator');
+            $table->integer('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
+            $table->softDeletes();
             $table->timestamps();
-            $table->softDeletes()->comment('Soft delete support for project recovery');
         });
     }
 

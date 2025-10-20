@@ -20,8 +20,7 @@ return new class extends Migration
                 ->on('conversations')
                 ->onDelete('NO ACTION');
 
-            $table->unsignedBigInteger('senderable_id');
-            $table->string('senderable_type');
+            $table->nullableMorphs('sender');
 
             $table->unsignedBigInteger('reply_to')->nullable()->default(null);
             $table->foreign('reply_to')
@@ -35,13 +34,11 @@ return new class extends Migration
 
             $table->enum('message_status', ['sent', 'delivered', 'seen', 'failed'])
                 ->default('sent');
-            $table->boolean('status')->default(true);
             $table->timestamp('edited_at')->nullable();
-
+            $table->integer('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
             $table->softDeletes();
             $table->timestamps();
 
-            $table->index(['senderable_id', 'senderable_type']);
         });
 
         Schema::table('conversations', function (Blueprint $table) {

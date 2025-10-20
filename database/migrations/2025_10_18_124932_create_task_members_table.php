@@ -20,18 +20,17 @@ return new class extends Migration
                 ->on('tasks')
                 ->onDelete('CASCADE');
 
-            $table->unsignedBigInteger('memberable_id')->nullable()->default(null);
-            $table->string('memberable_type')->nullable()->default(null);
+            $table->nullableMorphs('member');
 
             $table->string('role', 100)->nullable()->default(null);
             $table->boolean('is_active')->nullable()->default(true);
 
+            $table->nullableMorphs('creator');
+            $table->softDeletes();
             $table->timestamps();
 
-            $table->unique(
-                ['task_id', 'memberable_id', 'memberable_type'],
-                'unique_task_member'
-            );
+            $table->unique(['task_id'],'unique_task_member');
+
         });
     }
 

@@ -8,8 +8,8 @@ class TaskMember extends Model
 {
     protected $fillable = [
         'task_id',
-        'memberable_id',
-        'memberable_type',
+        'member_id',
+        'member_type',
         'role',
         'is_active',
     ];

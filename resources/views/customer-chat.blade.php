@@ -435,7 +435,7 @@
         chatMessages.innerHTML = '';
 
         messages.forEach(message => {
-            const isSent = message.senderable_type === 'App\\Models\\CustomerContact';
+            const isSent = message.sender_type === 'App\\Models\\CustomerContact';
             addMessageToChat(message.content, isSent, message);
         });
 
@@ -539,8 +539,8 @@
                         socket.emit('send_message', {
                             content: message,
                             conversation_id: conversationId,
-                            senderable_type: 'App\\Models\\CustomerContact',
-                            senderable_id: customer.id,
+                            sender_type: 'App\\Models\\CustomerContact',
+                            sender_id: customer.id,
                             message_type: 'text'
                         });
                     }
@@ -580,7 +580,7 @@
     // Socket.io event listeners
     socket.on('new_message', (data) => {
         // Check if message is from support team (not customer)
-        if (data.senderable_type !== 'App\\Models\\CustomerContact') {
+        if (data.sender_type !== 'App\\Models\\CustomerContact') {
             addMessageToChat(data.content, false, data);
         }
     });
