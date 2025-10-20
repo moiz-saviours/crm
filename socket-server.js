@@ -4,24 +4,82 @@ import { Server } from 'socket.io';
 const ENV = process.env.APP_ENV || 'local';
 const PORT = process.env.SOCKETIO_PORT || 6001;
 
-let allowedOrigins = [];
-let socketPath = '/socket.io/';
-switch (ENV) {
-    case 'production':
-        allowedOrigins = ['*'];
-        socketPath = '/socket.io/';
-        break;
+const getSocketConfig = () => {
+    const appUrl = process.env.APP_URL;
+    let allowedOrigins = [];
 
-    case 'development':
-        allowedOrigins = ['*'];
+    if (appUrl) {
+        allowedOrigins.push(appUrl);
+        try {
+            const url = new URL(appUrl);
+
+            if (ENV === 'development' && url.pathname.includes('/crm-development')) {
+                const baseOrigin = `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`;
+                allowedOrigins.push(
+                    baseOrigin,
+                    `${baseOrigin}/`,
+                    appUrl,
+                    `${appUrl}/`
+                );
+            }
+            else if (ENV === 'production') {
+                allowedOrigins.push(
+                    `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}`,
+                    `${url.protocol}//${url.hostname}${url.port ? ':' + url.port : ''}/`,
+                    appUrl.endsWith('/') ? appUrl.slice(0, -1) : appUrl + '/'
+                );
+
+                if (!url.hostname.startsWith('www.')) {
+                    const wwwUrl = `${url.protocol}//www.${url.hostname}${url.port ? ':' + url.port : ''}`;
+                    allowedOrigins.push(wwwUrl, `${wwwUrl}/`);
+                }
+            }
+        } catch (error) {
+            console.warn('Invalid APP_URL:', appUrl);
+        }
+    }
+    switch (ENV) {
+        case 'local':
+            allowedOrigins = [
+                'http://localhost:8000',
+                'http://127.0.0.1:8000',
+                'http://localhost:3000',
+                'http://127.0.0.1:3000'
+            ];
+            break;
+
+        case 'development':
+            allowedOrigins.push(
+                'http://localhost:8000',
+                'http://127.0.0.1:8000',
+                'http://localhost:3000',
+                'http://127.0.0.1:3000'
+            );
+            break;
+    }
+
+    allowedOrigins = [...new Set(allowedOrigins.filter(origin => origin && origin.trim()))];
+
+    console.log('🔧 Socket.IO Configuration:');
+    console.log('📍 Environment:', ENV);
+    console.log('📍 APP_URL:', appUrl);
+    console.log('📍 Allowed origins:', allowedOrigins);
+
+    let socketPath = '/socket.io/';
+    if (ENV === 'development' && appUrl && appUrl.includes('/crm-development')) {
         socketPath = '/crm-development/socket.io/';
-        break;
+    }
 
-    default: // local
-        allowedOrigins = ['*'];
-        socketPath = '/socket.io/';
-        break;
-}
+    return {
+        cors: {
+            origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+            methods: ["GET", "POST"],
+            credentials: true,
+            allowedHeaders: ["Content-Type", "Authorization"]
+        },
+        path: socketPath
+    };
+};
 const server = createServer();
 const io = new Server(server, {
     cors: {
