@@ -30,9 +30,11 @@
         left: 0;
         bottom: 0;
     }
-    .choices__list .is-selected{
-        background-color:#ebebeb;
+
+    .choices__list .is-selected {
+        background-color: #ebebeb;
     }
+
     .is-invalid {
         background-color: #f8d7da85;
     }
@@ -159,7 +161,7 @@
     }
 
     .dt-buttons .btn.btn-secondary span:hover {
-        color: #fff;
+        color: var(--bs-primary);
     }
 
     /** Status */
@@ -178,7 +180,7 @@
     }
 
     .status-toggle:checked {
-        background-color: #8392ab;
+        background-color: var(--bs-primary);
     }
 
     .status-toggle::before {
@@ -200,9 +202,11 @@
     .table > :not(caption) > * > * {
         /*padding: .5rem .5rem;*/
     }
+
     button.btn.btn-sm {
         /*padding: 0px;*/
     }
+
     .table a {
         text-decoration: underline;
     }

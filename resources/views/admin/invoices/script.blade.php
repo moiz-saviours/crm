@@ -287,7 +287,7 @@
                                 `<td class="align-middle text-center text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
-                                                          title="Show transaction logs"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top" title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
                         <td class="align-middle text-center text-nowrap">
@@ -324,10 +324,10 @@
                                                             data-id="${id}"
                                                             data-invoice-key="${invoice_key}"
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
-                                                            title="Copy Invoice Url"><i
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
-                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
-                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
+                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
+                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
                                     : ''}
                         </td>`;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
@@ -403,7 +403,7 @@
                                 table.cell(index, 1).data(`
                                     <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
-                                                          title="Show transaction logs"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top" title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                                 `).draw();
                             }
@@ -475,14 +475,14 @@
                             // Column 12: Actions
                             let actionsHtml = '';
                             if (brand) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
                             }
                             if (payment_attachments && payment_attachments.length > 0) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> `;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> `;
                             }
                             if (status != 1) {
-                                actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
-                                                <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
+                                actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
                             }
                             if (normalizeHtml(decodeHtml(rowData[10])) !== normalizeHtml(actionsHtml)) {
                                 table.cell(index, 10).data(actionsHtml).draw();
@@ -771,7 +771,7 @@
         {{--                const dropdownHtml = `--}}
         {{--                            <div class="form-group mb-3">--}}
         {{--                                <label for="merchant_select_${type}" class="form-label">Select Merchant</label>--}}
-        {{--                                <select class="form-control form-select" id="merchant_select_${type}" name="merchants[${type}]" title="Please select a ${type} merchant" required>--}}
+        {{--                                <select class="form-control form-select" id="merchant_select_${type}" name="merchants[${type}]" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a ${type} merchant" required>--}}
         {{--                                    <option value="" selected disabled>Please select a ${type} merchant</option>--}}
         {{--                                    ${merchant_types[type].map(merchant => `--}}
         {{--                                        <option value="${merchant.id}">${merchant.name}</option>--}}
@@ -849,7 +849,7 @@
                                     const dropdownHtml = `
                                     <div class="form-group mb-3">
                                         <label for="merchant_select_${safeType}" class="form-label">Select Merchant</label>
-                                        <select class="form-control form-select" id="merchant_select_${safeType}" name="merchants[${type}]" title="Please select a ${type} merchant" required>
+                                        <select class="form-control form-select" id="merchant_select_${safeType}" name="merchants[${type}]" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a ${type} merchant" required>
                                             <option value="" selected disabled>Please select a ${type} merchant</option>
                                             ${merchant_types[type].map(merchant => `
                                                 <option value="${merchant.id}">${merchant.name} ( Limit : ${merchant.limit} ) </option>

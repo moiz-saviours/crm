@@ -229,8 +229,8 @@
         {{--                        <td class="align-middle text-center text-nowrap"></td>--}}
         {{--                        <td class="align-middle text-center text-nowrap">${index}</td>--}}
         {{--                        <td class="align-middle text-center text-nowrap">--}}
-        {{--                            <object data="${logoUrl}" class="avatar avatar-sm me-3"  title="${name}">--}}
-        {{--                                <img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">--}}
+        {{--                            <object data="${logoUrl}" class="avatar avatar-sm me-3"  data-bs-toggle="tooltip" data-bs-placement="top" title="${name}">--}}
+        {{--                                <img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="${name}">--}}
         {{--                            </object>--}}
         {{--                        </td>--}}
         {{--                        <td class="align-middle text-center text-nowrap">${brand_key}</td>--}}
@@ -240,10 +240,10 @@
         {{--                            <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status === 1 ? 'checked' : ''} data-bs-toggle="toggle">--}}
         {{--                        </td>--}}
         {{--                        <td class="align-middle text-center table-actions">--}}
-        {{--                            <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">--}}
+        {{--                            <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">--}}
         {{--                                <i class="fas fa-edit"></i>--}}
         {{--                            </button>--}}
-        {{--                            <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">--}}
+        {{--                            <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">--}}
         {{--                                <i class="fas fa-trash"></i>--}}
         {{--                            </button>--}}
         {{--                        </td>--}}
@@ -331,17 +331,17 @@
         {{--                const columns = [--}}
         {{--                    null,--}}
         {{--                    index,--}}
-        {{--                    `<object data="${logoUrl}" class="avatar avatar-sm me-3"  title="${name}">--}}
-        {{--                                <img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">--}}
+        {{--                    `<object data="${logoUrl}" class="avatar avatar-sm me-3"  data-bs-toggle="tooltip" data-bs-placement="top" title="${name}">--}}
+        {{--                                <img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3" data-bs-toggle="tooltip" data-bs-placement="top" title="${name}">--}}
         {{--                            </object>`,--}}
         {{--                    brand_key,--}}
         {{--                    name,--}}
         {{--                    url,--}}
         {{--                    `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`,--}}
-        {{--                    ` <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">--}}
+        {{--                    ` <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">--}}
         {{--                                <i class="fas fa-edit"></i>--}}
         {{--                            </button>--}}
-        {{--                            <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">--}}
+        {{--                            <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">--}}
         {{--                                <i class="fas fa-trash"></i>--}}
         {{--                            </button>`--}}
         {{--                ];--}}

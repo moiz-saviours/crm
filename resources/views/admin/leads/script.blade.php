@@ -193,11 +193,11 @@
                             const converted = lead_status != 'Converted' && !customer_contact;
                             const columns = `
                                 <td class="align-middle text-left text-nowrap"></td>
-                                <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}</td>
+                                <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}</td>
                                 <td class="align-middle text-left text-nowrap">
-                                    ${brand ? `<a href="{{route('admin.brand.index')}}">${makeAcronym(brand.name)}</a>` : ''}
+                                    ${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}
                                 </td>
-                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : ''}</td>
+                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}</td>
                                 <td class="align-middle text-left text-nowrap">${date}</td>
                                 <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
                                 <td class="align-middle text-left text-nowrap">${country}</td>
@@ -206,14 +206,14 @@
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
                                 <td class="align-middle text-left table-actions">
-                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
+                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
-                                            title="Convert to Customer">
+.                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
                                         <i class="fas fa-user-check"></i>
                                     </button>
                                 </td>
@@ -248,17 +248,17 @@
                             const rowData = table.row(index).data();
 
                             // Column 2: Name
-                            if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`) {
-                                table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : name}`).draw();
+                            if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`) {
+                                table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`).draw();
                             }
                             // Column 3: Brand
-                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a>` : ''}`) {
-                                table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}">${makeAcronym(brand.name)}</a>` : ''}`).draw();
+                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : ''}`) {
+                                table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}`).draw();
                             }
 
                             // Column 4: Team
-                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : ''}`) {
-                                table.cell(index, 3).data(`${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : ''}`).draw();
+                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('admin.team.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`) {
+                                table.cell(index, 3).data(`${team ? `<a href="{{route('admin.team.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`).draw();
                             }
 
                             // Column 5: Created Date
@@ -310,14 +310,14 @@
                             } else {
                                 const converted = lead_status.name != 'Converted' && !customer_contact;
                                 const actionsHtml = `
-                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
+                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
-                                            title="Convert to Customer">
+                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
                                         <i class="fas fa-user-check"></i>
                                     </button>
                                 `;
@@ -408,8 +408,8 @@
                         $(`#tr-${lead.id} .convertBtn`).removeClass('convertBtn').addClass('disabled').removeAttr('data-id');
                         const index = table.row($('#tr-' + lead.id)).index();
                         const rowData = table.row(index).data();
-                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : lead.name}`) {
-                            table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}">${customer_contact.name}</a>` : lead.name}`).draw();
+                        if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`) {
+                            table.cell(index, 1).data(`${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`).draw();
                         }
                         if (decodeHtml(rowData[5]) !== 'Converted') {
                             table.cell(index, 5).data(lead_status.name).draw();

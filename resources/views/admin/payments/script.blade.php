@@ -217,7 +217,7 @@
                         `;
 
                             // <td class="align-middle text-center table-actions">
-                            //     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
+                            //     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                             //         <i class="fas fa-edit"></i>
                             //     </button>
                             // </td>

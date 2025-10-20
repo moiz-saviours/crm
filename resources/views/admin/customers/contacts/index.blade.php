@@ -21,7 +21,7 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="customer_contact_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="customer_contact_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createcustomer">Create New</button>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i>
 
                             </li>
-                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-contacttitle" data-toggle="tooltip" title="Take a Tour" data-tour="customer_contact"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-contacttitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="customer_contact"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">

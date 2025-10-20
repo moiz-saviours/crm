@@ -128,6 +128,10 @@
     @endif
 
 
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
     const userSettings = @json(auth()->user()->settings ?? []);
     document.addEventListener('DOMContentLoaded', function () {
         const settings = userSettings;
@@ -1014,7 +1018,6 @@
             if (!string) return '---';
             return string.length > limit ? string.substring(0, limit) + end : string;
         }
-
     });
     !function () {
         document.currentScript?.remove()

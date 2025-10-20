@@ -42,7 +42,7 @@
                     <label for="brand_key" class="form-label">Brand</label>
                     <select class="form-control select2 searchable tour-invoicecreatebrand unique-select-2" id="brand_key"
                             name="brand_key"
-                            title="Please select a brand" required autocomplete="off">
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a brand" required autocomplete="off">
                         <option value="" selected disabled>Please select brand</option>
                         @foreach($brands as $brand)
                             <option value="{{ $brand->brand_key }}">{{ $brand->name }}</option>
@@ -55,7 +55,7 @@
                 <div class="form-group mb-3">
                     <label for="team_key" class="form-label">Team</label>
                     <select class="form-control searchable tour-invoicecreateteam unique-select-2" id="team_key" name="team_key"
-                            title="Please select a team">
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a team">
                         <option value="" selected disabled>Please select team</option>
                         @foreach($teams as $team)
                             <option
@@ -72,7 +72,7 @@
                 <div class="form-group mb-3">
                     <label for="type" class="form-label">Type</label>
                     <select class="form-control tour-invoiceusertype" id="type" name="type"
-                            title="Please select customer type" required>
+                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
                         <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>
                     </select>
@@ -128,7 +128,7 @@
 
                 <div class="form-group mb-3">
                     <label for="agent_id" class="form-label">Agent</label>
-                    <select class="form-control searchable tour-invoiceagentselect unique-select-2" id="agent_id" name="agent_id" title="Please select agent">
+                    <select class="form-control searchable tour-invoiceagentselect unique-select-2" id="agent_id" name="agent_id" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select agent">
                         <option value="" >Select Agent</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}" {{ old('agent_id') == $user->id ? 'selected' : '' }}>

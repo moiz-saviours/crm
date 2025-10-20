@@ -160,7 +160,7 @@
                                                                class="select-user-checkbox">
                                                         <img
                                                             src="{{ $user->image && file_exists(public_path('assets/images/employees/'.$user->image)) ? asset('assets/images/employees/'.$user->image) : asset('assets/img/team-1.jpg') }}"
-                                                            alt="{{ $user->name }}" title="{{ $user->email }}"
+                                                            alt="{{ $user->name }}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $user->email }}"
                                                             class="rounded-circle user-image" width="50" height="50">
                                                         <div class="checkmark-overlay">✔</div>
                                                     </div>

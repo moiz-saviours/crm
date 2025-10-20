@@ -45,7 +45,7 @@
                                 <input type="text" id="dateRangePicker" name="dateRangePicker"
                                        class="form-control dateRangePicker"/>
                             </div>
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
                                     data-tour="invoicecreate"><i class="fas fa-exclamation-circle custom-dot"></i>
                             </button>
                             <button class="create-contact open-form-btn tour-createinvoice">Create New</button>
@@ -63,7 +63,7 @@
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
                             <li style="margin: 9px 2px">
                                 <button class="my-btn start-tour-btn tour-invoicetitle" data-toggle="tooltip"
-                                        title="Take a Tour" data-tour="invoices"><i
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="invoices"><i
                                         class="fas fa-exclamation-circle custom-dot"></i></button>
                             </li>
                         </ul>
@@ -152,7 +152,7 @@
                                                         class="invoice-number">{{ $invoice->invoice_number }}</span><br>
                                                     {{--                                                    <span class="invoice-key">{{ $invoice->invoice_key }}</span>--}}
                                                     <span class="invoice-key view-transactions text-primary"
-                                                          title="Show transaction logs"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top" title="Show transaction logs"
                                                           style="cursor: pointer;"
                                                           data-invoice-key="{{ $invoice->invoice_key }}"><b
                                                             style="font-weight: 600;">{{ $invoice->invoice_key }}</b></span>
@@ -248,7 +248,7 @@
                                                                     }
                                                                 @endphp
                                                                 data-invoice-url="{{ $baseUrl . '/invoice?InvoiceID=' . $invoice->invoice_key }}"
-                                                                title="Copy Invoice Url"><i
+                                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Invoice Url"><i
                                                                 class="fas fa-copy"></i></button>
                                                     @endif
                                                     @if(isset($invoice->payment_attachments) && count($invoice->payment_attachments) > 0)
@@ -261,7 +261,7 @@
                                                         <button type="button"
                                                                 class="btn btn-sm btn-primary view-payment-proofs"
                                                                 data-invoice-key="{{ $invoice->invoice_key }}"
-                                                                title="View Payment Proofs"><i
+                                                                data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i
                                                                 class="fas fa-paperclip"></i>
                                                             {{ $attachmentCount }}
                                                         </button>
@@ -270,11 +270,11 @@
                                                         <br>
                                                         <button type="button"
                                                                 class="btn btn-sm btn-primary editBtn mt-2"
-                                                                data-id="{{ $invoice->id }}" title="Edit"><i
+                                                                data-id="{{ $invoice->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
                                                                 class="fas fa-edit"></i></button>
                                                         <button type="button"
                                                                 class="btn btn-sm btn-danger deleteBtn mt-2"
-                                                                data-id="{{ $invoice->id }}" title="Delete"><i
+                                                                data-id="{{ $invoice->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i
                                                                 class="fas fa-trash"></i></button>
                                                     @endif
                                                 </td>

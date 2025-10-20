@@ -21,7 +21,7 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="employeecreate"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="employeecreate"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createmployee">Create New</button>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Employees
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-employeetitle" data-toggle="tooltip" title="Take a Tour" data-tour="employee"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"> <button class="my-btn start-tour-btn tour-employeetitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="employee"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">

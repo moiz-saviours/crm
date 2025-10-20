@@ -20,7 +20,7 @@
                             {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
                                     data-tour="lead_create"><i class="fas fa-exclamation-circle custom-dot"></i>
                             </button>
                             <button class="create-contact open-form-btn tour-createlead">Create New</button>
@@ -37,8 +37,8 @@
                             <li class="tab-item active" data-tab="home">Leads
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
                             <li style="margin: 9px 2px">
-                                <button class="my-btn start-tour-btn tour-leadtitle" data-toggle="tooltip"
-                                        title="Take a Tour" data-tour="lead"><i
+                                <button class="my-btn start-tour-btn tour-leadtitle"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="lead"><i
                                         class="fas fa-exclamation-circle custom-dot"></i></button>
                             </li>
 
@@ -112,21 +112,21 @@
                                                 <td class="align-middle text-left text-nowrap"></td>
                                                 <td class="align-middle text-left text-nowrap">
                                                     @if(isset($lead->customer_contact))
-                                                        <a href="{{route('admin.customer.contact.edit',[$lead->customer_contact->id])}}">{{ $lead->customer_contact->name }}</a>
+                                                        <a href="{{route('admin.customer.contact.edit',[$lead->customer_contact->id])}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $lead->customer_contact->name }}">{{ $lead->customer_contact->name }}</a>
                                                     @else
                                                         {{$lead->name}}
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-left text-nowrap">
                                                     @if(isset($lead->brand))
-                                                        <a href="{{route('admin.brand.index')}}">{{ makeAcronym($lead->brand->name) }}</a>
+                                                        <a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{$lead->brand->name}}">{{ makeAcronym($lead->brand->name) }}</a>
                                                     @else
 
                                                     @endif
                                                 </td>
                                                 <td class="align-middle text-left text-nowrap">
                                                     @if(isset($lead->team))
-                                                        <a href="{{route('admin.team.index')}}">{{ $lead->team->name }}</a>
+                                                        <a href="{{route('admin.team.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $lead->team->name }}">{{ $lead->team->name }}</a>
                                                     @else
 
                                                     @endif
@@ -153,10 +153,10 @@
                                                 </td>
                                                 <td class="align-middle text-left table-actions">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $lead->id }}" title="Edit"><i
+                                                            data-id="{{ $lead->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
                                                             class="fas fa-edit"></i></button>
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
-                                                            data-id="{{ $lead->id }}" title="Delete"><i
+                                                            data-id="{{ $lead->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i
                                                             class="fas fa-trash"></i></button>
                                                     <button type="button"
                                                             class="btn btn-sm btn-success @if(isset($lead->leadStatus)
@@ -166,7 +166,7 @@
                                                         && $lead->leadStatus->name != 'Converted'
                                                         && empty($lead->cus_contact_key)) data-id="{{ $lead->id }}"
                                                             @endif
-                                                            title="Convert to Customer">
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
                                                         <i class="fas fa-user-check"></i>
                                                     </button>
 

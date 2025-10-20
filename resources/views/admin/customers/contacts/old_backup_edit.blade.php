@@ -3074,7 +3074,7 @@
                                                             <span>Amount : {{ $payment->amount }}$
 
                                                         </span>
-                                                            <span data-toggle="tooltip" title="Due Date">
+                                                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="Due Date">
                                                                  Due: {{ ($payment->payment_date)->format('d M Y') ?? "---" }}
                                                         </span>
 

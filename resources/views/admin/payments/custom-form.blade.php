@@ -88,7 +88,7 @@
 
                 <div class="form-group mb-3">
                     <label for="type" class="form-label">Customer Type</label>
-                    <select class="form-control tour-paymentcustype" id="type" name="type" title="Please select customer type" required>
+                    <select class="form-control tour-paymentcustype" id="type" name="type" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select customer type" required>
                         <option value="0" {{ old('type', 1) == 0 ? 'selected' : '' }}>Fresh</option>
                         @if($customer_contacts->count() > 0)
                             <option value="1" {{ old('type', 1) == 1 ? 'selected' : '' }}>Upsale</option>

@@ -178,8 +178,8 @@
     }
 
     .status-toggle:checked {
-        background-color: #8392ab;
-    }
+    background-color: var(--bs-primary);
+}
 
     .status-toggle::before {
         content: '';

@@ -310,6 +310,27 @@
 {{--Jquery UI--}}
 <link rel="stylesheet" href="{{asset ('assets/themes/nifty/assets/css/jquery-ui.css')}}">
 <style>
+    /** TootTip Styling Starting */
+    .tooltip .tooltip-inner {
+        background-color: var(--bs-primary);
+        color: var(--bs-primary-color);
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+    .tooltip.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-start .tooltip-arrow::before {
+        border-left-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-end .tooltip-arrow::before {
+        border-right-color: var(--bs-primary);
+    }
+    /** TootTip Styling Ending */
 
     /* Full-screen loader styles */
 
@@ -320,10 +341,10 @@
 
     #loader {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 41px;
+        left: 219px;
+        width: 90%;
+        height: 95%;
         background-color: rgb(255 255 255); /* Semi-transparent background */
         display: flex;
         justify-content: center;
@@ -727,14 +748,17 @@ Detailed information and more samples can be found in the documentation.
         color: var(--nf-sidebar-color) !important;
 
     }
-    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible{
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible {
         color: var(--nf-sidebar-color) !important;
         border-radius: 5px !important;
         outline: none !important;
 
     }
+
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: var(--bs-primary); !important;
+        background-color: var(--bs-primary);
+    !important;
     }
 
     .nav_icons {

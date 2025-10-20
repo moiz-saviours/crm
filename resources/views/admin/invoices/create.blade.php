@@ -27,7 +27,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label for="brand_key" class="form-label">Brand</label>
                                     <select class="form-control searchable" id="brand_key" name="brand_key"
-                                            title="Please select a brand" required>
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a brand" required>
                                         <option value="" disabled>Please select brand</option>
                                         @foreach($brands as $brand)
                                             <option
@@ -43,7 +43,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label for="team_key" class="form-label">Team</label>
                                     <select class="form-control searchable" id="team_key" name="team_key"
-                                            title="Please select a team" required>
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a team" required>
                                         <option value="" disabled>Please select team</option>
                                         @foreach($teams as $team)
                                             <option
@@ -59,7 +59,7 @@
 
                                 <div class="col-md-4 mb-3">
                                     <label for="type" class="form-label">Customer Type</label>
-                                    <select class="form-control" id="type" name="type" title="Please select customer type" required>
+                                    <select class="form-control" id="type" name="type" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select customer type" required>
                                         <option value="0" {{ old('type') == 0 ? 'selected' : '' }}>
                                             Fresh
                                         </option>
@@ -121,7 +121,7 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="agent_id" class="form-label">Agent</label>
-                                    <select class="form-control searchable" id="agent_id" name="agent_id" title="Please select agent" required>
+                                    <select class="form-control searchable" id="agent_id" name="agent_id" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select agent" required>
                                         <option value="" disabled>Select Agent</option>
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ old('agent_id') == $user->id ? 'selected' : '' }}>

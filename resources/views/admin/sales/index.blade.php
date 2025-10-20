@@ -120,7 +120,7 @@
                 <h1 class="page-title mb-2 all-data">Sales KPI</h1>
                 <p>Welcome to Sales Kpi.</p>
                 {{--                <!-- END : Page title and information -->--}}
-                {{--                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard2"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>--}}
+                {{--                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="dashboard2"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>--}}
             </div>
         </div>
         <div class="content__boxed">

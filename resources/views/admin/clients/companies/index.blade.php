@@ -46,13 +46,13 @@
     {{--                                            <object--}}
     {{--                                                data="{{ $logoUrl }}"--}}
     {{--                                                class="avatar avatar-sm me-3"--}}
-    {{--                                                title="{{ $brand->name }}"--}}
+    {{--                                                data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $brand->name }}"--}}
     {{--                                            >--}}
     {{--                                                <img--}}
     {{--                                                    src="{{ $logoUrl }}"--}}
     {{--                                                    alt="{{ $brand->name }}"--}}
     {{--                                                    class="avatar avatar-sm me-3"--}}
-    {{--                                                    title="{{ $brand->name }}">--}}
+    {{--                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $brand->name }}">--}}
     {{--                                            </object>--}}
     {{--                                        </td>--}}
     {{--                                        <td class="align-middle text-center text-nowrap">{{$brand->brand_key}}</td>--}}
@@ -103,7 +103,7 @@
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="client_company_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="client_company_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createclientcompany">Create New</button>
 
                         </div>
@@ -118,7 +118,7 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Companies
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientcompanytitle" data-toggle="tooltip" title="Take a Tour" data-tour="client_company"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientcompanytitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="client_company"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -177,10 +177,10 @@
                                                         $logoUrl = filter_var($client_company->logo, FILTER_VALIDATE_URL) ? $client_company->logo : asset('assets/images/clients/companies/logos/'.$client_company->logo);
                                                     @endphp
                                                     <object data="{{ $logoUrl }}" class="avatar avatar-sm me-3"
-                                                            title="{{ $client_company->name }}"><img
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $client_company->name }}"><img
                                                             src="{{ $logoUrl }}" alt="{{ $client_company->name }}"
                                                             class="avatar avatar-sm me-3"
-                                                            title="{{ $client_company->name }}"></object>
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $client_company->name }}"></object>
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{$client_company->name}}
                                                 </td>
@@ -197,7 +197,7 @@
                                                 </td>
                                                 <td class="align-middle text-center table-actions ">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $client_company->id }}" title="Edit"><i
+                                                            data-id="{{ $client_company->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
                                                             class="fas fa-edit"></i></button>
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
                                                             data-id="{{ $client_company->id }}" title="Delete"><i

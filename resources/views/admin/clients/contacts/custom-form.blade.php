@@ -125,7 +125,7 @@
                     <div class="col-md-12 mb-3">
                         <label for="country" class="form-label">Country</label>
                         <select class="form-control searchable tour-clientcontactcountry" id="country" name="country"
-                                title="Please select country" required>
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Please select country" required>
                             @foreach(config('countries') as $code => $country)
                                 <option
                                     value="{{ $code }}" {{ (old('country') == $code ) || ($code == "US") ? 'selected' : '' }}>

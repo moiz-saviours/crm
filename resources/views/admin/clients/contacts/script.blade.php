@@ -202,10 +202,10 @@
                                         <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                     </td>
                                     <td class="align-middle text-center table-actions">
-                                        <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
+                                        <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
+                                        <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>

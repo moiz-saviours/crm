@@ -95,7 +95,7 @@
 {{--                            </button>--}}
 {{--                            <button class="header_btn">Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="lead_status_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="lead_status_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createleadstatus">Create New</button>
 
                         </div>
@@ -110,7 +110,7 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Lead Statuses
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-leadstatustitle" data-toggle="tooltip" title="Take a Tour" data-tour="lead_status"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-leadstatustitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="lead_status"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
 
                         </ul>
                     </div>

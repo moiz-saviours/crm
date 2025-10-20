@@ -22,7 +22,7 @@
                             {{--                            <button class="header_btn">Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn">Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="client_account_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="client_account_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createclientaccount">Create New</button>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Accounts
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientaccounttitle" data-toggle="tooltip" title="Take a Tour" data-tour="client_account"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientaccounttitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="client_account"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -121,11 +121,11 @@
 
                                                 <td class="align-middle text-center table-actions ">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $payment_merchant->id }}" title="Edit"><i
+                                                            data-id="{{ $payment_merchant->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
                                                             class="fas fa-edit"></i></button>
 
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
-                                                            data-id="{{ $payment_merchant->id }}" title="Delete"><i
+                                                            data-id="{{ $payment_merchant->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i
                                                             class="fas fa-trash"></i></button>
 
                                                 </td>

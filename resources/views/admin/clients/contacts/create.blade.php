@@ -25,7 +25,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="brand_key" class="form-label">Brand</label>
                                     <select class="form-control searchable" id="brand_key" name="brand_key"
-                                            title="Please select a brand" required>
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a brand" required>
                                         <option value="" disabled>Please select brand</option>
                                         @foreach($brands as $brand)
                                             <option
@@ -41,7 +41,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="team_key" class="form-label">Team</label>
                                     <select class="form-control searchable" id="team_key" name="team_key"
-                                            title="Please select a team">
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a team">
                                         <option value="" disabled>Please select team</option>
                                         @foreach($teams as $team)
                                             <option
@@ -108,7 +108,7 @@
                                         <div class="col-md-12">
                                             <label for="country" class="form-label">Country</label>
                                             <select class="form-control searchable" id="country" name="country"
-                                                    title="Please select country" required>
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Please select country" required>
                                                 @foreach($countries as $code => $country)
                                                     <option
                                                             value="{{ $code }}" {{ (old('country') == $code ) || ($code == "US") ? 'selected' : '' }}>
