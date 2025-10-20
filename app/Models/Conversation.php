@@ -12,7 +12,7 @@ class Conversation extends Model
         'receiverable_id',
         'receiverable_type',
         'conversation_status',
-        'last_message_id',,
+        'last_message_id',
         'status'
     ];
 
