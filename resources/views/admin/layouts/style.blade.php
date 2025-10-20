@@ -736,4 +736,9 @@ Detailed information and more samples can be found in the documentation.
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background-color: var(--bs-primary); !important;
     }
+
+    .nav_icons {
+        width: 25px;
+        height: 25px;
+    }
 </style>

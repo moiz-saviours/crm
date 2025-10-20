@@ -795,7 +795,11 @@ html[data-overlayscrollbars] > body::-webkit-scrollbar {
     border-radius: var(--nf-mainnav-submenu-border-radius);
     box-shadow: var(--nf-mainnav-submenu-active-shadow);
     color: var(--nf-mainnav-submenu-active-color);
-    font-weight: 600
+    /*font-weight: 600*/
+}
+
+.mainnav__inner .mainnav__menu > .nav-item > .nav-link.active {
+    font-weight: 500;
 }
 
 .mainnav__inner .mainnav__menu > .nav-item > .nav-link.active .nav-icon, .mainnav__inner .mainnav__menu > .nav-item > .nav-link.active i {
@@ -814,7 +818,9 @@ html[data-overlayscrollbars] > body::-webkit-scrollbar {
 }
 
 .root .mainnav__inner .nav-link {
-    color: var(--nf-mainnav-link-color)
+    color: var(--nf-mainnav-link-color);
+    /*font-size: var(--nf-profile-para-size);*/
+    font-size: 1rem;
 }
 
 .root .mainnav__inner .nav-link.disabled {
@@ -863,7 +869,8 @@ html[data-overlayscrollbars] > body::-webkit-scrollbar {
 }
 
 .mainnav__menu .mininav-toggle .nav-label {
-    display: inline-block
+    display: inline-block;
+    margin-top: 3px;
 }
 
 .mainnav__menu .mininav-toggle > .nav-label.mininav-content {
@@ -887,7 +894,9 @@ html[data-overlayscrollbars] > body::-webkit-scrollbar {
     transform: rotate(45deg);
     opacity: 1;
 }
-
+.main-nav-user-email-two{
+    font-size: var(--nf-profile-para-size);
+}
 
 .mainnav__menu .has-sub > .mininav-toggle.collapsed:after {
     transform: rotate(45deg)
@@ -1752,7 +1761,8 @@ html[data-overlayscrollbars] > body::-webkit-scrollbar {
     --nf-mainnav-bg: var(--bs-primary);
     --nf-mainnav-color: var(--bs-primary-color);
     --nf-mainnav-secondary-color: rgba(var(--bs-primary-color-rgb), 0.4);
-    --nf-mainnav-link-color: rgba(var(--bs-primary-color-rgb), 0.7);
+    /*--nf-mainnav-link-color: rgba(var(--bs-primary-color-rgb), 0.7);*/
+    --nf-mainnav-link-color: var(--bs-primary-color);
     --nf-mainnav-link-hover: var(--bs-primary-color);
     --nf-mainnav-link-active: var(--bs-primary-color);
     --nf-mainnav-link-active-underline-color: rgba(var(--bs-primary-color-rgb), 0.3);
