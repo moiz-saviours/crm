@@ -28,10 +28,7 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->unique(
-                ['project_id'],
-                'unique_project_member'
-            );
+
         });
     }
 

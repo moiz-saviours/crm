@@ -11,6 +11,7 @@ class Project extends Model
     protected $fillable = [
         'brand_id',
         'special_key',
+        'customer_special_key',
         'brand_key',
         'team_key',
         'type',

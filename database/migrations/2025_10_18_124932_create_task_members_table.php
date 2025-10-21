@@ -29,7 +29,6 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->unique(['task_id'],'unique_task_member');
 
         });
     }

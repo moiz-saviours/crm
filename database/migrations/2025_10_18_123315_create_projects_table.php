@@ -21,6 +21,7 @@ return new class extends Migration
                 ->onDelete('NO ACTION');
 
             $table->string('special_key', 100)->unique()->nullable()->comment('Unique internal key for project tracking');
+            $table->string('customer_special_key', 100)->nullable()->comment('Customer Unique key for project tracking');
             $table->string('brand_key', 100)->nullable()->default(null);
             $table->string('team_key', 100)->nullable()->default(null);
 
