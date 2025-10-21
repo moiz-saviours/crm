@@ -189,6 +189,10 @@ class LeadController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
             DB::beginTransaction();
+
+            // Get previous status before update
+            $oldStatusId = $lead->lead_status_id;
+
             $customer_contact = CustomerContact::withTrashed()->firstOrNew(
                 ['email' => $request->input('email')],
                 [
@@ -228,10 +232,34 @@ class LeadController extends Controller
                 $updateData['email'] = $request->input('email');
             }
             $lead->update($updateData);
+
+            $convertedStatus = LeadStatus::where('name', 'Converted')->first();
+
+            // If old status was "Converted" but new one is different — log the change
+            if ($convertedStatus && $oldStatusId == $convertedStatus->id && $lead->lead_status_id != $convertedStatus->id) {
+                UserActivity::create([
+                    'event_type' => 'converted_status_changed',
+                    'visitor_id' => $lead->visitor_id,
+                    'event_data' => json_encode([
+                        'message' => 'Converted lead status was changed manually.',
+                        'lead_name' => $lead->name,
+                        'old_status' => 'Converted',
+                        'new_status' => $lead->leadStatus->name ?? 'Unknown',
+                        'changed_by' => auth()->user()->name ?? 'System',
+                    ]),
+                ]);
+            }
+
             DB::commit();
             $lead->loadMissing(['customer_contact' => function ($query) {
                 $query->withTrashed()->select('id','special_key', 'name');
-            }], 'brand', 'team', 'leadStatus');
+            },
+                'brand' => function ($query) {
+                    $query->select('brand_key', 'name');
+                },
+                'team' => function ($query) {
+                    $query->select('team_key', 'name');
+                }],'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
