@@ -42,11 +42,22 @@ class MessageController extends Controller
 
     public function store(Request $request)
     {
+
+        // Validate text + attachments
         $request->validate([
-            'content' => 'required|string|max:5000',
+            'content' => 'nullable|string|max:5000',
             'conversation_id' => 'required|exists:conversations,id',
-            'message_type' => 'required|in:text,image,video,audio,file,system'
+            'message_type' => 'required|in:text,image,video,audio,file,system,attachment',
+            'attachments.*' => 'nullable|file|max:51200|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar'
         ]);
+        dd($request);
+        // Ensure at least content or attachment is provided
+        if (empty($request->content) && !$request->hasFile('attachments')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Message content or attachment is required.'
+            ], 422);
+        }
 
         // Create message
         $message = Message::create([
@@ -55,10 +66,25 @@ class MessageController extends Controller
             'sender_id' => auth()->id(),
             'content' => $request->content,
             'message_type' => $request->message_type,
-            'message_status' => 'sent'
+            'message_status' => 'sent',
         ]);
 
-        // Load relationships for response
+        // Handle file attachments (if any)
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('message_attachments', 'public');
+
+                MessageAttachment::create([
+                    'message_id' => $message->id,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+        }
+
+        // Load relationships for frontend
         $message->load('attachments', 'sender');
 
         return response()->json([
@@ -66,6 +92,7 @@ class MessageController extends Controller
             'message' => $message
         ]);
     }
+
 
     // Add this method to create new conversation
     public function storeConversation(Request $request)
