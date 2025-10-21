@@ -289,6 +289,30 @@
     .sent {
         align-items: flex-end;
     }
+
+    /* Attachment bubble styles */
+    .attachment-bubble {
+        border-radius: 12px;
+        background: #f4f6f8;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: background 0.2s ease;
+    }
+
+    .attachment-bubble:hover {
+        background: #e9ecef;
+    }
+
+    .sent-attach {
+        background: #d1e7ff;
+    }
+
+    .received-attach {
+        background: #f1f3f4;
+    }
+
+    .attachment-bubble i {
+        color: #6c757d;
+    }
 </style>
 <div class="chat-container">
     <!-- Chat Header -->
@@ -296,48 +320,50 @@
         <!-- Your header content -->
     </div>
     <!-- Chat Messages -->
-<div class="chat-messages" id="chatMessages">
-    @if(isset($conversation) && $conversation->id)
-        <!-- Messages will be loaded dynamically via AJAX -->
-        <div class="text-center py-4 text-muted" id="loadingMessages">
-            <div class="spinner-border spinner-border-sm" role="status">
-                <span class="visually-hidden">Loading messages...</span>
-            </div>
-            Loading messages...
-        </div>
-        
-        <!-- Hidden no messages state -->
-        <div class="d-none" id="noMessagesState">
-            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
-                <div class="mb-3">
-                    <i class="fas fa-comment-slash fa-3x text-muted"></i>
+    <div class="chat-messages" id="chatMessages">
+        @if (isset($conversation) && $conversation->id)
+            <!-- Messages will be loaded dynamically via AJAX -->
+            <div class="text-center py-4 text-muted" id="loadingMessages">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading messages...</span>
                 </div>
-                <h5 class="text-muted mb-3">No Messages Yet</h5>
-                <p class="text-muted mb-4">Send a message to start the conversation</p>
+                Loading messages...
             </div>
-        </div>
-    @else
-        <!-- No conversation state -->
-        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4" id="noConversationState">
-            <div class="mb-3">
-                <i class="fas fa-comments fa-3x text-muted"></i>
+
+            <!-- Hidden no messages state -->
+            <div class="d-none" id="noMessagesState">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-comment-slash fa-3x text-muted"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">No Messages Yet</h5>
+                    <p class="text-muted mb-4">Send a message to start the conversation</p>
+                </div>
             </div>
-            <h5 class="text-muted mb-3">No Conversation Started</h5>
-            <p class="text-muted mb-4">Start a new conversation to begin chatting</p>
-            <button class="btn btn-primary" id="startConversationBtn">
-                <i class="fas fa-plus me-2"></i>Start Chatting
-            </button>
-        </div>
-    @endif
-</div>
+        @else
+            <!-- No conversation state -->
+            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4"
+                id="noConversationState">
+                <div class="mb-3">
+                    <i class="fas fa-comments fa-3x text-muted"></i>
+                </div>
+                <h5 class="text-muted mb-3">No Conversation Started</h5>
+                <p class="text-muted mb-4">Start a new conversation to begin chatting</p>
+                <button class="btn btn-primary" id="startConversationBtn">
+                    <i class="fas fa-plus me-2"></i>Start Chatting
+                </button>
+            </div>
+        @endif
+    </div>
 
     <!-- Attachment Preview -->
-<div class="attachment-preview d-none" id="attachmentPreview"></div>
+    <div class="attachment-preview d-none" id="attachmentPreview"></div>
 
 
 
     <!-- Chat Input -->
-    <div class="chat-input-container" id="chatInputContainer" style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
+    <div class="chat-input-container" id="chatInputContainer"
+        style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
         <div class="message-editor">
             <div class="editor-toolbar">
                 <button title="Bold"><i class="fas fa-bold"></i></button>
@@ -348,7 +374,7 @@
                 <button title="Insert Link"><i class="fas fa-link"></i></button>
                 <button title="Insert Emoji"><i class="far fa-smile"></i></button>
             </div>
-            
+
             <input type="file" id="fileInput" multiple hidden>
             <input type="file" id="imageInput" accept="image/*" multiple hidden>
 
@@ -370,7 +396,7 @@
             </div>
         </div>
     </div>
-    
+
 </div>
 <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
@@ -397,7 +423,7 @@
 
     function initializeChatWithConversation() {
         socket = io('{{ config('socketio.url') }}');
-        
+
         socket.emit('join_conversation', conversationId);
 
         loadMessages();
@@ -421,29 +447,29 @@
     function startNewConversation() {
         const btn = document.getElementById('startConversationBtn');
         const originalText = btn.innerHTML;
-        
+
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
 
-        fetch('{{ route("admin.customer.contact.conversations.store") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                receiver_type: 'App\\Models\\CustomerContact',
-                receiver_id: {{ $customer_contact->id ?? 'null' }}
+        fetch('{{ route('admin.customer.contact.conversations.store') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    receiver_type: 'App\\Models\\CustomerContact',
+                    receiver_id: {{ $customer_contact->id ?? 'null' }}
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('noConversationState').style.display = 'none';
-                
-                document.getElementById('chatInputContainer').style.display = 'block';
-                
-                document.getElementById('chatMessages').innerHTML = `
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('noConversationState').style.display = 'none';
+
+                    document.getElementById('chatInputContainer').style.display = 'block';
+
+                    document.getElementById('chatMessages').innerHTML = `
                     <div class="text-center py-4 text-muted" id="loadingMessages">
                         <div class="spinner-border spinner-border-sm" role="status">
                             <span class="visually-hidden">Loading messages...</span>
@@ -452,17 +478,17 @@
                     </div>
                 `;
 
-                window.location.reload();
-            } else {
-                throw new Error(data.message || 'Failed to create conversation');
-            }
-        })
-        .catch(error => {
-            console.error('Error creating conversation:', error);
-            toastr.error('Failed to start conversation: ' + error.message);
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        });
+                    window.location.reload();
+                } else {
+                    throw new Error(data.message || 'Failed to create conversation');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating conversation:', error);
+                toastr.error('Failed to start conversation: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
     }
 
     // Load messages via AJAX and render using partial
@@ -471,7 +497,7 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('loadingMessages').style.display = 'none';
-                
+
                 if (data.messages && data.messages.length > 0) {
                     // Show messages
                     document.getElementById('chatMessages').innerHTML = data.html;
@@ -497,121 +523,190 @@
         });
     }
 
-    // Add new message (for real-time and manual sending)
     function addNewMessage(content, isSent = true, messageData = null) {
         const chatMessages = document.getElementById('chatMessages');
 
-        // Hide no messages state if it's visible
+        // Hide empty states
         const noMessagesState = document.getElementById('noMessagesState');
         if (noMessagesState && !noMessagesState.classList.contains('d-none')) {
             noMessagesState.classList.add('d-none');
         }
-        
-        // Remove loading state if it's still there
+
+        // Hide loading spinner
         const loadingMessages = document.getElementById('loadingMessages');
-        if (loadingMessages) {
-            loadingMessages.style.display = 'none';
+        if (loadingMessages) loadingMessages.style.display = 'none';
+
+        const message = messageData || {};
+
+        const isAttachment = message.attachments && message.attachments.length > 0;
+        const createdAt = message.created_at
+            ? new Date(message.created_at)
+            : new Date();
+
+        const timeStr = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const avatarText = isSent ? 'ME' : (message.sender?.name?.substring(0, 2) || 'U');
+        const avatarTitle = isSent ? 'You' : (message.sender?.name || 'User');
+
+        //  Build message HTML identical to Blade
+        let html = `<div class="message ${isSent ? 'sent' : 'received'}">`;
+
+        // Left avatar
+        if (!isSent) {
+            html += `
+                <div class="message-avatar" data-bs-toggle="tooltip" title="${avatarTitle}">
+                    ${avatarText}
+                </div>
+            `;
         }
 
-        // Create message element similar to Blade structure
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+        // Message bubble (only for text)
+        if (content && content.trim() !== '') {
+            html += `
+                <div class="message-bubble">
+                    <div class="message-content">${content.replace(/\n/g, '<br>')}</div>
+                    <div class="message-footer mt-1">
+                        <div class="message-time small">${timeStr}</div>
+                    </div>
+                </div>
+            `;
+        }
 
-        // Avatar setup
-        const avatarText = isSent ? 'ME' : (messageData?.sender?.name?.substring(0, 2) || 'U');
-        const avatarTitle = isSent ? 'You' : (messageData?.sender?.name || 'User');
+        // Attachments
+        if (isAttachment) {
+            html += `
+                <div class="message-attachments mt-2 ${isSent ? 'ms-auto text-end' : ''}" style="max-width: 80%;">
+            `;
 
-        const avatar = document.createElement('div');
-        avatar.className = 'message-avatar';
-        avatar.textContent = avatarText;
-        avatar.setAttribute('data-bs-toggle', 'tooltip');
-        avatar.setAttribute('data-bs-placement', 'top');
-        avatar.setAttribute('title', avatarTitle);
+            message.attachments.forEach(att => {
+                const filePath = att.file_path
+                    ? `/storage/${att.file_path}`
+                    : '#';
+                const fileType = att.file_type || '';
+                const icon = fileType.startsWith('image/')
+                    ? 'fa-file-image'
+                    : fileType.startsWith('video/')
+                    ? 'fa-file-video'
+                    : fileType.startsWith('audio/')
+                    ? 'fa-file-audio'
+                    : 'fa-file';
 
-        // Message bubble
-        const messageBubble = document.createElement('div');
-        messageBubble.className = 'message-bubble';
+                const size = att.file_size ? formatFileSize(att.file_size) : '';
 
-        // Content section
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        contentDiv.textContent = content;
-
-        // Footer section (time, status, etc.)
-        const messageFooter = document.createElement('div');
-        messageFooter.className = 'message-footer';
-
-        const timeDiv = document.createElement('div');
-        timeDiv.className = 'message-time';
-        const messageTime = messageData ? new Date(messageData.created_at) : new Date();
-        timeDiv.textContent = messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        messageFooter.appendChild(timeDiv);
-
-        // Append content first, then footer
-        messageBubble.appendChild(contentDiv);
-        messageBubble.appendChild(messageFooter);
-
-        // Add attachments if any
-        if (messageData?.attachments && messageData.attachments.length > 0) {
-            const attachmentsDiv = document.createElement('div');
-            attachmentsDiv.className = 'message-attachments mt-2';
-
-            messageData.attachments.forEach(att => {
-                const attachmentItem = document.createElement('div');
-                attachmentItem.className = 'attachment-item small';
-                attachmentItem.innerHTML = `<i class="fas fa-file me-1"></i><span>${att.file_name}</span>`;
-                attachmentsDiv.appendChild(attachmentItem);
+                html += `
+                    <div class="attachment-bubble d-inline-flex align-items-center justify-content-between gap-2 px-3 py-2 mb-1 ${isSent ? 'sent-attach' : 'received-attach'}">
+                        <div class="d-flex align-items-center gap-2 text-truncate" style="max-width: 250px;">
+                            <i class="fas ${icon}"></i>
+                            <a href="${filePath}" target="_blank" class="text-decoration-none text-dark small text-truncate">
+                                ${att.file_name || 'Attachment'}
+                            </a>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <small class="text-muted">${size}</small>
+                            <a href="${filePath}" download="${att.file_name || ''}" class="text-muted ms-1" title="Download">
+                                <i class="fas fa-download small"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
             });
 
-            messageBubble.appendChild(attachmentsDiv);
+            html += `
+                <div class="small text-muted mt-1 ${isSent ? 'text-end' : 'text-start'}">${timeStr}</div>
+                </div>
+            `;
         }
 
-        // Arrange message structure (based on direction)
+        // Right avatar
         if (isSent) {
-            messageDiv.appendChild(messageBubble);
-            messageDiv.appendChild(avatar);
-        } else {
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(messageBubble);
+            html += `
+                <div class="message-avatar" data-bs-toggle="tooltip" title="${avatarTitle}">
+                    ${avatarText}
+                </div>
+            `;
         }
 
-        chatMessages.appendChild(messageDiv);
+        html += `</div>`;
 
-        // Tooltip for avatars
-        new bootstrap.Tooltip(avatar);
+        // Append to chat container
+        chatMessages.insertAdjacentHTML('beforeend', html);
+
+        // Re-init Bootstrap tooltips
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            new bootstrap.Tooltip(el);
+        });
 
         scrollToBottom();
     }
+
+    // Helper function for file size formatting (same as PHP)
+    function formatFileSize(bytes) {
+        if (!bytes || bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+
 
     // Initialize chat functionality
     function initializeChatFunctionality() {
         const messageTextarea = document.getElementById('messageTextarea');
         const sendButton = document.getElementById('sendButton');
-
         const attachFileBtn = document.getElementById('attachFileBtn');
         const attachImageBtn = document.getElementById('attachImageBtn');
         const fileInput = document.getElementById('fileInput');
         const imageInput = document.getElementById('imageInput');
         const attachmentPreview = document.getElementById('attachmentPreview');
-
         let selectedFiles = [];
 
-        // Open file selectors
-        attachFileBtn.addEventListener('click', () => fileInput.click());
-        attachImageBtn.addEventListener('click', () => imageInput.click());
+        // --- Disable inputs dynamically ---
+        function updateInputStates() {
+            const hasText = messageTextarea.value.trim().length > 0;
+            const hasFiles = selectedFiles.length > 0;
 
-        // Handle file selection
-        fileInput.addEventListener('change', handleFileSelect);
-        imageInput.addEventListener('change', handleFileSelect);
+            // Hide attach buttons when user types text
+            if (hasText) {
+                attachFileBtn.classList.add('d-none');
+                attachImageBtn.classList.add('d-none');
+            } else {
+                attachFileBtn.classList.remove('d-none');
+                attachImageBtn.classList.remove('d-none');
+            }
 
-        function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            selectedFiles.push(...files);
-            renderAttachmentPreview();
+            // Hide message box when attachments exist
+            if (hasFiles) {
+                messageTextarea.classList.add('d-none');
+            } else {
+                messageTextarea.classList.remove('d-none');
+            }
         }
 
-        // Render preview list
+
+        // --- File selection handler ---
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+
+            // Validation: max 3 files
+            if (selectedFiles.length + files.length > 3) {
+                toastr.warning('You can only attach up to 3 files.');
+                return;
+            }
+
+            // Validation: each file ≤ 3 MB
+            for (const file of files) {
+                if (file.size > 3 * 1024 * 1024) {
+                    toastr.warning(`"${file.name}" exceeds 3 MB limit.`);
+                    return;
+                }
+            }
+
+            selectedFiles.push(...files);
+            renderAttachmentPreview();
+            updateInputStates();
+        }
+
+        // --- Render preview ---
         function renderAttachmentPreview() {
             attachmentPreview.innerHTML = '';
             if (selectedFiles.length > 0) {
@@ -622,120 +717,80 @@
                     const item = document.createElement('div');
                     item.className = 'attachment-item';
                     item.innerHTML = `
-                        <i class="fas ${icon}"></i>
-                        ${file.name}
+                        <i class="fas ${icon}"></i> ${file.name}
                         <span class="remove-attachment" data-index="${index}">
                             <i class="fas fa-times"></i>
                         </span>
                     `;
                     attachmentPreview.appendChild(item);
+                    updateInputStates();
+
                 });
             } else {
                 attachmentPreview.classList.add('d-none');
             }
         }
 
-        // Remove attachment
-        attachmentPreview.addEventListener('click', (e) => {
+        // --- Remove attachment ---
+        attachmentPreview.addEventListener('click', e => {
             if (e.target.closest('.remove-attachment')) {
                 const index = e.target.closest('.remove-attachment').dataset.index;
                 selectedFiles.splice(index, 1);
                 renderAttachmentPreview();
+                updateInputStates();
             }
         });
 
+        // --- Listeners ---
+        attachFileBtn.addEventListener('click', () => fileInput.click());
+        attachImageBtn.addEventListener('click', () => imageInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        imageInput.addEventListener('change', handleFileSelect);
+        messageTextarea.addEventListener('input', updateInputStates);
 
-        // ✅ Listen for file selection
-        attachmentInput.addEventListener('change', function (e) {
-            selectedFiles = Array.from(e.target.files);
-            renderAttachmentPreview(); // optional UI update
-        });
-
-        // ✅ Send message (text + attachments)
+        // --- Send Message ---
         function sendMessage() {
             const message = messageTextarea.value.trim();
 
-            // Stop if no text or attachments
             if (!message && selectedFiles.length === 0) {
+                toastr.warning('Please type a message or attach a file.');
                 return;
             }
 
-            // Add message locally for instant feedback
-            addNewMessage(message, true);
-
-            // Prepare FormData
             const formData = new FormData();
             formData.append('conversation_id', conversationId);
             formData.append('message_type', selectedFiles.length > 0 ? 'file' : 'text');
             formData.append('content', message);
 
-            selectedFiles.forEach(file => {
-                formData.append('attachments[]', file);
-            });
+            selectedFiles.forEach(file => formData.append('attachments[]', file));
 
-            // ✅ Send to Laravel backend
             fetch('/admin/customer/contact/messages', {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: formData
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    // Reset inputs
+                if (data.success && data.message) {
+                    addNewMessage(data.message.content, true, data.message);
+                    if (socket) socket.emit('send_message', data.message);
+
                     messageTextarea.value = '';
-                    messageTextarea.style.height = '60px';
-                    attachmentInput.value = '';
                     selectedFiles = [];
                     renderAttachmentPreview();
-
-                    // ✅ Emit via Socket.io (for real-time updates)
-                    if (socket) {
-                        socket.emit('send_message', {
-                            content: message,
-                            conversation_id: conversationId,
-                            sender_type: currentUser.type,
-                            sender_id: currentUser.id,
-                            message_type: data.message.message_type,
-                            attachments: data.message.attachments || []
-                        });
-                    }
+                    fileInput.value = '';
+                    imageInput.value = '';
+                    updateInputStates();
                 } else {
                     toastr.error('Failed to send message');
                 }
             })
-            .catch(err => {
-                console.error('Send error:', err);
-                toastr.error('Failed to send message');
-            });
+            .catch(() => toastr.error('Send failed'));
         }
 
-        // ✅ Send on button click
         sendButton.addEventListener('click', sendMessage);
-
-        // ✅ Send on Enter (without Shift)
-        messageTextarea.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        // ✅ Auto-expand textarea height
-        messageTextarea.addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = `${this.scrollHeight}px`;
-
-            if (this.scrollHeight > 120) {
-                this.style.height = '120px';
-                this.style.overflowY = 'auto';
-            } else {
-                this.style.overflowY = 'hidden';
-            }
-        });
     }
+
 
 
     // Scroll to bottom of chat
@@ -744,4 +799,3 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 </script>
-

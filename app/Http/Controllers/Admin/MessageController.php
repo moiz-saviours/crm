@@ -9,7 +9,7 @@ use App\Models\Message;
 use App\Models\MessageAttachment;
 use Illuminate\Support\Facades\Storage;
 use App\Events\NewMessageEvent;
-
+use Illuminate\Support\Facades\Validator;
 class MessageController extends Controller
 {
     public function getConversationMessages($conversationId)
@@ -42,14 +42,21 @@ class MessageController extends Controller
 
     public function store(Request $request)
     {
-
-        // Validate text + attachments
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'content' => 'nullable|string|max:5000',
             'conversation_id' => 'required|exists:conversations,id',
             'message_type' => 'required|in:text,image,video,audio,file,system,attachment',
-            'attachments.*' => 'nullable|file|max:51200|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar'
+            'attachments' => 'nullable|array|max:3',
+            'attachments.*' => 'nullable|file|max:3072|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar', // ✅ each <= 3MB
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         // Ensure at least content or attachment is provided
         if (empty($request->content) && !$request->hasFile('attachments')) {
             return response()->json([
