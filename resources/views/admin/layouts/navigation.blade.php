@@ -70,7 +70,8 @@
                 <ul class="mainnav__menu nav flex-column">
                     <!-- Link with submenu -->
                     <li class="nav-item has-sub">
-                        <a class="mininav-toggle nav-link collapsed {{ request()->is('admin/dashboard*') || request()->is('admin/sales*') ? 'active' : '' }}">
+                        <a href="javascript:void(0)"
+                           class="mininav-toggle nav-link collapsed {{ request()->is('admin/dashboard*') || request()->is('admin/sales*') ? 'active' : '' }}">
 {{--                            <i class="demo-pli-home fs-5 me-2"></i>--}}
                             <img src="{{asset ('assets/images/icons/stats.png')}}" class="me-2 nav_icons" alt="">
                             <span class="nav-label ms-1">Dashboard</span>
