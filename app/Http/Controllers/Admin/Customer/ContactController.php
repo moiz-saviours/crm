@@ -305,6 +305,12 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
                         'date' => $activity->created_at,
                         'data' => $activity,
                     ];
+                }elseif ($activity->event_type === 'converted_status_changed') {
+                    $timeline[] = [
+                        'type' => 'conversion',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
                 } else {
                     $timeline[] = [
                         'type' => 'activity',
