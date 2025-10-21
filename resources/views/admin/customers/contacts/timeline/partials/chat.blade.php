@@ -365,7 +365,7 @@
     <div class="chat-input-container" id="chatInputContainer"
         style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
         <div class="message-editor">
-            <div class="editor-toolbar">
+            {{-- <div class="editor-toolbar">
                 <button title="Bold"><i class="fas fa-bold"></i></button>
                 <button title="Italic"><i class="fas fa-italic"></i></button>
                 <button title="Underline"><i class="fas fa-underline"></i></button>
@@ -373,7 +373,7 @@
                 <button title="Numbered List"><i class="fas fa-list-ol"></i></button>
                 <button title="Insert Link"><i class="fas fa-link"></i></button>
                 <button title="Insert Emoji"><i class="far fa-smile"></i></button>
-            </div>
+            </div> --}}
 
             <input type="file" id="fileInput" multiple hidden>
             <input type="file" id="imageInput" accept="image/*" multiple hidden>
