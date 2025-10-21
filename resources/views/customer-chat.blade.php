@@ -306,6 +306,92 @@
             height: 100%;
             flex-direction: column;
         }
+
+        /* Attachment bubble styles */
+        .attachment-bubble {
+            border-radius: 12px;
+            background: #f4f6f8;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        .attachment-bubble:hover {
+            background: #e9ecef;
+        }
+
+        .sent-attach {
+            background: #d1e7ff;
+        }
+
+        .received-attach {
+            background: #f1f3f4;
+        }
+
+        .attachment-bubble i {
+            color: #6c757d;
+        }
+
+        /* Keep attachments aligned with same message bubble rules */
+        .message-attachments {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-width: 70%;
+        }
+
+        .message.sent .message-attachments {
+            align-items: flex-end;
+            margin-left: auto;
+        }
+
+        .message.received .message-attachments {
+            align-items: flex-start;
+        }
+
+        /* Ensure attachments visually match message bubbles */
+        .attachment-bubble {
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        .attachment-bubble a {
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sent-attach {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
+
+        .received-attach {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+        }
+
+        .attachment-bubble i {
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+
+        .attachment-bubble:hover {
+            opacity: 0.9;
+        }
+
+        /* Time alignment below attachment */
+        .message-attachments .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
     </style>
 </head>
 <body>
@@ -445,64 +531,108 @@
     // Add message to chat
     function addMessageToChat(content, isSent = true, messageData = null) {
         const chatMessages = document.getElementById('chatMessages');
-        
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-        
-        // Create avatar
+
+        // Avatar
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        
-        if (isSent) {
-            avatar.textContent = customer?.name?.substring(0, 2) || 'ME';
-            avatar.setAttribute('title', customer?.name || 'You');
-        } else {
-            avatar.textContent = 'SP';
-            avatar.setAttribute('title', 'Support Team');
-        }
-        
-        avatar.setAttribute('data-bs-toggle', 'tooltip');
-        avatar.setAttribute('data-bs-placement', 'top');
-        
-        // Create message bubble
-        const messageBubble = document.createElement('div');
-        messageBubble.className = 'message-bubble';
+        avatar.textContent = isSent ? 'ME' : 'SP';
+        avatar.setAttribute('title', isSent ? 'You' : 'Support Team');
 
-        const messageHeader = document.createElement('div');
-        messageHeader.className = 'message-header';
+        // --- Always append avatar first for consistency ---
+        if (!isSent) messageDiv.appendChild(avatar);
 
-        const timeDiv = document.createElement('div');
-        timeDiv.className = 'message-time';
-        const messageTime = messageData ? new Date(messageData.created_at) : new Date();
-        timeDiv.textContent = messageTime.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        // Message bubble (text)
+        if (content && content.trim() !== '') {
+            const messageBubble = document.createElement('div');
+            messageBubble.className = 'message-bubble';
 
-        messageHeader.appendChild(timeDiv);
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content.replace(/\n/g, '<br>');
+            messageBubble.appendChild(messageContent);
 
-        const contentDiv = document.createElement('div');
-        contentDiv.textContent = content;
+            const footer = document.createElement('div');
+            footer.className = 'message-footer mt-1';
+            footer.innerHTML = `
+                <div class="message-time small">
+                    ${(messageData ? new Date(messageData.created_at) : new Date()).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}
+                </div>`;
+            messageBubble.appendChild(footer);
 
-        messageBubble.appendChild(messageHeader);
-        messageBubble.appendChild(contentDiv);
-
-        // Arrange elements based on sent/received
-        if (isSent) {
-            messageDiv.appendChild(messageBubble);
-            messageDiv.appendChild(avatar);
-        } else {
-            messageDiv.appendChild(avatar);
             messageDiv.appendChild(messageBubble);
         }
-        
+
+        // Attachments
+        if (messageData && messageData.attachments && messageData.attachments.length > 0) {
+            const attachmentsWrap = document.createElement('div');
+            attachmentsWrap.className = `message-attachments mt-2 ${isSent ? 'ms-auto text-end' : ''}`;
+            attachmentsWrap.style.maxWidth = '80%';
+
+            messageData.attachments.forEach(att => {
+                const icon = att.file_type.startsWith('image/')
+                    ? 'fa-file-image'
+                    : att.file_type.startsWith('video/')
+                    ? 'fa-file-video'
+                    : att.file_type.startsWith('audio/')
+                    ? 'fa-file-audio'
+                    : 'fa-file';
+
+                const attachmentDiv = document.createElement('div');
+                attachmentDiv.className = `attachment-bubble d-inline-flex align-items-center justify-content-between gap-2 px-3 py-2 mb-1 ${isSent ? 'sent-attach' : 'received-attach'}`;
+                attachmentDiv.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 text-truncate" style="max-width: 250px;">
+                        <i class="fas ${icon}"></i>
+                        <a href="${att.file_url}" target="_blank"
+                            class="text-decoration-none text-dark small text-truncate">
+                            ${att.original_name || att.file_name || 'File'}
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <small class="text-muted">${formatFileSize(att.file_size)}</small>
+                        <a href="${att.file_url}" download="${att.original_name || att.file_name}" class="text-muted ms-1" title="Download">
+                            <i class="fas fa-download small"></i>
+                        </a>
+                    </div>`;
+
+                attachmentsWrap.appendChild(attachmentDiv);
+            });
+
+            // Timestamp under attachments
+            const timeDiv = document.createElement('div');
+            timeDiv.className = `small text-muted mt-1 ${isSent ? 'text-end' : 'text-start'}`;
+            timeDiv.textContent = (messageData ? new Date(messageData.created_at) : new Date()).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            attachmentsWrap.appendChild(timeDiv);
+
+            messageDiv.appendChild(attachmentsWrap);
+        }
+
+        // --- Always append avatar last for sent messages ---
+        if (isSent) messageDiv.appendChild(avatar);
+
         chatMessages.appendChild(messageDiv);
-        
-        // Initialize Bootstrap tooltip
         new bootstrap.Tooltip(avatar);
-        
         scrollToBottom();
     }
+
+
+// Helper function to format file size (same as PHP)
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+
 
     // Initialize chat functionality
     function initializeChat() {

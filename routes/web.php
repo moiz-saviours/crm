@@ -332,25 +332,41 @@ Route::post('/customer/chat/{customer_contact:special_key}/message', function (R
     ]);
 });
 
-// Get conversation messages - using customer special_key
 Route::get('/customer/chat/{customer_contact:special_key}/messages', function (CustomerContact $customer_contact) {
     // Find conversation for this customer
     $conversation = Conversation::where(function($query) use ($customer_contact) {
-            $query->where('sender_type', 'App\Models\CustomerContact')
+            $query->where('sender_type', 'App\\Models\\CustomerContact')
                   ->where('sender_id', $customer_contact->id);
-        })->orWhere(function($query) use ($customer_contact) {
-            $query->where('receiver_type', 'App\Models\CustomerContact')
+        })
+        ->orWhere(function($query) use ($customer_contact) {
+            $query->where('receiver_type', 'App\\Models\\CustomerContact')
                   ->where('receiver_id', $customer_contact->id);
-        })->first();
+        })
+        ->first();
 
     if (!$conversation) {
         return response()->json(['error' => 'Conversation not found'], 404);
     }
 
-    $messages = Message::with(['sender'])
+    //  Include attachments relation
+    $messages = Message::with(['sender', 'attachments'])
         ->where('conversation_id', $conversation->id)
         ->orderBy('created_at', 'asc')
         ->get();
+
+    //  Format response with useful attachment info
+    $messages->transform(function ($message) {
+        $message->attachments->transform(function ($attachment) {
+            return [
+                'id' => $attachment->id,
+                'original_name' => $attachment->file_name,
+                'file_url' => asset('storage/' . $attachment->file_path),
+                'file_type' => $attachment->file_type,
+                'file_size' => $attachment->file_size,
+            ];
+        });
+        return $message;
+    });
 
     return response()->json($messages);
 });
