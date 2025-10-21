@@ -255,10 +255,10 @@ class LeadController extends Controller
                 $query->withTrashed()->select('id','special_key', 'name');
             },
                 'brand' => function ($query) {
-                    $query->select('brand_key', 'name');
+                    $query->withTrashed()->select('brand_key', 'name');
                 },
                 'team' => function ($query) {
-                    $query->select('team_key', 'name');
+                    $query->withTrashed()->select('team_key', 'name');
                 }],'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
