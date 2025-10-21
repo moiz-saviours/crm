@@ -588,8 +588,62 @@
     function initializeChatFunctionality() {
         const messageTextarea = document.getElementById('messageTextarea');
         const sendButton = document.getElementById('sendButton');
-        const attachmentInput = document.getElementById('attachmentInput'); // input[type="file" multiple]
+
+        const attachFileBtn = document.getElementById('attachFileBtn');
+        const attachImageBtn = document.getElementById('attachImageBtn');
+        const fileInput = document.getElementById('fileInput');
+        const imageInput = document.getElementById('imageInput');
+        const attachmentPreview = document.getElementById('attachmentPreview');
+
         let selectedFiles = [];
+
+        // Open file selectors
+        attachFileBtn.addEventListener('click', () => fileInput.click());
+        attachImageBtn.addEventListener('click', () => imageInput.click());
+
+        // Handle file selection
+        fileInput.addEventListener('change', handleFileSelect);
+        imageInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            selectedFiles.push(...files);
+            renderAttachmentPreview();
+        }
+
+        // Render preview list
+        function renderAttachmentPreview() {
+            attachmentPreview.innerHTML = '';
+            if (selectedFiles.length > 0) {
+                attachmentPreview.classList.remove('d-none');
+                selectedFiles.forEach((file, index) => {
+                    const isImage = file.type.startsWith('image/');
+                    const icon = isImage ? 'fa-file-image' : 'fa-file';
+                    const item = document.createElement('div');
+                    item.className = 'attachment-item';
+                    item.innerHTML = `
+                        <i class="fas ${icon}"></i>
+                        ${file.name}
+                        <span class="remove-attachment" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    attachmentPreview.appendChild(item);
+                });
+            } else {
+                attachmentPreview.classList.add('d-none');
+            }
+        }
+
+        // Remove attachment
+        attachmentPreview.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-attachment')) {
+                const index = e.target.closest('.remove-attachment').dataset.index;
+                selectedFiles.splice(index, 1);
+                renderAttachmentPreview();
+            }
+        });
+
 
         // ✅ Listen for file selection
         attachmentInput.addEventListener('change', function (e) {
@@ -691,60 +745,3 @@
     }
 </script>
 
-<script>
-    // === Attachment Handling ===
-const attachFileBtn = document.getElementById('attachFileBtn');
-const attachImageBtn = document.getElementById('attachImageBtn');
-const fileInput = document.getElementById('fileInput');
-const imageInput = document.getElementById('imageInput');
-const attachmentPreview = document.getElementById('attachmentPreview');
-let selectedFiles = [];
-
-// Open file selectors
-attachFileBtn.addEventListener('click', () => fileInput.click());
-attachImageBtn.addEventListener('click', () => imageInput.click());
-
-// Handle file selection
-fileInput.addEventListener('change', handleFileSelect);
-imageInput.addEventListener('change', handleFileSelect);
-
-function handleFileSelect(event) {
-    const files = Array.from(event.target.files);
-    selectedFiles.push(...files);
-    renderAttachmentPreview();
-}
-
-// Render preview list
-function renderAttachmentPreview() {
-    attachmentPreview.innerHTML = '';
-    if (selectedFiles.length > 0) {
-        attachmentPreview.classList.remove('d-none');
-        selectedFiles.forEach((file, index) => {
-            const isImage = file.type.startsWith('image/');
-            const icon = isImage ? 'fa-file-image' : 'fa-file';
-            const item = document.createElement('div');
-            item.className = 'attachment-item';
-            item.innerHTML = `
-                <i class="fas ${icon}"></i>
-                ${file.name}
-                <span class="remove-attachment" data-index="${index}">
-                    <i class="fas fa-times"></i>
-                </span>
-            `;
-            attachmentPreview.appendChild(item);
-        });
-    } else {
-        attachmentPreview.classList.add('d-none');
-    }
-}
-
-// Remove attachment
-attachmentPreview.addEventListener('click', (e) => {
-    if (e.target.closest('.remove-attachment')) {
-        const index = e.target.closest('.remove-attachment').dataset.index;
-        selectedFiles.splice(index, 1);
-        renderAttachmentPreview();
-    }
-});
-
-</script>

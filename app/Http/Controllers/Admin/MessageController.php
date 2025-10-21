@@ -50,7 +50,6 @@ class MessageController extends Controller
             'message_type' => 'required|in:text,image,video,audio,file,system,attachment',
             'attachments.*' => 'nullable|file|max:51200|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar'
         ]);
-        dd($request);
         // Ensure at least content or attachment is provided
         if (empty($request->content) && !$request->hasFile('attachments')) {
             return response()->json([
