@@ -444,7 +444,7 @@
                         <!-- Chat Input -->
                         <div class="chat-input-container">
                             <div class="message-editor">
-                                <div class="editor-toolbar">
+                                {{-- <div class="editor-toolbar">
                                     <button title="Bold"><i class="fas fa-bold"></i></button>
                                     <button title="Italic"><i class="fas fa-italic"></i></button>
                                     <button title="Underline"><i class="fas fa-underline"></i></button>
@@ -452,18 +452,18 @@
                                     <button title="Numbered List"><i class="fas fa-list-ol"></i></button>
                                     <button title="Insert Link"><i class="fas fa-link"></i></button>
                                     <button title="Insert Emoji"><i class="far fa-smile"></i></button>
-                                </div>
+                                </div> --}}
 
                                 <textarea class="message-textarea" id="messageTextarea" placeholder="Type your message here..."></textarea>
 
                                 <div class="editor-actions">
                                     <div class="attachment-options">
-                                        <button class="attachment-btn" id="attachFileBtn" title="Attach File">
+                                        {{-- <button class="attachment-btn" id="attachFileBtn" title="Attach File">
                                             <i class="fas fa-paperclip"></i> Attach File
                                         </button>
                                         <button class="attachment-btn" id="attachImageBtn" title="Insert Image">
                                             <i class="fas fa-image"></i> Image
-                                        </button>
+                                        </button> --}}
                                     </div>
 
                                     <button class="send-btn" id="sendButton">
