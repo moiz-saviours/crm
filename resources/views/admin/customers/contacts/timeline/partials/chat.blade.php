@@ -305,7 +305,7 @@
             </div>
             Loading messages...
         </div>
-
+        
         <!-- Hidden no messages state -->
         <div class="d-none" id="noMessagesState">
             <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
@@ -332,9 +332,9 @@
 </div>
 
     <!-- Attachment Preview -->
-    <div class="attachment-preview d-none" id="attachmentPreview">
-        <!-- Attachment preview will be shown here -->
-    </div>
+<div class="attachment-preview d-none" id="attachmentPreview"></div>
+
+
 
     <!-- Chat Input -->
     <div class="chat-input-container" id="chatInputContainer" style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
@@ -348,6 +348,9 @@
                 <button title="Insert Link"><i class="fas fa-link"></i></button>
                 <button title="Insert Emoji"><i class="far fa-smile"></i></button>
             </div>
+            
+            <input type="file" id="fileInput" multiple hidden>
+            <input type="file" id="imageInput" accept="image/*" multiple hidden>
 
             <textarea class="message-textarea" id="messageTextarea" placeholder="Type your message here..."></textarea>
 
@@ -367,7 +370,7 @@
             </div>
         </div>
     </div>
-
+    
 </div>
 <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
@@ -393,14 +396,11 @@
     });
 
     function initializeChatWithConversation() {
-        socket = io('{{ config('socketio.url') }}',{
-            transports: ["websocket", "polling"],
-            path: '{{ config('socketio.path') }}',
-        });
-
+        socket = io('{{ config('socketio.url') }}');
+        
         socket.emit('join_conversation', conversationId);
 
-        loadMessages(conversationId);
+        loadMessages();
         initializeChatFunctionality();
 
         socket.on('new_message', (data) => {
@@ -421,7 +421,7 @@
     function startNewConversation() {
         const btn = document.getElementById('startConversationBtn');
         const originalText = btn.innerHTML;
-
+        
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
 
@@ -440,9 +440,9 @@
         .then(data => {
             if (data.success) {
                 document.getElementById('noConversationState').style.display = 'none';
-
+                
                 document.getElementById('chatInputContainer').style.display = 'block';
-
+                
                 document.getElementById('chatMessages').innerHTML = `
                     <div class="text-center py-4 text-muted" id="loadingMessages">
                         <div class="spinner-border spinner-border-sm" role="status">
@@ -459,20 +459,19 @@
         })
         .catch(error => {
             console.error('Error creating conversation:', error);
-            alert('Failed to start conversation: ' + error.message);
+            toastr.error('Failed to start conversation: ' + error.message);
             btn.disabled = false;
             btn.innerHTML = originalText;
         });
     }
 
     // Load messages via AJAX and render using partial
-    function loadMessages(conversationId) {
-        const route = `{{ route('admin.customer.contact.conversation.message', ':conversation_id') }}`.replace(':conversation_id', conversationId);
-        fetch(route)
+    function loadMessages() {
+        fetch(`/admin/customer/contact/conversations/${conversationId}/messages`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('loadingMessages').style.display = 'none';
-
+                
                 if (data.messages && data.messages.length > 0) {
                     // Show messages
                     document.getElementById('chatMessages').innerHTML = data.html;
@@ -507,7 +506,7 @@
         if (noMessagesState && !noMessagesState.classList.contains('d-none')) {
             noMessagesState.classList.add('d-none');
         }
-
+        
         // Remove loading state if it's still there
         const loadingMessages = document.getElementById('loadingMessages');
         if (loadingMessages) {
@@ -590,68 +589,144 @@
         const messageTextarea = document.getElementById('messageTextarea');
         const sendButton = document.getElementById('sendButton');
 
-        // Send message function
-        function sendMessage() {
-            const message = messageTextarea.value.trim();
-            if (message) {
-                // Add message locally immediately
-                addNewMessage(message, true);
+        const attachFileBtn = document.getElementById('attachFileBtn');
+        const attachImageBtn = document.getElementById('attachImageBtn');
+        const fileInput = document.getElementById('fileInput');
+        const imageInput = document.getElementById('imageInput');
+        const attachmentPreview = document.getElementById('attachmentPreview');
 
-                // Send to Laravel backend via AJAX
-                fetch('/admin/customer/contact/messages', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            content: message,
-                            conversation_id: conversationId,
-                            message_type: 'text'
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Message sent:', data);
-                        if (data.success) {
-                            // Message sent successfully
-                            messageTextarea.value = '';
-                            messageTextarea.style.height = '60px';
+        let selectedFiles = [];
 
-                            // Also send via Socket.io for real-time
-                            if (socket) {
-                                socket.emit('send_message', {
-                                    content: message,
-                                    conversation_id: conversationId,
-                                    sender_type: currentUser.type,
-                                    sender_id: currentUser.id,
-                                    message_type: 'text'
-                                });
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error sending message:', error);
-                        alert('Failed to send message');
-                    });
+        // Open file selectors
+        attachFileBtn.addEventListener('click', () => fileInput.click());
+        attachImageBtn.addEventListener('click', () => imageInput.click());
+
+        // Handle file selection
+        fileInput.addEventListener('change', handleFileSelect);
+        imageInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            selectedFiles.push(...files);
+            renderAttachmentPreview();
+        }
+
+        // Render preview list
+        function renderAttachmentPreview() {
+            attachmentPreview.innerHTML = '';
+            if (selectedFiles.length > 0) {
+                attachmentPreview.classList.remove('d-none');
+                selectedFiles.forEach((file, index) => {
+                    const isImage = file.type.startsWith('image/');
+                    const icon = isImage ? 'fa-file-image' : 'fa-file';
+                    const item = document.createElement('div');
+                    item.className = 'attachment-item';
+                    item.innerHTML = `
+                        <i class="fas ${icon}"></i>
+                        ${file.name}
+                        <span class="remove-attachment" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    attachmentPreview.appendChild(item);
+                });
+            } else {
+                attachmentPreview.classList.add('d-none');
             }
         }
 
-        // Send message on button click
+        // Remove attachment
+        attachmentPreview.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-attachment')) {
+                const index = e.target.closest('.remove-attachment').dataset.index;
+                selectedFiles.splice(index, 1);
+                renderAttachmentPreview();
+            }
+        });
+
+
+        // ✅ Listen for file selection
+        attachmentInput.addEventListener('change', function (e) {
+            selectedFiles = Array.from(e.target.files);
+            renderAttachmentPreview(); // optional UI update
+        });
+
+        // ✅ Send message (text + attachments)
+        function sendMessage() {
+            const message = messageTextarea.value.trim();
+
+            // Stop if no text or attachments
+            if (!message && selectedFiles.length === 0) {
+                return;
+            }
+
+            // Add message locally for instant feedback
+            addNewMessage(message, true);
+
+            // Prepare FormData
+            const formData = new FormData();
+            formData.append('conversation_id', conversationId);
+            formData.append('message_type', selectedFiles.length > 0 ? 'file' : 'text');
+            formData.append('content', message);
+
+            selectedFiles.forEach(file => {
+                formData.append('attachments[]', file);
+            });
+
+            // ✅ Send to Laravel backend
+            fetch('/admin/customer/contact/messages', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Reset inputs
+                    messageTextarea.value = '';
+                    messageTextarea.style.height = '60px';
+                    attachmentInput.value = '';
+                    selectedFiles = [];
+                    renderAttachmentPreview();
+
+                    // ✅ Emit via Socket.io (for real-time updates)
+                    if (socket) {
+                        socket.emit('send_message', {
+                            content: message,
+                            conversation_id: conversationId,
+                            sender_type: currentUser.type,
+                            sender_id: currentUser.id,
+                            message_type: data.message.message_type,
+                            attachments: data.message.attachments || []
+                        });
+                    }
+                } else {
+                    toastr.error('Failed to send message');
+                }
+            })
+            .catch(err => {
+                console.error('Send error:', err);
+                toastr.error('Failed to send message');
+            });
+        }
+
+        // ✅ Send on button click
         sendButton.addEventListener('click', sendMessage);
 
-        // Send message on Enter key
-        messageTextarea.addEventListener('keydown', function(e) {
+        // ✅ Send on Enter (without Shift)
+        messageTextarea.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
         });
 
-        // Auto-expand textarea
-        messageTextarea.addEventListener('input', function() {
+        // ✅ Auto-expand textarea height
+        messageTextarea.addEventListener('input', function () {
             this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
+            this.style.height = `${this.scrollHeight}px`;
 
             if (this.scrollHeight > 120) {
                 this.style.height = '120px';
@@ -662,9 +737,11 @@
         });
     }
 
+
     // Scroll to bottom of chat
     function scrollToBottom() {
         const chatMessages = document.getElementById('chatMessages');
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 </script>
+
