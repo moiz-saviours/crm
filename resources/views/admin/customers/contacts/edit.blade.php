@@ -535,7 +535,7 @@
             }
 
             .content {
-                height: calc(100% - 60px);
+                /* height: calc(100% - 60px); */
                 background-color: #f5f8fa;
             }
 
