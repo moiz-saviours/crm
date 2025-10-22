@@ -40,6 +40,8 @@
                 @include('admin.customers.contacts.timeline.partials.card-box.activity')
             @elseif ($item['type'] === 'conversion')
                 @include('admin.customers.contacts.timeline.partials.card-box.conversion')
+            @elseif ($item['type'] === 'form_submission')
+                @include('admin.customers.contacts.timeline.partials.card-box.form_submission')
             @endif
         @endforeach
         @else
