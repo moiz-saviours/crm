@@ -91,10 +91,6 @@
             return 1;
         }
         function initializeDatatable(table_div, index) {
-            console.log(`Initializing table: ${table_div.attr('id')} - Instance: ${index}`);
-            // if ($.fn.DataTable.isDataTable(table_div)) {
-            //     table_div.DataTable().destroy();
-            // }
             let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
@@ -529,6 +525,7 @@
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');
+            let table = dataTables[0];
             AjaxDeleteRequestPromise(`{{ route("admin.invoice.delete", "") }}/${id}`, null, 'DELETE', {
                 useDeleteSwal: true,
                 useToastr: true,
