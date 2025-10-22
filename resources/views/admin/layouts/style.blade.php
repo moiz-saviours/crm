@@ -417,7 +417,7 @@ Detailed information and more samples can be found in the documentation.
     /** Datatable */
 
     div.dt-container div.dt-length select {
-        min-width: 60px;
+        min-width: 105px;
     }
 
     .dt-buttons button.btn.btn-secondary {
@@ -501,7 +501,9 @@ Detailed information and more samples can be found in the documentation.
         margin-right: 20px;
         display: inline-block;
     }
-
+    .table tr .text-left {
+        text-align: left !important;
+    }
     .table.dataTable.table.table-striped > tbody > tr:nth-of-type(2n+1).selected > *,
     .table.dataTable.table > tbody > tr.selected > * {
         box-shadow: inset 0 0 0 9999px var(--bs-primary);
