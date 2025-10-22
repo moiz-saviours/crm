@@ -20,6 +20,8 @@ return new class extends Migration
             $table->enum('conversation_status', ['pending', 'approved', 'rejected', 'blocked'])
                 ->default('pending');
 
+            $table->nullableMorphs('context');
+
             $table->unsignedBigInteger('last_message_id')->nullable()->default(null);
 
             $table->integer('status')->nullable()->default(1)->comment('0 = inactive, 1 = active');
