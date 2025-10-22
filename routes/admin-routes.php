@@ -25,7 +25,8 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     TeamTargetController as AdminTeamTargetController,
     SalesKpiController as AdminSalesKpiController,
     EmailController as AdminEmailController,
-    MessageController as AdminMessageController
+    MessageController as AdminMessageController,
+    ProjectController as AdminProjectController,
 };
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Encryption\Encrypter;
@@ -263,9 +264,13 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::get('/timeline/fetch-remote', [AdminCustomerContactController::class, 'fetchRemote'])
                     ->name('timeline.fetch-remote');
                 Route::post('/retry/email/{id}', [AdminEmailController::class, 'retryEmail'])->name('retry.email');
-                Route::post('/messages', [AdminMessageController::class, 'store']);
-                Route::get('/conversations/{conversationId}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversation.message');
+                Route::post('/messages', [AdminMessageController::class, 'store'])->name('messages.store');
+                Route::get('/conversations/{conversationId}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversation.messages');
                 Route::post('/conversations', [AdminMessageController::class, 'storeConversation'])->name('conversations.store');
+
+                Route::get('/projects/data', [AdminProjectController::class, 'getProjectsData'])->name('projects.data');
+                Route::get('/projects/details', [AdminProjectController::class, 'getProjectDetails'])->name('projects.details');
+
             });
         });
         /** Companies Routes */
