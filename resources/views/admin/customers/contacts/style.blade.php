@@ -430,4 +430,22 @@
 
     }
 
+    table.dataTable {
+        width: auto !important;
+        table-layout: fixed;
+    }
+
+    table.dataTable thead th {
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+    }
+
+    table.dataTable tbody td.text-nowrap {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+    }
+
 </style>
