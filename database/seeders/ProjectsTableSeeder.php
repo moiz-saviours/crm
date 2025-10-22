@@ -27,7 +27,6 @@ class ProjectsTableSeeder extends Seeder
         $admins = Admin::all();
 
         // If no records exist, we'll use null/default values
-        $brandIds = $brands->pluck('id')->toArray();
         $customerContactIds = $customerContacts->pluck('id')->toArray();
         $teamIds = $teams->pluck('id')->toArray();
         
@@ -35,72 +34,58 @@ class ProjectsTableSeeder extends Seeder
         $projectAttachments = [];
         $projectMembers = [];
 
-        for ($i = 1; $i <= 10; $i++) {
-            // Determine brand_id - assign to existing brands sequentially
-            $brandId = null;
-            if (!empty($brandIds)) {
-                $brandId = $brandIds[($i - 1) % count($brandIds)];
-            }
+        $projectCounter = 1;
+        
+        // Create 50 projects for each admin
+        foreach ($admins as $admin) {
+            for ($i = 1; $i <= 50; $i++) {
 
-            // Get customer_special_key from CustomerContact sequentially
-            $customerSpecialKey = null;
-            if (!empty($customerContactIds)) {
-                $customerContact = $customerContacts[($i - 1) % count($customerContacts)];
-                $customerSpecialKey = $customerContact->special_key ?? 'CUST-' . str_pad($customerContact->id, 4, '0', STR_PAD_LEFT);
-            }
+                // Get cus_contact_key from CustomerContact sequentially
+                $customerSpecialKey = null;
+                if (!empty($customerContactIds)) {
+                    $customerContact = $customerContacts[($projectCounter - 1) % count($customerContacts)];
+                    $customerSpecialKey = $customerContact->special_key ?? 'CUST-' . str_pad($customerContact->id, 4, '0', STR_PAD_LEFT);
+                }
 
-            // Get team_key from Team model sequentially
-            $teamKey = null;
-            if (!empty($teamIds)) {
-                $team = $teams[($i - 1) % count($teams)];
-                $teamKey = $team->team_key ?? 'TEAM-' . str_pad($team->id, 3, '0', STR_PAD_LEFT);
-            }
+                // Get team_key from Team model sequentially
+                $teamKey = null;
+                if (!empty($teamIds)) {
+                    $team = $teams[($projectCounter - 1) % count($teams)];
+                    $teamKey = $team->team_key ?? 'TEAM-' . str_pad($team->id, 3, '0', STR_PAD_LEFT);
+                }
 
-            // Get brand_key from Brand model sequentially
-            $brandKey = null;
-            if ($brandId && !empty($brands)) {
-                $brand = $brands->firstWhere('id', $brandId);
-                $brandKey = $brand->brand_key ?? 'BRAND-' . str_pad($brandId, 3, '0', STR_PAD_LEFT);
-            }
+                // Get brand_key from Brand model sequentially
+                $brandKey = null;
 
-            // Determine creator - use Admin with first available ID or authenticated user
-            $creatorType = 'App\Models\Admin';
-            $creatorId = null;
-            
-            if ($admins->isNotEmpty()) {
-                $creatorId = $admins->first()->id; // Use first admin instead of random
-            } else {
-                // Fallback to authenticated user or default
-                $creatorId = Auth::id() ?? 1;
-            }
+                $projects[] = [
+                    'special_key' => 'PROJ-' . str_pad($projectCounter, 6, '0', STR_PAD_LEFT) . '-' . uniqid(),
+                    'cus_contact_key' => $customerSpecialKey,
+                    'brand_key' => $brandKey,
+                    'team_key' => $teamKey,
+                    'type' => $this->getProjectType($projectCounter),
+                    'value' => $this->getProjectValue($projectCounter),
+                    'label' => 'Project ' . $projectCounter . ' - Admin ' . $admin->id,
+                    'theme_color' => $this->getThemeColor($projectCounter),
+                    'project_status' => $this->getProjectStatus($projectCounter),
+                    'is_progress' => $projectCounter % 4 !== 0,
+                    'progress' => $this->getProgress($projectCounter),
+                    'bill_type' => $this->getBillType($projectCounter),
+                    'total_rate' => $this->getTotalRate($projectCounter),
+                    'estimated_hours' => $this->getEstimatedHours($projectCounter),
+                    'start_date' => $this->getStartDate($projectCounter),
+                    'deadline' => $this->getDeadline($projectCounter),
+                    'tags' => json_encode($this->getTags($projectCounter)),
+                    'description' => $this->getDescription($projectCounter) . ' (Assigned to Admin ' . $admin->id . ')',
+                    'is_notify' => $projectCounter % 5 !== 0,
+                    'creator_type' => 'App\Models\Admin',
+                    'creator_id' => $admin->id,
+                    'status' => $projectCounter % 100 === 0 ? 0 : 1, // Every 100th project is inactive
+                    'created_at' => Carbon::now()->subDays(rand(0, 365)),
+                    'updated_at' => Carbon::now()->subDays(rand(0, 365)),
+                ];
 
-            $projects[] = [
-                'brand_id' => $brandId,
-                'special_key' => 'PROJ-' . str_pad($i, 6, '0', STR_PAD_LEFT) . '-' . uniqid(),
-                'customer_special_key' => $customerSpecialKey,
-                'brand_key' => $brandKey,
-                'team_key' => $teamKey,
-                'type' => $this->getProjectType($i),
-                'value' => $this->getProjectValue($i),
-                'label' => 'Project Label ' . $i,
-                'theme_color' => $this->getThemeColor($i),
-                'project_status' => $this->getProjectStatus($i),
-                'is_progress' => $i % 4 !== 0,
-                'progress' => $this->getProgress($i),
-                'bill_type' => $this->getBillType($i),
-                'total_rate' => $this->getTotalRate($i),
-                'estimated_hours' => $this->getEstimatedHours($i),
-                'start_date' => $this->getStartDate($i),
-                'deadline' => $this->getDeadline($i),
-                'tags' => json_encode($this->getTags($i)),
-                'description' => $this->getDescription($i),
-                'is_notify' => $i % 5 !== 0,
-                'creator_type' => $creatorType,
-                'creator_id' => $creatorId,
-                'status' => $i === 10 ? 0 : 1,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ];
+                $projectCounter++;
+            }
         }
 
         // Insert projects and get their IDs
@@ -123,18 +108,29 @@ class ProjectsTableSeeder extends Seeder
                 ];
             }
 
-            // Create 3-5 members per project
+            // Create 3-5 members per project (include the creator admin and others)
             $memberCount = rand(3, 5);
-            $usedMemberIds = []; // Track used member IDs for uniqueness
+            $usedMemberIds = [$project->creator_id]; // Start with creator
             
-            for ($k = 1; $k <= $memberCount; $k++) {
-                $memberType = 'App\Models\Admin';
+            // Add the creator as first member (usually as Project Manager)
+            $projectMembers[] = [
+                'project_id' => $project->id,
+                'member_type' => 'App\Models\Admin',
+                'member_id' => $project->creator_id,
+                'role' => 'Project Manager',
+                'is_active' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+
+            // Add additional members
+            for ($k = 2; $k <= $memberCount; $k++) {
                 $memberId = $this->getMemberId($admins, $k, $usedMemberIds);
                 $usedMemberIds[] = $memberId;
 
                 $projectMembers[] = [
                     'project_id' => $project->id,
-                    'member_type' => $memberType,
+                    'member_type' => 'App\Models\Admin',
                     'member_id' => $memberId,
                     'role' => $this->getMemberRole($k),
                     'is_active' => $k !== $memberCount, // Last member is inactive for demo
@@ -147,6 +143,10 @@ class ProjectsTableSeeder extends Seeder
         // Insert attachments and members
         DB::table('project_attachments')->insert($projectAttachments);
         DB::table('project_members')->insert($projectMembers);
+
+        $this->command->info('Created ' . count($projects) . ' projects (' . $admins->count() . ' admins × 50 projects each)');
+        $this->command->info('Created ' . count($projectAttachments) . ' project attachments');
+        $this->command->info('Created ' . count($projectMembers) . ' project member assignments');
     }
 
     private function getFileName(int $projectIndex, int $attachmentIndex): string
@@ -179,23 +179,23 @@ class ProjectsTableSeeder extends Seeder
         if ($admins->isNotEmpty()) {
             $availableAdmins = $admins->whereNotIn('id', $usedMemberIds);
             if ($availableAdmins->isNotEmpty()) {
-                return $availableAdmins->first()->id;
+                return $availableAdmins->random()->id;
             }
-            // If all admins are used, reuse the first one
-            return $admins->first()->id;
+            // If all admins are used, pick a random one (avoid duplicates where possible)
+            return $admins->random()->id;
         }
         return $memberIndex;
     }
 
     private function getMemberRole(int $memberIndex): string
     {
-        $roles = ['Project Manager', 'Developer', 'Designer', 'QA Tester', 'Business Analyst'];
-        return $roles[($memberIndex - 1) % count($roles)];
+        $roles = ['Developer', 'Designer', 'QA Tester', 'Business Analyst', 'Technical Lead'];
+        return $roles[($memberIndex - 2) % count($roles)]; // Start from index 2 since PM is already assigned
     }
 
     private function getProjectType(int $index): string
     {
-        $types = ['web_development', 'mobile_app', 'design', 'marketing', 'consulting'];
+        $types = ['web_development', 'mobile_app', 'design', 'marketing', 'consulting', 'ecommerce', 'api_development', 'maintenance'];
         return $types[($index - 1) % count($types)];
     }
 
@@ -207,13 +207,13 @@ class ProjectsTableSeeder extends Seeder
 
     private function getThemeColor(int $index): string
     {
-        $colors = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6'];
+        $colors = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
         return $colors[($index - 1) % count($colors)];
     }
 
     private function getProjectStatus(int $index): string
     {
-        $statuses = ['isprogress', 'on hold', 'cancelled', 'finished'];
+        $statuses = ['is_progress', 'on hold', 'cancelled', 'finished'];
         return $statuses[($index - 1) % count($statuses)];
     }
 
@@ -224,7 +224,9 @@ class ProjectsTableSeeder extends Seeder
             'finished' => 100,
             'cancelled' => rand(0, 50),
             'on hold' => rand(20, 80),
-            default => rand(0, 95) // isprogress
+            'planning' => rand(0, 20),
+            'review' => rand(80, 95),
+            default => rand(0, 95)
         };
     }
 
@@ -236,39 +238,41 @@ class ProjectsTableSeeder extends Seeder
 
     private function getTotalRate(int $index): float
     {
-        $rates = [1500.00, 2500.50, 5000.00, 7500.75, 10000.00, 15000.00, 20000.00, 25000.00, 35000.00, 50000.00];
-        return $rates[$index - 1] ?? 5000.00;
+        $rates = [1500.00, 2500.50, 5000.00, 7500.75, 10000.00, 15000.00, 20000.00, 25000.00, 35000.00, 50000.00, 75000.00, 100000.00];
+        return $rates[($index - 1) % count($rates)];
     }
 
     private function getEstimatedHours(int $index): float
     {
-        $hours = [50.0, 80.5, 120.0, 200.0, 150.5, 300.0, 250.0, 400.0, 350.5, 500.0];
-        return $hours[$index - 1] ?? 200.0;
+        $hours = [50.0, 80.5, 120.0, 200.0, 150.5, 300.0, 250.0, 400.0, 350.5, 500.0, 600.0, 750.0];
+        return $hours[($index - 1) % count($hours)];
     }
 
     private function getStartDate(int $index): Carbon
     {
-        return Carbon::now()->subDays(($index * 10) + 5);
+        return Carbon::now()->subDays(($index * 7) + rand(1, 30));
     }
 
     private function getDeadline(int $index): Carbon
     {
-        return Carbon::now()->addDays(($index * 15) + 30);
+        return Carbon::now()->addDays(($index * 10) + rand(30, 180));
     }
 
     private function getTags(int $index): array
     {
         $tagSets = [
-            ['urgent', 'development'],
-            ['design', 'ui/ux'],
-            ['marketing', 'seo'],
-            ['mobile', 'ios', 'android'],
-            ['web', 'responsive'],
-            ['ecommerce', 'payment'],
-            ['api', 'integration'],
-            ['analytics', 'tracking'],
-            ['security', 'authentication'],
-            ['cloud', 'deployment']
+            ['urgent', 'development', 'web'],
+            ['design', 'ui/ux', 'responsive'],
+            ['marketing', 'seo', 'social-media'],
+            ['mobile', 'ios', 'android', 'flutter'],
+            ['web', 'responsive', 'frontend'],
+            ['ecommerce', 'payment', 'woocommerce'],
+            ['api', 'integration', 'rest'],
+            ['analytics', 'tracking', 'data'],
+            ['security', 'authentication', 'ssl'],
+            ['cloud', 'deployment', 'aws'],
+            ['maintenance', 'support', 'updates'],
+            ['consulting', 'strategy', 'planning']
         ];
 
         return $tagSets[($index - 1) % count($tagSets)];
@@ -286,7 +290,9 @@ class ProjectsTableSeeder extends Seeder
             'API development and integration services for third-party systems.',
             'Data analytics and tracking implementation for business intelligence.',
             'Security enhancement project with authentication system implementation.',
-            'Cloud deployment and infrastructure setup for scalable applications.'
+            'Cloud deployment and infrastructure setup for scalable applications.',
+            'Ongoing maintenance and support services for existing systems.',
+            'Strategic consulting and planning for digital transformation.'
         ];
 
         return $descriptions[($index - 1) % count($descriptions)];

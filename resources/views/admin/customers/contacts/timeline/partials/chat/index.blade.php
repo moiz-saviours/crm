@@ -290,6 +290,151 @@
         align-items: flex-end;
     }
 
+    .chat-sidebar {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        height: 400px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 8px 35px 8px 12px;
+        border: 1px solid var(--light-gray);
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--bs-primary);
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-color);
+    }
+
+    .contacts-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .contact-item:hover {
+        background-color: #f8f9fa;
+        border-color: var(--light-gray);
+    }
+
+    .contact-item.active {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: white;
+    }
+
+    .contact-item.active .contact-last-message,
+    .contact-item.active .contact-time {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .contact-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    .contact-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .contact-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .contact-last-message {
+        font-size: 0.8rem;
+        color: var(--gray-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .contact-time {
+        font-size: 0.7rem;
+        color: var(--gray-color);
+        white-space: nowrap;
+    }
+
+    .unread-badge {
+        background-color: var(--success-color);
+        color: white;
+        border-radius: 10px;
+        padding: 2px 8px;
+        font-size: 0.7rem;
+        margin-left: 5px;
+    }
+
+    .no-contacts {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--gray-color);
+    }
+
+    /* Scrollbar for sidebar */
+    .chat-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chat-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .chat-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
+    }
+
     /* Attachment bubble styles */
     .attachment-bubble {
         border-radius: 12px;
@@ -313,91 +458,136 @@
     .attachment-bubble i {
         color: #6c757d;
     }
+
+    /* ADD these CSS classes */
+    .project-bg {
+        background-color: #3b82f6 !important;
+    }
+
+    .task-bg {
+        background-color: #10b981 !important;
+    }
+
+    .invoice-bg {
+        background-color: #f59e0b !important;
+    }
+
+    .general-bg {
+        background-color: #6b7280 !important;
+    }
 </style>
-<div class="chat-container">
-    <!-- Chat Header -->
-    <div class="chat-header d-none">
-        <!-- Your header content -->
-    </div>
-    <!-- Chat Messages -->
-    <div class="chat-messages" id="chatMessages">
-        @if (isset($conversation) && $conversation->id)
-            <!-- Messages will be loaded dynamically via AJAX -->
-            <div class="text-center py-4 text-muted" id="loadingMessages">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Loading messages...</span>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <h5 class="mb-3">Conversations</h5>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search Conversations..." id="contactSearch">
+                    <i class="fas fa-search search-icon"></i>
                 </div>
-                Loading messages...
             </div>
 
-            <!-- Hidden no messages state -->
-            <div class="d-none" id="noMessagesState">
-                <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
-                    <div class="mb-3">
-                        <i class="fas fa-comment-slash fa-3x text-muted"></i>
+            <div class="contacts-list" id="contactsList">
+                <!-- ADD THIS LOADING ELEMENT -->
+                <div class="text-center py-4 text-muted" id="loadingContacts">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Loading Conversations...</span>
                     </div>
-                    <h5 class="text-muted mb-3">No Messages Yet</h5>
-                    <p class="text-muted mb-4">Send a message to start the conversation</p>
+                    Loading Conversations...
                 </div>
-            </div>
-        @else
-            <!-- No conversation state -->
-            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4"
-                id="noConversationState">
-                <div class="mb-3">
-                    <i class="fas fa-comments fa-3x text-muted"></i>
-                </div>
-                <h5 class="text-muted mb-3">No Conversation Started</h5>
-                <p class="text-muted mb-4">Start a new conversation to begin chatting</p>
-                <button class="btn btn-primary" id="startConversationBtn">
-                    <i class="fas fa-plus me-2"></i>Start Chatting
-                </button>
-            </div>
-        @endif
-    </div>
-
-    <!-- Attachment Preview -->
-    <div class="attachment-preview d-none" id="attachmentPreview"></div>
-
-
-
-    <!-- Chat Input -->
-    <div class="chat-input-container" id="chatInputContainer"
-        style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
-        <div class="message-editor">
-            {{-- <div class="editor-toolbar">
-                <button title="Bold"><i class="fas fa-bold"></i></button>
-                <button title="Italic"><i class="fas fa-italic"></i></button>
-                <button title="Underline"><i class="fas fa-underline"></i></button>
-                <button title="Bullet List"><i class="fas fa-list-ul"></i></button>
-                <button title="Numbered List"><i class="fas fa-list-ol"></i></button>
-                <button title="Insert Link"><i class="fas fa-link"></i></button>
-                <button title="Insert Emoji"><i class="far fa-smile"></i></button>
-            </div> --}}
-
-            <input type="file" id="fileInput" multiple hidden>
-            <input type="file" id="imageInput" accept="image/*" multiple hidden>
-
-            <textarea class="message-textarea" id="messageTextarea" placeholder="Type your message here..."></textarea>
-
-            <div class="editor-actions">
-                <div class="attachment-options">
-                    <button class="attachment-btn" id="attachFileBtn" title="Attach File">
-                        <i class="fas fa-paperclip"></i> Attach File
-                    </button>
-                    <button class="attachment-btn" id="attachImageBtn" title="Insert Image">
-                        <i class="fas fa-image"></i> Image
-                    </button>
-                </div>
-
-                <button class="send-btn" id="sendButton">
-                    Send <i class="fas fa-paper-plane ms-1"></i>
-                </button>
             </div>
         </div>
     </div>
 
+    <div class="col-md-8">
+        <div class="chat-container">
+            <!-- Chat Header -->
+            <div class="chat-header d-none">
+                <!-- Your header content -->
+            </div>
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                @if (isset($conversation) && $conversation->id)
+                    <!-- Messages will be loaded dynamically via AJAX -->
+                    <div class="text-center py-4 text-muted" id="loadingMessages">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="visually-hidden">Loading messages...</span>
+                        </div>
+                        Loading messages...
+                    </div>
+
+                    <!-- Hidden no messages state -->
+                    <div class="d-none" id="noMessagesState">
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-comment-slash fa-3x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted mb-3">No Messages Yet</h5>
+                            <p class="text-muted mb-4">Send a message to start the conversation</p>
+                        </div>
+                    </div>
+                @else
+                    <!-- No conversation state -->
+                    <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4"
+                        id="noConversationState">
+                        <div class="mb-3">
+                            <i class="fas fa-comments fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">No Conversation Started</h5>
+                        <p class="text-muted mb-4">Start a new conversation to begin chatting</p>
+                        <button class="btn btn-primary" id="startConversationBtn">
+                            <i class="fas fa-plus me-2"></i>Start Chatting
+                        </button>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Attachment Preview -->
+            <div class="attachment-preview d-none" id="attachmentPreview"></div>
+
+
+
+            <!-- Chat Input -->
+            <div class="chat-input-container" id="chatInputContainer"
+                style="{{ !isset($conversation) || !$conversation->id ? 'display: none;' : '' }}">
+                <div class="message-editor">
+                    {{-- <div class="editor-toolbar">
+                                <button title="Bold"><i class="fas fa-bold"></i></button>
+                                <button title="Italic"><i class="fas fa-italic"></i></button>
+                                <button title="Underline"><i class="fas fa-underline"></i></button>
+                                <button title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                                <button title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                                <button title="Insert Link"><i class="fas fa-link"></i></button>
+                                <button title="Insert Emoji"><i class="far fa-smile"></i></button>
+                            </div> --}}
+
+                    <input type="file" id="fileInput" multiple hidden>
+                    <input type="file" id="imageInput" accept="image/*" multiple hidden>
+
+                    <textarea class="message-textarea" id="messageTextarea" placeholder="Type your message here..."></textarea>
+
+                    <div class="editor-actions">
+                        <div class="attachment-options">
+                            <button class="attachment-btn" id="attachFileBtn" title="Attach File">
+                                <i class="fas fa-paperclip"></i> Attach File
+                            </button>
+                            <button class="attachment-btn" id="attachImageBtn" title="Insert Image">
+                                <i class="fas fa-image"></i> Image
+                            </button>
+                        </div>
+
+                        <button class="send-btn" id="sendButton">
+                            Send <i class="fas fa-paper-plane ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
+
 <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
 <script>
@@ -412,14 +602,268 @@
 
     let socket = null;
 
+    let currentContext = {
+        type: '{{ addslashes(get_class($customer_contact ?? null)) }}',
+        id: {{ $customer_contact->id ?? 'null' }}
+    };
+
     // Initialize based on conversation existence
     document.addEventListener('DOMContentLoaded', function() {
+        loadConversationsAsContacts(); // Add this line
+
         if (conversationId) {
             initializeChatWithConversation();
         } else {
             initializeNoConversationState();
         }
     });
+
+    // UPDATE the loadConversationsAsContacts function:
+        function loadConversationsAsContacts() {
+            const loadingElement = document.getElementById('loadingContacts');
+            const contactsList = document.getElementById('contactsList');
+            
+            if (loadingElement) loadingElement.style.display = 'block';
+            
+            // Get context-based conversations for this customer contact
+            fetch(`/admin/customer/contact/${currentContext.id}/context-conversations`)
+                .then(response => response.json())
+                .then(data => {
+                    if (loadingElement) loadingElement.style.display = 'none';
+                    renderContextConversations(data.conversations || []);
+                })
+                .catch(error => {
+                    console.error('Error loading conversations:', error);
+                    if (loadingElement) {
+                        loadingElement.innerHTML = '<div class="text-danger">Failed to load conversations</div>';
+                    }
+                });
+        }
+
+        // UPDATE the render function for context conversations:
+        function renderContextConversations(conversations) {
+            const contactsList = document.getElementById('contactsList');
+            
+            if (!conversations || conversations.length === 0) {
+                contactsList.innerHTML = `
+                    <div class="no-contacts">
+                        <i class="fas fa-comments fa-2x mb-3"></i>
+                        <p>No conversations yet</p>
+                        <small class="text-muted">Start a new conversation about a project, task, or invoice</small>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            conversations.forEach(conversation => {
+                const isActive = conversation.id == conversationId;
+                const contextInfo = getContextInfo(conversation);
+                const lastMessage = getLastMessagePreview(conversation);
+                const unreadCount = getUnreadCount(conversation);
+                
+                html += `
+                    <div class="contact-item ${isActive ? 'active' : ''}" data-conversation-id="${conversation.id}">
+                        <div class="contact-avatar ${contextInfo.color}">${contextInfo.icon}</div>
+                        <div class="contact-info">
+                            <div class="contact-name">
+                                ${contextInfo.title}
+                                ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
+                            </div>
+                            <div class="contact-last-message">${lastMessage}</div>
+                        </div>
+                        <div class="contact-time">${formatTime(conversation.last_message_time || conversation.updated_at)}</div>
+                    </div>
+                `;
+            });
+            
+            contactsList.innerHTML = html;
+            
+            // Add click event listeners
+            document.querySelectorAll('.contact-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const conversationId = this.dataset.conversationId;
+                    selectConversation(conversationId);
+                });
+            });
+        }
+
+        // ADD this function to get context information:
+        function getContextInfo(conversation) {
+            const contextType = conversation.context_type;
+            const contextId = conversation.context_id;
+            
+            const contextConfig = {
+                'App\\Models\\Project': {
+                    icon: '📋',
+                    color: 'project-bg',
+                    title: `Project #${contextId}`,
+                    prefix: 'Project'
+                },
+                'App\\Models\\Task': {
+                    icon: '✅',
+                    color: 'task-bg',
+                    title: `Task #${contextId}`,
+                    prefix: 'Task'
+                },
+                'App\\Models\\Invoice': {
+                    icon: '🧾',
+                    color: 'invoice-bg',
+                    title: `Invoice #${contextId}`,
+                    prefix: 'Invoice'
+                },
+                'App\\Models\\CustomerContact': {
+                    icon: '💬',
+                    color: 'general-bg',
+                    title: 'General Chat',
+                    prefix: 'General'
+                }
+            };
+            
+            return contextConfig[contextType] || {
+                icon: '💬',
+                color: 'general-bg',
+                title: 'Conversation',
+                prefix: 'General'
+            };
+        }
+
+    // Render conversations as contact list
+    function renderConversationsAsContacts(conversations) {
+        const contactsList = document.getElementById('contactsList');
+
+        if (!conversations || conversations.length === 0) {
+            contactsList.innerHTML = `
+                <div class="no-contacts">
+                    <i class="fas fa-comments fa-2x mb-3"></i>
+                    <p>No conversations yet</p>
+                    <small class="text-muted">Start a new conversation to begin chatting</small>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        conversations.forEach(conversation => {
+            const isActive = conversation.id == conversationId;
+            const otherParty = getOtherParty(conversation);
+            const avatarText = getAvatarText(otherParty);
+            const lastMessage = getLastMessagePreview(conversation);
+            const unreadCount = getUnreadCount(conversation);
+
+            html += `
+                <div class="contact-item ${isActive ? 'active' : ''}" data-conversation-id="${conversation.id}">
+                    <div class="contact-avatar">${avatarText}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">
+                            ${otherParty.name || 'Unknown'}
+                            ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
+                        </div>
+                        <div class="contact-last-message">${lastMessage}</div>
+                    </div>
+                    <div class="contact-time">${formatTime(conversation.last_message_time || conversation.updated_at)}</div>
+                </div>
+            `;
+        });
+
+        contactsList.innerHTML = html;
+
+        // Add click event listeners to conversation items
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const conversationId = this.dataset.conversationId;
+                selectConversation(conversationId);
+            });
+        });
+    }
+
+    // Get the other party in conversation (not current user)
+    function getOtherParty(conversation) {
+        const currentUserType = '{{ addslashes(get_class(auth()->user())) }}';
+        const customerContactType = '{{ addslashes(get_class($customer_contact)) }}';
+
+        if (conversation.sender_type === currentUserType && conversation.sender_id === currentUser.id) {
+            // Current user is sender, so receiver is the customer contact
+            return {
+                type: conversation.receiver_type,
+                id: conversation.receiver_id,
+                name: conversation.receiver?.name || conversation.receiver?.email || 'Customer Contact'
+            };
+        } else {
+            // Current user is receiver, so sender is the customer contact
+            return {
+                type: conversation.sender_type,
+                id: conversation.sender_id,
+                name: conversation.sender?.name || conversation.sender?.email || 'Customer Contact'
+            };
+        }
+    }
+
+    // Get avatar text from name
+    function getAvatarText(party) {
+        if (!party.name) return 'CC';
+
+        // For customer contacts, use first letters of name or fallback to 'CC'
+        const nameParts = party.name.split(' ');
+        if (nameParts.length >= 2) {
+            return (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+        }
+        return party.name.substring(0, 2).toUpperCase();
+    }
+
+    // Get last message preview
+    function getLastMessagePreview(conversation) {
+        if (conversation.last_message) {
+            const content = conversation.last_message.content;
+            return content.length > 30 ? content.substring(0, 30) + '...' : content;
+        }
+        return 'No messages yet';
+    }
+
+    // Get unread message count
+    function getUnreadCount(conversation) {
+        return conversation.unread_count || 0;
+    }
+
+    // Format time for display
+    function formatTime(timestamp) {
+        if (!timestamp) return '';
+
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            return date.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } else if (diffDays === 1) {
+            return 'Yesterday';
+        } else if (diffDays < 7) {
+            return date.toLocaleDateString([], {
+                weekday: 'short'
+            });
+        } else {
+            return date.toLocaleDateString([], {
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+    }
+
+    // Handle conversation selection
+    function selectConversation(conversationId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('conversation_id', conversationId);
+        window.location.href = url.toString();
+    }
+
+    // Update conversation list when new messages arrive
+    function updateConversationList() {
+        loadConversationsAsContacts();
+    }
 
     function initializeChatWithConversation() {
         socket = io('{{ config('socketio.url') }}');
@@ -432,6 +876,7 @@
         socket.on('new_message', (data) => {
             if (data.sender_id !== currentUser.id || data.sender_type !== currentUser.type) {
                 addNewMessage(data.content, false, data);
+                updateConversationList(); // Add this line
             }
         });
     }
@@ -459,7 +904,7 @@
                 },
                 body: JSON.stringify({
                     receiver_type: 'App\\Models\\CustomerContact',
-                    receiver_id: {{ $customer_contact->id ?? 'null' }}
+                    receiver_id: currentContext.id
                 })
             })
             .then(response => response.json())
@@ -539,11 +984,14 @@
         const message = messageData || {};
 
         const isAttachment = message.attachments && message.attachments.length > 0;
-        const createdAt = message.created_at
-            ? new Date(message.created_at)
-            : new Date();
+        const createdAt = message.created_at ?
+            new Date(message.created_at) :
+            new Date();
 
-        const timeStr = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeStr = createdAt.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
         const avatarText = isSent ? 'ME' : (message.sender?.name?.substring(0, 2) || 'U');
         const avatarTitle = isSent ? 'You' : (message.sender?.name || 'User');
 
@@ -578,17 +1026,17 @@
             `;
 
             message.attachments.forEach(att => {
-                const filePath = att.file_path
-                    ? `/storage/${att.file_path}`
-                    : '#';
+                const filePath = att.file_path ?
+                    `/storage/${att.file_path}` :
+                    '#';
                 const fileType = att.file_type || '';
-                const icon = fileType.startsWith('image/')
-                    ? 'fa-file-image'
-                    : fileType.startsWith('video/')
-                    ? 'fa-file-video'
-                    : fileType.startsWith('audio/')
-                    ? 'fa-file-audio'
-                    : 'fa-file';
+                const icon = fileType.startsWith('image/') ?
+                    'fa-file-image' :
+                    fileType.startsWith('video/') ?
+                    'fa-file-video' :
+                    fileType.startsWith('audio/') ?
+                    'fa-file-audio' :
+                    'fa-file';
 
                 const size = att.file_size ? formatFileSize(att.file_size) : '';
 
@@ -636,6 +1084,7 @@
         });
 
         scrollToBottom();
+        updateConversationList();
     }
 
     // Helper function for file size formatting (same as PHP)
@@ -646,8 +1095,6 @@
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
     }
-
-
 
     // Initialize chat functionality
     function initializeChatFunctionality() {
@@ -765,37 +1212,54 @@
             selectedFiles.forEach(file => formData.append('attachments[]', file));
 
             fetch('/admin/customer/contact/messages', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.message) {
-                    addNewMessage(data.message.content, true, data.message);
-                    if (socket) socket.emit('send_message', data.message);
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.message) {
+                        addNewMessage(data.message.content, true, data.message);
+                        if (socket) socket.emit('send_message', data.message);
 
-                    messageTextarea.value = '';
-                    selectedFiles = [];
-                    renderAttachmentPreview();
-                    fileInput.value = '';
-                    imageInput.value = '';
-                    updateInputStates();
-                } else {
-                    toastr.error('Failed to send message');
-                }
-            })
-            .catch(() => toastr.error('Send failed'));
+                        messageTextarea.value = '';
+                        selectedFiles = [];
+                        renderAttachmentPreview();
+                        fileInput.value = '';
+                        imageInput.value = '';
+                        updateInputStates();
+                    } else {
+                        toastr.error('Failed to send message');
+                    }
+                })
+                .catch(() => toastr.error('Send failed'));
         }
 
         sendButton.addEventListener('click', sendMessage);
     }
-
-
 
     // Scroll to bottom of chat
     function scrollToBottom() {
         const chatMessages = document.getElementById('chatMessages');
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+
+    // SEARCH FUNCTIONALITY:
+    document.getElementById('contactSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const contactItems = document.querySelectorAll('.contact-item');
+
+        contactItems.forEach(item => {
+            const contactName = item.querySelector('.contact-name').textContent.toLowerCase();
+            const lastMessage = item.querySelector('.contact-last-message').textContent.toLowerCase();
+
+            if (contactName.includes(searchTerm) || lastMessage.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
 </script>

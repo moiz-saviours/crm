@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Conversation extends Model
 {
@@ -13,13 +14,21 @@ class Conversation extends Model
         'receiver_type',
         'conversation_status',
         'last_message_id',
-        'status'
+        'status',
+        'context_type',
+        'context_id'
     ];
 
     public function sender()
     {
         return $this->morphTo();
     }
+
+    public function context(): MorphTo
+    {
+        return $this->morphTo();
+    }
+    
     public function receiver()
     {
         return $this->morphTo();

@@ -586,18 +586,24 @@ private function formatEmailForTimeline(Email $email)
         $page = (int)request()->get('page', 1);
         $limit = (int)request()->get('limit', default: 10);
 
-        // ADD THIS: Get or create conversation with the customer contact
-        $conversation = Conversation::where([
-            'sender_type' => get_class(auth()->user()),
-            'sender_id' => auth()->id(),
-            'receiver_type' => get_class($customer_contact),
-            'receiver_id' => $customer_contact->id,
-        ])->orWhere([
-            'sender_type' => get_class($customer_contact),
-            'sender_id' => $customer_contact->id,
-            'receiver_type' => get_class(auth()->user()),
-            'receiver_id' => auth()->id(),
-        ])->first();
+        // UPDATE THIS: Get conversation from URL parameter or fallback to existing logic
+        if ($request->has('conversation_id')) {
+            $conversation = Conversation::find($request->conversation_id);
+            
+            // Verify the conversation belongs to this customer contact
+            if ($conversation && (
+                ($conversation->sender_type === get_class($customer_contact) && $conversation->sender_id === $customer_contact->id) ||
+                ($conversation->receiver_type === get_class($customer_contact) && $conversation->receiver_id === $customer_contact->id)
+            )) {
+                // Conversation is valid for this customer contact
+            } else {
+                // Invalid conversation_id, fallback to default logic
+                $conversation = $this->getDefaultConversation($customer_contact);
+            }
+        } else {
+            // Use existing logic when no conversation_id in URL
+            $conversation = $this->getDefaultConversation($customer_contact);
+        }
 
 
         // $auth_pseudo_emails = [];
@@ -652,6 +658,21 @@ private function formatEmailForTimeline(Email $email)
             'total_count',
             'conversation'
         ));
+    }
+
+    private function getDefaultConversation($customer_contact)
+    {
+        return Conversation::where([
+            'sender_type' => get_class(auth()->user()),
+            'sender_id' => auth()->id(),
+            'receiver_type' => get_class($customer_contact),
+            'receiver_id' => $customer_contact->id,
+        ])->orWhere([
+            'sender_type' => get_class($customer_contact),
+            'sender_id' => $customer_contact->id,
+            'receiver_type' => get_class(auth()->user()),
+            'receiver_id' => auth()->id(),
+        ])->first();
     }
 
     /**

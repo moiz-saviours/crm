@@ -268,6 +268,10 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::get('/conversations/{conversationId}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversation.messages');
                 Route::post('/conversations', [AdminMessageController::class, 'storeConversation'])->name('conversations.store');
 
+                Route::get('/{customer_contact}/context-conversations', [AdminMessageController::class, 'getContextConversations'])
+                ->name('context-conversations');
+
+
                 Route::get('/projects/data', [AdminProjectController::class, 'getProjectsData'])->name('projects.data');
                 Route::get('/projects/details', [AdminProjectController::class, 'getProjectDetails'])->name('projects.details');
 

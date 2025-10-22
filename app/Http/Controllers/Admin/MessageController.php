@@ -10,6 +10,7 @@ use App\Models\MessageAttachment;
 use Illuminate\Support\Facades\Storage;
 use App\Events\NewMessageEvent;
 use Illuminate\Support\Facades\Validator;
+use App\Models\CustomerContact;
 class MessageController extends Controller
 {
     public function getConversationMessages($conversationId)
@@ -137,6 +138,48 @@ class MessageController extends Controller
             'success' => true,
             'conversation' => $conversation,
             'message' => 'Conversation started successfully'
+        ]);
+    }
+
+    // ADD THIS METHOD to your CustomerContactController:
+    public function getConversations(CustomerContact $customer_contact)
+    {
+        $conversations = Conversation::with(['sender', 'receiver', 'lastMessage'])
+            ->where(function($query) use ($customer_contact) {
+                $query->where('sender_type', get_class(auth()->user()))
+                    ->where('sender_id', auth()->id())
+                    ->where('receiver_type', get_class($customer_contact))
+                    ->where('receiver_id', $customer_contact->id);
+            })
+            ->orWhere(function($query) use ($customer_contact) {
+                $query->where('sender_type', get_class($customer_contact))
+                    ->where('sender_id', $customer_contact->id)
+                    ->where('receiver_type', get_class(auth()->user()))
+                    ->where('receiver_id', auth()->id());
+            })
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'conversations' => $conversations
+        ]);
+    }
+
+    public function getContextConversations(CustomerContact $customer_contact)
+    {
+        $conversations = Conversation::with(['sender', 'receiver', 'lastMessage', 'context'])
+            ->where('receiver_type', CustomerContact::class)
+            ->where('receiver_id', $customer_contact->id)
+            ->orWhere(function($query) use ($customer_contact) {
+                $query->where('sender_type', CustomerContact::class)
+                    ->where('sender_id', $customer_contact->id);
+            })
+            ->whereNotNull('context_type') // Only context-based conversations
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'conversations' => $conversations
         ]);
     }
 }

@@ -62,7 +62,7 @@
                 <h6 class="card-title">Team & Brand</h6>
                 <p class="mb-1"><strong>Brand:</strong> {{ $project->brand_key ?? 'N/A' }}</p>
                 <p class="mb-1"><strong>Team:</strong> {{ $project->team_key ?? 'N/A' }}</p>
-                <p class="mb-0"><strong>Customer Key:</strong> {{ $project->customer_special_key ?? 'N/A' }}</p>
+                <p class="mb-0"><strong>Customer Key:</strong> {{ $project->cus_contact_key ?? 'N/A' }}</p>
             </div>
         </div>
 
