@@ -45,6 +45,8 @@
     const currentScript = getCurrentScript();
     const apiBaseUrl = getApiBaseUrl(currentScript);
 
+    const endpoint = `${apiBaseUrl}/track-activity`;
+
     const startTime = Date.now();
     let maxScroll = 0;
     let clickCount = 0;
@@ -66,8 +68,10 @@
 
     const visitor_id = getVisitorId();
 
+
+
     function sendActivity(sync = false) {
-        const endpoint = `${apiBaseUrl}/track-activity`;
+
         const data = JSON.stringify({
             visitor_id,
             event_type: "page_view",
@@ -121,16 +125,24 @@
             if (f.name) formData[f.name] = f.value;
         });
 
-        if (!activityData.form_submissions) {
-            activityData.form_submissions = [];
-        }
-
-        activityData.form_submissions.push({
+        const formSubmission = {
             form_name: form.getAttribute("name") || form.id || "unnamed_form",
             form_action: form.action,
             submitted_at: new Date().toISOString(),
             data: formData
+        };
+
+        const payload = JSON.stringify({
+            visitor_id,
+            event_type: "form_submission",
+            event_data: formSubmission,
         });
+
+        fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: payload
+        }).catch(() => {});
     });
 
 })();
