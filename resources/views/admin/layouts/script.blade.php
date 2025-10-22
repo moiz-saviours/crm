@@ -14,7 +14,7 @@
 <!-- New -->
 {{--https://cdn.datatables.net/v/bs4/jszip-3.10.1/dt-2.1.8/b-3.2.0/b-colvis-3.2.0/b-html5-3.2.0/b-print-3.2.0/cr-2.0.4/date-1.5.4/fc-5.0.4/fh-4.0.1/sc-2.4.3/sp-2.3.3/sl-2.1.0/datatables.min.css--}}
 <link href="{{asset('assets/css/datatable/new/datatables.min.css')}}" rel="stylesheet">
-{{--<link href="https://cdn.datatables.net/buttons/3.2.3/css/buttons.dataTables.css" rel="stylesheet">--}}
+<link href="https://cdn.datatables.net/buttons/3.2.5/css/buttons.dataTables.css" rel="stylesheet">
 
 {{--https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js--}}
 <script src="{{asset('assets/js/plugins/datatable/new/pdfmake.min.js')}}"></script>
@@ -128,10 +128,11 @@
     @endif
 
 
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [title]'))
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+
     const userSettings = @json(auth()->user()->settings ?? []);
     document.addEventListener('DOMContentLoaded', function () {
         const settings = userSettings;
