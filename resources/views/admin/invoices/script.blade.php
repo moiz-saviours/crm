@@ -135,8 +135,9 @@
                 columnDefs: [
                     {
                         orderable: false,
+                        targets: 0,
                         className: 'select-checkbox',
-                        targets: 0
+                        render: DataTable.render.select(),
                     },
                     {
                         targets: getColumnIndex(table_div, 'CREATED AT'),
