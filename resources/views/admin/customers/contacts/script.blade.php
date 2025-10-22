@@ -85,7 +85,7 @@
                     },
                     ...exportButtons // keep your existing export buttons
                 ],
-                order: [[getColumnIndex(table_div, 'LAST ACTIVITY'), 'desc']],
+                order: [[getColumnIndex(table_div, 'LAST ACTIVITY'), 'asc']],
                 responsive: false,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
