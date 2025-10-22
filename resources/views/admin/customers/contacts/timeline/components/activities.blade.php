@@ -274,7 +274,7 @@
             @include('admin.customers.contacts.timeline.partials.project')
         </div>
         <div class="tab-pane fade" id="chats-container" role="tabpanel" aria-labelledby="chat-tab">
-            @include('admin.customers.contacts.timeline.partials.chat')
+            @include('admin.customers.contacts.timeline.partials.chat.index')
         </div>
         <div id="show-more-container" class="text-center mt-3" style="display: {{ count($timeline) >= $limit ? 'block' : 'none' }};">
             <button id="show-more-btn" class="btn btn-outline-primary btn-sm">

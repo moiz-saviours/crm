@@ -31,7 +31,7 @@ class MessageController extends Controller
 
         $html = '';
         foreach ($messages as $message) {
-            $html .= view('admin.customers.contacts.timeline.partials.card-box.messages', ['message' => $message])->render();
+            $html .= view('admin.customers.contacts.timeline.partials.chat.partials.messages', ['message' => $message])->render();
         }
 
         return response()->json([
