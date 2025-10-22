@@ -98,16 +98,40 @@
             let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
-                    "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                    "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-5'l><'col-sm-12 col-md-6'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
-                buttons: exportButtons,
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        text: '<i class="fa fa-columns"></i> Columns',
+                        className: 'btn btn-secondary btn-sm',
+                        postfixButtons: ['colvisRestore'],
+                        columns: function (idx, data, node) {
+                            const header = $(table_div).find('thead th').eq(idx);
+                            const headerText = header.text().trim().toLowerCase();
+                            if (
+                                header.hasClass('no-col-vis') ||
+                                header.hasClass('select-checkbox') ||
+                                headerText.includes('action') ||
+                                headerText.includes('select')
+                            ) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    },
+                    ...exportButtons // keep your existing export buttons
+                ],
                 order: [[getColumnIndex(table_div, 'CREATED AT'), 'desc']],
                 responsive: false,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
+                pageLength: 100,
+                lengthMenu: [[10, 25, 50, 100, -1], ['10 Rows', '25 Rows', '50 Rows', '100 Rows', 'Show All']],
                 columnDefs: [
                     {
                         orderable: false,
@@ -296,21 +320,20 @@
                         <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
-                        <td class="align-middle space-between text-nowrap" style="text-align: left;">`+
-                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
-                            //     <span style="width: 120px;">Amount:</span>
-                            //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                            // </div>
-                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
-                            //     <span style="width: 120px;">Tax:</span>
-                            //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                            // </div>
-                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
-                            //     <span style="width: 120px;">Tax Amount:</span>
-                            //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                            // </div>
-                            `<div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Total Amount:</span>
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">` +
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Amount:</span>
+                                //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax:</span>
+                                //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax Amount:</span>
+                                //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                                // </div>
+                                `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
                         </td>
@@ -427,7 +450,7 @@
                                 table.cell(index, 5).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
                             }
 
-                            const newContent = ``+
+                            const newContent = `` +
                                 // <div style="display: flex; justify-content: space-between; gap: 10px;">
                                 //     <span style="width: 120px;">Amount:</span>
                                 //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
@@ -441,7 +464,6 @@
                                 //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
                                 // </div>
                                 `<div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Total Amount:</span>
                                     <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                                 </div>`;
                             // Column 8: Amount
@@ -479,6 +501,8 @@
                             }
                             if (payment_attachments && payment_attachments.length > 0) {
                                 actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> `;
+                            } else {
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary disabled" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip"></i>0</button> `;
                             }
                             if (status != 1) {
                                 actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
@@ -1026,21 +1050,20 @@
                         <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
                         <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
-                        <td class="align-middle space-between text-nowrap" style="text-align: left;">`+
-                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
-                            //     <span style="width: 120px;">Amount:</span>
-                            //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                            // </div>
-                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
-                            //     <span style="width: 120px;">Tax:</span>
-                            //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                            // </div>
-                            // <div style="display: flex; justify-content: space-between; gap: 10px;">
-                            //     <span style="width: 120px;">Tax Amount:</span>
-                            //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                            // </div>
-                            `<div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Total Amount:</span>
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">` +
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Amount:</span>
+                                //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax:</span>
+                                //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax Amount:</span>
+                                //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                                // </div>
+                                `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
                         </td>
@@ -1056,7 +1079,7 @@
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
                                                             title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
-                            ${payment_attachments && payment_attachments.length > 0 ? `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> ` : ''}
+                            ${payment_attachments && payment_attachments.length > 0 ? `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> ` : '<button type="button" class="btn btn-sm btn-primary disabled" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip"></i>0</button>'}
                             ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
                                     '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
                                     : ''}
