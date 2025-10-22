@@ -97,7 +97,7 @@ class LeadStatusController extends Controller
             if ($leadStatus->delete()) {
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
-            return response()->json(['error' => 'An error occurred while deleting the record.']);
+            return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
 
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);

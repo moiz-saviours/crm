@@ -154,7 +154,7 @@ protected function getTimeline($customerEmail, $folder = "all", $page, $limit, $
         ->toArray();
 
     $query = Email::with('events');
-    
+
     // Your existing folder logic (keep this as is)
     if ($folder == 'inbox') {
         $query->where('from_email', $customerEmail)
@@ -270,7 +270,7 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
     });
 
     // Rest of your timeline building code remains the same...
-    $total_count = 
+    $total_count =
     ($formattedEmails?->count() ?? 0)
     + ($customerContact->notes?->count() ?? 0)
     + (($customerContact->lead && $customerContact->lead->activities)
@@ -331,7 +331,7 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
             }
         }
     }
-    
+
     // Sort entire timeline by date (latest first)
     usort($timeline, function ($a, $b) {
         return strtotime($b['date']) - strtotime($a['date']);
@@ -362,11 +362,11 @@ private function processHtmlForDisplay($html, $text = null)
     if (!$html && $text) {
         return nl2br(htmlspecialchars($text));
     }
-    
+
     if (!$html) {
         return 'No content';
     }
-    
+
     // Apply CSS inlining for display
     try {
         $cssToInlineStyles = new CssToInlineStyles();
@@ -375,7 +375,7 @@ private function processHtmlForDisplay($html, $text = null)
         // If CSS inlining fails, use original HTML
         $inlinedHtml = $html;
     }
-    
+
     // Remove unwanted tags for display
     $patterns = [
         '/<!DOCTYPE[^>]*>/i',
@@ -385,14 +385,14 @@ private function processHtmlForDisplay($html, $text = null)
         '/<title[^>]*>.*?<\/title>/is',
         '/<meta[^>]*>/i',
     ];
-    
+
     $cleanedHtml = preg_replace($patterns, '', $inlinedHtml);
-    
+
     // Extract body content if exists, otherwise use the whole thing
     if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $cleanedHtml, $matches)) {
         return $matches[1];
     }
-    
+
     return $cleanedHtml;
 }
 private function formatEmailForTimeline(Email $email)
@@ -492,7 +492,7 @@ private function formatEmailForTimeline(Email $email)
                 'count' => $data['count'],
                 "{$tab}_total" => $data["{$tab}_total"],
                 'total_count' => $data['total_count'],
-                
+
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -585,7 +585,7 @@ private function formatEmailForTimeline(Email $email)
         };
         $page = (int)request()->get('page', 1);
         $limit = (int)request()->get('limit', default: 10);
-        
+
         // ADD THIS: Get or create conversation with the customer contact
         $conversation = Conversation::where([
             'sender_type' => get_class(auth()->user()),
@@ -599,7 +599,7 @@ private function formatEmailForTimeline(Email $email)
             'receiver_id' => auth()->id(),
         ])->first();
 
-        
+
         // $auth_pseudo_emails = [];
         // if (auth()->user()->pseudo_email) {
         //     $auth_pseudo_emails[] = [
@@ -727,7 +727,7 @@ private function formatEmailForTimeline(Email $email)
             if ($customer_contact->delete()) {
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
-            return response()->json(['error' => 'An error occurred while deleting the record.']);
+            return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
