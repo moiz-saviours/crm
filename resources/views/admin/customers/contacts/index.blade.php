@@ -77,57 +77,59 @@
 
                                         <tr>
                                             <th></th>
-                                            <th class="align-middle text-center text-nowrap">SNO.</th>
-                                            <th class="align-middle text-center text-nowrap">BRAND</th>
-                                            <th class="align-middle text-center text-nowrap">TEAM</th>
-                                            <th class="align-middle text-center text-nowrap">NAME</th>
-                                            <th class="align-middle text-center text-nowrap">EMAIL</th>
-                                            <th class="align-middle text-center text-nowrap">PHONE</th>
-                                            <th class="align-middle text-center text-nowrap">ADDRESS</th>
-                                            <th class="align-middle text-center text-nowrap">CITY</th>
-                                            <th class="align-middle text-center text-nowrap">STATE</th>
-                                            <th class="align-middle text-center text-nowrap">COUNTRY</th>
-                                            <th class="align-middle text-center text-nowrap">POSTAL CODE</th>
-                                            <th class="align-middle text-center text-nowrap">STATUS</th>
-                                            <th class="align-middle text-center text-nowrap tour-contactaction">ACTION</th>
+                                            <th class="align-middle text-left text-nowrap">NAME</th>
+                                            <th class="align-middle text-left text-nowrap">BRAND</th>
+                                            <th class="align-middle text-left text-nowrap">TEAM</th>
+                                            <th class="align-middle text-left text-nowrap">EMAIL</th>
+                                            <th class="align-middle text-left text-nowrap">PHONE</th>
+                                            <th class="align-middle text-left text-nowrap">CONTACT OWNER</th>
+                                            <th class="align-middle text-left text-nowrap">LAST ACTIVITY</th>
+                                            <th class="align-middle text-left text-nowrap">CREATED AT</th>
+                                            <th class="align-middle text-left text-nowrap">STATUS</th>
+                                            <th class="align-middle text-left text-nowrap tour-contactaction">ACTION</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         @foreach($customer_contacts as $customer_contact)
                                             <tr id="tr-{{$customer_contact->id}}">
-                                                <td class="align-middle text-center text-nowrap"></td>
-                                                <td class="align-middle text-center text-nowrap">{{$loop->iteration}}</td>
-
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap"></td>
+                                                <td class="align-middle text-left text-nowrap">
+                                                    <a href="{{route('admin.customer.contact.edit',[$customer_contact->id])}}" title="{{isset($customer_contact->company) ? $customer_contact->company->name : 'No associated company'}}">{{ $customer_contact->name }}</a>
+                                                </td>
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if(isset($customer_contact->brand))
                                                         <a href="{{route('admin.brand.index')}}">{{ $customer_contact->brand->name }}</a>
                                                     @else
                                                         ---
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if(isset($customer_contact->team))
                                                         <a href="{{route('admin.team.index')}}">{{ $customer_contact->team->name }}</a>
                                                     @else
                                                         ---
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
-                                                        <a href="{{route('admin.customer.contact.edit',[$customer_contact->id])}}" title="{{isset($customer_contact->company) ? $customer_contact->company->name : 'No associated company'}}">{{ $customer_contact->name }}</a>
+                                                <td class="align-middle text-left text-nowrap">{{ $customer_contact->email }}</td>
+                                                <td class="align-middle text-left text-nowrap">{{ $customer_contact->phone }}</td>
+                                                <td class="align-middle text-left text-nowrap">{{ $customer_contact->contact_owner }}</td>
+                                                <td class="align-middle text-left" data-order="{{ $customer_contact->last_activity ? strtotime($customer_contact->last_activity) : 0 }}">{{ $customer_contact->last_activity_formatted }}</td>
+                                                <td class="align-middle text-left" data-order="{{$customer_contact->created_at}}">
+                                                    @if ($customer_contact->created_at->isToday())
+                                                        Today
+                                                        at {{ $customer_contact->created_at->timezone('GMT+5')->format('g:i A') }}
+                                                        GMT+5
+                                                    @else
+                                                        {{ $customer_contact->created_at->timezone('GMT+5')->format('M d, Y g:i A') }}
+                                                        GMT+5
+                                                    @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->email }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->phone }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->address }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->city }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->state }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->country }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $customer_contact->zipcode }}</td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     <input type="checkbox" class="status-toggle change-status"
                                                            data-id="{{ $customer_contact->id }}"
                                                            {{ $customer_contact->status == 1 ? 'checked' : '' }} data-bs-toggle="toggle">
                                                 </td>
-                                                <td class="align-middle text-center table-actions">
+                                                <td class="align-middle text-left table-actions">
 {{--                                                    <button type="button" class="btn btn-sm btn-primary editBtn"--}}
 {{--                                                            data-id="{{ $customer_contact->id }}" title="Edit"><i--}}
 {{--                                                            class="fas fa-edit"></i></button>--}}
