@@ -313,7 +313,15 @@ $formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
                         'date' => $activity->created_at,
                         'data' => $activity,
                     ];
-                } else {
+                }
+                elseif ($activity->event_type === 'form_submission') {
+                    $timeline[] = [
+                        'type' => 'form_submission',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                }
+                else {
                     $timeline[] = [
                         'type' => 'activity',
                         'date' => $activity->created_at,
