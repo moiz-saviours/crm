@@ -58,7 +58,6 @@ io.on('connection', (socket) => {
                 created_at: new Date().toISOString(),
                 attachments: data.attachments || []
             };
-            console.log('New message:', messageData);
             // Broadcast to all users in the conversation
             io.to(`conversation_${data.conversation_id}`).emit('new_message', messageData);
             console.log('Message sent to conversation:', data.conversation_id);
