@@ -81,7 +81,20 @@
                         text: '<i class="fa fa-columns"></i> Columns',
                         className: 'btn btn-secondary btn-sm',
                         postfixButtons: ['colvisRestore'],
-                        columns: ':not(:first-child):not(:last-child)' // hide/show all except checkbox and action
+                        columns: function (idx, data, node) {
+                            const header = $(table_div).find('thead th').eq(idx);
+                            const headerText = header.text().trim().toLowerCase();
+                            if (
+                                header.hasClass('no-col-vis') ||
+                                header.hasClass('select-checkbox') ||
+                                headerText.includes('action') ||
+                                headerText.includes('select')
+                            ) {
+                                return false;
+                            }
+
+                            return true;
+                        }
                     },
                     ...exportButtons // keep your existing export buttons
                 ],
