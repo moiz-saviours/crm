@@ -43,7 +43,9 @@ class ContactController extends Controller
         $brands = Brand::all();
         $teams = Team::all();
         $countries = config('countries');
-        $customer_contacts = CustomerContact::all();
+        $customer_contacts = CustomerContact::get()->sortByDesc(function ($contact) {
+            return $contact->last_activity ? strtotime($contact->last_activity) : 0;
+        })->values();
         return view('admin.customers.contacts.index', compact('customer_contacts', 'brands', 'teams', 'countries'));
     }
 
