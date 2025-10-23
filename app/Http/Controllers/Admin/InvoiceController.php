@@ -24,7 +24,24 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        $invoices = Invoice::whereBetween('created_at', [Carbon::now('GMT+5')->startOfMonth(), Carbon::now('GMT+5')->endOfMonth(),])->with('payment_transaction_logs')->get();
+        $actual_dates = [
+            'start_date' => Carbon::now()->startOfMonth(),
+            'end_date' => Carbon::now()->endOfMonth(),
+        ];
+        $invoices = Invoice::whereBetween('created_at',[$actual_dates['start_date'], $actual_dates['end_date']])->with('payment_transaction_logs')->get();
+        if ($invoices->isEmpty()) {
+            $lastRecordDate = Invoice::latest('created_at')->value('created_at');
+            if ($lastRecordDate) {
+                $startDate = Carbon::parse($lastRecordDate)->startOfMonth();
+                $endDate = Carbon::parse($lastRecordDate)->endOfMonth();
+                $invoices = Invoice::whereBetween('created_at', [$startDate, $endDate])->with('payment_transaction_logs')->get();
+                $actual_dates = [
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ];
+            }
+        }
+
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $groupedMerchants = [];
         foreach ($brands as $brand) {
@@ -62,7 +79,7 @@ class InvoiceController extends Controller
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
         $users = User::where('status', 1)->orderBy('name')->get();
-        return view('admin.invoices.index', compact('invoices', 'groupedMerchants', 'brands', 'teams', 'customer_contacts', 'users'));
+        return view('admin.invoices.index', compact('invoices', 'groupedMerchants', 'brands', 'teams', 'customer_contacts', 'users','actual_dates'));
     }
 
     /**
@@ -598,7 +615,7 @@ class InvoiceController extends Controller
                     'customer_contact:id,name,special_key',
                 ]);
             $invoices = $baseQuery()->whereBetween('invoices.created_at', [$startDate, $endDate])->get();
-            $actualDates = [
+            $actual_dates = [
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date']
             ];
@@ -611,7 +628,7 @@ class InvoiceController extends Controller
                     $startDate = Carbon::parse($lastRecordDate)->startOfMonth();
                     $endDate = Carbon::parse($lastRecordDate)->endOfMonth();
                     $invoices = $baseQuery()->whereBetween('created_at', [$startDate, $endDate])->get();
-                    $actualDates = [
+                    $actual_dates = [
                         'start_date' => $startDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
                         'end_date' => $endDate->timezone('GMT+5')->format('Y-m-d h:i:s A')
                     ];
@@ -630,7 +647,7 @@ class InvoiceController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $invoices,
-                'actual_dates' => $actualDates,
+                'actual_dates' => $actual_dates,
                 'count' => $invoices->count(),
             ]);
 
