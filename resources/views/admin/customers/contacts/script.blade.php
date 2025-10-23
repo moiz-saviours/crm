@@ -114,7 +114,7 @@
                     },
                     ...exportButtons // keep your existing export buttons
                 ],
-                order: [[getColumnIndex(table_div, 'LAST ACTIVITY'), 'asc']],
+                order: [[getColumnIndex(table_div, 'LAST ACTIVITY'), 'desc']],
                 responsive: false,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
@@ -213,6 +213,9 @@
             datatable.buttons().container().appendTo(`#right-icon-${index}`);
             return datatable;
         }
+        dataTables[0].on('draw', function () {
+            $('[data-bs-toggle="tooltip"]').tooltip({container: 'body'});
+        });
 
         $(function () {
             $('[data-bs-toggle="tooltip"], [title]').tooltip();
@@ -293,24 +296,27 @@
                                 phone,
                                 status,
                                 last_activity,
+                                last_activity_formatted,
                                 created_at,
+                                created_at_formatted,
                                 contact_owner
                             } = response.data;
                             const index = table.rows().count() + 1;
+
                             const columns = `
-                                    <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : '---'}</td>
-                                    <td class="align-middle text-center text-nowrap"></td>
-                                    <td class="align-middle text-center text-nowrap">${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a>` : '---'}</td>
-                                    <td class="align-middle text-center text-nowrap"><a href="{{route('admin.customer.contact.edit')}}/${id}" title="${company ? company.name : 'No associated company'}" >${name}</a></td>
-                                    <td class="align-middle text-center text-nowrap">${email}</td>
-                                    <td class="align-middle text-center text-nowrap">${phone ?? ""}</td>
-                                    <td class="align-middle text-center text-nowrap">${last_activity ?? ""}</td>
-                                    <td class="align-middle text-center text-nowrap">${created_at ?? ""}</td>
-                                    <td class="align-middle text-center text-nowrap">${contact_owner ?? ""}</td>
-                                    <td class="align-middle text-center text-nowrap">
+                                    <td class="align-middle text-left text-nowrap"></td>
+                                    <td class="align-middle text-left text-nowrap"><a href="{{route('admin.customer.contact.edit')}}/${id}">${name}</a></td>
+                                    <td class="align-middle text-left text-nowrap">${brand ? `<a href="{{route('admin.brand.index')}}">${brand.name}</a>` : '---'}</td>
+                                    <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}">${team.name}</a>` : '---'}</td>
+                                    <td class="align-middle text-left text-nowrap">${email}</td>
+                                    <td class="align-middle text-left text-nowrap">${phone ?? ""}</td>
+                                    <td class="align-middle text-left text-nowrap">${contact_owner ?? ""}</td>
+                                    <td class="align-middle text-left text-nowrap" data-order="${formatDate(last_activity)}">${last_activity_formatted ?? ""}</td>
+                                    <td class="align-middle text-left text-nowrap" data-order="${formatDate(created_at)}">${created_at_formatted ?? ""}</td>
+                                    <td class="align-middle text-left text-nowrap">
                                         <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                     </td>
-                                    <td class="align-middle text-center table-actions">
+                                    <td class="align-middle text-left table-actions">
                                         <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -321,6 +327,7 @@
                             //     <i class="fas fa-edit"></i>
                             // </button>
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                            table.order([getColumnIndex($(table.table().container()), 'LAST ACTIVITY'), 'desc']).draw();
                             $('#manage-form')[0].reset();
 
                             $('#formContainer').removeClass('open')
@@ -431,5 +438,19 @@
                     }
                 });
         });
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            const date = new Date(dateString);
+            return date.toLocaleString('en-CA', {
+                timeZone: 'Asia/Karachi',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).replace(',', '')
+        }
     });
 </script>
