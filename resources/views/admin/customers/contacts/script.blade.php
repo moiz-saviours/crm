@@ -62,6 +62,7 @@
 
         /** Initializing Datatable */
         const dataTables = [];
+        let table;
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
                 dataTables[index] = initializeDatatable($(this), index);
@@ -213,8 +214,9 @@
             datatable.buttons().container().appendTo(`#right-icon-${index}`);
             return datatable;
         }
-        dataTables[0].on('draw', function () {
-            $('[data-bs-toggle="tooltip"]').tooltip({container: 'body'});
+        table = dataTables[0];
+        table.on('draw', function () {
+            $('[data-bs-toggle="tooltip"], [title]').tooltip();
         });
 
         $(function () {
@@ -311,8 +313,8 @@
                                     <td class="align-middle text-left text-nowrap">${email}</td>
                                     <td class="align-middle text-left text-nowrap">${phone ?? ""}</td>
                                     <td class="align-middle text-left text-nowrap">${contact_owner ?? ""}</td>
-                                    <td class="align-middle text-left text-nowrap" data-order="${formatDate(last_activity)}">${last_activity_formatted ?? ""}</td>
-                                    <td class="align-middle text-left text-nowrap" data-order="${formatDate(created_at)}">${created_at_formatted ?? ""}</td>
+                                    <td class="align-middle text-left" data-order="${formatDate(last_activity)}">${last_activity_formatted ?? ""}</td>
+                                    <td class="align-middle text-left" data-order="${formatDate(created_at)}">${created_at_formatted ?? ""}</td>
                                     <td class="align-middle text-left text-nowrap">
                                         <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                     </td>
