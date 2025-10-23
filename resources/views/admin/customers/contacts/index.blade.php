@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="content__boxed tour-contactalldata">
-            <div class="content__wrap">
+            <div class="">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
@@ -84,7 +84,7 @@
                                             <th class="align-middle text-left text-nowrap">PHONE</th>
                                             <th class="align-middle text-left text-nowrap">CONTACT OWNER</th>
                                             <th class="align-middle text-left text-nowrap">LAST ACTIVITY</th>
-                                            <th class="align-middle text-left text-nowrap">CREATED AT</th>
+                                            <th class="align-middle text-left text-nowrap">CREATED DATE</th>
                                             <th class="align-middle text-left text-nowrap">STATUS</th>
                                             <th class="align-middle text-left text-nowrap tour-contactaction">ACTION</th>
                                         </tr>
