@@ -61,15 +61,31 @@
         }));
 
         /** Initializing Datatable */
+        const dataTables = [];
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
-                initializeDatatable($(this), index)
-            })
+                dataTables[index] = initializeDatatable($(this), index);
+            });
         }
-        var table;
 
+        function getColumnIndex(table, headerText) {
+            const headers = table.find('thead th');
+            for (let i = 0; i < headers.length; i++) {
+                if ($(headers[i]).text().trim().toLowerCase() === headerText.toLowerCase()) {
+                    return i;
+                }
+            }
+            return 0;
+        }
         function initializeDatatable(table_div, index) {
-            table = table_div.DataTable({
+            const skipCols = [
+                0,
+                getColumnIndex(table_div, 'CREATED DATE'),
+                getColumnIndex(table_div, 'LAST ACTIVITY'),
+                getColumnIndex(table_div, 'STATUS'),
+                getColumnIndex(table_div, 'ACTION'),
+            ].filter(i => i !== null && i !== undefined).filter((value, index, self) => self.indexOf(value) === index);
+            let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
                     "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-5'l><'col-sm-12 col-md-6'f>>" +
@@ -126,9 +142,11 @@
                     {
                         targets: '_all',
                         render: function (data, type, row, meta) {
-                            if ([0, 7, 8, 9, 10].includes(meta.col)) return data;
+                            if (skipCols.includes(meta.col)) return data;
                             if (!data) return '';
-
+                            if (type !== 'display') {
+                                return data;
+                            }
                             const maxLength = 15;
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = data;
@@ -151,7 +169,7 @@
                         },
 
                         createdCell: function (td, cellData, rowData, row, col) {
-                            if ([0, 7, 8, 9,10].includes(col)) {
+                            if (skipCols.includes(col)) {
                                 td.removeAttribute('title');
                                 return;
                             }
@@ -178,7 +196,7 @@
                     {width: '8%', targets: 5},  // PHONE
                     {width: '9%', targets: 6},  // CONTACT OWNER
                     {width: '8%', targets: 7},  // LAST ACTIVITY
-                    {width: '8%', targets: 8},  // CREATED AT
+                    {width: '8%', targets: 8},  // CREATED DATE
                     {width: '6%', targets: 9},  // STATUS
                     {width: '5%', targets: 10},  // ACTION buttons
                 ],
@@ -191,22 +209,14 @@
                     end: 0
                 },
             });
-            table.columns.adjust().draw();
-            table.buttons().container().appendTo(`#right-icon-${index}`);
+            datatable.columns.adjust().draw();
+            datatable.buttons().container().appendTo(`#right-icon-${index}`);
+            return datatable;
         }
+
         $(function () {
             $('[data-bs-toggle="tooltip"], [title]').tooltip();
         });
-
-        function getColumnIndex(table, headerText) {
-            const headers = table.find('thead th');
-            for (let i = 0; i < headers.length; i++) {
-                if ($(headers[i]).text().trim().toLowerCase() === headerText.toLowerCase()) {
-                    return i;
-                }
-            }
-            return 1;
-        }
 
         /** Edit */
         $(document).on('click', '.editBtn', function () {
@@ -268,6 +278,7 @@
             e.preventDefault();
             var dataId = $('#manage-form').data('id');
             var formData = new FormData(this);
+            let table = dataTables[0];
             if (!dataId) {
                 AjaxRequestPromise(`{{ route("admin.customer.contact.store") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
@@ -378,6 +389,7 @@
             const statusCheckbox = $(this);
             const status = +statusCheckbox.is(':checked');
             const rowId = statusCheckbox.data('id');
+            let table = dataTables[0];
             AjaxRequestPromise(`{{ route('admin.customer.contact.change.status') }}/${rowId}?status=${status}`, null, 'GET', {useToastr: true})
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
@@ -391,6 +403,7 @@
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');
+            let table = dataTables[0];
             AjaxDeleteRequestPromise(`{{ route("admin.customer.contact.delete", "") }}/${id}`, null, 'DELETE', {
                 useDeleteSwal: true,
                 useToastr: true,
