@@ -1,9 +1,4 @@
 <script>
-    <!---- SCRIPT BLADE----->
-    $(document).ready(function () {
-        console.log('Document ready fired');
-    });
-
     $(document).ready(function () {
         /** Valid Url */
         function isValidUrl(url) {
@@ -66,13 +61,6 @@
         }));
 
         /** Initializing Datatable */
-            // if ($('.initTable').length) {
-            //     $('.initTable').each(function (index) {
-            //         initializeDatatable($(this), index)
-            //     })
-            // }
-            // var table;
-
         var dataTables = [];
 
         if ($('.initTable').length) {
@@ -88,9 +76,16 @@
                     return i;
                 }
             }
-            return 1;
+            return 0;
         }
         function initializeDatatable(table_div, index) {
+            const skipCols = [
+                0,
+                getColumnIndex(table_div, 'CREATED DATE'),
+                getColumnIndex(table_div, 'LAST ACTIVITY'),
+                getColumnIndex(table_div, 'STATUS'),
+                getColumnIndex(table_div, 'ACTION'),
+            ].filter(i => i !== null && i !== undefined).filter((value, index, self) => self.indexOf(value) === index);
             let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
@@ -120,7 +115,7 @@
                     },
                     ...exportButtons // keep your existing export buttons
                 ],
-                order: [[getColumnIndex(table_div, 'CREATED AT'), 'desc']],
+                order: [[getColumnIndex(table_div, 'CREATED DATE'), 'desc']],
                 responsive: false,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
@@ -136,7 +131,7 @@
                         render: DataTable.render.select(),
                     },
                     {
-                        targets: getColumnIndex(table_div, 'CREATED AT'),
+                        targets: getColumnIndex(table_div, 'CREATED DATE'),
                         type: 'date',
                         render: function (data, type, row) {
                             if (type === 'sort') {
@@ -144,7 +139,56 @@
                             }
                             return data;
                         }
-                    }
+                    },
+                    {
+                        targets: '_all',
+                        render: function (data, type, row, meta) {
+                            if (skipCols.includes(meta.col)) return data;
+                            if (!data) return '';
+                            if (type !== 'display') {
+                                return data;
+                            }
+                            const maxLength = 15;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data;
+
+                            function truncateTextNodes(node) {
+                                node.childNodes.forEach(child => {
+                                    if (child.nodeType === Node.TEXT_NODE) {
+                                        const txt = child.textContent;
+                                        if (txt && txt.trim().length > maxLength) {
+                                            child.textContent = txt.substring(0, maxLength) + '...';
+                                        }
+                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                        truncateTextNodes(child);
+                                    }
+                                });
+                            }
+
+                            truncateTextNodes(tempDiv);
+                            return tempDiv.innerHTML;
+                        },
+
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if (skipCols.includes(col)) {
+                                td.removeAttribute('title');
+                                return;
+                            }
+
+                            if (!cellData) {
+                                td.removeAttribute('title');
+                                return;
+                            }
+                            const temp = document.createElement('div');
+                            temp.innerHTML = cellData;
+                            const fullText = (temp.textContent || temp.innerText || '').trim();
+                            if (fullText.length > 15) {
+                                td.setAttribute('title', fullText);
+                            } else {
+                                td.removeAttribute('title');
+                            }
+                        }
+                    },
                 ],
                 select: {
                     style: 'os',
@@ -155,10 +199,10 @@
                     end: 1
                 },
             });
+            datatable.columns.adjust().draw();
             datatable.buttons().container().appendTo(`#right-icon-${index}`);
             return datatable;
         }
-
         /** Edit */
         $(document).on('click', '.editBtn', function (e) {
             e.preventDefault();
@@ -940,7 +984,13 @@
         $('#dateRangePicker').on('apply.daterangepicker', function () {
             filterInvoices();
         });
+        @if(isset($actual_dates['start_date']) && isset($actual_dates['end_date']))
+        let actualStart = moment("{{ $actual_dates['start_date'] }}", "YYYY-MM-DD h:mm:ss A");
+        let actualEnd = moment("{{ $actual_dates['end_date'] }}", "YYYY-MM-DD h:mm:ss A");
 
+        $('#dateRangePicker').data('daterangepicker').setStartDate(actualStart);
+        $('#dateRangePicker').data('daterangepicker').setEndDate(actualEnd);
+        @endif
         function filterInvoices() {
             const teamKey = $('#teamSelect').val();
             const brandKey = $('#brandSelect').val();
@@ -1095,9 +1145,6 @@
                 picker.startDate.format('YYYY-MM-DD h:mm:ss A') + ' - ' +
                 picker.endDate.format('YYYY-MM-DD h:mm:ss A')
             );
-        });
-        $('#dateRangePicker').on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
         });
     });
 </script>
