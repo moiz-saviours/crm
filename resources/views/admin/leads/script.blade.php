@@ -61,34 +61,136 @@
         }));
 
         /** Initializing Datatable */
+        var dataTables = [];
+
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
-                initializeDatatable($(this), index)
-            })
+                dataTables[index] = initializeDatatable($(this), index);
+            });
         }
-        var table;
 
+        function getColumnIndex(table, headerText) {
+            const headers = table.find('thead th');
+            for (let i = 0; i < headers.length; i++) {
+                if ($(headers[i]).text().trim().toLowerCase() === headerText.toLowerCase()) {
+                    return i;
+                }
+            }
+            return 0;
+        }
         function initializeDatatable(table_div, index) {
-            table = table_div.DataTable({
+            const skipCols = [
+                0,
+                getColumnIndex(table_div, 'CREATED DATE'),
+                getColumnIndex(table_div, 'LAST ACTIVITY'),
+                getColumnIndex(table_div, 'STATUS'),
+                getColumnIndex(table_div, 'ACTION'),
+            ].filter(i => i !== null && i !== undefined).filter((value, index, self) => self.indexOf(value) === index);
+
+            let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
-                    "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                    "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-5'l><'col-sm-12 col-md-6'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
-                buttons: exportButtons,
-                order: [[4, 'desc']],
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        text: '<i class="fa fa-columns"></i> Columns',
+                        className: 'btn btn-secondary btn-sm',
+                        postfixButtons: ['colvisRestore'],
+                        columns: function (idx, data, node) {
+                            const header = $(table_div).find('thead th').eq(idx);
+                            const headerText = header.text().trim().toLowerCase();
+                            if (
+                                header.hasClass('no-col-vis') ||
+                                header.hasClass('select-checkbox') ||
+                                headerText.includes('action') ||
+                                headerText.includes('select')
+                            ) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    },
+                    ...exportButtons // keep your existing export buttons
+                ],
+                order: [[getColumnIndex(table_div, 'CREATED DATE'), 'desc']],
                 responsive: false,
                 autoWidth: true,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
-                columnDefs: [{
-                    orderable: false,
-                    targets: 0,
-                    className: 'select-checkbox',
-                    render: DataTable.render.select(),
-                },
+                pageLength: 100,
+                lengthMenu: [[10, 25, 50, 100, -1], ['10 Rows', '25 Rows', '50 Rows', '100 Rows', 'Show All']],
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets: 0,
+                        className: 'select-checkbox',
+                        render: DataTable.render.select(),
+                    },
+                    {
+                        targets: getColumnIndex(table_div, 'CREATED DATE'),
+                        type: 'date',
+                        render: function (data, type, row) {
+                            if (type === 'sort') {
+                                return $(this).data('order') || data;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        targets: '_all',
+                        render: function (data, type, row, meta) {
+                            if (skipCols.includes(meta.col)) return data;
+                            if (!data) return '';
+                            if (type !== 'display') {
+                                return data;
+                            }
+                            const maxLength = 15;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data;
+
+                            function truncateTextNodes(node) {
+                                node.childNodes.forEach(child => {
+                                    if (child.nodeType === Node.TEXT_NODE) {
+                                        const txt = child.textContent;
+                                        if (txt && txt.trim().length > maxLength) {
+                                            child.textContent = txt.substring(0, maxLength) + '...';
+                                        }
+                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                        truncateTextNodes(child);
+                                    }
+                                });
+                            }
+
+                            truncateTextNodes(tempDiv);
+                            return tempDiv.innerHTML;
+                        },
+
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if (skipCols.includes(col)) {
+                                td.removeAttribute('title');
+                                return;
+                            }
+
+                            if (!cellData) {
+                                td.removeAttribute('title');
+                                return;
+                            }
+                            const temp = document.createElement('div');
+                            temp.innerHTML = cellData;
+                            const fullText = (temp.textContent || temp.innerText || '').trim();
+                            if (fullText.length > 15) {
+                                td.setAttribute('title', fullText);
+                            } else {
+                                td.removeAttribute('title');
+                            }
+                        }
+                    },
                     {width: '10%', targets: 0},  // checkbox or icon column
                     {width: '30%', targets: 1},  // NAME
                     {width: '10%', targets: 2},  // BRAND
@@ -109,9 +211,10 @@
                     end: 1
                 },
             });
-            table.buttons().container().appendTo(`#right-icon-${index}`);
+            datatable.columns.adjust().draw();
+            datatable.buttons().container().appendTo(`#right-icon-${index}`);
+            return datatable;
         }
-
         /** Edit */
         $(document).on('click', '.editBtn', function () {
             const id = $(this).data('id');
@@ -170,6 +273,7 @@
             e.preventDefault();
             var dataId = $('#manage-form').data('id');
             var formData = new FormData(this);
+            let table = dataTables[0];
             if (!dataId) {
                 AjaxRequestPromise(`{{ route("admin.lead.store") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
@@ -183,6 +287,7 @@
                                 country,
                                 lead_status,
                                 note,
+                                created_at,
                                 date,
                                 status
                             } = Object.fromEntries(
@@ -198,7 +303,7 @@
                                     ${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}
                                 </td>
                                 <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}</td>
-                                <td class="align-middle text-left text-nowrap">${date}</td>
+                                <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
                                 <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
                                 <td class="align-middle text-left text-nowrap">${country}</td>
                                 <td class="align-middle text-left text-nowrap">${note}</td>
@@ -336,6 +441,7 @@
             const statusCheckbox = $(this);
             const status = +statusCheckbox.is(':checked');
             const rowId = statusCheckbox.data('id');
+            let table = dataTables[0];
             AjaxRequestPromise(`{{ route('admin.lead.change.status') }}/${rowId}?status=${status}`, null, 'GET', {useToastr: true})
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
@@ -349,6 +455,7 @@
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');
+            let table = dataTables[0];
             console.log('Deleting record with ID:', id);
             AjaxDeleteRequestPromise(`{{ route("admin.lead.delete", "") }}/${id}`, null, 'DELETE', {
                 useDeleteSwal: true,
@@ -397,7 +504,7 @@
 
         function convertLeadToCustomer(url, $btn) {
             $btn.prop('disabled', true).addClass('disabled');
-
+            let table = dataTables[0];
             AjaxRequestPromise(url, null, 'POST', {useToastr: false})
                 .then(res => {
                     if (res?.success) {
@@ -425,7 +532,6 @@
                     $btn.prop('disabled', false).removeClass('disabled');
                 });
         }
-
         function makeAcronym(text) {
             if (!text) return "";
             const words = text.trim().split(/\s+/);
@@ -441,5 +547,125 @@
             return route.replace(':id', id);
         }
 
+        $('#dateRangePicker').daterangepicker({
+            timePicker: true,
+            timePicker24Hour: false,
+            timePickerIncrement: 1,
+            locale: {
+                format: 'YYYY-MM-DD h:mm:ss A',
+            },
+            startDate: moment().startOf('month').startOf('day'),
+            endDate: moment().endOf('month').endOf('day'),
+            ranges: {
+                'Today': [moment().startOf('day'), moment().endOf('day')],
+                'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+                'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+                'Last 30 Days': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment().endOf('day')],
+                'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
+            }
+        });
+
+        $('#teamSelect, #brandSelect').change(function () {
+            filterRecords();
+        });
+        $('#dateRangePicker').on('apply.daterangepicker', function () {
+            filterRecords();
+        });
+        @if(isset($actual_dates['start_date']) && isset($actual_dates['end_date']))
+        let actualStart = moment("{{ $actual_dates['start_date'] }}", "YYYY-MM-DD h:mm:ss A");
+        let actualEnd = moment("{{ $actual_dates['end_date'] }}", "YYYY-MM-DD h:mm:ss A");
+        $('#dateRangePicker').data('daterangepicker').setStartDate(actualStart);
+        $('#dateRangePicker').data('daterangepicker').setEndDate(actualEnd);
+        @endif
+        function filterRecords() {
+            const teamKey = $('#teamSelect').val();
+            const brandKey = $('#brandSelect').val();
+            const dates = $('#dateRangePicker').data('daterangepicker');
+
+            let table = dataTables[0];
+            table.clear().draw();
+
+            AjaxRequestPromise(`{{ route("admin.lead.index") }}`, {
+                team_key: teamKey,
+                brand_key: brandKey,
+                start_date: dates.startDate.format('YYYY-MM-DD h:mm:ss A'),
+                end_date: dates.endDate.format('YYYY-MM-DD h:mm:ss A'),
+            }, 'GET', {useToastr: false})
+                .then(response => {
+                    if (response && response.success && response.data) {
+                        if (response.actual_dates) {
+                            const actualStart = moment(response.actual_dates.start_date, 'YYYY-MM-DD h:mm:ss A');
+                            const actualEnd = moment(response.actual_dates.end_date, 'YYYY-MM-DD h:mm:ss A');
+                            $('#dateRangePicker').data('daterangepicker').setStartDate(actualStart);
+                            $('#dateRangePicker').data('daterangepicker').setEndDate(actualEnd);
+                            if (response.actual_dates.start_date !== dates.startDate.format('YYYY-MM-DD h:mm:ss A') ||
+                                response.actual_dates.end_date !== dates.endDate.format('YYYY-MM-DD h:mm:ss A')) {
+                                toastr.info('Date range adjusted to show available records');
+                            }
+                        }
+                        if (response?.data) {
+                            response.data.forEach(function (lead, index) {
+                                const sanitizedLead = Object.fromEntries(
+                                    Object.entries(lead).map(([key, value]) => [key, value === null ? '' : value])
+                                );
+                                const {
+                                    id,
+                                    brand,
+                                    team,
+                                    customer_contact,
+                                    name,
+                                    country,
+                                    lead_status,
+                                    note,
+                                    date,
+                                    created_at,
+                                    status
+                                } = sanitizedLead;
+                                const converted = lead_status != 'Converted' && !customer_contact;
+                                const columns = `
+                                <td class="align-middle text-left text-nowrap"></td>
+                                <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/admin/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}</td>
+                                <td class="align-middle text-left text-nowrap">
+                                    ${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}
+                                </td>
+                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}</td>
+                                <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
+                                <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
+                                <td class="align-middle text-left text-nowrap">${country}</td>
+                                <td class="align-middle text-left text-nowrap">${note}</td>
+                                <td class="align-middle text-left text-nowrap">
+                                    <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
+                                </td>
+                                <td class="align-middle text-left table-actions">
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
+.                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                </td>
+                                `;
+                                table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                            })
+                        }
+                    }
+                })
+
+                .catch(error => console.error('An error occurred while updating the record.', error))
+        }
+
+        $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(
+                picker.startDate.format('YYYY-MM-DD h:mm:ss A') + ' - ' +
+                picker.endDate.format('YYYY-MM-DD h:mm:ss A')
+            );
+        });
     });
 </script>
