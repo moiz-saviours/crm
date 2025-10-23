@@ -147,9 +147,8 @@
                         render: function (data, type, row, meta) {
                             if (skipCols.includes(meta.col)) return data;
                             if (!data) return '';
-                            if (type !== 'display') {
-                                return data;
-                            }
+                            if (type !== 'display') return data;
+
                             const maxLength = 15;
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = data;
@@ -172,25 +171,27 @@
                         },
 
                         createdCell: function (td, cellData, rowData, row, col) {
-                            if (skipCols.includes(col)) {
-                                td.removeAttribute('title');
-                                return;
-                            }
-
-                            if (!cellData) {
-                                td.removeAttribute('title');
+                            if (skipCols.includes(col) || !cellData) {
+                                td.innerHTML = cellData || '';
                                 return;
                             }
                             const temp = document.createElement('div');
                             temp.innerHTML = cellData;
                             const fullText = (temp.textContent || temp.innerText || '').trim();
+                            const tooltipDiv = document.createElement('div');
+                            tooltipDiv.classList.add('truncate-cell');
+                            tooltipDiv.innerHTML = td.innerHTML;
+                            td.innerHTML = '';
+                            td.appendChild(tooltipDiv);
                             if (fullText.length > 15) {
-                                td.setAttribute('title', fullText);
-                            } else {
-                                td.removeAttribute('title');
+                                tooltipDiv.setAttribute('title', fullText);
+                                tooltipDiv.setAttribute('data-bs-toggle', 'tooltip');
+                                tooltipDiv.setAttribute('data-bs-placement', 'top');
                             }
+                            new bootstrap.Tooltip(tooltipDiv);
                         }
                     },
+
                     {width: '10%', targets: 0},  // checkbox or icon column
                     {width: '30%', targets: 1},  // NAME
                     {width: '10%', targets: 2},  // BRAND
@@ -215,6 +216,13 @@
             datatable.buttons().container().appendTo(`#right-icon-${index}`);
             return datatable;
         }
+        dataTables[0].on('draw', function () {
+            const tooltipElements = document.querySelectorAll('[data-bs-toggle="tooltip"], [title]');
+            tooltipElements.forEach(el => {
+                new bootstrap.Tooltip(el);
+            });
+        });
+
         /** Edit */
         $(document).on('click', '.editBtn', function () {
             const id = $(this).data('id');
