@@ -5,21 +5,21 @@ const ENV = process.env.APP_ENV || 'local';
 const PORT = process.env.SOCKETIO_PORT || 6001;
 
 let allowedOrigins = [];
-let socketPath = '/socket.io/';
+let socketPath = '/socket.io';
 switch (ENV) {
     case 'production':
         allowedOrigins = ['*'];
-        socketPath = '/socket.io/';
+        socketPath = '/socket.io';
         break;
 
     case 'development':
         allowedOrigins = ['*'];
-        socketPath = '/crm-development/socket.io/';
+        socketPath = '/crm-development/socket.io';
         break;
 
     default: // local
         allowedOrigins = ['*'];
-        socketPath = '/socket.io/';
+        socketPath = '/socket.io';
         break;
 }
 const server = createServer();
@@ -29,6 +29,7 @@ const io = new Server(server, {
         methods: ["GET", "POST"]
     },
     path: socketPath,
+    transports: ['websocket', 'polling']
 });
 
 // Store active conversations
