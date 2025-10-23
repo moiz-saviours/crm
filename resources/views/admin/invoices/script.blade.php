@@ -329,8 +329,8 @@
                             } = response.data;
                             const index = table.rows().count() + 1;
                             const columns = `
-                        <td class="align-middle text-center text-nowrap"></td>` +
-                                // <td class="align-middle text-center text-nowrap">${index}</td>
+                        <td class="align-middle text-left text-nowrap"></td>` +
+                                // <td class="align-middle text-left text-nowrap">${index}</td>
                                 // <td class="align-middle space-between text-nowrap" style="text-align: left;">
                                 //     <div style="display:flex;justify-content:space-between;gap:10px;">
                                 //         <span>Authorize : </span>
@@ -349,18 +349,18 @@
                                 //         <span>0-0</span>
                                 //     </div>
                                 // </td>
-                                `<td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                                `<td class="align-middle text-left text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
-                        <td class="align-middle text-center text-nowrap">
+                        <td class="align-middle text-left text-nowrap">
                             ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
-                        <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
-                        <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
                         <td class="align-middle space-between text-nowrap" style="text-align: left;">` +
                                 // <div style="display: flex; justify-content: space-between; gap: 10px;">
                                 //     <span style="width: 120px;">Amount:</span>
@@ -378,12 +378,12 @@
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
                         </td>
-                        <td class="align-middle text-center text-nowrap">
+                        <td class="align-middle text-left text-nowrap">
                             ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${due_date}</td>
-                        <td class="align-middle text-center text-nowrap" data-order="${created_at}">${date}</td>
-                        <td class="align-middle text-center table-actions">
+                        <td class="align-middle text-left text-nowrap">${due_date}</td>
+                        <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
+                        <td class="align-middle text-left table-actions">
                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                             data-id="${id}"
                                                             data-invoice-key="${invoice_key}"
@@ -605,7 +605,7 @@
                 type: 'GET',
                 data: {invoice_key: invoice_key},
                 beforeSend: function () {
-                    $('#transactionLogs').html('<tr><td colspan="4" class="text-center">Loading...</td></tr>');
+                    $('#transactionLogs').html('<tr><td colspan="4" class="text-left">Loading...</td></tr>');
                 },
                 success: function (response) {
                     if (response.status === 'success' && response.logs.length > 0) {
@@ -647,12 +647,12 @@
                         });
                         $('#transactionLogs').html(rows);
                     } else {
-                        $('#transactionLogs').html('<tr><td colspan="12" class="text-center">No transactions found</td></tr>');
+                        $('#transactionLogs').html('<tr><td colspan="12" class="text-left">No transactions found</td></tr>');
                     }
                     $('#transactionModal').modal('show');
                 },
                 error: function () {
-                    $('#transactionLogs').html('<tr><td colspan="12" class="text-center text-danger">Error fetching data</td></tr>');
+                    $('#transactionLogs').html('<tr><td colspan="12" class="text-left text-danger">Error fetching data</td></tr>');
                 }
             });
         });
@@ -670,7 +670,7 @@
                 type: 'GET',
                 data: {invoice_key: invoice_key},
                 beforeSend: function () {
-                    $tableBody.html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+                    $tableBody.html('<tr><td colspan="6" class="text-left">Loading...</td></tr>');
                 },
                 success: function (response) {
                     $tableBody.empty();
@@ -691,10 +691,10 @@
                                         const fileName = attachment.original_name || attachment.file_name;
                                         const createdAt = attachment.created_at || payment_attachment.created_at;
                                         const $row = $('<tr>').html(`
-                                            <td class="align-middle text-center">${attachment.id}</td>
-                                            <td class="align-middle text-center">${fileName}</td>
-                                            <td class="align-middle text-center">${fileType}</td>
-                                            <td class="align-middle text-center">
+                                            <td class="align-middle text-left">${attachment.id}</td>
+                                            <td class="align-middle text-left">${fileName}</td>
+                                            <td class="align-middle text-left">${fileType}</td>
+                                            <td class="align-middle text-left">
                                                 <button class="btn btn-sm btn-outline-primary view-file-btn"
                                                         data-url="${fileUrl}"
                                                         data-name="${fileName}"
@@ -702,8 +702,8 @@
                                                     <i class="fas fa-eye"></i> View
                                                 </button>
                                             </td>
-                                            <td class="align-middle text-center">${new Date(createdAt).toLocaleString()}</td>
-                                            <td class="align-middle text-center">
+                                            <td class="align-middle text-left">${new Date(createdAt).toLocaleString()}</td>
+                                            <td class="align-middle text-left">
                                                 <a href="${fileUrl}" download="${fileName}" class="btn btn-sm btn-outline-primary download-btn">
                                                     <i class="fas fa-download"></i> Download
                                                 </a>
@@ -716,7 +716,7 @@
                                 console.error('Error parsing attachments:', e);
                                 $tableBody.append(`
                             <tr>
-                                <td colspan="6" class="text-center text-danger">
+                                <td colspan="6" class="text-left text-danger">
                                     Error loading attachments for payment ${parentIndex + 1}
                                 </td>
                             </tr>
@@ -725,15 +725,15 @@
                         });
 
                         if (!hasValidAttachments) {
-                            $tableBody.html('<tr><td colspan="6" class="text-center">No valid attachments found.</td></tr>');
+                            $tableBody.html('<tr><td colspan="6" class="text-left">No valid attachments found.</td></tr>');
                         }
                     } else {
-                        $tableBody.html('<tr><td colspan="6" class="text-center">No payment attachments found.</td></tr>');
+                        $tableBody.html('<tr><td colspan="6" class="text-left">No payment attachments found.</td></tr>');
                     }
                     $('#paymentProofModal').modal('show');
                 },
                 error: function () {
-                    $tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error fetching data</td></tr>');
+                    $tableBody.html('<tr><td colspan="6" class="text-left text-danger">Error fetching data</td></tr>');
                 }
             });
         });
@@ -1083,21 +1083,21 @@
                             //     </div>` : ''}
                             // `;
                             const columns = `
-                        <td class="align-middle text-center text-nowrap"></td>` +
-                                // <td class="align-middle text-center text-nowrap">${index}</td>
-                                // <td class="align-middle text-center text-nowrap">${gatewayCountsHtml}</td>
-                                `<td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                        <td class="align-middle text-left text-nowrap"></td>` +
+                                // <td class="align-middle text-left text-nowrap">${index}</td>
+                                // <td class="align-middle text-left text-nowrap">${gatewayCountsHtml}</td>
+                                `<td class="align-middle text-left text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
                                                           title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
-                        <td class="align-middle text-center text-nowrap">
+                        <td class="align-middle text-left text-nowrap">
                             ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
-                        <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
-                        <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
                         <td class="align-middle space-between text-nowrap" style="text-align: left;">` +
                                 // <div style="display: flex; justify-content: space-between; gap: 10px;">
                                 //     <span style="width: 120px;">Amount:</span>
@@ -1115,12 +1115,12 @@
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
                         </td>
-                        <td class="align-middle text-center text-nowrap">
+                        <td class="align-middle text-left text-nowrap">
                             ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${due_date}</td>
-                        <td class="align-middle text-center text-nowrap" data-order="${created_at}">${date}</td>
-                        <td class="align-middle text-center table-actions">
+                        <td class="align-middle text-left text-nowrap">${due_date}</td>
+                        <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
+                        <td class="align-middle text-left table-actions">
                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                             data-id="${id}"
                                                             data-invoice-key="${invoice_key}"
