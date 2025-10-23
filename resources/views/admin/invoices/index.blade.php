@@ -56,7 +56,7 @@
             </div>
         </div>
         <div class="content__boxed tour-invoicealldata">
-            <div class="content__wrap">
+            <div class="">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
@@ -393,7 +393,6 @@
     @push('script')
         <script src="{{asset('assets/js/moment.min.js')}}"></script>
         <script src="{{asset('assets/js/plugins/daterangepicker/daterangepicker.min.js')}}"></script>
-        <!-- INDEX SCRIPT -->
         @include('admin.invoices.script')
     @endpush
 @endsection
