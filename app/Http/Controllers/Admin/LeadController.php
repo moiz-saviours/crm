@@ -9,6 +9,7 @@ use App\Models\Lead;
 use App\Models\LeadStatus;
 use App\Models\Team;
 use App\Models\UserActivity;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -27,16 +28,74 @@ class LeadController extends Controller
      */
     public function index(Request $request)
     {
+        $validated = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'team_key' => 'nullable|string',
+            'brand_key' => 'nullable|string',
+        ], [
+            [
+                'start_date.required' => 'The start date is required.',
+                'start_date.date' => 'The start date must be a valid date.',
+                'end_date.required' => 'The end date is required.',
+                'end_date.date' => 'The end date must be a valid date.',
+                'end_date.after_or_equal' => 'The end date must be a valid date.',
+                'team_key.required' => 'The team key is required.',
+                'team_key.string' => 'The team key must be a valid string.',
+                'brand_key.required' => 'The brand key is required.',
+                'brand_key.string' => 'The brand key must be a valid string.',
+            ]
+        ]);
+        $startDate = isset($validated['start_date'])
+            ? Carbon::createFromFormat('Y-m-d h:i:s A', $validated['start_date'], 'GMT+5')->setTimezone('UTC')
+            : Carbon::now('GMT+5')->startOfMonth()->setTimezone('UTC');
+        $endDate = isset($validated['end_date'])
+            ? Carbon::createFromFormat('Y-m-d h:i:s A', $validated['end_date'], 'GMT+5')->setTimezone('UTC')
+            : Carbon::now('GMT+5')->endOfMonth()->setTimezone('UTC');
+        $teamKey = $validated['team_key'] ?? 'all';
+        $brandKey = $validated['brand_key'] ?? 'all';
+        $actual_dates = [
+            'start_date' => $startDate->copy()->timezone('GMT+5')->format('Y-m-d h:i:s A'),
+            'end_date' => $endDate->copy()->timezone('GMT+5')->format('Y-m-d h:i:s A'),
+        ];
         $tab = $request->get('tab', 'all');
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $customer_contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
-        $leads = Lead::with('customer_contact');
+        $leads = Lead::whereBetween('created_at', [$actual_dates['start_date'], $actual_dates['end_date']])
+            ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+            ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey));
 //        if ($tab === 'my') {
 //            $leads->where('assigned_to', auth()->id());
 //        }
-        $leads = $leads->get();
-        return view('admin.leads.index', compact('leads', 'brands', 'teams', 'customer_contacts'));
+        $leads = $leads->with('customer_contact:id,special_key,name', 'brand:brand_key,name', 'team:team_key,name', 'leadStatus:id,name')->get();
+        if ($leads->isEmpty() && !isset($validated['start_date']) && !isset($validated['end_date']) && $brandKey == 'all' && $teamKey == 'all') {
+            $lastRecordDate = Lead::latest('created_at')->value('created_at');
+            if ($lastRecordDate) {
+                $startDate = Carbon::parse($lastRecordDate)->startOfMonth();
+                $endDate = Carbon::parse($lastRecordDate)->endOfMonth();
+                $leads = Lead::whereBetween('created_at', [$startDate, $endDate])
+                    ->when($teamKey !== 'all', fn($q) => $q->where('team_key', $teamKey))
+                    ->when($brandKey !== 'all', fn($q) => $q->where('brand_key', $brandKey))
+                    ->with('customer_contact:id,special_key,name', 'brand:brand_key,name', 'team:team_key,name', 'leadStatus:id,name')->get();
+                $actual_dates = [
+                    'start_date' => $startDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
+                    'end_date' => $endDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
+                ];
+            }
+        }
+        $leads = $leads->map(function ($lead) {
+            if ($lead->created_at->isToday()) {
+                $lead->date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
+            } else {
+                $lead->date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
+            }
+            return $lead;
+        });
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'data' => $leads, 'actual_dates' => $actual_dates, 'count' => $leads->count()]);
+        }
+        return view('admin.leads.index', compact('leads', 'brands', 'teams', 'customer_contacts', 'actual_dates'));
     }
 
     /**
@@ -189,10 +248,8 @@ class LeadController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
             DB::beginTransaction();
-
             // Get previous status before update
             $oldStatusId = $lead->lead_status_id;
-
             $customer_contact = CustomerContact::withTrashed()->firstOrNew(
                 ['email' => $request->input('email')],
                 [
@@ -232,9 +289,7 @@ class LeadController extends Controller
                 $updateData['email'] = $request->input('email');
             }
             $lead->update($updateData);
-
             $convertedStatus = LeadStatus::where('name', 'Converted')->first();
-
             // If old status was "Converted" but new one is different — log the change
             if ($convertedStatus && $oldStatusId == $convertedStatus->id && $lead->lead_status_id != $convertedStatus->id) {
                 UserActivity::create([
@@ -249,17 +304,16 @@ class LeadController extends Controller
                     ]),
                 ]);
             }
-
             DB::commit();
             $lead->loadMissing(['customer_contact' => function ($query) {
-                $query->withTrashed()->select('id','special_key', 'name');
+                $query->withTrashed()->select('id', 'special_key', 'name');
             },
                 'brand' => function ($query) {
                     $query->withTrashed()->select('brand_key', 'name');
                 },
                 'team' => function ($query) {
                     $query->withTrashed()->select('team_key', 'name');
-                }],'leadStatus');
+                }], 'leadStatus');
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
