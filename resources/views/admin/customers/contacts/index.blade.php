@@ -94,7 +94,7 @@
                                             <tr id="tr-{{$customer_contact->id}}">
                                                 <td class="align-middle text-left text-nowrap"></td>
                                                 <td class="align-middle text-left text-nowrap">
-                                                    <a href="{{route('admin.customer.contact.edit',[$customer_contact->id])}}" title="{{isset($customer_contact->company) ? $customer_contact->company->name : 'No associated company'}}">{{ $customer_contact->name }}</a>
+                                                    <a href="{{route('admin.customer.contact.edit',[$customer_contact->id])}}">{{ $customer_contact->name }}</a>
                                                 </td>
                                                 <td class="align-middle text-left text-nowrap">
                                                     @if(isset($customer_contact->brand))
@@ -113,7 +113,7 @@
                                                 <td class="align-middle text-left text-nowrap">{{ $customer_contact->email }}</td>
                                                 <td class="align-middle text-left text-nowrap">{{ $customer_contact->phone }}</td>
                                                 <td class="align-middle text-left text-nowrap">{{ $customer_contact->contact_owner }}</td>
-                                                <td class="align-middle text-left" data-order="{{ $customer_contact->last_activity ? strtotime($customer_contact->last_activity) : 0 }}">{{ $customer_contact->last_activity_formatted }}</td>
+                                                <td class="align-middle text-left" data-order="{{ $customer_contact->last_activity ??'' }}">{{ $customer_contact->last_activity_formatted }}</td>
                                                 <td class="align-middle text-left" data-order="{{$customer_contact->created_at}}">
                                                     @if ($customer_contact->created_at->isToday())
                                                         Today
