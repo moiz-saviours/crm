@@ -20,10 +20,33 @@
                             {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
+                            <div class="form-group ">
+                                <label for="teamSelect">Select Team:</label>
+                                <select id="teamSelect" name="teamSelect" class="form-control">
+                                    <option value="all">All Teams</option>
+                                    @foreach($teams as $team)
+                                        <option value="{{ $team->team_key }}">{{ $team->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group ">
+                                <label for="brandSelect">Select Brand:</label>
+                                <select id="brandSelect" name="brandSelect" class="form-control">
+                                    <option value="all">All Brands</option>
+                                    @foreach($brands as $brand)
+                                        <option value="{{ $brand->brand_key }}">{{ $brand->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group ">
+                                <label for="dateRangePicker">Select Date Range:</label>
+                                <input type="text" id="dateRangePicker" name="dateRangePicker"
+                                       class="form-control dateRangePicker"/>
+                            </div>
                             <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
                                     data-tour="lead_create"><i class="fas fa-exclamation-circle custom-dot"></i>
                             </button>
-                            <button class="create-contact open-form-btn tour-createlead">Create New</button>
+                            <button class="create-record open-form-btn tour-createlead">Create New</button>
                         </div>
                     </div>
                 </header>
@@ -131,7 +154,8 @@
 
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-left text-nowrap">
+                                                <td class="align-middle text-left text-nowrap"
+                                                    data-order="{{$lead->created_at}}">
                                                     @if ($lead->created_at->isToday())
                                                         Today
                                                         at {{ $lead->created_at->timezone('GMT+5')->format('g:i A') }}
@@ -186,6 +210,8 @@
     </section>
     <!-- Modal -->
     @push('script')
+        <script src="{{asset('assets/js/moment.min.js')}}"></script>
+        <script src="{{asset('assets/js/plugins/daterangepicker/daterangepicker.min.js')}}"></script>
         @include('admin.leads.script')
     @endpush
 @endsection
