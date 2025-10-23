@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 
 const ENV = process.env.APP_ENV || 'local';
 const PORT = process.env.SOCKETIO_PORT || 6001;
+const URL = process.env.SOCKETIO_URL || 6001;
 
 let allowedOrigins = [];
 let socketPath = '/socket.io';
@@ -89,5 +90,5 @@ io.on('connection', (socket) => {
 });
 server.listen(PORT, () => {
     console.log(`✅ Socket.IO server running on port ${PORT}`);
-    console.log(`📍 http://localhost:${PORT}`);
+    console.log(`📍 ${URL}:${PORT}`);
 });
