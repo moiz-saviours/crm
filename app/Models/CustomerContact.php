@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Traits\ActivityLoggable;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 class CustomerContact extends Model
 {
@@ -41,7 +41,7 @@ class CustomerContact extends Model
      *
      * @var array
      */
-    protected $appends = ['last_activity', 'last_activity_formatted'];
+    protected $appends = ['last_activity', 'last_activity_formatted','created_at_formatted'];
 
     /**
      * Generate a unique special key.
@@ -79,7 +79,7 @@ class CustomerContact extends Model
     public function getLastActivityAttribute()
     {
         if (!$this->special_key) return null;
-        $times = [
+        $times = collect([
             $this->getLastEmailActivity(),
             $this->getLastNoteActivity(),
             $this->getLastUserActivity(),
@@ -88,8 +88,8 @@ class CustomerContact extends Model
             $this->getLastLeadActivity(),
             $this->updated_at,
             $this->created_at,
-        ];
-        return max(array_filter($times)) ?: null;
+        ])->filter()->map(fn($t) => $t instanceof \Carbon\Carbon ? $t : \Carbon\Carbon::parse($t));
+        return $times->isNotEmpty() ? $times->sortDesc()->first()->clone() : null;
     }
 
     /**
@@ -106,6 +106,22 @@ class CustomerContact extends Model
             return "Today at {$activityDate->format('g:i A')} GMT+5";
         } else {
             return "{$activityDate->format('M d, Y g:i A')} GMT+5";
+        }
+    }
+    /**
+     * Get the formatted created at for display
+     */
+    public function getCreatedAtFormattedAttribute()
+    {
+        $created_at = $this->created_at;
+        if (!$created_at) {
+            return '---';
+        }
+        $Date = Carbon::parse($created_at)->timezone('GMT+5');
+        if ($Date->isToday()) {
+            return "Today at {$Date->format('g:i A')} GMT+5";
+        } else {
+            return "{$Date->format('M d, Y g:i A')} GMT+5";
         }
     }
 
