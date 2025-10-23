@@ -107,26 +107,26 @@
 
                                         <tr>
                                             <th></th>
-                                            {{--                                            <th class="align-middle text-center text-nowrap">SNO.</th>--}}
-                                            {{--                                            <th class="align-middle text-center text-nowrap">ATTEMPT</th>--}}
-                                            <th class="align-middle text-center text-nowrap">INVOICE #</th>
-                                            <th class="align-middle text-center text-nowrap">BRAND</th>
-                                            <th class="align-middle text-center text-nowrap">TEAM</th>
-                                            <th class="align-middle text-center text-nowrap">CUSTOMER CONTACT</th>
-                                            <th class="align-middle text-center text-nowrap">AGENT</th>
-                                            <th class="align-middle text-center text-nowrap">AMOUNT</th>
-                                            <th class="align-middle text-center text-nowrap">STATUS</th>
-                                            <th class="align-middle text-center text-nowrap">DUE DATE</th>
-                                            <th class="align-middle text-center text-nowrap">CREATED DATE</th>
-                                            <th class="align-middle text-center text-nowrap tour-invoiceaction">ACTION
+                                            {{--                                            <th class="align-middle text-left text-nowrap">SNO.</th>--}}
+                                            {{--                                            <th class="align-middle text-left text-nowrap">ATTEMPT</th>--}}
+                                            <th class="align-middle text-left text-nowrap">INVOICE #</th>
+                                            <th class="align-middle text-left text-nowrap">BRAND</th>
+                                            <th class="align-middle text-left text-nowrap">TEAM</th>
+                                            <th class="align-middle text-left text-nowrap">CUSTOMER CONTACT</th>
+                                            <th class="align-middle text-left text-nowrap">AGENT</th>
+                                            <th class="align-middle text-left text-nowrap">AMOUNT</th>
+                                            <th class="align-middle text-left text-nowrap">STATUS</th>
+                                            <th class="align-middle text-left text-nowrap">DUE DATE</th>
+                                            <th class="align-middle text-left text-nowrap">CREATED DATE</th>
+                                            <th class="align-middle text-left text-nowrap tour-invoiceaction">ACTION
                                             </th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         @foreach($invoices as $invoice)
                                             <tr id="tr-{{$invoice->id}}">
-                                                <td class="align-middle text-center text-nowrap"></td>
-                                                {{--                                                <td class="align-middle text-center text-nowrap"--}}
+                                                <td class="align-middle text-left text-nowrap"></td>
+                                                {{--                                                <td class="align-middle text-left text-nowrap"--}}
                                                 {{--                                                    data-order="{{$loop->iteration}}">{{$loop->iteration}}</td>--}}
                                                 {{--                                                <td class="align-middle space-between text-nowrap" style="text-align: left;">--}}
                                                 {{--                                                    @php--}}
@@ -149,7 +149,7 @@
                                                 {{--                                                        <div class="text-muted">No Gateway Found</div>--}}
                                                 {{--                                                    @endif--}}
                                                 {{--                                                </td>--}}
-                                                <td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                                                <td class="align-middle text-left text-nowrap text-sm invoice-cell">
                                                     <span
                                                         class="invoice-number">{{ $invoice->invoice_number }}</span><br>
                                                     {{--                                                    <span class="invoice-key">{{ $invoice->invoice_key }}</span>--}}
@@ -160,21 +160,21 @@
                                                           data-invoice-key="{{ $invoice->invoice_key }}"><b
                                                             style="font-weight: 600;">{{ $invoice->invoice_key }}</b></span>
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if(isset($invoice->brand))
                                                         <a href="{{route('admin.brand.index')}}?search={{$invoice->brand->name}}">{{ $invoice->brand->name }}</a>
                                                     @else
                                                         ---
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if(isset($invoice->team))
                                                         <a href="{{route('admin.team.index')}}?search={{$invoice->team->name}}">{{ $invoice->team->name }}</a>
                                                     @else
                                                         ---
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if(isset($invoice->customer_contact))
                                                         <a href="{{route('admin.customer.contact.index')}}?search={{$invoice->customer_contact->name}}">{{ $invoice->customer_contact->name }}</a>
                                                         {{--                                                        <a href="{{route('admin.customer.contact.edit',[$invoice->customer_contact->id])}}">{{ $invoice->customer_contact->name }}</a>--}}
@@ -183,7 +183,7 @@
                                                         ---
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if(isset($invoice->agent_id , $invoice->agent_type ,$invoice->agent ))
                                                         <a href="{{route('admin.employee.index')}}?search={{$invoice->agent->name}}">{{ $invoice->agent->name }}</a>
                                                     @else
@@ -212,7 +212,7 @@
                                                         <span>{{ $invoice->currency ." ". number_format($invoice->total_amount, 2, '.', '') }}</span>
                                                     </div>
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if($invoice->status == 0)
                                                         <span class="badge bg-warning text-dark">Due</span>
                                                     @elseif($invoice->status == 1)
@@ -223,8 +223,8 @@
                                                         <span class="badge bg-danger">Charge Back</span>
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center text-nowrap">{{Carbon\Carbon::parse($invoice->due_date)->format('Y-m-d')}}</td>
-                                                <td class="align-middle text-center text-nowrap"
+                                                <td class="align-middle text-left text-nowrap">{{Carbon\Carbon::parse($invoice->due_date)->format('Y-m-d')}}</td>
+                                                <td class="align-middle text-left text-nowrap"
                                                     data-order="{{$invoice->created_at}}">
                                                     @if ($invoice->created_at->isToday())
                                                         Today
@@ -235,7 +235,7 @@
                                                         GMT+5
                                                     @endif
                                                 </td>
-                                                <td class="align-middle text-center table-actions ">
+                                                <td class="align-middle text-left table-actions ">
                                                     @if(isset($invoice->brand))
                                                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                                 data-id="{{ $invoice->id }}"
@@ -354,12 +354,12 @@
                     <table class="table table-striped" id="paymentProofTable">
                         <thead>
                         <tr>
-                            <th class="align-middle text-center">ID</th>
-                            <th class="align-middle text-center">FILE NAME</th>
-                            <th class="align-middle text-center">TYPE</th>
-                            <th class="align-middle text-center">PREVIEW</th>
-                            <th class="align-middle text-center">UPLOADED AT</th>
-                            <th class="align-middle text-center">ACTIONS</th>
+                            <th class="align-middle text-left">ID</th>
+                            <th class="align-middle text-left">FILE NAME</th>
+                            <th class="align-middle text-left">TYPE</th>
+                            <th class="align-middle text-left">PREVIEW</th>
+                            <th class="align-middle text-left">UPLOADED AT</th>
+                            <th class="align-middle text-left">ACTIONS</th>
                         </tr>
                         </thead>
                         <tbody id="paymentProofsTbody">
@@ -381,7 +381,7 @@
                     <h5 class="modal-title" id="previewFileName">File Preview</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
+                <div class="modal-body text-left">
                     <iframe id="pdfPreview" src="" style="width:100%; height:500px; border:none;"></iframe>
                     <img id="imagePreview" src="" class="img-fluid" style="display:none;">
                 </div>
