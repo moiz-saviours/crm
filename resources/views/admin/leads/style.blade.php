@@ -2,6 +2,7 @@
     .custom-form .fh-1 {
         background: var(--nf-header-bg);
     }
+
     td.align-middle.text-center.text-nowrap.editable:hover select {
         border: 1px solid #000;
         border-radius: 5px;
@@ -10,6 +11,7 @@
     td.align-middle.text-center.text-nowrap.editable[data], td.align-middle.text-center.text-nowrap.editable {
         cursor: pointer;
     }
+
     td {
         padding: 4px 8px !important;
     }
@@ -52,10 +54,11 @@
         cursor: pointer;
     }
 
-    .filters .actions .create-contact {
+    .filters .actions .create-record {
         background-color: #ff5722;
         color: #fff;
         border: none;
+        margin-top: 20px;
     }
 
     .search-bar input {
@@ -101,9 +104,9 @@
     }
 
     .custom-tabs {
-                margin: 0px 0px 4px 0px;
-                display: flex;
-            }
+        margin: 0px 0px 4px 0px;
+        display: flex;
+    }
 
     .tab-nav {
         display: flex;
@@ -281,13 +284,14 @@
         width: 100%;
     }
 
-    .custom-form .form-body input:not(.is-invalid)[type="checkbox"]{
+    .custom-form .form-body input:not(.is-invalid)[type="checkbox"] {
         width: 2%;
         margin-right: 10px;
         appearance: none;
         cursor: pointer;
         position: relative;
     }
+
     .custom-form .form-body input:not(.is-invalid)[type="radio"] {
         margin-right: 10px;
         appearance: none;
@@ -296,11 +300,13 @@
         cursor: pointer;
         position: relative;
     }
+
     .fh-checkbox input[type="checkbox"]:checked,
-    .fh-radiobox input[type="radio"]:checked{
+    .fh-radiobox input[type="radio"]:checked {
         background: var(--nf-header-bg);
         border-color: var(--nf-header-bg);
     }
+
     .fh-checkbox input[type="checkbox"]:checked::after {
         content: '\2713';
         color: #fff;
@@ -312,6 +318,7 @@
         font-weight: bold;
         z-index: 99;
     }
+
     .fh-radiobox input[type="radio"]:checked::after {
         content: '';
         width: 8px;
@@ -333,7 +340,8 @@
         display: flex;
         justify-content: space-evenly;
     }
-    .form-button .btn-primary{
+
+    .form-button .btn-primary {
         width: 30%;
         padding: 10px;
         color: white;
@@ -343,7 +351,8 @@
         background: var(--bs-primary);
         margin-right: 10px;
     }
-    .form-button .btn-secondary{
+
+    .form-button .btn-secondary {
         width: 30%;
         padding: 10px;
         color: var(--bs-primary);
@@ -353,6 +362,7 @@
         background: transparent;
         margin-right: 10px;
     }
+
     .form-container img {
         max-width: 100px;
         max-height: 100px;
