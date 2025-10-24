@@ -21,37 +21,14 @@ class ProjectsTableSeeder extends Seeder
      */
     public function run(): void
     {
-
-        //Check table existence before querying
-        if (!Schema::hasTable('projects')) {
-            $this->command->error('Table "projects" does not exist. Please run migrations first.');
-            return;
-        }
-
-        if (!Schema::hasTable('customer_contacts')) {
-            $this->command->error('Table "customer_contacts" does not exist.');
-            return;
-        }
-
-        if (!Schema::hasTable('admins')) {
-            $this->command->error('Table "admins" does not exist.');
-            return;
-        }
-
-        if (!Schema::hasTable('brands')) {
-            $this->command->error('Table "brands" does not exist.');
-            return;
-        }
-
-        
-        if (!Schema::hasTable('teams')) {
-            $this->command->error('Table "teams" does not exist.');
-            return;
-        }
-
+        try {
         // Get existing records from related tables
         $brands = Brand::all();
-        $customerContacts = CustomerContact::all();
+        $customerContacts = CustomerContact::all()
+            ->sortByDesc(function ($customer) {
+                return $customer->last_activity;
+            })
+            ->take(10);
         $teams = Team::all();
         $admins = Admin::all();
 
@@ -65,8 +42,8 @@ class ProjectsTableSeeder extends Seeder
             return;
         }
 
-        $teamKeys = $teams->pluck('special_key')->toArray();
-        $brandsKeys = $brands->pluck('special_key')->toArray();
+        $teamKeys = $teams->pluck('team_key')->toArray();
+        $brandsKeys = $brands->pluck('brand_key')->toArray();
 
 
 
@@ -80,17 +57,18 @@ class ProjectsTableSeeder extends Seeder
         $teamKey = null;
         if (!empty($teamIds)) {
             $team = $teams[($projectCounter - 1) % count($teams)];
-            $teamKey = $team->team_key ?? Team::generateSpecialKey();
+            $teamKey = $team->team_key ?? null;
         }
 
         $brandKey = null;
         if (!empty($brandIds)) {
             $brand = $brands[($projectCounter - 1) % count($brands)];
-            $brandKey = $brand->brand_key ?? Team::generateSpecialKey();
+            $brandKey = $brand->brand_key ?? null;
         }
 
         // 🔁 Create 50 projects for each customer
         foreach ($customerContacts as $customerContact) {
+            try {
             for ($i = 1; $i <= 10; $i++) {
 
                 // Randomly assign an admin as the creator
@@ -126,6 +104,10 @@ class ProjectsTableSeeder extends Seeder
 
                 $projectCounter++;
             }
+            } catch (\Throwable $e) {
+                $this->command->error("❌ Error while generating projects for Customer ID {$customerContact->id}: " . $e->getMessage());
+                break;
+            }
         }
 
         // Insert all projects
@@ -134,6 +116,7 @@ class ProjectsTableSeeder extends Seeder
 
         // 🔗 Create attachments and members for each project
         foreach ($insertedProjects as $index => $project) {
+            try {
             // Attachments (2–4 per project)
             $attachmentCount = rand(2, 4);
             for ($j = 1; $j <= $attachmentCount; $j++) {
@@ -178,8 +161,16 @@ class ProjectsTableSeeder extends Seeder
                     'updated_at' => Carbon::now(),
                 ];
             }
+            } catch (\Throwable $e) {
+                $this->command->error("⚠️ Error while processing Project ID {$project->id}: " . $e->getMessage());
+                break;
+            }
+
         }
 
+        } catch (\Throwable $e) {
+            $this->command->error('❌ Seeder stopped due to unexpected error: ' . $e->getMessage());
+        }
         // Insert attachments and members
         DB::table('project_attachments')->insert($projectAttachments);
         DB::table('project_members')->insert($projectMembers);
