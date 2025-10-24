@@ -165,21 +165,25 @@ class MessageController extends Controller
         ]);
     }
 
-    public function getContextConversations(CustomerContact $customer_contact)
-    {
-        $conversations = Conversation::with(['sender', 'receiver', 'lastMessage', 'context'])
-            ->where('receiver_type', CustomerContact::class)
-            ->where('receiver_id', $customer_contact->id)
-            ->orWhere(function($query) use ($customer_contact) {
-                $query->where('sender_type', CustomerContact::class)
-                    ->where('sender_id', $customer_contact->id);
-            })
-            ->whereNotNull('context_type') // Only context-based conversations
-            ->orderBy('updated_at', 'desc')
-            ->get();
+public function getContextConversations(Request $request)
+{
+    $customerContactId = $request->customer_contact_id;
+    
+    $conversations = Conversation::with(['sender', 'receiver', 'lastMessage'])
+        ->where(function($query) use ($customerContactId) {
+            $query->where('sender_type', CustomerContact::class)
+                  ->where('sender_id', $customerContactId);
+        })
+        ->orWhere(function($query) use ($customerContactId) {
+            $query->where('receiver_type', CustomerContact::class)
+                  ->where('receiver_id', $customerContactId);
+        })
+        ->whereNotNull('context_type')
+        ->orderBy('updated_at', 'desc')
+        ->get();
 
-        return response()->json([
-            'conversations' => $conversations
-        ]);
-    }
+    return response()->json([
+        'conversations' => $conversations
+    ]);
+}
 }
