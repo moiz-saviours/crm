@@ -100,26 +100,20 @@
 //     });
 // });
 
-
-
 // my updated
 
-
 document.addEventListener("DOMContentLoaded", function () {
-
-    // 🔧 DEBUG MODE CONTROL
-    // =========================
+    if (window.__wlScriptRunning) {
+        console.log('WL Script: Another instance is already running, skipping this script');
+        return;
+    }
     const DEBUG_KEY = "debug_mode";
 
-    // Default agar key set nahi hai to false rakho
     if (!localStorage.getItem(DEBUG_KEY)) {
-        localStorage.setItem(DEBUG_KEY, "false");
+        localStorage.setItem(DEBUG_KEY, "true");
     }
-
-    // LocalStorage se debug value read karo
     const DEBUG_MODE = localStorage.getItem(DEBUG_KEY) === "true";
     console.log("🪶 Debug Mode:", DEBUG_MODE ? "ON" : "OFF");
-
 
     const PENDING_SUBMISSIONS_KEY = "pending_lead_submissions";
     const SUBMITTED_IDS_KEY = "submitted_lead_ids";
@@ -127,14 +121,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (activeScriptInfo) {
         console.log('WL Script: Active instance running from:', activeScriptInfo.src);
         const allScripts = document.querySelectorAll('script[src*="wl-script.js"]');
-        allScripts.forEach(script => {
-            script.setAttribute('data-wl-processed', 'true');
-        });
+        allScripts.forEach(script => script.setAttribute('data-wl-processed', 'true'));
     }
     function getActiveScriptInfo() {
         const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
         let activeScript = null;
-
         for (let script of scripts) {
             if (!script.hasAttribute('data-wl-processed')) {
                 activeScript = script;
@@ -145,8 +136,8 @@ document.addEventListener("DOMContentLoaded", function () {
             activeScript = scripts[0];
         }
         if (activeScript) {
-            const url = new URL(activeScript.src);
             return {
+                full_url: activeScript.src,
                 script: activeScript,
                 domain: getApiBaseUrl(activeScript),
                 src: activeScript.src,
@@ -195,6 +186,18 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Using API base URL:", apiBaseUrl);
         return apiBaseUrl;
     }
+    function getDomainTokenMap() {
+        const scripts = document.querySelectorAll('script[src*="wl-script.js"]');
+        const map = {};
+        scripts.forEach(script => {
+            const domain = getApiBaseUrl(script);
+            const token = getScriptToken(script);
+            if (domain && token) map[domain] = token;
+        });
+        console.log("🌐 Domain–Token Map:", map);
+        return map;
+    }
+
     function getVisitorId() {
         let id = localStorage.getItem("visitor_id");
         if (!id) {
@@ -207,13 +210,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return "sub_" + Math.random().toString(36).substr(2, 9) + Date.now();
     }
     const forms = document.querySelectorAll("form");
+    const visitor_id = !localStorage.getItem("visitor_id") ? getVisitorId() : localStorage.getItem("visitor_id");
     forms.forEach(form => {
-        const visitor_id = getVisitorId();
         form.addEventListener("submit", async function () {
-            if (window.__wlScriptRunning) {
-                console.log('WL Script: Another instance is already running, skipping this script');
-                return;
-            }
+            if (window.__wlScriptRunning) return;
             window.__wlScriptRunning = true;
 
             const token = activeScriptInfo ? activeScriptInfo.token : null;
@@ -221,13 +221,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const fields = form.querySelectorAll("label, input, textarea, select");
 
             fields.forEach((field, index) => {
-                if (field.name) {
-                    formData[field.name] = field.value;
-                } else if (field.label) {
-                    formData[field.label] = field.value;
-                } else {
-                    formData["field_" + index] = field.value;
-                }
+                if (field.name) formData[field.name] = field.value; else if (field.label) formData[field.label] = field.value; else formData["field_" + index] = field.value;
             });
 
             const deviceInfo = {
@@ -247,27 +241,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 script_token: token,
                 form_data: formData,
                 device_info: deviceInfo,
-                scriptInstance: activeScriptInfo ? activeScriptInfo.src : 'unknown'
+                scriptInstance: activeScriptInfo ? activeScriptInfo.src : 'unknown',
+                id: generateSubmissionId(),
+                createdAt: new Date().toISOString(),
+                attemptedDomains: []
             });
             saveSubmissionToStorage(payload);
-            console.log("Form data saved to localStorage, will send to unique domains after redirect");
         });
     });
     function saveSubmissionToStorage(submission) {
+        const pending = getPendingSubmissions();
+        pending.push(submission);
+        localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(pending));
+    }
+    function getPendingSubmissions() {
         try {
-            const pending = getPendingSubmissions();
-            submission.id = submission.id || generateSubmissionId();
-            submission.createdAt = new Date().toISOString();
-            submission.attemptedDomains = submission.attemptedDomains || [];
-
-            pending.push(submission);
-            localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(pending));
-            console.log("Submission saved to storage:", submission.id);
-            return submission.id;
-        } catch (e) {
-            console.error("Error saving submission to storage:", e);
-            return null;
+            return JSON.parse(localStorage.getItem(PENDING_SUBMISSIONS_KEY)) || [];
+        } catch {
+            return [];
         }
+    }
+    function markSubmissionAsSent(submissionId, domain) {
+        const submitted = JSON.parse(localStorage.getItem(SUBMITTED_IDS_KEY)) || {};
+        submitted[`${submissionId}_${domain}`] = new Date().toISOString();
+        localStorage.setItem(SUBMITTED_IDS_KEY, JSON.stringify(submitted));
+    }
+    function isSubmissionSent(submissionId, domain) {
+        const submitted = JSON.parse(localStorage.getItem(SUBMITTED_IDS_KEY)) || {};
+        return !!submitted[`${submissionId}_${domain}`];
     }
     async function sendToSingleDomain(domain, submission) {
         try {
@@ -276,18 +277,50 @@ document.addEventListener("DOMContentLoaded", function () {
                     'Content-Type': 'application/json',
                 }, body: JSON.stringify(submission)
             });
-            localStorage.setItem(domain, response);
-
-            if (response.ok) {
-                console.log(`Successfully sent submission ${submission.id} to ${domain}`);
-                return true;
-            } else {
-                console.error(`Fetch failed for ${domain}: HTTP ${response.status}`);
-                return false;
-            }
+            return response.ok;
         } catch (error) {
-            console.error(`Error sending to ${domain}:`, error);
             return false;
+        }
+    }
+    async function sendSubmissionToDomains(submission) {
+        const domainTokenMap = getDomainTokenMap();
+        let sentToAll = true;
+
+        for (const [domain, token] of Object.entries(domainTokenMap)) {
+            if (isSubmissionSent(submission.id, domain)) {
+                console.log(`Skipping ${domain}, already sent.`);
+                continue;
+            }
+            const payload = {
+                visitor_id: submission.visitor_id,
+                submissions: [
+                    {
+                        domain,
+                        script_token: token,
+                        form_data: submission.form_data,
+                        device_info: submission.device_info,
+                        scriptInstance: `${domain.replace('/api', '')}/assets/js/wl-script.js?token=${token}`,
+                        id: submission.id,
+                        createdAt: submission.createdAt
+                    }
+                ]
+            };
+            const success = await sendToSingleDomain(domain, payload);
+            if (success) markSubmissionAsSent(submission.id, domain);
+            else sentToAll = false;
+            await new Promise(r => setTimeout(r, 500));
+        }
+        if (sentToAll) {
+            console.log(`Submission ${submission.id} successfully sent to all domains, removing from storage`);
+            removeSubmissionFromStorage(submission.id);
+        } else {
+            submission.retryCount = (submission.retryCount || 0) + 1;
+            if (submission.retryCount >= 3) {
+                console.warn(`⚠️ Removing submission ${submission.id} after 3 failed attempts`);
+                removeSubmissionFromStorage(submission.id);
+            } else {
+                saveSubmissionToStorage(submission);
+            }
         }
     }
     function getAllUniqueDomains() {
@@ -322,42 +355,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         for (const submission of pending) {
-            await sendSubmissionToDomains(submission, workingDomains);
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await sendSubmissionToDomains(submission);
         }
-    }
-    async function sendSubmissionToDomains(submission, domains) {
-        const results = [];
-        let sentToAllDomains = true;
-
-        for (const domain of domains) {
-            if (isSubmissionSent(submission.id, domain)) {
-                console.log(`Submission ${submission.id} already sent to ${domain}, skipping`);
-                continue;
-            }
-
-            const success = await sendToSingleDomain(domain, submission);
-            results.push({domain, success});
-            if (success) {
-                markSubmissionAsSent(submission.id, domain);
-            } else {
-                sentToAllDomains = false;
-            }
-        }
-        if (sentToAllDomains) {
-            console.log(`Submission ${submission.id} successfully sent to all domains, removing from storage`);
-            // removeSubmissionFromStorage(submission.id);
-        } else {
-            submission.attemptedDomains = domains.filter(domain => results.find(r => r.domain === domain && r.success));
-            const pending = getPendingSubmissions();
-            const index = pending.findIndex(sub => sub.id === submission.id);
-            if (index !== -1) {
-                pending[index] = submission;
-                localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(pending));
-            }
-            console.log(`Submission ${submission.id} sent to ${submission.attemptedDomains.length} out of ${domains.length} domains`);
-        }
-        return results;
     }
     function removeSubmissionFromStorage(submissionId) {
         try {
@@ -369,50 +368,11 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error removing submission from storage:", e);
         }
     }
-    function markSubmissionAsSent(submissionId, domain) {
-        try {
-            const submitted = getSubmittedIds();
-            const key = `${submissionId}_${domain}`;
-            submitted[key] = new Date().toISOString();
-            localStorage.setItem(SUBMITTED_IDS_KEY, JSON.stringify(submitted));
-        } catch (e) {
-            console.error("Error marking submission as sent:", e);
-        }
-    }
-    function getSubmittedIds() {
-        try {
-            const submitted = localStorage.getItem(SUBMITTED_IDS_KEY);
-            return submitted ? JSON.parse(submitted) : {};
-        } catch (e) {
-            console.error("Error reading submitted IDs:", e);
-            return {};
-        }
-    }
-    function getPendingSubmissions() {
-        try {
-            const pending = localStorage.getItem(PENDING_SUBMISSIONS_KEY);
-            return pending ? JSON.parse(pending) : [];
-        } catch (e) {
-            console.error("Error reading pending submissions:", e);
-            return [];
-        }
-    }
-    function isSubmissionSent(submissionId, domain) {
-        try {
-            const submitted = getSubmittedIds();
-            const key = `${submissionId}_${domain}`;
-            return !!submitted[key];
-        } catch (e) {
-            console.error("Error checking submission status:", e);
-            return false;
-        }
-    }
     function cleanupOldSubmissions() {
         if (DEBUG_MODE) {
             console.log("🟡 Debug: Cleanup skipped");
             return;
         }
-
 
         const pending = getPendingSubmissions();
         const now = new Date();
@@ -431,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cleanupOldSubmissions();
     sendStoredSubmissions();
     document.addEventListener('visibilitychange', function () {
-        if (!document.hidden) {
+        if (!document.hidden && DEBUG_MODE === false) {
             sendStoredSubmissions();
         }
     });
