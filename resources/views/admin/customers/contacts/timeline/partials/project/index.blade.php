@@ -1,5 +1,4 @@
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -81,7 +80,6 @@ $(document).ready(function() {
     });
 
     function loadProjects() {
-        console.log('Loading projects with filters...');
         const filters = {
             cus_contact_key: customerContactKey,
             status: $('#statusFilter').val(),
@@ -130,7 +128,6 @@ $(document).ready(function() {
 
 // Drag and Drop functionality can be added here
 function initializeDragAndDrop() {
-    console.log('Initializing SortableJS...');
     
     const sortableContainers = document.querySelectorAll('.sortable-container');
     
@@ -158,7 +155,6 @@ function initializeDragAndDrop() {
                     .map(item => item.dataset.projectId)
                     .filter(id => id);
                 
-                console.log('Drag ended - Project:', projectId, 'From:', oldStatus, 'To:', newStatus);
                 
                 // Remove empty placeholder if it exists
                 const emptyPlaceholder = evt.to.querySelector('.empty-column');
@@ -170,7 +166,6 @@ function initializeDragAndDrop() {
                 updateProjectMove(projectId, oldStatus, newStatus, projectIds);
             },
             onAdd: function(evt) {
-                console.log('Item added to column');
                 // Remove empty placeholder when item is added
                 const emptyPlaceholder = evt.to.querySelector('.empty-column');
                 if (emptyPlaceholder) {
@@ -178,7 +173,6 @@ function initializeDragAndDrop() {
                 }
             },
             onRemove: function(evt) {
-                console.log('Item removed from column');
                 // Add empty placeholder if column becomes empty
                 if (evt.from.children.length === 0) {
                     evt.from.innerHTML = '<div class="text-center text-muted py-4 empty-column"><small>No projects in this status</small></div>';
@@ -190,7 +184,6 @@ function initializeDragAndDrop() {
 
 // Combined update for status and order
 function updateProjectMove(projectId, oldStatus, newStatus, projectIds) {
-    console.log('Updating project move:', projectId, oldStatus, '->', newStatus, 'order:', projectIds);
     
     $.ajax({
         url: '{{ route("admin.customer.contact.projects.update-move") }}',
