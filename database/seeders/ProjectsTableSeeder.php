@@ -51,7 +51,11 @@ class ProjectsTableSeeder extends Seeder
 
         // Get existing records from related tables
         $brands = Brand::all();
-        $customerContacts = CustomerContact::all();
+        $customerContacts = CustomerContact::all()
+            ->sortByDesc(function ($customer) {
+                return $customer->last_activity;
+            })
+            ->take(10);
         $teams = Team::all();
         $admins = Admin::all();
 
