@@ -315,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function () {
             removeSubmissionFromStorage(submission.id);
         } else {
             submission.retryCount = (submission.retryCount || 0) + 1;
-            if (submission.retryCount >= 3) {
+            if (submission.retryCount >= 1) {
                 console.warn(`⚠️ Removing submission ${submission.id} after 3 failed attempts`);
                 removeSubmissionFromStorage(submission.id);
             } else {
