@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class LeadController extends Controller
@@ -495,25 +496,15 @@ class LeadController extends Controller
             /** ----------------------------------------------------------------
              * STEP 0: Handle navigator.sendBeacon() raw JSON payload
              * ----------------------------------------------------------------*/
-            $rawInput = $request->getContent();
-            $decoded = json_decode($rawInput, true);
-            if (is_array($decoded)) {
-                $request->merge($decoded);
-            }
-            \Log::info('StoreFromScript Incoming:', ['data' => $request->all()]);
+            Log::channel('webToLead')->info('StoreFromScript Incoming:', ['data' => $request->all()]);
+            $lead = Lead::create([
+                'lead_status_id' => 1,
+                'raw_data' => json_encode($request->all()),
+            ]);
             /** ----------------------------------------------------------------
              * STEP 1: Validate brand token & create raw record
              * ----------------------------------------------------------------*/
             $brand = Brand::all()->firstWhere('script_token', $request->script_token);
-            if (!$brand) {
-                return response()->json(['error' => 'Invalid script token.'], 404);
-            }
-            // Save raw data first
-            $lead = Lead::create([
-                'brand_key' => $brand->brand_key,
-                'lead_status_id' => 1,
-                'raw_data' => json_encode($request->all()),
-            ]);
             $leadId = $lead->id;
             /** ----------------------------------------------------------------
              * STEP 2: Prepare device info
@@ -537,10 +528,10 @@ class LeadController extends Controller
                             $userIp = $ipResponse->json()['ip'];
                         }
                     } catch (\Exception $e) {
-                        \Log::warning('Unable to fetch public IP on localhost', ['error' => $e->getMessage()]);
+                        Log::channel('webToLead')->warning('Unable to fetch public IP on localhost', ['error' => $e->getMessage()]);
                     }
                 }
-                \Log::info('Detected IP Automatically:', ['ip' => $userIp]);
+                Log::channel('webToLead')->info('Detected IP Automatically:', ['ip' => $userIp]);
                 // Step 3: Fetch location info from IP
                 $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
                 if ($ipapiRes->successful()) {
@@ -596,6 +587,7 @@ class LeadController extends Controller
              * STEP 4: Update record with processed data
              * ----------------------------------------------------------------*/
             $lead->update([
+                'brand_key' => $brand?->brand_key,
                 'name' => $dataToSave['name'] ?? '',
                 'email' => $dataToSave['email'] ?? '',
                 'phone' => $dataToSave['phone'] ?? '',
@@ -615,7 +607,7 @@ class LeadController extends Controller
                     $lead->update([
                         'cus_contact_key' => $existingContact->special_key,
                     ]);
-                    \Log::info('Lead auto-linked to existing customer', [
+                    Log::channel('webToLead')->info('Lead auto-linked to existing customer', [
                         'lead_id' => $lead->id,
                         'cus_contact_key' => $existingContact->special_key,
                     ]);
@@ -630,7 +622,7 @@ class LeadController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('StoreFromScript Error:', ['error' => $e->getMessage()]);
+            Log::channel('webToLead')->error('StoreFromScript Error:', ['error' => $e->getMessage()]);
             return response()->json([
                 'error' => $e->getMessage(),
             ], 500);
