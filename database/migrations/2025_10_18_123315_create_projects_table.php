@@ -13,10 +13,10 @@ return new class extends Migration {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->integer('order_column')->nullable()->default(0);
-            $table->string('special_key', 100)->unique()->nullable();
-            $table->string('cus_contact_key', 100)->nullable();
-            $table->string('brand_key', 100)->nullable()->default(null);
-            $table->string('team_key', 100)->nullable()->default(null);
+            $table->unsignedBigInteger('special_key')->nullable()->default(null)->unique();
+            $table->unsignedBigInteger('cus_contact_key')->nullable()->default(null);
+            $table->unsignedBigInteger('brand_key')->nullable()->default(null);
+            $table->unsignedBigInteger('team_key')->nullable()->default(null);
             $table->string('type', 50)->nullable()->default(null);
             $table->enum('value', ['regular', 'standard', 'premium', 'exclusive'])->default('regular');
             $table->string('label', 50)->nullable()->default(null);

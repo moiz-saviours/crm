@@ -20,7 +20,7 @@ return new class extends Migration
                 ->on('projects')
                 ->onDelete('NO ACTION');
 
-            $table->string('special_key')->unique()->nullable()->default(null);
+            $table->unsignedBigInteger('special_key')->nullable()->default(null)->unique();
 
             $table->enum('task_status', ['is_progress', 'on_hold', 'cancelled', 'finished'])
                 ->default('is_progress');

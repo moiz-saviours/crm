@@ -12,6 +12,7 @@ use App\Models\CustomerContact;
 use App\Models\Team;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class ProjectsTableSeeder extends Seeder
 {
@@ -20,6 +21,34 @@ class ProjectsTableSeeder extends Seeder
      */
     public function run(): void
     {
+
+        //Check table existence before querying
+        if (!Schema::hasTable('projects')) {
+            $this->command->error('Table "projects" does not exist. Please run migrations first.');
+            return;
+        }
+
+        if (!Schema::hasTable('customer_contacts')) {
+            $this->command->error('Table "customer_contacts" does not exist.');
+            return;
+        }
+
+        if (!Schema::hasTable('admins')) {
+            $this->command->error('Table "admins" does not exist.');
+            return;
+        }
+
+        if (!Schema::hasTable('brands')) {
+            $this->command->error('Table "brands" does not exist.');
+            return;
+        }
+
+        
+        if (!Schema::hasTable('teams')) {
+            $this->command->error('Table "teams" does not exist.');
+            return;
+        }
+
         // Get existing records from related tables
         $brands = Brand::all();
         $customerContacts = CustomerContact::all();
@@ -36,14 +65,29 @@ class ProjectsTableSeeder extends Seeder
             return;
         }
 
-        // If no records exist, we'll use null/default values
-        $teamIds = $teams->pluck('id')->toArray();
+        $teamKeys = $teams->pluck('special_key')->toArray();
+        $brandsKeys = $brands->pluck('special_key')->toArray();
+
+
+
 
         $projects = [];
         $projectAttachments = [];
         $projectMembers = [];
 
         $projectCounter = 1;
+
+        $teamKey = null;
+        if (!empty($teamIds)) {
+            $team = $teams[($projectCounter - 1) % count($teams)];
+            $teamKey = $team->team_key ?? Team::generateSpecialKey();
+        }
+
+        $brandKey = null;
+        if (!empty($brandIds)) {
+            $brand = $brands[($projectCounter - 1) % count($brands)];
+            $brandKey = $brand->brand_key ?? Team::generateSpecialKey();
+        }
 
         // 🔁 Create 50 projects for each customer
         foreach ($customerContacts as $customerContact) {
@@ -52,20 +96,10 @@ class ProjectsTableSeeder extends Seeder
                 // Randomly assign an admin as the creator
                 $admin = $admins->random();
 
-                // Get team_key sequentially
-                $teamKey = null;
-                if (!empty($teamIds)) {
-                    $team = $teams[($projectCounter - 1) % count($teams)];
-                    $teamKey = $team->team_key ?? 'TEAM-' . str_pad($team->id, 3, '0', STR_PAD_LEFT);
-                }
-
-                // Get brand_key (optional for now)
-                $brandKey = null;
-
                 // Prepare project record
                 $projects[] = [
-                    'special_key' => 'PROJ-' . str_pad($projectCounter, 6, '0', STR_PAD_LEFT) . '-' . uniqid(),
-                    'cus_contact_key' => $customerContact->special_key ?? 'CUST-' . str_pad($customerContact->id, 4, '0', STR_PAD_LEFT),
+                    'special_key' => Project::generateSpecialKey(),
+                    'cus_contact_key' => $customerContact->special_key ?? CustomerContact::generateSpecialKey(),
                     'brand_key' => $brandKey,
                     'team_key' => $teamKey,
                     'type' => $this->getProjectType($projectCounter),
