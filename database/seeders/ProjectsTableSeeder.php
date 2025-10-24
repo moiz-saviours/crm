@@ -47,7 +47,7 @@ class ProjectsTableSeeder extends Seeder
 
         // 🔁 Create 50 projects for each customer
         foreach ($customerContacts as $customerContact) {
-            for ($i = 1; $i <= 50; $i++) {
+            for ($i = 1; $i <= 10; $i++) {
 
                 // Randomly assign an admin as the creator
                 $admin = $admins->random();

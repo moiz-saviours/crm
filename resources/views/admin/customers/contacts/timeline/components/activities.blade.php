@@ -69,11 +69,6 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link customize" data-tab="tasks" data-bs-toggle="tab" data-bs-target="#tasks-container"
-                type="button" role="tab" aria-controls="tasks" aria-selected="false">Tasks
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
         <button class="nav-link customize" data-tab="meetings" data-bs-toggle="tab" data-bs-target="#meetings-container"
                 type="button" role="tab" aria-controls="meetings" aria-selected="false">Meetings
         </button>
@@ -86,6 +81,11 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link customize" data-tab="projects" data-bs-toggle="tab" data-bs-target="#projects-container"
                 type="button" role="tab" aria-controls="projects" aria-selected="false">Projects
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link customize" data-tab="tasks" data-bs-toggle="tab" data-bs-target="#tasks-container"
+                type="button" role="tab" aria-controls="tasks" aria-selected="false">Tasks
         </button>
     </li>
 </ul>
@@ -264,14 +264,14 @@
         <div class="tab-pane fade custom-tabs-row-scroll" id="calls-container" role="tabpanel" aria-labelledby="call-tab">
             @include('admin.customers.contacts.timeline.static-content.call')
         </div>
-        <div class="tab-pane fade custom-tabs-row-scroll" id="tasks-container" role="tabpanel" aria-labelledby="task-tab">
-            @include('admin.customers.contacts.timeline.static-content.task')
-        </div>
         <div class="tab-pane fade custom-tabs-row-scroll" id="meetings-container" role="tabpanel" aria-labelledby="meeting-tab">
             @include('admin.customers.contacts.timeline.static-content.meeting')
         </div>
         <div class="tab-pane fade custom-tabs-row-scroll" id="projects-container" role="tabpanel" aria-labelledby="project-tab">
             @include('admin.customers.contacts.timeline.partials.project.index')
+        </div>
+                <div class="tab-pane fade custom-tabs-row-scroll" id="tasks-container" role="tabpanel" aria-labelledby="task-tab">
+            @include('admin.customers.contacts.timeline.static-content.task')
         </div>
         <div class="tab-pane fade" id="chats-container" role="tabpanel" aria-labelledby="chat-tab">
             @include('admin.customers.contacts.timeline.partials.chat.index')
