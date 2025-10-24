@@ -103,10 +103,9 @@
 // my updated
 
 document.addEventListener("DOMContentLoaded", function () {
-    if (window.__wlScriptRunning) {
-        console.log('WL Script: Another instance is already running, skipping this script');
-        return;
-    }
+    if (window.__wlScriptRunning) return;
+    window.__wlScriptRunning = true;
+    
     const DEBUG_KEY = "debug_mode";
 
     if (!localStorage.getItem(DEBUG_KEY)) {
