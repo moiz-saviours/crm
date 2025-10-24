@@ -275,6 +275,9 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::get('/projects/data', [AdminProjectController::class, 'getProjectsData'])->name('projects.data');
                 Route::get('/projects/details', [AdminProjectController::class, 'getProjectDetails'])->name('projects.details');
 
+                Route::post('/projects/update-move', [AdminProjectController::class, 'updateProjectMove'])
+                    ->name('projects.update-move');
+
             });
         });
         /** Companies Routes */

@@ -1,4 +1,5 @@
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -8,8 +9,8 @@
                 <div class="col-md-2">
                     <select class="form-select" id="statusFilter">
                         <option value="">All Status</option>
-                        <option value="isprogress">In Progress</option>
-                        <option value="on hold">On Hold</option>
+                        <option value="is_progress">In Progress</option>
+                        <option value="on_hold">On Hold</option>
                         <option value="cancelled">Cancelled</option>
                         <option value="finished">Finished</option>
                     </select>
@@ -65,7 +66,7 @@
 @push('script')
 <script>
 $(document).ready(function() {
-    const customerId = '{{ $customer_contact->id }}';
+    const customerContactKey = '{{ $customer_contact->special_key }}';
     loadProjects();
 
     // Filter functionality
@@ -82,7 +83,7 @@ $(document).ready(function() {
     function loadProjects() {
         console.log('Loading projects with filters...');
         const filters = {
-            customer_id: customerId,
+            cus_contact_key: customerContactKey,
             status: $('#statusFilter').val(),
             value: $('#valueFilter').val(),
             search: $('#searchInput').val()
@@ -94,6 +95,8 @@ $(document).ready(function() {
             data: filters,
             success: function(response) {
                 $('#projectsContainer').html(response);
+                // ADD THIS LINE - Initialize drag & drop after content loads
+                initializeDragAndDrop();
             },
             error: function(xhr) {
                 console.error('Error loading projects:', xhr);
@@ -113,7 +116,7 @@ $(document).ready(function() {
             method: 'GET',
             data: { 
                 id: projectId,
-                customer_id: customerId
+                cus_contact_key: customerContactKey
             },
             success: function(response) {
                 $('#projectModalBody').html(response);
@@ -124,7 +127,99 @@ $(document).ready(function() {
             }
         });
     }
+
+// Drag and Drop functionality can be added here
+function initializeDragAndDrop() {
+    console.log('Initializing SortableJS...');
+    
+    const sortableContainers = document.querySelectorAll('.sortable-container');
+    
+    sortableContainers.forEach(container => {
+        new Sortable(container, {
+            group: {
+                name: 'projects',
+                pull: true,
+                put: true
+            },
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            // Only prevent dragging the empty placeholder itself, but allow dropping on it
+            filter: '.empty-column',
+            // Allow dropping even on filtered elements
+            draggable: '.sortable-item',
+            
+            onEnd: function(evt) {
+                const projectId = evt.item.dataset.projectId;
+                const oldStatus = evt.from.dataset.status;
+                const newStatus = evt.to.dataset.status;
+                const projectIds = Array.from(evt.to.querySelectorAll('.sortable-item'))
+                    .map(item => item.dataset.projectId)
+                    .filter(id => id);
+                
+                console.log('Drag ended - Project:', projectId, 'From:', oldStatus, 'To:', newStatus);
+                
+                // Remove empty placeholder if it exists
+                const emptyPlaceholder = evt.to.querySelector('.empty-column');
+                if (emptyPlaceholder) {
+                    emptyPlaceholder.remove();
+                }
+                
+                // Single combined update
+                updateProjectMove(projectId, oldStatus, newStatus, projectIds);
+            },
+            onAdd: function(evt) {
+                console.log('Item added to column');
+                // Remove empty placeholder when item is added
+                const emptyPlaceholder = evt.to.querySelector('.empty-column');
+                if (emptyPlaceholder) {
+                    emptyPlaceholder.remove();
+                }
+            },
+            onRemove: function(evt) {
+                console.log('Item removed from column');
+                // Add empty placeholder if column becomes empty
+                if (evt.from.children.length === 0) {
+                    evt.from.innerHTML = '<div class="text-center text-muted py-4 empty-column"><small>No projects in this status</small></div>';
+                }
+            }
+        });
+    });
+}
+
+// Combined update for status and order
+function updateProjectMove(projectId, oldStatus, newStatus, projectIds) {
+    console.log('Updating project move:', projectId, oldStatus, '->', newStatus, 'order:', projectIds);
+    
+    $.ajax({
+        url: '{{ route("admin.customer.contact.projects.update-move") }}',
+        method: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            project_id: projectId,
+            old_status: oldStatus,
+            new_status: newStatus,
+            project_ids: projectIds,
+            cus_contact_key: customerContactKey
+        },
+        success: function(response) {
+            if (response.success) {
+                console.log('Project move updated successfully');
+            } else {
+                console.error('Failed to update project move');
+                loadProjects(); // Reload to reset
+            }
+        },
+        error: function(xhr) {
+            console.error('Error updating project move:', xhr);
+            loadProjects(); // Reload to reset
+        }
+    });
+}
+
 });
+
 </script>
 
 @endpush
@@ -299,6 +394,36 @@ $(document).ready(function() {
     .project-board {
         padding: 15px;
     }
+}
+
+/* SortableJS Styles */
+.sortable-ghost {
+    opacity: 0.4;
+    background: #f8f9fa;
+}
+
+.sortable-chosen {
+    transform: rotate(5deg);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.sortable-drag {
+    opacity: 0.8;
+}
+
+.sortable-item {
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.sortable-item:active {
+    cursor: grabbing;
+}
+
+/* Empty column styling */
+.empty-column {
+    pointer-events: none;
+    user-select: none;
 }
 </style>
 

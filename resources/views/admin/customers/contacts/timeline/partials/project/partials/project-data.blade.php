@@ -1,17 +1,19 @@
 <div class="container-fluid">
-    {{-- Horizontal Scroll Container --}}
     <div class="row flex-nowrap overflow-auto pb-3" id="projectsHorizontalScroll" style="min-height: 600px;">
-        @foreach(['isprogress' => 'In Progress', 'on hold' => 'On Hold', 'cancelled' => 'Cancelled', 'finished' => 'Finished'] as $status => $statusLabel)
+        @foreach(['is_progress' => 'In Progress', 'on_hold' => 'On Hold', 'cancelled' => 'Cancelled', 'finished' => 'Finished'] as $status => $statusLabel)
         <div class="col-xl-3 col-lg-4 col-md-6 mb-4" style="min-width: 320px;">
-            <div class="project-board h-100">
+            <div class="project-board h-100" data-status="{{ $status }}">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="text-muted mb-0">{{ $statusLabel }}</h6>
                     <span class="badge bg-light text-dark">{{ $projects->where('project_status', $status)->count() }}</span>
                 </div>
                 
-                <div class="project-column" style="max-height: 500px; overflow-y: auto;">
+                {{-- This div is the Sortable container --}}
+                <div class="project-column sortable-container" id="column-{{ $status }}" data-status="{{ $status }}">
                     @foreach($projects->where('project_status', $status) as $project)
-                    <div class="project-card {{ $project->value }} mb-3" data-project-id="{{ $project->id }}">
+                    <div class="project-card {{ $project->value }} mb-3 sortable-item" 
+                         data-project-id="{{ $project->id }}">
+                        {{-- Your card content remains the same --}}
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <h6 class="mb-0 text-truncate" style="max-width: 180px;">{{ $project->label }}</h6>
                             <span class="badge status-badge bg-{{ $project->getStatusColor() }}">
@@ -66,7 +68,7 @@
                     @endforeach
                     
                     @if($projects->where('project_status', $status)->count() === 0)
-                    <div class="text-center text-muted py-4">
+                    <div class="text-center text-muted py-4 empty-column">
                         <small>No projects in this status</small>
                     </div>
                     @endif

@@ -26,45 +26,51 @@ class ProjectsTableSeeder extends Seeder
         $teams = Team::all();
         $admins = Admin::all();
 
+        if ($customerContacts->isEmpty()) {
+            $this->command->error("No customer contacts found.");
+            return;
+        }
+
+        if ($admins->isEmpty()) {
+            $this->command->error("No admins found.");
+            return;
+        }
+
         // If no records exist, we'll use null/default values
-        $customerContactIds = $customerContacts->pluck('id')->toArray();
         $teamIds = $teams->pluck('id')->toArray();
-        
+
         $projects = [];
         $projectAttachments = [];
         $projectMembers = [];
 
         $projectCounter = 1;
-        
-        // Create 50 projects for each admin
-        foreach ($admins as $admin) {
+
+        // 🔁 Create 50 projects for each customer
+        foreach ($customerContacts as $customerContact) {
             for ($i = 1; $i <= 50; $i++) {
 
-                // Get cus_contact_key from CustomerContact sequentially
-                $customerSpecialKey = null;
-                if (!empty($customerContactIds)) {
-                    $customerContact = $customerContacts[($projectCounter - 1) % count($customerContacts)];
-                    $customerSpecialKey = $customerContact->special_key ?? 'CUST-' . str_pad($customerContact->id, 4, '0', STR_PAD_LEFT);
-                }
+                // Randomly assign an admin as the creator
+                $admin = $admins->random();
 
-                // Get team_key from Team model sequentially
+                // Get team_key sequentially
                 $teamKey = null;
                 if (!empty($teamIds)) {
                     $team = $teams[($projectCounter - 1) % count($teams)];
                     $teamKey = $team->team_key ?? 'TEAM-' . str_pad($team->id, 3, '0', STR_PAD_LEFT);
                 }
 
-                // Get brand_key from Brand model sequentially
+                // Get brand_key (optional for now)
                 $brandKey = null;
 
+                // Prepare project record
                 $projects[] = [
                     'special_key' => 'PROJ-' . str_pad($projectCounter, 6, '0', STR_PAD_LEFT) . '-' . uniqid(),
-                    'cus_contact_key' => $customerSpecialKey,
+                    'cus_contact_key' => $customerContact->special_key ?? 'CUST-' . str_pad($customerContact->id, 4, '0', STR_PAD_LEFT),
                     'brand_key' => $brandKey,
                     'team_key' => $teamKey,
                     'type' => $this->getProjectType($projectCounter),
                     'value' => $this->getProjectValue($projectCounter),
-                    'label' => 'Project ' . $projectCounter . ' - Admin ' . $admin->id,
+                    'label' => 'Project ' . $projectCounter . ' - Customer ' . $customerContact->id,
                     'theme_color' => $this->getThemeColor($projectCounter),
                     'project_status' => $this->getProjectStatus($projectCounter),
                     'is_progress' => $projectCounter % 4 !== 0,
@@ -75,7 +81,7 @@ class ProjectsTableSeeder extends Seeder
                     'start_date' => $this->getStartDate($projectCounter),
                     'deadline' => $this->getDeadline($projectCounter),
                     'tags' => json_encode($this->getTags($projectCounter)),
-                    'description' => $this->getDescription($projectCounter) . ' (Assigned to Admin ' . $admin->id . ')',
+                    'description' => $this->getDescription($projectCounter) . ' (For Customer ' . $customerContact->id . ')',
                     'is_notify' => $projectCounter % 5 !== 0,
                     'creator_type' => 'App\Models\Admin',
                     'creator_id' => $admin->id,
@@ -88,13 +94,13 @@ class ProjectsTableSeeder extends Seeder
             }
         }
 
-        // Insert projects and get their IDs
+        // Insert all projects
         DB::table('projects')->insert($projects);
         $insertedProjects = Project::all();
 
-        // Create attachments and members for each project
+        // 🔗 Create attachments and members for each project
         foreach ($insertedProjects as $index => $project) {
-            // Create 2-4 attachments per project
+            // Attachments (2–4 per project)
             $attachmentCount = rand(2, 4);
             for ($j = 1; $j <= $attachmentCount; $j++) {
                 $projectAttachments[] = [
@@ -102,17 +108,17 @@ class ProjectsTableSeeder extends Seeder
                     'file_name' => $this->getFileName($index + 1, $j),
                     'file_path' => $this->getFilePath($index + 1, $j),
                     'file_type' => $this->getFileType($j),
-                    'file_size' => rand(1024, 10485760), // 1KB to 10MB
+                    'file_size' => rand(1024, 10485760),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ];
             }
 
-            // Create 3-5 members per project (include the creator admin and others)
+            // Members (3–5 per project)
             $memberCount = rand(3, 5);
-            $usedMemberIds = [$project->creator_id]; // Start with creator
-            
-            // Add the creator as first member (usually as Project Manager)
+            $usedMemberIds = [$project->creator_id];
+
+            // Add creator as Project Manager
             $projectMembers[] = [
                 'project_id' => $project->id,
                 'member_type' => 'App\Models\Admin',
@@ -123,7 +129,7 @@ class ProjectsTableSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ];
 
-            // Add additional members
+            // Add additional random admins
             for ($k = 2; $k <= $memberCount; $k++) {
                 $memberId = $this->getMemberId($admins, $k, $usedMemberIds);
                 $usedMemberIds[] = $memberId;
@@ -133,7 +139,7 @@ class ProjectsTableSeeder extends Seeder
                     'member_type' => 'App\Models\Admin',
                     'member_id' => $memberId,
                     'role' => $this->getMemberRole($k),
-                    'is_active' => $k !== $memberCount, // Last member is inactive for demo
+                    'is_active' => $k !== $memberCount,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ];
@@ -144,10 +150,11 @@ class ProjectsTableSeeder extends Seeder
         DB::table('project_attachments')->insert($projectAttachments);
         DB::table('project_members')->insert($projectMembers);
 
-        $this->command->info('Created ' . count($projects) . ' projects (' . $admins->count() . ' admins × 50 projects each)');
+        $this->command->info('Created ' . count($projects) . ' projects (' . $customerContacts->count() . ' customers × 50 projects each)');
         $this->command->info('Created ' . count($projectAttachments) . ' project attachments');
         $this->command->info('Created ' . count($projectMembers) . ' project member assignments');
     }
+
 
     private function getFileName(int $projectIndex, int $attachmentIndex): string
     {
@@ -213,7 +220,7 @@ class ProjectsTableSeeder extends Seeder
 
     private function getProjectStatus(int $index): string
     {
-        $statuses = ['is_progress', 'on hold', 'cancelled', 'finished'];
+        $statuses = ['is_progress', 'on_hold', 'cancelled', 'finished'];
         return $statuses[($index - 1) % count($statuses)];
     }
 
@@ -223,7 +230,7 @@ class ProjectsTableSeeder extends Seeder
         return match($status) {
             'finished' => 100,
             'cancelled' => rand(0, 50),
-            'on hold' => rand(20, 80),
+            'on_hold' => rand(20, 80),
             'planning' => rand(0, 20),
             'review' => rand(80, 95),
             default => rand(0, 95)
