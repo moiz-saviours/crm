@@ -1,482 +1,4 @@
-<style>
-    :root {
-        --primary-color: #1f2832;
-        --secondary-color: #1f2832;
-        --light-color: #fff;
-        --dark-color: #212529;
-        --success-color: #4cc9f0;
-        --gray-color: #6c757d;
-        --light-gray: #e9ecef;
-    }
-
-    .chat-container {
-        /* background-color: white; */
-        border-radius: 3px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        height: 400px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .chat-header {
-        background-color: var(--bs-primary);
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .chat-header h5 {
-        margin: 0;
-        font-weight: 600;
-        color: var(--light-color)
-    }
-
-    .chat-status {
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .status-indicator {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #4ade80;
-        margin-right: 5px;
-    }
-
-    .chat-messages {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        /* background-color: var(--bs-card-color); */
-    }
-
-    .message {
-        margin-bottom: 15px;
-        display: flex;
-    }
-
-    .message.received {
-        justify-content: flex-start;
-    }
-
-    .message.sent {
-        justify-content: flex-end;
-    }
-
-    .message-bubble {
-        max-width: 70%;
-        padding: 5px 15px;
-        border-radius: 3px;
-        position: relative;
-    }
-
-    .message-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-
-    .received .message-bubble {
-        background-color: white;
-        /* border: 1px solid var(--bs-primary); */
-        border-bottom-left-radius: 5px;
-    }
-
-    .sent .message-bubble {
-        background-color: var(--bs-primary);
-        color: white;
-        border-bottom-right-radius: 5px;
-    }
-
-    .message-sender {
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .received .message-sender {
-        color: var(--bs-primary);
-    }
-
-    .sent .message-sender {
-        color: rgba(255, 255, 255, 0.9);
-    }
-
-    .message-time {
-        font-size: 0.7rem;
-        opacity: 0.7;
-    }
-
-    .chat-input-container {
-        border-top: 1px solid var(--light-gray);
-        padding: 4px;
-        /* background-color: white; */
-    }
-
-    .message-editor {
-        border: 1px solid var(--light-gray);
-        border-radius: 3px;
-        overflow: hidden;
-    }
-
-    .editor-toolbar {
-        display: flex;
-        padding: 2px 10px;
-        border-bottom: 1px solid var(--light-gray);
-        background-color: #f8f9fa;
-    }
-
-    .editor-toolbar button {
-        background: none;
-        border: none;
-        color: var(--gray-color);
-        margin-right: 10px;
-        font-size: 0.6rem;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-
-    .editor-toolbar button:hover {
-        color: var(--bs-primary);
-    }
-
-    .message-textarea {
-        width: 100%;
-        border: none;
-        padding: 12px 15px;
-        resize: none;
-        min-height: 60px;
-        max-height: 120px;
-        /* Optional: set max height */
-        outline: none;
-        font-family: inherit;
-        overflow-y: auto;
-        /* Show scrollbar when needed */
-    }
-
-    .editor-actions {
-        display: flex;
-        justify-content: space-between;
-        padding: 2px 15px;
-        background-color: #f8f9fa;
-    }
-
-    .attachment-options {
-        display: flex;
-    }
-
-    .attachment-btn {
-        background: none;
-        border: none;
-        color: var(--gray-color);
-        margin-right: 15px;
-        cursor: pointer;
-        font-size: 0.6rem;
-    }
-
-    .attachment-btn:hover {
-        color: var(--bs-primary);
-    }
-
-    .send-btn {
-        background-color: var(--bs-primary);
-        color: white;
-        border: none;
-        border-radius: 3px;
-        padding: 3px 15px;
-        font-weight: 500;
-        transition: background-color 0.2s;
-    }
-
-    .send-btn:hover {
-        background-color: var(--secondary-color);
-    }
-
-    .attachment-preview {
-        display: flex;
-        padding: 10px 15px;
-        background-color: var(--bs-card-color);
-        ;
-        border-top: 1px solid var(--light-gray);
-    }
-
-    .attachment-item {
-        display: flex;
-        align-items: center;
-        background-color: white;
-        border: 1px solid var(--bs-primary);
-        ;
-        border-radius: 3px;
-        padding: 5px 10px;
-        margin-right: 10px;
-        font-size: 0.8rem;
-    }
-
-    .attachment-item i {
-        margin-right: 5px;
-        color: var(--bs-primary);
-    }
-
-    .remove-attachment {
-        margin-left: 8px;
-        color: var(--gray-color);
-        cursor: pointer;
-    }
-
-    /* Scrollbar styling */
-    .chat-messages::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .chat-messages::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-
-    .customer-info {
-        display: flex;
-        align-items: center;
-    }
-
-    .customer-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--bs-primary);
-        ;
-        font-weight: 600;
-        margin-right: 12px;
-    }
-
-    .message-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background-color: var(--bs-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        font-size: 0.8rem;
-        margin: 0 8px;
-        flex-shrink: 0;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .received {
-        align-items: flex-start;
-    }
-
-    .sent {
-        align-items: flex-end;
-    }
-
-    .chat-sidebar {
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        height: 400px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .sidebar-header {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--light-gray);
-    }
-
-    .search-container {
-        position: relative;
-        margin-bottom: 15px;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 8px 35px 8px 12px;
-        border: 1px solid var(--light-gray);
-        border-radius: 6px;
-        font-size: 0.9rem;
-    }
-
-    .search-input:focus {
-        outline: none;
-        border-color: var(--bs-primary);
-    }
-
-    .search-icon {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--gray-color);
-    }
-
-    .contacts-list {
-        flex: 1;
-        overflow-y: auto;
-    }
-
-    .contact-item {
-        display: flex;
-        align-items: center;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
-    }
-
-    .contact-item:hover {
-        background-color: #f8f9fa;
-        border-color: var(--light-gray);
-    }
-
-    .contact-item.active {
-        background-color: var(--bs-primary);
-        border-color: var(--bs-primary);
-        color: white;
-    }
-
-    .contact-item.active .contact-last-message,
-    .contact-item.active .contact-time {
-        color: rgba(255, 255, 255, 0.8);
-    }
-
-    .contact-avatar {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: 600;
-        margin-right: 12px;
-        flex-shrink: 0;
-    }
-
-    .contact-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .contact-name {
-        font-weight: 600;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .contact-last-message {
-        font-size: 0.8rem;
-        color: var(--gray-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .contact-time {
-        font-size: 0.7rem;
-        color: var(--gray-color);
-        white-space: nowrap;
-    }
-
-    .unread-badge {
-        background-color: var(--success-color);
-        color: white;
-        border-radius: 10px;
-        padding: 2px 8px;
-        font-size: 0.7rem;
-        margin-left: 5px;
-    }
-
-    .no-contacts {
-        text-align: center;
-        padding: 40px 20px;
-        color: var(--gray-color);
-    }
-
-    /* Scrollbar for sidebar */
-    .chat-sidebar::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .chat-sidebar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    .chat-sidebar::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 2px;
-    }
-
-    /* Attachment bubble styles */
-    .attachment-bubble {
-        border-radius: 12px;
-        background: #f4f6f8;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        transition: background 0.2s ease;
-    }
-
-    .attachment-bubble:hover {
-        background: #e9ecef;
-    }
-
-    .sent-attach {
-        background: #d1e7ff;
-    }
-
-    .received-attach {
-        background: #f1f3f4;
-    }
-
-    .attachment-bubble i {
-        color: #6c757d;
-    }
-
-    /* ADD these CSS classes */
-    .project-bg {
-        background-color: #3b82f6 !important;
-    }
-
-    .task-bg {
-        background-color: #10b981 !important;
-    }
-
-    .invoice-bg {
-        background-color: #f59e0b !important;
-    }
-
-    .general-bg {
-        background-color: #6b7280 !important;
-    }
-</style>
-
+@include('admin.customers.contacts.timeline.partials.chat.partials.style')
 <div class="row">
     <div class="col-md-4">
         <div class="chat-sidebar">
@@ -593,7 +115,8 @@
 <script>
     // Global variables
     //todo need to handle customer id
-    const conversationId = {{ $conversation->id ?? 'null' }};
+    window.conversationId = {{ $conversation->id ?? 'null' }}; // Make it globally accessible
+    window.previousConversationId = null; // For socket management
     const currentUser = {
         id: {{ auth()->id() }},
         type: '{{ addslashes(get_class(auth()->user())) }}',
@@ -609,13 +132,23 @@
 
     // Initialize based on conversation existence
     document.addEventListener('DOMContentLoaded', function() {
-        loadConversationsAsContacts(); // Add this line
-
-        if (conversationId) {
+        // Get conversation_id from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlConversationId = urlParams.get('conversation_id');
+        
+        if (urlConversationId) {
+            // Set the global conversationId from URL
+            window.conversationId = urlConversationId;
+            loadSelectedConversation(urlConversationId);
+        } else if (conversationId) {
+            // Use the existing conversationId from PHP
+            window.conversationId = conversationId;
             initializeChatWithConversation();
         } else {
             initializeNoConversationState();
         }
+        
+        loadConversationsAsContacts(); // Load conversations list
     });
 
     // UPDATE the loadConversationsAsContacts function:
@@ -626,7 +159,7 @@
             if (loadingElement) loadingElement.style.display = 'block';
             
             // Get context-based conversations for this customer contact
-            fetch(`/admin/customer/contact/${currentContext.id}/context-conversations`)
+            fetch(`{{ route('admin.customer.contact.conversations.context') }}?customer_contact_id=${currentContext.id}`)
                 .then(response => response.json())
                 .then(data => {
                     if (loadingElement) loadingElement.style.display = 'none';
@@ -661,10 +194,9 @@
                 const contextInfo = getContextInfo(conversation);
                 const lastMessage = getLastMessagePreview(conversation);
                 const unreadCount = getUnreadCount(conversation);
-                
+
                 html += `
                     <div class="contact-item ${isActive ? 'active' : ''}" data-conversation-id="${conversation.id}">
-                        <div class="contact-avatar ${contextInfo.color}">${contextInfo.icon}</div>
                         <div class="contact-info">
                             <div class="contact-name">
                                 ${contextInfo.title}
@@ -672,10 +204,9 @@
                             </div>
                             <div class="contact-last-message">${lastMessage}</div>
                         </div>
-                        <div class="contact-time">${formatTime(conversation.last_message_time || conversation.updated_at)}</div>
-                    </div>
-                `;
-            });
+                        </div>
+                        `;
+                    });
             
             contactsList.innerHTML = html;
             
@@ -689,44 +220,46 @@
         }
 
         // ADD this function to get context information:
-        function getContextInfo(conversation) {
-            const contextType = conversation.context_type;
-            const contextId = conversation.context_id;
-            
-            const contextConfig = {
-                'App\\Models\\Project': {
-                    icon: '📋',
-                    color: 'project-bg',
-                    title: `Project #${contextId}`,
-                    prefix: 'Project'
-                },
-                'App\\Models\\Task': {
-                    icon: '✅',
-                    color: 'task-bg',
-                    title: `Task #${contextId}`,
-                    prefix: 'Task'
-                },
-                'App\\Models\\Invoice': {
-                    icon: '🧾',
-                    color: 'invoice-bg',
-                    title: `Invoice #${contextId}`,
-                    prefix: 'Invoice'
-                },
-                'App\\Models\\CustomerContact': {
-                    icon: '💬',
-                    color: 'general-bg',
-                    title: 'General Chat',
-                    prefix: 'General'
-                }
-            };
-            
-            return contextConfig[contextType] || {
-                icon: '💬',
-                color: 'general-bg',
-                title: 'Conversation',
-                prefix: 'General'
-            };
+function getContextInfo(conversation) {
+    const contextType = conversation.context_type;
+    const contextId = conversation.context_id;
+
+    const contextConfig = {
+        'App\\Models\\Project': {
+            icon: '<i class="fas fa-project-diagram text-primary"></i>',
+            color: 'project-bg',
+            title: `Project #${contextId}`,
+            prefix: 'Project'
+        },
+        'App\\Models\\Task': {
+            icon: '<i class="fas fa-tasks text-success"></i>',
+            color: 'task-bg',
+            title: `Task #${contextId}`,
+            prefix: 'Task'
+        },
+        'App\\Models\\Invoice': {
+            icon: '<i class="fas fa-file-invoice text-warning"></i>',
+            color: 'invoice-bg',
+            title: `Invoice #${contextId}`,
+            prefix: 'Invoice'
+        },
+        'App\\Models\\CustomerContact': {
+            icon: '<i class="fas fa-comments text-info"></i>',
+            color: 'general-bg',
+            title: 'General Chat',
+            prefix: 'General'
         }
+    };
+
+    return contextConfig[contextType] || {
+        icon: '<i class="fas fa-comment-dots text-secondary"></i>',
+        color: 'general-bg',
+        title: 'Conversation',
+        prefix: 'General'
+    };
+}
+
+
 
     // Render conversations as contact list
     function renderConversationsAsContacts(conversations) {
@@ -753,7 +286,6 @@
 
             html += `
                 <div class="contact-item ${isActive ? 'active' : ''}" data-conversation-id="${conversation.id}">
-                    <div class="contact-avatar">${avatarText}</div>
                     <div class="contact-info">
                         <div class="contact-name">
                             ${otherParty.name || 'Unknown'}
@@ -761,10 +293,9 @@
                         </div>
                         <div class="contact-last-message">${lastMessage}</div>
                     </div>
-                    <div class="contact-time">${formatTime(conversation.last_message_time || conversation.updated_at)}</div>
-                </div>
-            `;
-        });
+                    </div>
+                    `;
+                });
 
         contactsList.innerHTML = html;
 
@@ -853,11 +384,67 @@
         }
     }
 
+    // ADD THIS FUNCTION after selectConversation:
+    function loadSelectedConversation(conversationId) {
+        // Update global conversationId
+        window.conversationId = conversationId;
+        
+        // Show loading state
+        document.getElementById('chatMessages').innerHTML = `
+            <div class="text-center py-4 text-muted" id="loadingMessages">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading messages...</span>
+                </div>
+                Loading messages...
+            </div>
+        `;
+        
+        // Show chat input
+        document.getElementById('chatInputContainer').style.display = 'block';
+        
+        // Hide no conversation state
+        const noConversationState = document.getElementById('noConversationState');
+        if (noConversationState) noConversationState.style.display = 'none';
+        
+        // Hide no messages state
+        const noMessagesState = document.getElementById('noMessagesState');
+        if (noMessagesState) noMessagesState.classList.add('d-none');
+        
+        // Load messages for the selected conversation
+        loadMessages();
+        
+        // Update active state in sidebar
+        document.querySelectorAll('.contact-item').forEach(item => {
+            if (item.dataset.conversationId == conversationId) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Reinitialize socket for new conversation
+        if (socket) {
+            if (window.previousConversationId) {
+                socket.emit('leave_conversation', window.previousConversationId);
+            }
+            socket.emit('join_conversation', conversationId);
+            window.previousConversationId = conversationId;
+        }
+        
+        // Reinitialize chat functionality for new conversation
+        initializeChatFunctionality();
+    }
+
+
     // Handle conversation selection
     function selectConversation(conversationId) {
+        // Update URL without reloading page
         const url = new URL(window.location.href);
         url.searchParams.set('conversation_id', conversationId);
-        window.location.href = url.toString();
+        window.history.pushState({}, '', url.toString());
+        
+        // Load the selected conversation
+        loadSelectedConversation(conversationId);
     }
 
     // Update conversation list when new messages arrive
@@ -865,10 +452,20 @@
         loadConversationsAsContacts();
     }
 
+    // ADD this global variable at the top:
+    let isSocketInitialized = false;
+
+    // UPDATE the initializeChatWithConversation function:
     function initializeChatWithConversation() {
-        socket = io('{{ config('socketio.url') }}');
+        if (!isSocketInitialized) {
+            socket = io('{{ config('socketio.url') }}');
+            isSocketInitialized = true;
+        }
 
         socket.emit('join_conversation', conversationId);
+        
+        // Store previous conversation ID for socket management
+        window.previousConversationId = conversationId;
 
         loadMessages();
         initializeChatFunctionality();
@@ -876,7 +473,7 @@
         socket.on('new_message', (data) => {
             if (data.sender_id !== currentUser.id || data.sender_type !== currentUser.type) {
                 addNewMessage(data.content, false, data);
-                updateConversationList(); // Add this line
+                updateConversationList();
             }
         });
     }
@@ -896,7 +493,7 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
 
-        fetch('{{ route('admin.customer.contact.conversations.store') }}', {
+        fetch('{{ route("admin.customer.contact.conversations.store") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -910,20 +507,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('noConversationState').style.display = 'none';
-
-                    document.getElementById('chatInputContainer').style.display = 'block';
-
-                    document.getElementById('chatMessages').innerHTML = `
-                    <div class="text-center py-4 text-muted" id="loadingMessages">
-                        <div class="spinner-border spinner-border-sm" role="status">
-                            <span class="visually-hidden">Loading messages...</span>
-                        </div>
-                        Loading messages...
-                    </div>
-                `;
-
-                    window.location.reload();
+                    // Use the new conversation loading function instead of reload
+                    loadSelectedConversation(data.conversation.id);
+                    
+                    // Refresh the conversations list
+                    updateConversationList();
                 } else {
                     throw new Error(data.message || 'Failed to create conversation');
                 }
@@ -938,18 +526,24 @@
 
     // Load messages via AJAX and render using partial
     function loadMessages() {
-        fetch(`/admin/customer/contact/conversations/${conversationId}/messages`)
+        // Use the global conversationId which gets updated when switching
+        const currentConvId = window.conversationId || conversationId;
+        
+        if (!currentConvId) {
+            document.getElementById('noMessagesState').classList.remove('d-none');
+            return;
+        }
+
+        fetch(`{{ route('admin.customer.contact.conversations.messages', ':conversationId') }}`.replace(':conversationId', currentConvId))
             .then(response => response.json())
             .then(data => {
                 document.getElementById('loadingMessages').style.display = 'none';
 
                 if (data.messages && data.messages.length > 0) {
-                    // Show messages
                     document.getElementById('chatMessages').innerHTML = data.html;
                     initializeTooltips();
                     scrollToBottom();
                 } else {
-                    // Show no messages state
                     document.getElementById('noMessagesState').classList.remove('d-none');
                 }
             })
@@ -968,35 +562,37 @@
         });
     }
 
-    function addNewMessage(content, isSent = true, messageData = null) {
-        const chatMessages = document.getElementById('chatMessages');
+// UPDATE the addNewMessage function:
+function addNewMessage(content, isSent = true, messageData = null) {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
 
-        // Hide empty states
-        const noMessagesState = document.getElementById('noMessagesState');
-        if (noMessagesState && !noMessagesState.classList.contains('d-none')) {
-            noMessagesState.classList.add('d-none');
-        }
+    // Hide empty states
+    const noMessagesState = document.getElementById('noMessagesState');
+    if (noMessagesState && !noMessagesState.classList.contains('d-none')) {
+        noMessagesState.classList.add('d-none');
+    }
 
-        // Hide loading spinner
-        const loadingMessages = document.getElementById('loadingMessages');
-        if (loadingMessages) loadingMessages.style.display = 'none';
+    // Hide loading spinner
+    const loadingMessages = document.getElementById('loadingMessages');
+    if (loadingMessages) loadingMessages.style.display = 'none';
 
-        const message = messageData || {};
+    const message = messageData || {};
 
-        const isAttachment = message.attachments && message.attachments.length > 0;
-        const createdAt = message.created_at ?
-            new Date(message.created_at) :
-            new Date();
+    const isAttachment = message.attachments && message.attachments.length > 0;
+    const createdAt = message.created_at ?
+        new Date(message.created_at) :
+        new Date();
 
-        const timeStr = createdAt.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        const avatarText = isSent ? 'ME' : (message.sender?.name?.substring(0, 2) || 'U');
-        const avatarTitle = isSent ? 'You' : (message.sender?.name || 'User');
+    const timeStr = createdAt.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    const avatarText = isSent ? 'ME' : (message.sender?.name?.substring(0, 2) || 'U');
+    const avatarTitle = isSent ? 'You' : (message.sender?.name || 'User');
 
-        //  Build message HTML identical to Blade
-        let html = `<div class="message ${isSent ? 'sent' : 'received'}">`;
+    // Build message HTML identical to Blade
+    let html = `<div class="message ${isSent ? 'sent' : 'received'}">`;
 
         // Left avatar
         if (!isSent) {
@@ -1097,148 +693,162 @@
     }
 
     // Initialize chat functionality
-    function initializeChatFunctionality() {
-        const messageTextarea = document.getElementById('messageTextarea');
-        const sendButton = document.getElementById('sendButton');
-        const attachFileBtn = document.getElementById('attachFileBtn');
-        const attachImageBtn = document.getElementById('attachImageBtn');
-        const fileInput = document.getElementById('fileInput');
-        const imageInput = document.getElementById('imageInput');
-        const attachmentPreview = document.getElementById('attachmentPreview');
-        let selectedFiles = [];
+// UPDATE the initializeChatFunctionality function:
+function initializeChatFunctionality() {
+    // Remove existing event listeners first to prevent duplicates
+    const sendButton = document.getElementById('sendButton');
+    const newSendButton = sendButton.cloneNode(true);
+    sendButton.parentNode.replaceChild(newSendButton, sendButton);
 
-        // --- Disable inputs dynamically ---
-        function updateInputStates() {
-            const hasText = messageTextarea.value.trim().length > 0;
-            const hasFiles = selectedFiles.length > 0;
+    const attachFileBtn = document.getElementById('attachFileBtn');
+    const newAttachFileBtn = attachFileBtn.cloneNode(true);
+    attachFileBtn.parentNode.replaceChild(newAttachFileBtn, attachFileBtn);
 
-            // Hide attach buttons when user types text
-            if (hasText) {
-                attachFileBtn.classList.add('d-none');
-                attachImageBtn.classList.add('d-none');
-            } else {
-                attachFileBtn.classList.remove('d-none');
-                attachImageBtn.classList.remove('d-none');
-            }
+    const attachImageBtn = document.getElementById('attachImageBtn');
+    const newAttachImageBtn = attachImageBtn.cloneNode(true);
+    attachImageBtn.parentNode.replaceChild(newAttachImageBtn, attachImageBtn);
 
-            // Hide message box when attachments exist
-            if (hasFiles) {
-                messageTextarea.classList.add('d-none');
-            } else {
-                messageTextarea.classList.remove('d-none');
+    const messageTextarea = document.getElementById('messageTextarea');
+    const fileInput = document.getElementById('fileInput');
+    const imageInput = document.getElementById('imageInput');
+    const attachmentPreview = document.getElementById('attachmentPreview');
+    
+    let selectedFiles = [];
+
+    // --- Disable inputs dynamically ---
+    function updateInputStates() {
+        const hasText = messageTextarea.value.trim().length > 0;
+        const hasFiles = selectedFiles.length > 0;
+
+        // Hide attach buttons when user types text
+        if (hasText) {
+            newAttachFileBtn.classList.add('d-none');
+            newAttachImageBtn.classList.add('d-none');
+        } else {
+            newAttachFileBtn.classList.remove('d-none');
+            newAttachImageBtn.classList.remove('d-none');
+        }
+
+        // Hide message box when attachments exist
+        if (hasFiles) {
+            messageTextarea.classList.add('d-none');
+        } else {
+            messageTextarea.classList.remove('d-none');
+        }
+    }
+
+    // --- File selection handler ---
+    function handleFileSelect(event) {
+        const files = Array.from(event.target.files);
+
+        // Validation: max 3 files
+        if (selectedFiles.length + files.length > 3) {
+            toastr.warning('You can only attach up to 3 files.');
+            return;
+        }
+
+        // Validation: each file ≤ 3 MB
+        for (const file of files) {
+            if (file.size > 3 * 1024 * 1024) {
+                toastr.warning(`"${file.name}" exceeds 3 MB limit.`);
+                return;
             }
         }
 
+        selectedFiles.push(...files);
+        renderAttachmentPreview();
+        updateInputStates();
+    }
 
-        // --- File selection handler ---
-        function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
+    // --- Render preview ---
+    function renderAttachmentPreview() {
+        attachmentPreview.innerHTML = '';
+        if (selectedFiles.length > 0) {
+            attachmentPreview.classList.remove('d-none');
+            selectedFiles.forEach((file, index) => {
+                const isImage = file.type.startsWith('image/');
+                const icon = isImage ? 'fa-file-image' : 'fa-file';
+                const item = document.createElement('div');
+                item.className = 'attachment-item';
+                item.innerHTML = `
+                    <i class="fas ${icon}"></i> ${file.name}
+                    <span class="remove-attachment" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </span>
+                `;
+                attachmentPreview.appendChild(item);
+                updateInputStates();
+            });
+        } else {
+            attachmentPreview.classList.add('d-none');
+        }
+    }
 
-            // Validation: max 3 files
-            if (selectedFiles.length + files.length > 3) {
-                toastr.warning('You can only attach up to 3 files.');
-                return;
-            }
-
-            // Validation: each file ≤ 3 MB
-            for (const file of files) {
-                if (file.size > 3 * 1024 * 1024) {
-                    toastr.warning(`"${file.name}" exceeds 3 MB limit.`);
-                    return;
-                }
-            }
-
-            selectedFiles.push(...files);
+    // --- Remove attachment ---
+    attachmentPreview.addEventListener('click', e => {
+        if (e.target.closest('.remove-attachment')) {
+            const index = e.target.closest('.remove-attachment').dataset.index;
+            selectedFiles.splice(index, 1);
             renderAttachmentPreview();
             updateInputStates();
         }
+    });
 
-        // --- Render preview ---
-        function renderAttachmentPreview() {
-            attachmentPreview.innerHTML = '';
-            if (selectedFiles.length > 0) {
-                attachmentPreview.classList.remove('d-none');
-                selectedFiles.forEach((file, index) => {
-                    const isImage = file.type.startsWith('image/');
-                    const icon = isImage ? 'fa-file-image' : 'fa-file';
-                    const item = document.createElement('div');
-                    item.className = 'attachment-item';
-                    item.innerHTML = `
-                        <i class="fas ${icon}"></i> ${file.name}
-                        <span class="remove-attachment" data-index="${index}">
-                            <i class="fas fa-times"></i>
-                        </span>
-                    `;
-                    attachmentPreview.appendChild(item);
+    // --- Add event listeners ---
+    newAttachFileBtn.addEventListener('click', () => fileInput.click());
+    newAttachImageBtn.addEventListener('click', () => imageInput.click());
+    fileInput.addEventListener('change', handleFileSelect);
+    imageInput.addEventListener('change', handleFileSelect);
+    messageTextarea.addEventListener('input', updateInputStates);
+
+    // --- Send Message ---
+    function sendMessage() {
+        const message = messageTextarea.value.trim();
+        const currentConvId = window.conversationId;
+
+        if (!message && selectedFiles.length === 0) {
+            toastr.warning('Please type a message or attach a file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('conversation_id', currentConvId);
+        formData.append('message_type', selectedFiles.length > 0 ? 'file' : 'text');
+        formData.append('content', message);
+
+        selectedFiles.forEach(file => formData.append('attachments[]', file));
+
+        fetch('{{ route("admin.customer.contact.messages.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.message) {
+                    addNewMessage(data.message.content, true, data.message);
+                    if (socket) socket.emit('send_message', data.message);
+
+                    messageTextarea.value = '';
+                    selectedFiles = [];
+                    renderAttachmentPreview();
+                    fileInput.value = '';
+                    imageInput.value = '';
                     updateInputStates();
-
-                });
-            } else {
-                attachmentPreview.classList.add('d-none');
-            }
-        }
-
-        // --- Remove attachment ---
-        attachmentPreview.addEventListener('click', e => {
-            if (e.target.closest('.remove-attachment')) {
-                const index = e.target.closest('.remove-attachment').dataset.index;
-                selectedFiles.splice(index, 1);
-                renderAttachmentPreview();
-                updateInputStates();
-            }
-        });
-
-        // --- Listeners ---
-        attachFileBtn.addEventListener('click', () => fileInput.click());
-        attachImageBtn.addEventListener('click', () => imageInput.click());
-        fileInput.addEventListener('change', handleFileSelect);
-        imageInput.addEventListener('change', handleFileSelect);
-        messageTextarea.addEventListener('input', updateInputStates);
-
-        // --- Send Message ---
-        function sendMessage() {
-            const message = messageTextarea.value.trim();
-
-            if (!message && selectedFiles.length === 0) {
-                toastr.warning('Please type a message or attach a file.');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('conversation_id', conversationId);
-            formData.append('message_type', selectedFiles.length > 0 ? 'file' : 'text');
-            formData.append('content', message);
-
-            selectedFiles.forEach(file => formData.append('attachments[]', file));
-
-            fetch('/admin/customer/contact/messages', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.message) {
-                        addNewMessage(data.message.content, true, data.message);
-                        if (socket) socket.emit('send_message', data.message);
-
-                        messageTextarea.value = '';
-                        selectedFiles = [];
-                        renderAttachmentPreview();
-                        fileInput.value = '';
-                        imageInput.value = '';
-                        updateInputStates();
-                    } else {
-                        toastr.error('Failed to send message');
-                    }
-                })
-                .catch(() => toastr.error('Send failed'));
-        }
-
-        sendButton.addEventListener('click', sendMessage);
+                } else {
+                    toastr.error('Failed to send message');
+                }
+            })
+            .catch(() => toastr.error('Send failed'));
     }
+
+    newSendButton.addEventListener('click', sendMessage);
+    
+    // Initialize input states
+    updateInputStates();
+}
 
     // Scroll to bottom of chat
     function scrollToBottom() {
@@ -1261,5 +871,26 @@
                 item.style.display = 'none';
             }
         });
+    });
+
+    // ADD this at the end of your JavaScript:
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(event) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlConversationId = urlParams.get('conversation_id');
+        
+        if (urlConversationId) {
+            loadSelectedConversation(urlConversationId);
+        } else {
+            // No conversation in URL, show no conversation state
+            document.getElementById('noConversationState').style.display = 'flex';
+            document.getElementById('chatInputContainer').style.display = 'none';
+            document.getElementById('chatMessages').innerHTML = '';
+            
+            // Remove active state from all contacts
+            document.querySelectorAll('.contact-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
     });
 </script>

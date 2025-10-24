@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
+use App\Http\Controllers\Admin\{
+    DashboardController as AdminDashboardController,
     ChannelController as AdminChannelController,
     AccountController as AdminAccountController,
     ActivityLogController as AdminActivityLogController,
@@ -264,13 +265,11 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::get('/timeline/fetch-remote', [AdminCustomerContactController::class, 'fetchRemote'])
                     ->name('timeline.fetch-remote');
                 Route::post('/retry/email/{id}', [AdminEmailController::class, 'retryEmail'])->name('retry.email');
+
                 Route::post('/messages', [AdminMessageController::class, 'store'])->name('messages.store');
-                Route::get('/conversations/{conversationId}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversation.messages');
+                Route::get('/conversations/{conversation}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversations.messages');
                 Route::post('/conversations', [AdminMessageController::class, 'storeConversation'])->name('conversations.store');
-
-                Route::get('/{customer_contact}/context-conversations', [AdminMessageController::class, 'getContextConversations'])
-                ->name('context-conversations');
-
+                Route::get('/conversations/context', [AdminMessageController::class, 'getContextConversations'])->name('conversations.context');
 
                 Route::get('/projects/data', [AdminProjectController::class, 'getProjectsData'])->name('projects.data');
                 Route::get('/projects/details', [AdminProjectController::class, 'getProjectDetails'])->name('projects.details');
