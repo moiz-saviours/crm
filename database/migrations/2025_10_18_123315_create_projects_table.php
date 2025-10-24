@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
+            $table->integer('order_column')->nullable()->default(0);
             $table->string('special_key', 100)->unique()->nullable();
             $table->string('cus_contact_key', 100)->nullable();
             $table->string('brand_key', 100)->nullable()->default(null);
@@ -20,7 +21,7 @@ return new class extends Migration {
             $table->enum('value', ['regular', 'standard', 'premium', 'exclusive'])->default('regular');
             $table->string('label', 50)->nullable()->default(null);
             $table->string('theme_color', 50)->nullable()->default(null);
-            $table->enum('project_status', ['is_progress', 'on hold', 'cancelled', 'finished'])
+            $table->enum('project_status', ['is_progress', 'on_hold', 'cancelled', 'finished'])
                 ->default('is_progress');
             $table->boolean('is_progress')->nullable()->default(false);
             $table->integer('progress')->nullable()->default(0);

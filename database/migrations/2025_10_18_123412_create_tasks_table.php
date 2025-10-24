@@ -22,8 +22,8 @@ return new class extends Migration
 
             $table->string('special_key')->unique()->nullable()->default(null);
 
-            $table->enum('task_status', ['isprogress', 'on hold', 'cancelled', 'finished'])
-                ->default('isprogress');
+            $table->enum('task_status', ['is_progress', 'on_hold', 'cancelled', 'finished'])
+                ->default('is_progress');
             $table->string('label')->nullable()->default(null);
 
             $table->text('description')->nullable()->default(null);

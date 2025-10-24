@@ -22,7 +22,7 @@ class Project extends Model
         'special_key', 'cus_contact_key', 'brand_key', 'team_key',
         'type', 'value', 'label', 'theme_color', 'project_status', 'is_progress',
         'progress', 'bill_type', 'total_rate', 'estimated_hours', 'start_date',
-        'deadline', 'tags', 'description', 'is_notify', 'creator_type', 'creator_id', 'status'
+        'deadline', 'tags', 'description', 'is_notify', 'creator_type', 'creator_id', 'status'.'order_column'
     ];
     protected $casts = [
         'tags' => 'array',
@@ -83,7 +83,7 @@ class Project extends Model
     {
         return match ($this->project_status) {
             'is_progress' => 'primary',
-            'on hold' => 'warning',
+            'on_hold' => 'warning',
             'cancelled' => 'danger',
             'finished' => 'success',
             default => 'secondary'
