@@ -97,6 +97,9 @@
                             <button class="attachment-btn" id="attachImageBtn" title="Insert Image">
                                 <i class="fas fa-image"></i> Image
                             </button>
+                            <button class="customer-chat-link" id="copyChatLinkBtn" title="Copy Chat Link">
+                                <i class="fas fa-link"></i> Copy Chat Link
+                            </button>
                         </div>
 
                         <button class="send-btn" id="sendButton">
@@ -220,44 +223,44 @@
         }
 
         // ADD this function to get context information:
-function getContextInfo(conversation) {
-    const contextType = conversation.context_type;
-    const contextId = conversation.context_id;
+        function getContextInfo(conversation) {
+            const contextType = conversation.context_type;
+            const contextId = conversation.context_id;
 
-    const contextConfig = {
-        'App\\Models\\Project': {
-            icon: '<i class="fas fa-project-diagram text-primary"></i>',
-            color: 'project-bg',
-            title: `Project #${contextId}`,
-            prefix: 'Project'
-        },
-        'App\\Models\\Task': {
-            icon: '<i class="fas fa-tasks text-success"></i>',
-            color: 'task-bg',
-            title: `Task #${contextId}`,
-            prefix: 'Task'
-        },
-        'App\\Models\\Invoice': {
-            icon: '<i class="fas fa-file-invoice text-warning"></i>',
-            color: 'invoice-bg',
-            title: `Invoice #${contextId}`,
-            prefix: 'Invoice'
-        },
-        'App\\Models\\CustomerContact': {
-            icon: '<i class="fas fa-comments text-info"></i>',
-            color: 'general-bg',
-            title: 'General Chat',
-            prefix: 'General'
+            const contextConfig = {
+                'App\\Models\\Project': {
+                    icon: '<i class="fas fa-project-diagram text-primary"></i>',
+                    color: 'project-bg',
+                    title: `Project #${contextId}`,
+                    prefix: 'Project'
+                },
+                'App\\Models\\Task': {
+                    icon: '<i class="fas fa-tasks text-success"></i>',
+                    color: 'task-bg',
+                    title: `Task #${contextId}`,
+                    prefix: 'Task'
+                },
+                'App\\Models\\Invoice': {
+                    icon: '<i class="fas fa-file-invoice text-warning"></i>',
+                    color: 'invoice-bg',
+                    title: `Invoice #${contextId}`,
+                    prefix: 'Invoice'
+                },
+                'App\\Models\\CustomerContact': {
+                    icon: '<i class="fas fa-comments text-info"></i>',
+                    color: 'general-bg',
+                    title: conversation.receiver.name ?? 'Not Provided',
+                    prefix: 'General'
+                }
+            };
+
+            return contextConfig[contextType] || {
+                icon: '<i class="fas fa-comment-dots text-secondary"></i>',
+                color: 'general-bg',
+                title: 'Conversation',
+                prefix: 'General'
+            };
         }
-    };
-
-    return contextConfig[contextType] || {
-        icon: '<i class="fas fa-comment-dots text-secondary"></i>',
-        color: 'general-bg',
-        title: 'Conversation',
-        prefix: 'General'
-    };
-}
 
 
 
@@ -518,7 +521,19 @@ function getContextInfo(conversation) {
             })
             .catch(error => {
                 console.error('Error creating conversation:', error);
-                toastr.error('Failed to start conversation: ' + error.message);
+                
+                if (error.response && error.response.data && error.response.data.errors) {
+                    // Validation errors
+                    const validationErrors = Object.values(error.response.data.errors).flat();
+                    toastr.error('Validation error: ' + validationErrors.join(', '));
+                } else if (error.response && error.response.data && error.response.data.message) {
+                    // Server error with message
+                    toastr.error('Error: ' + error.response.data.message);
+                } else {
+                    // Network or other error
+                    toastr.error('Failed to start conversation: ' + error.message);
+                }
+                
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             });
@@ -890,6 +905,47 @@ function initializeChatFunctionality() {
             // Remove active state from all contacts
             document.querySelectorAll('.contact-item').forEach(item => {
                 item.classList.remove('active');
+            });
+        }
+    });
+</script>
+
+<script>
+    //todo its temporary script need to move to proper place
+    // Copy chat link to clipboard
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyChatLinkBtn = document.getElementById('copyChatLinkBtn');
+        
+        if (copyChatLinkBtn) {
+            copyChatLinkBtn.addEventListener('click', function() {
+                const customerSpecialKey = '{{ $customer_contact->special_key }}';
+                const chatUrl = `{{ url('/customer/chat') }}/${customerSpecialKey}`;
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(chatUrl)
+                    .then(() => {
+                        // Show success feedback
+                        const originalText = copyChatLinkBtn.innerHTML;
+                        copyChatLinkBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        copyChatLinkBtn.disabled = true;
+                        
+                        // Revert after 2 seconds
+                        setTimeout(() => {
+                            copyChatLinkBtn.innerHTML = originalText;
+                            copyChatLinkBtn.disabled = false;
+                        }, 2000);
+                        
+                        // Optional: Show toast notification
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success('Chat link copied to clipboard!');
+                        } else {
+                            alert('Chat link copied to clipboard!');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        alert('Failed to copy chat link. Please copy manually: ' + chatUrl);
+                    });
             });
         }
     });

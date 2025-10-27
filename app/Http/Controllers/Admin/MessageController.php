@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Storage;
 use App\Events\NewMessageEvent;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CustomerContact;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use Exception;
 class MessageController extends Controller
 {
     public function getConversationMessages($conversationId)
@@ -104,41 +108,74 @@ class MessageController extends Controller
     // Add this method to create new conversation
     public function storeConversation(Request $request)
     {
-        //todo need to handle agent can only send meesage to assign customer
-        $request->validate([
-            'receiver_id' => 'required|integer'
-        ]);
+        try {
+            // Validate request
+            $validated = $request->validate([
+                'receiver_id' => 'required|integer|exists:customer_contacts,id'
+            ]);
 
-        // Check if conversation already exists
-        $existingConversation = Conversation::where([
-            'sender_type' => get_class(auth()->user()),
-            'sender_id' => auth()->id(),
-            'receiver_type' => 'App\Models\CustomerContact',
-            'receiver_id' => $request->receiver_id,
-        ])->first();
+            $receiverId = $validated['receiver_id'];
+            $currentUser = auth()->user();
 
-        if ($existingConversation) {
+            // Check if conversation already exists
+            $existingConversation = Conversation::where([
+                'sender_type' => get_class($currentUser),
+                'sender_id' => $currentUser->id,
+                'receiver_type' => 'App\Models\CustomerContact',
+                'receiver_id' => $receiverId,
+            ])->orWhere([
+                'sender_type' => 'App\Models\CustomerContact',
+                'sender_id' => $receiverId,
+                'receiver_type' => get_class($currentUser),
+                'receiver_id' => $currentUser->id,
+            ])->first();
+
+            if ($existingConversation) {
+                return response()->json([
+                    'success' => true,
+                    'conversation' => $existingConversation,
+                    'message' => 'Conversation already exists'
+                ]);
+            }
+
+            // Create new conversation
+            $conversation = Conversation::create([
+                'sender_type' => get_class($currentUser),
+                'sender_id' => $currentUser->id,
+                'receiver_type' => 'App\Models\CustomerContact',
+                'receiver_id' => $receiverId,
+                'conversation_status' => 'approved',
+                'context_type' => 'App\Models\CustomerContact', // Add this
+                'context_id' => $receiverId, // Add this - same as receiver_id for one-to-one
+            ]);
+
             return response()->json([
                 'success' => true,
-                'conversation' => $existingConversation,
-                'message' => 'Conversation already exists'
-            ]);
+                'conversation' => $conversation,
+                'message' => 'Conversation started successfully'
+            ], 201);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (QueryException $e) {
+            Log::error('Database error creating conversation: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Database error occurred while creating conversation'
+            ], 500);
+
+        } catch (Exception $e) {
+            Log::error('Unexpected error creating conversation: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred'
+            ], 500);
         }
-
-        // Create new conversation
-        $conversation = Conversation::create([
-            'sender_type' => get_class(auth()->user()),
-            'sender_id' => auth()->id(),
-            'receiver_type' => 'App\Models\CustomerContact',
-            'receiver_id' => $request->receiver_id,
-            'conversation_status' => 'approved'
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'conversation' => $conversation,
-            'message' => 'Conversation started successfully'
-        ]);
     }
 
     // ADD THIS METHOD to your CustomerContactController:

@@ -52,7 +52,7 @@
         flex: 1;
         padding: 20px;
         overflow-y: auto;
-        background-color: var(--bs-card-color);
+        background-color: var(--light-color);
     }
 
     .message {
@@ -84,7 +84,7 @@
 
     .received .message-bubble {
         background-color: white;
-        /* border: 1px solid var(--bs-primary); */
+        border: 1px solid var(--bs-primary);
         border-bottom-left-radius: 5px;
     }
 
@@ -180,6 +180,19 @@
     }
 
     .attachment-btn:hover {
+        color: var(--bs-primary);
+    }
+
+    .customer-chat-link {
+        background: none;
+        border: none;
+        color: var(--gray-color);
+        margin-right: 15px;
+        cursor: pointer;
+        font-size: 0.6rem;
+    }
+
+    .customer-chat-link:hover {
         color: var(--bs-primary);
     }
 
@@ -317,7 +330,7 @@
         padding: 8px 35px 8px 12px;
         border: 1px solid var(--light-gray);
         border-radius: 6px;
-        font-size: 0.9rem;
+        font-size: 0.6rem;
     }
 
     .search-input:focus {
