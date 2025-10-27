@@ -1222,7 +1222,7 @@
                     <!-- Attachment input and icon -->
                     <div class="d-flex align-items-center mt-2">
                         <!-- Attachment preview -->
-                        <div id="attachmentPreview" class="row mt-2 w-100"></div>
+                        <div id="emailAttachmentPreview" class="row mt-2 w-100"></div>
                     </div>
                 </div>
 
@@ -1347,7 +1347,7 @@
                 const toEl = document.querySelector('[name="to"]');
                 const attachmentInputs = document.querySelectorAll('input[name="attachments[]"]');
                 const attachmentInput = document.getElementById('emailAttachment');
-                const attachmentPreview = document.getElementById('attachmentPreview');
+                const emailAttachmentPreview = document.getElementById('emailAttachmentPreview');
 
                 let totalAttachmentSize = 0;
                 let valid = true;
@@ -1444,7 +1444,7 @@
                             
                             allFiles = [];
                             attachmentInput.value = "";
-                            attachmentPreview.innerHTML = "";
+                            emailAttachmentPreview.innerHTML = "";
                             
                             window.refreshTimeline();
                             window.resetEmailTemplatePosition();
@@ -1590,7 +1590,7 @@ document.addEventListener("click", function (e) {
 </script>
 <script>
     const attachmentInput = document.getElementById('emailAttachment');
-    const attachmentPreview = document.getElementById('attachmentPreview');
+    const emailAttachmentPreview = document.getElementById('emailAttachmentPreview');
 
     let allFiles = []; // keep track of all selected files
 
@@ -1631,7 +1631,7 @@ document.addEventListener("click", function (e) {
     });
 
     // Remove attachment
-    attachmentPreview.addEventListener('click', function(e) {
+    emailAttachmentPreview.addEventListener('click', function(e) {
         const removeBtn = e.target.closest('.remove-attachment');
         if (!removeBtn) return;
 
@@ -1642,7 +1642,7 @@ document.addEventListener("click", function (e) {
 
     // Render attachments preview
     function renderAttachmentPreview() {
-        attachmentPreview.innerHTML = ''; // clear preview
+        emailAttachmentPreview.innerHTML = ''; // clear preview
 
         const dt = new DataTransfer(); // to update input.files
         allFiles.forEach((file, index) => {
@@ -1668,7 +1668,8 @@ document.addEventListener("click", function (e) {
                 </div>
             `;
 
-            attachmentPreview.appendChild(colDiv);
+            emailAttachmentPreview.appendChild(colDiv);
+            console.log(emailAttachmentPreview);
         });
 
         // Update input files
