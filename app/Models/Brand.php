@@ -163,5 +163,11 @@ class Brand extends Model
 
         return substr(hash_hmac('sha256', $normalized, 'brand_token'), 0, 15);
     }
+
+    public function assignedTeams()
+    {
+        return $this->hasMany(AssignTeamBrand::class, 'brand_key', 'brand_key')
+            ->with('team');
+    }
 }
 

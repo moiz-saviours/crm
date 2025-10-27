@@ -504,7 +504,25 @@ class LeadController extends Controller
             /** ----------------------------------------------------------------
              * STEP 1: Validate brand token & create raw record
              * ----------------------------------------------------------------*/
-            $brand = Brand::all()->firstWhere('script_token', $request->script_token);
+
+            $submissions = collect($request->input('submissions', []));
+            $submission = $submissions->first() ?? [];
+
+            try {
+                $scriptToken = $request->input('script_token') ?? ($submission['script_token'] ?? null);
+                $brand = Brand::all()->first(fn($b) => $b->script_token === $scriptToken);
+
+                // Assigned team key (first team of brand)
+                $team_Key = $brand?->assignedTeams->first()?->team?->team_key;
+
+            } catch (\Exception $e) {
+                Log::channel('webToLead')->error('Brand/Team fetch error:', [
+                    'script_token' => $scriptToken ?? null,
+                    'error' => $e->getMessage(),
+                ]);
+
+            }
+
             $leadId = $lead->id;
             /** ----------------------------------------------------------------
              * STEP 2: Prepare device info
@@ -565,7 +583,9 @@ class LeadController extends Controller
             /** ----------------------------------------------------------------
              * STEP 3: Map form data to proper fields
              * ----------------------------------------------------------------*/
-            $formData = collect($request->form_data ?? [])
+
+
+            $formData = collect($submission['form_data'] ?? [])
                 ->mapWithKeys(fn($value, $key) => [strtolower($key) => $value])
                 ->toArray();
             $fieldMapping = [
@@ -588,11 +608,12 @@ class LeadController extends Controller
              * ----------------------------------------------------------------*/
             $lead->update([
                 'brand_key' => $brand?->brand_key,
+                'team_key' => $team_Key,
                 'name' => $dataToSave['name'] ?? '',
                 'email' => $dataToSave['email'] ?? '',
                 'phone' => $dataToSave['phone'] ?? '',
                 'note' => $dataToSave['note'] ?? '',
-                'lead_response' => json_encode($request->form_data),
+                'lead_response' => json_encode($submission['form_data'] ?? []),
                 'device_info' => json_encode($deviceInfo),
                 'city' => $deviceInfo['city'] ?? '',
                 'state' => $deviceInfo['state'] ?? '',
@@ -601,6 +622,9 @@ class LeadController extends Controller
                 'address' => $deviceInfo['address'] ?? '',
                 'visitor_id' => $deviceInfo['visitor_id'] ?? '',
             ]);
+            /** ----------------------------------------------------------------
+             * STEP 5: Auto-link with Customer Contact (if exists)
+             * ----------------------------------------------------------------*/
             if (!empty($lead->email)) {
                 $existingContact = CustomerContact::where('email', $lead->email)->first();
                 if ($existingContact) {
