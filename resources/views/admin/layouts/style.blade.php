@@ -341,10 +341,10 @@
 
     #loader {
         position: fixed;
-        top: 41px;
-        left: 219px;
-        width: 90%;
-        height: 95%;
+        /*top: 41px;*/
+        /*left: 219px;*/
+        width: 100%;
+        height: 100%;
         background-color: rgb(255 255 255); /* Semi-transparent background */
         display: flex;
         justify-content: center;
