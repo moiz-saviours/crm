@@ -21,7 +21,7 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="client_contact_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="client_contact_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createclientcontact">Create New</button>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Contacts
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientcontacttitle" data-toggle="tooltip" title="Take a Tour" data-tour="client_contact"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-clientcontacttitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="client_contact"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -104,10 +104,10 @@
                                                 </td>
                                                 <td class="align-middle text-center table-actions ">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $client_contact->id }}" title="Edit"><i
+                                                            data-id="{{ $client_contact->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
                                                                 class="fas fa-edit"></i></button>
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
-                                                            data-id="{{ $client_contact->id }}" title="Delete"><i
+                                                            data-id="{{ $client_contact->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i
                                                                 class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>

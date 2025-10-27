@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
+use App\Http\Controllers\Admin\{
+    DashboardController as AdminDashboardController,
     ChannelController as AdminChannelController,
     AccountController as AdminAccountController,
     ActivityLogController as AdminActivityLogController,
@@ -23,11 +24,15 @@ use App\Http\Controllers\Admin\{DashboardController as AdminDashboardController,
     TaskController as AdminTaskController,
     TeamController as AdminTeamController,
     TeamTargetController as AdminTeamTargetController,
-    SalesKpiController as AdminSalesKpiController};
+    SalesKpiController as AdminSalesKpiController,
+    EmailController as AdminEmailController,
+    MessageController as AdminMessageController,
+    ProjectController as AdminProjectController,
+};
+use App\Http\Controllers\UserActivityController;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\EmailController;
 
 require __DIR__ . '/admin-auth.php';
 Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')->name('admin.')->group(function () {
@@ -223,6 +228,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::post('/update/{invoice?}', [AdminInvoiceController::class, 'update'])->name('update');
             Route::delete('/delete/{invoice?}', [AdminInvoiceController::class, 'delete'])->name('delete');
             Route::get('/payment-proofs', [AdminInvoiceController::class, 'getPaymentProof'])->name('payment_proofs');
+            Route::get('invoice-filter', [AdminInvoiceController::class, 'filterInvoice'])->name('filter');
         });
     });
     /** Sales Routes */
@@ -251,9 +257,26 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 });
                 Route::get('/change-status/{customer_contact?}', [AdminCustomerContactController::class, 'change_status'])->name('change.status');
                 Route::delete('/delete/{customer_contact?}', [AdminCustomerContactController::class, 'delete'])->name('delete');
-                Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
-                Route::get('/emails/fetch', [EmailController::class, 'fetch'])->name('emails.fetch');
-                Route::get('/emails/fetch-new', [EmailController::class, 'fetchNewEmails'])->name('emails.fetch-new');
+                Route::post('/send-email', [AdminEmailController::class, 'sendEmail'])->name('send.email');
+                Route::get('/attachments/{id}/download', [AdminEmailController::class, 'download'])->name('attachments.download');
+
+                Route::get('/timeline/refresh', [AdminCustomerContactController::class, 'refresh'])
+                    ->name('timeline.refresh');
+                Route::get('/timeline/fetch-remote', [AdminCustomerContactController::class, 'fetchRemote'])
+                    ->name('timeline.fetch-remote');
+                Route::post('/retry/email/{id}', [AdminEmailController::class, 'retryEmail'])->name('retry.email');
+
+                Route::post('/messages', [AdminMessageController::class, 'store'])->name('messages.store');
+                Route::get('/conversations/{conversation}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversations.messages');
+                Route::post('/conversations', [AdminMessageController::class, 'storeConversation'])->name('conversations.store');
+                Route::get('/conversations/context', [AdminMessageController::class, 'getContextConversations'])->name('conversations.context');
+
+                Route::get('/projects/data', [AdminProjectController::class, 'getProjectsData'])->name('projects.data');
+                Route::get('/projects/details', [AdminProjectController::class, 'getProjectDetails'])->name('projects.details');
+
+                Route::post('/projects/update-move', [AdminProjectController::class, 'updateProjectMove'])
+                    ->name('projects.update-move');
+
             });
         });
         /** Companies Routes */
@@ -282,6 +305,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::get('/change-lead-status/{lead?}', [AdminLeadController::class, 'change_lead_status'])->name('change.lead-status');
             Route::get('/change-status/{lead?}', [AdminLeadController::class, 'change_status'])->name('change.status');
             Route::delete('/delete/{lead?}', [AdminLeadController::class, 'delete'])->name('delete');
+            Route::post('/convert/{lead}', [AdminLeadController::class, 'convert_to_customer'])->name('convert');
         });
     });
     /** Lead Status Routes */
@@ -349,5 +373,6 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
+    Route::get('user-activity', [UserActivityController::class, 'index'])->name('user-activity.index');
 
 });

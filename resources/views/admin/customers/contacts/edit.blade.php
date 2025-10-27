@@ -5,14 +5,12 @@
         @include('admin.customers.contacts.style')
 
         <style>
-            /*body {*/
-            /*    font-family: Arial, sans-serif;*/
-            /*    margin: 0;*/
-            /*    padding: 0;*/
-            /*    display: flex;*/
-            /*    height: 100vh;*/
-            /*}*/
 
+            .fetching-buttons {
+                font-size: 0.813rem;
+                padding: 6px 14px;
+                border-radius: 3px;
+            }
 
             .containerr {
                 display: flex;
@@ -44,7 +42,7 @@
             }
 
             .nav-tabs.newtabs-space {
-                margin-bottom: 34px;
+                margin-bottom: 8px;
             }
 
             .date-by-order {
@@ -52,12 +50,12 @@
                 padding-left: 15px;
                 font-size: 1.063rem;
                 color: var(--bs-primary);
-                padding-top: 10px
+                /* padding-top: 10px */
             }
 
             .custom-tabs-row-scroll {
-                padding-bottom: 50px;
-                height: 100vh;
+                padding-bottom: 150px;
+                height: 80vh;
                 /* Makes sure it takes up full height of the viewport */
                 overflow-y: auto;
                 /* Enables vertical scrolling */
@@ -70,7 +68,8 @@
             .nav-tabs .nav-link.main-tabs-view {
                 border-radius: 0px;
                 font-weight: 400;
-                font-size: var(--nf-profile-para-size);;
+                font-size: var(--nf-profile-para-size);
+                ;
                 /*font-size: 0.813rem;*/
                 padding: 12px 28px;
                 color: rgb(51, 71, 91);
@@ -127,14 +126,40 @@
 
             }
 
-            .sidebar-icons {
+
+
+            .sidebar-icons i {
                 background-color: #EAF0F6;
                 border: 1px solid #CBD6E2;
                 color: #506E91;
                 padding: 12px;
                 border-radius: 31px;
-                /*font-size: 9px;*/
-                font-size: 0.9rem;
+
+                cursor: pointer;
+                transition: 150ms ease-out;
+                white-space: nowrap;
+                padding-block: 8px;
+                padding-inline: 0px;
+                font-size: 12px;
+                line-height: 14px;
+                justify-content: center;
+                text-align: center;
+                inline-size: 32px;
+                border-start-start-radius: 999999px;
+                border-start-end-radius: 999999px;
+                border-end-end-radius: 999999px;
+                border-end-start-radius: 999999px;
+            }
+
+            .sidebar-icons p {
+                color: rgb(51, 71, 91);
+                max-height: 36px;
+                font-size: 12px;
+                line-height: 18px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+                word-break: keep-all;
             }
 
 
@@ -188,9 +213,9 @@
             }
 
             /* .avatar-img-box {
-                            width: 53px;
-                            height: 43px;
-                        } */
+                                                    width: 53px;
+                                                    height: 43px;
+                                                } */
 
             .avatar-img {
                 border-radius: 50%;
@@ -244,7 +269,7 @@
 
             .email-box-container {
                 background-color: rgb(255, 255, 255);
-                border: 1px solid rgb(223, 227, 235);
+                /*border: 1px solid rgb(223, 227, 235);*/
                 border-radius: 4px;
                 padding: 16px 17px;
                 margin-bottom: 20px;
@@ -292,16 +317,17 @@
 
             .profile_actions p {
                 font-size: 0.75rem;
-                /*font-size: 10px;*/
-                margin: 0px 8px;
                 color: gray;
+                font-size: 8px;
             }
 
             .email-child-wrapper {
                 display: flex;
                 gap: 8px;
                 cursor: pointer;
-                align-items: center
+                align-items: baseline;
+                user-select: none;
+                cursor: alias;
             }
 
             .comment-active_head {
@@ -412,8 +438,7 @@
                 margin: 5px 0px;
             }
 
-            .custom-right-detail-column {
-            }
+            .custom-right-detail-column {}
 
             .contact-card-details-para {
                 font-weight: 500;
@@ -510,7 +535,7 @@
             }
 
             .content {
-                height: calc(100% - 60px);
+                /* height: calc(100% - 60px); */
                 background-color: #f5f8fa;
             }
 
@@ -528,6 +553,7 @@
 
             .data-highlights p {
                 font-size: var(--nf-profile-para-size);
+                margin-bottom: 0px;
             }
 
             .data-row {
@@ -565,7 +591,7 @@
                 /* padding-left: 15px; */
                 font-size: var(--nf-profile-heading-size);
                 color: var(--bs-primary);
-                padding-top: 10px;
+                /*padding-top: 10px;*/
             }
 
             .activities-seprater {
@@ -573,6 +599,7 @@
                 font-weight: 600;
                 font-size: var(--nf-profile-para-size);
                 margin: 0px !important;
+                cursor: pointer
             }
 
             .activities-addition-links {
@@ -598,11 +625,11 @@
             }
 
             /* .email-child-wrapper {
-                            color: #007bff;
-                            padding: 10px 15px;
+                                                    color: #007bff;
+                                                    padding: 10px 15px;
 
-                            font-size: 14px;
-                        } */
+                                                    font-size: 14px;
+                                                } */
 
             .comment-box {
                 margin-top: 10px;
@@ -672,15 +699,12 @@
             .profile_actions {
                 display: flex;
                 align-items: center;
-                justify-content: space-evenly;
                 border-bottom: 1px solid #ddd;
-                /* padding-bottom: 30px; */
-                padding: 20px 13px;
-                /* gap: 11px; */
-                flex-wrap: wrap;
+                padding: 20px 0px;
+                flex-wrap: nowrap;
                 margin: 10px 0px;
+                justify-content: space-around;
             }
-
 
             .profile_actions p {
                 text-align: center;
@@ -699,7 +723,7 @@
             .data-highlights h2 {
                 text-align: left;
                 /* padding-left: 15px;
-                            padding-bottom: 15px; */
+                                                    padding-bottom: 15px; */
                 font-size: var(--nf-profile-heading-size);
                 color: var(--bs-primary);
             }
@@ -823,8 +847,7 @@
                 border: 1px solid #ddd;
             }
 
-            .your-comment-btn {
-            }
+            .your-comment-btn {}
 
             .toolbar {
                 background-color: #dddddda6;
@@ -899,6 +922,13 @@
 
             }
 
+            .user-email-template img {
+                display: block;
+                max-width: 100%;
+                height: auto;
+                object-fit: contain;
+            }
+
             .contentdisplay {
                 display: none;
 
@@ -906,12 +936,13 @@
 
             .contentdisplaytwo {
                 display: none;
-
+                padding: 0 20px;
             }
 
             .new-profile-email-wrapper {
                 display: flex;
                 gap: 7px;
+                font-size: 11px;
             }
 
             .new-profile-parent-wrapper {
@@ -923,7 +954,7 @@
             .user_profile_text p {
                 margin-bottom: -3px;
                 font-size: 0.75rem;
-                font-weight: 700;
+                /* font-weight: 700; */
                 margin-top: 4px;
                 padding-left: 8px;
             }
@@ -931,8 +962,8 @@
             .activ_head {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 10px;
-                align-items: center;
+                margin: 10px 0;
+                align-items: baseline;
             }
 
             .user_cont p {
@@ -946,18 +977,29 @@
                 font-size: var(--nf-profile-para-size);
                 color: gray;
                 margin: 0;
-                /* padding: 16px 6px; */
+                /*padding: 16px 6px;*/
+            }
+
+            .right_collab a {
+                float: right;
+                color: #0091ae;
+                padding: 5px;
+                border-radius: 5px;
+                font-size: var(--nf-profile-para-size);
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            .right_collab a:hover {
+                text-decoration: underline;
             }
 
             .right_collab {
                 float: right;
-                /* background: var(--bs-primary); */
                 color: #0091ae;
-                /*color: var(--bs-primary);*/
                 padding: 5px;
                 border-radius: 5px;
                 font-size: var(--nf-profile-para-size);
-                /*font-size: 11px;*/
                 cursor: pointer;
             }
 
@@ -1054,10 +1096,6 @@
                 background-color: #eaf0f6;
                 border-color: #cbd6e2;
                 color: #506e91;
-            }
-
-            .create-contact {
-                font-size: 7px;
             }
 
             .main-payment-btn-wrapper {
@@ -1246,9 +1284,9 @@
             }
 
             /* .doc-attachment:hover {
-                        transform: scale(1.05);
-                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-                        } */
+                                                transform: scale(1.05);
+                                                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                                                } */
 
             .icon-doc {
                 font-size: 24px;
@@ -1382,8 +1420,7 @@
 
             }
 
-            .showhide:hover {
-            }
+            .showhide:hover {}
 
 
             .show_btn:hover {
@@ -1403,35 +1440,83 @@
                 color: grey;
             }
 
+            .truncate-recipients {
+                display: inline-block;
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                vertical-align: bottom;
+            }
+            #show-more-container {
+                display: none;
+            }
+            /* GLOBAL TOOLTIP STYLES */
+            .custom-tooltip .tooltip-inner {
+                background-color: #ffffff;
+                color: #333333;
+                border: 1px solid #dee2e6;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                max-width: 400px !important;
+                min-width: 300px;
+                text-align: left !important;
+                padding: 15px;
+            }
+
+            .custom-tooltip .tooltip-arrow {
+                display: none;
+            }
+
+
+            .custom-tooltip-content p {
+                margin: 8px 0;
+                line-height: 1.4;
+                font-size: 13px;
+                color: #333;
+                text-align: left;
+            }
+
+            .tooltip {
+                --bs-tooltip-max-width: 400px;
+            }
+
+            /* Style for toggle tooltip icon */
+            .toggle-tooltip-icon {
+                transition: color 0.2s ease;
+            }
+
+            .toggle-tooltip-icon:hover {
+                color: #495057 !important;
+            }
+
+            /* Ensure click-triggered tooltips stay on top */
+            .custom-tooltip {
+                z-index: 9999;
+            }
         </style>
     @endpush
     <div class="new-class-hide-scroll">
         <section id="content" class="content new-box-main-wrapper ">
-
             <div class="container-fluid p-0 ">
-
                 <div class="">
-@if($imapError)
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{ $imapError }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
-
-
+                    @if ($imapError)
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ $imapError }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <div class="row ">
                         <div class="col-lg-3">
 
                             <div class="sidebarr">
                                 <div class="main-left-sidebar-actions">
-                                    <a href="{{ route('admin.customer.contact.index') }}"
-                                       class="view-subscription-link">
+                                    <a href="{{ route('admin.customer.contact.index') }}" class="view-subscription-link">
                                         <span><i class="fa fa-angle-left " aria-hidden="true"></i>
                                             contacts</span>
                                     </a>
-                                    {{--                                    <a href="#" class="view-subscription-link"> --}}
-                                    {{--                                        <span>Actions</span> --}}
-                                    {{--                                    </a> --}}
+                                    <a href="#" class="view-subscription-link">
+                                        <span>Actions</span>
+                                    </a>
 
                                 </div>
                                 <div class="left_side_sec">
@@ -1439,7 +1524,7 @@
                                         <div class="avatar-img-box" style="padding-inline-end: 10px;">
                                             @if (file_exists(public_path('assets/images/user1.png')))
                                                 <img class="mainnav__avatar img-md rounded-circle hv-oc profile-image"
-                                                     src="{{ asset('assets/images/user1.png') }}">
+                                                    src="{{ asset('assets/images/user1.png') }}">
                                             @else
                                                 @php
                                                     $words = explode(
@@ -1450,8 +1535,7 @@
                                                         $words[0][0] . (count($words) > 1 ? $words[1][0] : ''),
                                                     );
                                                 @endphp
-                                                <div
-                                                    class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
+                                                <div class="mainnav__avatar img-md rounded-circle hv-oc profile-image d-flex align-items-center justify-content-center "
                                                     style="background-color: var(--bs-primary);color:var(--bs-primary-color);font-size: var(--bs-border-radius-xxl);">
                                                     {{ $initials }}
                                                 </div>
@@ -1466,50 +1550,56 @@
                                                     justify-content: center;
                                                 }
                                             </style>
-                                            <div class="email_sec">
-                                                <p id="customerEmail">{{ $customer_contact->email }}</p>
-                                                <i class="fa fa-clone prof-edit-icons copyEmail" aria-hidden="true"
-                                                   data-bs-toggle="tooltip" data-bs-placement="top"
-                                                   title="Copy email to clipboard"></i>
-                                            </div>
+<div class="email_sec d-flex align-items-center gap-2 email-truncate-container">
+    <p class="mb-0  customerEmail"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="{{ $customer_contact->email }}">
+       {{ Str::limit($customer_contact->email, 18) }}
+    </p>
+    <i class="fa fa-clone prof-edit-icons copyEmail"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="Copy email to clipboard"
+       data-email="{{ $customer_contact->email }}"></i>
+</div>
+
+
+
                                         </div>
                                         <div>
 
-                                            {{--                                            <button class="custom-contact-detail-dropdown" type="button" --}}
-                                            {{--                                                    id="dropdownMenuButtonedit" data-bs-toggle="dropdown" --}}
-                                            {{--                                                    aria-expanded="false"> --}}
-                                            {{--                                                <i class="fa fa-pencil prof-edit-icons edit-icons-kit" --}}
-                                            {{--                                                   aria-hidden="true"></i> --}}
-                                            {{--                                            </button> --}}
-                                            {{--                                            <ul class="dropdown-menu custom-edit-detail-dropdown-show" --}}
-                                            {{--                                                aria-labelledby="dropdownMenuButtonedit"> --}}
-                                            {{--                                                <li> --}}
-                                            {{--                                                    <p class="edit-prof-head">First Name</p> --}}
-                                            {{--                                                    <input class="edit-input-fields " type="text" --}}
-                                            {{--                                                           placeholder="Hanny"> --}}
-                                            {{--                                                </li> --}}
-                                            {{--                                                <li> --}}
-                                            {{--                                                    <p class="edit-prof-head">Last Name</p> --}}
-                                            {{--                                                    <input class="edit-input-fields " type="text" --}}
-                                            {{--                                                           placeholder="Hanny"> --}}
-                                            {{--                                                </li> --}}
-                                            {{--                                                <li> --}}
-                                            {{--                                                    <p class="edit-prof-head">Job Title</p> --}}
-                                            {{--                                                    <input class="edit-input-fields " type="text" --}}
-                                            {{--                                                           placeholder="Hanny"> --}}
-                                            {{--                                                </li> --}}
-                                            {{--                                                <li> --}}
-                                            {{--                                                    <div class="main-edit-btn-box"> --}}
-                                            {{--                                                        <button class="edit-prof-btn"> --}}
-                                            {{--                                                            Save --}}
-                                            {{--                                                        </button> --}}
-                                            {{--                                                        <button class="edit-prof-btn canel-edition-btn"> --}}
-                                            {{--                                                            Cancel --}}
-                                            {{--                                                        </button> --}}
-                                            {{--                                                    </div> --}}
-                                            {{--                                                </li> --}}
+                                            <button class="custom-contact-detail-dropdown" type="button"
+                                                id="dropdownMenuButtonedit" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-pencil prof-edit-icons edit-icons-kit"
+                                                    aria-hidden="true"></i>
+                                            </button>
+                                            <ul class="dropdown-menu custom-edit-detail-dropdown-show"
+                                                aria-labelledby="dropdownMenuButtonedit">
+                                                <li>
+                                                    <p class="edit-prof-head">First Name</p>
+                                                    <input class="edit-input-fields " type="text" placeholder="Hanny">
+                                                </li>
+                                                <li>
+                                                    <p class="edit-prof-head">Last Name</p>
+                                                    <input class="edit-input-fields " type="text" placeholder="Hanny">
+                                                </li>
+                                                <li>
+                                                    <p class="edit-prof-head">Job Title</p>
+                                                    <input class="edit-input-fields " type="text" placeholder="Hanny">
+                                                </li>
+                                                <li>
+                                                    <div class="main-edit-btn-box">
+                                                        <button class="edit-prof-btn">
+                                                            Save
+                                                        </button>
+                                                        <button class="edit-prof-btn canel-edition-btn">
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </li>
 
-                                            {{--                                            </ul> --}}
+                                            </ul>
 
                                         </div>
                                     </div>
@@ -1517,37 +1607,34 @@
 
                                 <div>
                                     <div class="profile_actions">
-                                        <div class="text-center">
-
-                                            <i class="fa fa-pencil-square-o sidebar-icons" aria-hidden="true"></i>
-                                            <p> Note</p>
-
+                                        <div class="text-center sidebar-icons active" >
+                                            <i class="fa fa-list" aria-hidden="true"></i>
+                                            <p>Activity</p>
                                         </div>
-
-                                        <div class="text-center">
-
-                                            <i class="fa fa-envelope sidebar-icons" aria-hidden="true"></i>
-                                            <p> Email</p>
+                                        <div class="text-center sidebar-icons" >
+                                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                                            <p>Email</p>
                                         </div>
-
-                                        <div class="text-center">
-
-                                            <i class="fa fa-phone sidebar-icons" aria-hidden="true"></i>
+                                        <div class="text-center sidebar-icons" >
+                                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            <p>Note</p>
+                                        </div>
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-phone" aria-hidden="true"></i>
                                             <p>Call</p>
                                         </div>
-                                        <div class="text-center">
-                                            <i class="fa fa-calendar sidebar-icons" aria-hidden="true"></i>
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
                                             <p>Meeting</p>
                                         </div>
-                                        {{--                                        <div class="text-center"> --}}
-                                        {{--                                            <i class="fa fa-list sidebar-icons" aria-hidden="true"></i> --}}
-                                        {{--                                            <p>Task</p> --}}
-                                        {{--                                        </div> --}}
-
-                                        {{--                                        <div class="text-center"> --}}
-                                        {{--                                            <i class="fa fa-calendar-check-o sidebar-icons" aria-hidden="true"></i> --}}
-                                        {{--                                            <p>More</p> --}}
-                                        {{--                                        </div> --}}
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-list" aria-hidden="true"></i>
+                                            <p>Task</p>
+                                        </div>
+                                        <div class="text-center sidebar-icons">
+                                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                            <p>More</p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1558,11 +1645,10 @@
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplecontact"
-                                                        aria-expanded="true" aria-controls="collapseExamplecontact">
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplecontact"
+                                                    aria-expanded="true" aria-controls="collapseExamplecontact">
                                                     <i class="fa fa-chevron-down toggle-icon" aria-hidden="true"
-                                                       style="padding-right: 5px;"></i>
+                                                        style="padding-right: 5px;"></i>
                                                     About this contact
                                                 </button>
                                             </div>
@@ -1577,88 +1663,84 @@
                                                 <div class="mb-2">
                                                     <p class="contact-card-details-head">Phone</p>
                                                     <p class="contact-card-details-para">{{ $customer_contact->phone }}</p>
-                                                    {{--                                                <input class="contact-details-input-fields " type="number" --}}
-                                                    {{--                                                       placeholder=""> --}}
                                                 </div>
                                                 <div class="mb-2">
                                                     <p class="contact-card-details-head">Contact Owner</p>
                                                     <p class="contact-card-details-para">
                                                         {{ $customer_contact->creator->name ?? '---' }}</p>
                                                 </div>
-                                                {{--                                                <div class="mb-4"> --}}
-                                                {{--                                                    <p class="contact-card-details-head">Last contacted</p> --}}
-                                                {{--                                                    <input class="contact-details-input-fields " type="text" --}}
-                                                {{--                                                           placeholder=""> --}}
-                                                {{--                                                </div> --}}
-                                                {{--                                                <div class="mb-4"> --}}
-                                                {{--                                                    <div class=""> --}}
-                                                {{--                                                        <button --}}
-                                                {{--                                                            class="custom-contact-detail-dropdown dropdown-toggle" --}}
-                                                {{--                                                            type="button" id="dropdownMenuButtonlead" --}}
-                                                {{--                                                            data-bs-toggle="dropdown" aria-expanded="false"> --}}
-                                                {{--                                                            Lead --}}
-                                                {{--                                                        </button> --}}
-                                                {{--                                                        <ul class="dropdown-menu custom-contact-detail-dropdown-show" --}}
-                                                {{--                                                            aria-labelledby="dropdownMenuButtonlead"> --}}
-                                                {{--                                                            <li><a class="dropdown-item" href="#">Action</a> --}}
-                                                {{--                                                            </li> --}}
-                                                {{--                                                            <li><a class="dropdown-item" href="#">Another --}}
-                                                {{--                                                                    action</a> --}}
-                                                {{--                                                            </li> --}}
-                                                {{--                                                            <li><a class="dropdown-item" href="#">Something else --}}
-                                                {{--                                                                    here</a> --}}
-                                                {{--                                                            </li> --}}
-                                                {{--                                                        </ul> --}}
-                                                {{--                                                    </div> --}}
-                                                {{--                                                </div> --}}
+                                                <div class="mb-4">
+                                                    <p class="contact-card-details-head">Last contacted</p>
+                                                    <input class="contact-details-input-fields " type="text"
+                                                        placeholder="">
+                                                </div>
+                                                <div class="mb-4">
+                                                    <div class="">
+                                                        <button class="custom-contact-detail-dropdown dropdown-toggle"
+                                                            type="button" id="dropdownMenuButtonlead"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Lead
+                                                        </button>
+                                                        <ul class="dropdown-menu custom-contact-detail-dropdown-show"
+                                                            aria-labelledby="dropdownMenuButtonlead">
+                                                            <li><a class="dropdown-item" href="#">Action</a>
+                                                            </li>
+                                                            <li><a class="dropdown-item" href="#">Another
+                                                                    action</a>
+                                                            </li>
+                                                            <li><a class="dropdown-item" href="#">Something else
+                                                                    here</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        {{--                                        <div class="collpase-divider mb-3 mt-3"></div> --}}
+                                        <div class="collpase-divider mb-3 mt-3"></div>
 
 
-                                        {{--                                        <div class="collapse-header-prent-box"> --}}
-                                        {{--                                            <div class="collapse-header-box"> --}}
+                                        <div class="collapse-header-prent-box">
+                                            <div class="collapse-header-box">
 
-                                        {{--                                                <button class="btn custom-btn-collapse" type="button" --}}
-                                        {{--                                                        data-bs-toggle="collapse" --}}
-                                        {{--                                                        data-bs-target="#collapseExamplesubscriptions" --}}
-                                        {{--                                                        aria-expanded="true" --}}
-                                        {{--                                                        aria-controls="collapseExamplesubscriptions"> --}}
-                                        {{--                                                    <i class="fa fa-caret-down" aria-hidden="true" --}}
-                                        {{--                                                       style="padding-right: 5px;"></i> --}}
-                                        {{--                                                    Communication subscriptions --}}
-                                        {{--                                                </button> --}}
-                                        {{--                                            </div> --}}
-                                        {{--                                        </div> --}}
+                                                <button class="btn custom-btn-collapse" type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseExamplesubscriptions" aria-expanded="true"
+                                                    aria-controls="collapseExamplesubscriptions">
+                                                    <i class="fa fa-caret-down" aria-hidden="true"
+                                                        style="padding-right: 5px;"></i>
+                                                    Communication subscriptions
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                        {{--                                        <div class="collapse" id="collapseExamplesubscriptions"> --}}
-                                        {{--                                            <div class="card custom-contact-cards card-body"> --}}
-                                        {{--                                                <p class="contact-card-subscription-para"> --}}
-                                        {{--                                                    Use subscription types to manage the communication this --}}
-                                        {{--                                                    contact --}}
-                                        {{--                                                    receives --}}
-                                        {{--                                                    from you --}}
-                                        {{--                                                </p> --}}
-                                        {{--                                                <a href="#" class="view-subscription-link"> --}}
-                                        {{--                                                    <span>View Subscription</span> --}}
-                                        {{--                                                </a> --}}
-                                        {{--                                            </div> --}}
-                                        {{--                                        </div> --}}
+                                        <div class="collapse" id="collapseExamplesubscriptions">
+                                            <div class="card custom-contact-cards card-body">
+                                                <p class="contact-card-subscription-para">
+                                                    Use subscription types to manage the communication this
+                                                    contact
+                                                    receives
+                                                    from you
+                                                </p>
+                                                <a href="#" class="view-subscription-link">
+                                                    <span>View Subscription</span>
+                                                </a>
+                                            </div>
+                                        </div>
 
-                                        {{--                                        <div class="collpase-divider mb-3 mt-3"></div> --}}
-                                        {{--                                        <div class="collapse-header-prent-box"> --}}
-                                        {{--                                            <div class="collapse-header-box"> --}}
+                                        <div class="collpase-divider mb-3 mt-3"></div>
+                                        <div class="collapse-header-prent-box">
+                                            <div class="collapse-header-box">
 
-                                        {{--                                                <button class="btn custom-btn-collapse" type="button" --}}
-                                        {{--                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleweb" --}}
-                                        {{--                                                        aria-expanded="true" aria-controls="collapseExampleweb"> --}}
-                                        {{--                                                    <i class="fa fa-caret-down" aria-hidden="true" --}}
-                                        {{--                                                       style="padding-right: 5px;"></i> --}}
-                                        {{--                                                    Website Activity --}}
-                                        {{--                                                </button> --}}
-                                        {{--                                            </div> --}}
-                                        {{--                                        </div> --}}
+                                                <button class="btn custom-btn-collapse" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleweb"
+                                                    aria-expanded="true" aria-controls="collapseExampleweb">
+                                                    <i class="fa fa-caret-down" aria-hidden="true"
+                                                        style="padding-right: 5px;"></i>
+                                                    Website Activity
+                                                </button>
+                                            </div>
+                                        </div>
 
                                         <div class="collapse" id="collapseExampleweb">
                                             <div class="card custom-contact-cards card-body">
@@ -1674,731 +1756,58 @@
                             </div>
 
                         </div>
-                        <div class="col-lg-6 p-0">
 
-                            <div class="custom-tabs-row custom-tabs-row-scroll">
+                        <div class="col-lg-6 p-0">
+                            <div class="custom-tabs-row">
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                    {{--                                    <li class="nav-item" role="presentation"> --}}
-                                    {{--                                        <button class="nav-link main-tabs-view active" id="home-tab" --}}
-                                    {{--                                                data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" --}}
-                                    {{--                                                aria-controls="home" aria-selected="true">Overview --}}
-                                    {{--                                        </button> --}}
-                                    {{--                                    </li> --}}
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link main-tabs-view active" id="profile-tab"
-                                                data-bs-toggle="tab"
-                                                data-bs-target="#profile" type="button" role="tab"
-                                                aria-controls="profile"
-                                                aria-selected="true">Activities
+                                        <button class="nav-link main-tabs-view" id="overview-tab" data-bs-toggle="tab"
+                                            data-bs-target="#overview" type="button" role="tab"
+                                            aria-controls="overview" aria-selected="true">Overview
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link main-tabs-view active" id="activity-tab"
+                                            data-bs-toggle="tab" data-bs-target="#activity" type="button"
+                                            role="tab" aria-controls="activity" aria-selected="true">Activities
                                         </button>
                                     </li>
                                 </ul>
                                 <div class="tab-content" id="myTabContent">
-                                    {{--                                    <div class="tab-pane fade active show" id="home" role="tabpanel" --}}
-                                    {{--                                         aria-labelledby="home-tab"> --}}
-                                    {{--                                        <div> --}}
-
-                                    {{--                                            <div class="data-highlights"> --}}
-                                    {{--                                                <div class="data-top-heading-header"> --}}
-                                    {{--                                                    <h2>Data highlights</h2> --}}
-                                    {{--                                                    <p class="contact-card-details-head">12/03/2024 4:48 PM --}}
-                                    {{--                                                        GMT+5 --}}
-                                    {{--                                                    </p> --}}
-                                    {{--                                                </div> --}}
-                                    {{--                                                <div class="data-row"> --}}
-                                    {{--                                                    <div> --}}
-                                    {{--                                                        <h5>CREATE DATE</h5> --}}
-                                    {{--                                                        <p>{{$customer_contact->created_at}}</p> --}}
-                                    {{--                                                    </div> --}}
-                                    {{--                                                    <div> --}}
-                                    {{--                                                        <h5>LIFECYCLE STAGE</h5> --}}
-                                    {{--                                                        <p>Lead</p> --}}
-                                    {{--                                                    </div> --}}
-                                    {{--                                                    <div> --}}
-                                    {{--                                                        <h5>LAST ACTIVITY DATE</h5> --}}
-                                    {{--                                                        <p>12/03/2024 4:48 PM GMT+5</p> --}}
-                                    {{--                                                    </div> --}}
-                                    {{--                                                </div> --}}
-                                    {{--                                            </div> --}}
-                                    {{--                                            <div class="recent-activities"> --}}
-
-                                    {{--                                                <div class="activity"> --}}
-                                    {{--                                                    <h2>Recent activities</h2> --}}
-                                    {{--                                                    <div> --}}
-                                    {{--                                                        <p class="recent-filters"> Filter by: <span --}}
-                                    {{--                                                                class="activities-seprater">7 --}}
-                                    {{--                                                                    activities</span></p> --}}
-                                    {{--                                                    </div> --}}
-                                    {{--                                                    <div class="email-box-container"> --}}
-                                    {{--                                                        <div class="activ_head" --}}
-                                    {{--                                                             onclick="toggleContent('toggledContent1')"> --}}
-                                    {{--                                                            <div class="email-child-wrapper"> --}}
-                                    {{--                                                                <i class="fa fa-caret-right" aria-hidden="true"></i> --}}
-                                    {{--                                                                <i class="fa fa-envelope-o new-sidebar-icons" --}}
-                                    {{--                                                                   aria-hidden="true"></i> --}}
-
-                                    {{--                                                                <p> --}}
-                                    {{--                                                                    Inbound email from --}}
-                                    {{--                                                                    <span --}}
-                                    {{--                                                                        class="activities-seprater">{{$customer_contact->name}}</span> --}}
-                                    {{--                                                                </p> --}}
-                                    {{--                                                            </div> --}}
-                                    {{--                                                            <p class="usre_date">Dec 3, 2024 at 4:48 PM GMT+5 --}}
-                                    {{--                                                            </p> --}}
-                                    {{--                                                        </div> --}}
-
-                                    {{--                                                        <div class="collpase-divider mt-2 mb-2"></div> --}}
-
-
-                                    {{--                                                        <div> --}}
-                                    {{--                                                            <div class="contact-us-text"> --}}
-                                    {{--                                                                <p>contact us</p> --}}
-
-                                    {{--                                                            </div> --}}
-                                    {{--                                                            <div class="user_profile-hidden" id="toggledContent1"> --}}
-                                    {{--                                                                <div class="user_profile_img"> --}}
-                                    {{--                                                                    <div class="avatarr">MM</div> --}}
-                                    {{--                                                                </div> --}}
-                                    {{--                                                                <div class="user_profile_text"> --}}
-                                    {{--                                                                    <p>Mike Stewar mikestewar1932@outlook.com --}}
-                                    {{--                                                                    </p> --}}
-                                    {{--                                                                    <p style="font-weight: 500">to --}}
-                                    {{--                                                                        info@phototouchexpert.com --}}
-                                    {{--                                                                    </p> --}}
-                                    {{--                                                                </div> --}}
-                                    {{--                                                            </div> --}}
-                                    {{--                                                        </div> --}}
-                                    {{--                                                        <div class="user_cont"> --}}
-                                    {{--                                                            <p> --}}
-                                    {{--                                                                Hi there, I hope you're doing well. I specialize --}}
-                                    {{--                                                                in --}}
-                                    {{--                                                                online reputation management and can help boost --}}
-                                    {{--                                                                your --}}
-                                    {{--                                                                business's presence by generating positive --}}
-                                    {{--                                                                reviews --}}
-                                    {{--                                                                and --}}
-                                    {{--                                                                addressing any negative feedback. --}}
-                                    {{--                                                            </p> --}}
-                                    {{--                                                        </div> --}}
-
-
-                                    {{--                                                        <div> --}}
-                                    {{--                                                            <div class="comment-active_head" id="toggledContent1"> --}}
-
-
-                                    {{--                                                                <div> --}}
-
-                                    {{--                                                                    <div class="email-child-wrapper" --}}
-                                    {{--                                                                         id="toggleButton"> --}}
-                                    {{--                                                                        <i class="fa fa-commenting-o add-coment-icon" --}}
-                                    {{--                                                                           aria-hidden="true"></i> --}}
-                                    {{--                                                                        <span class="activities-addition-links">Add --}}
-                                    {{--                                                                                Comments</span> --}}
-                                    {{--                                                                    </div> --}}
-
-
-                                    {{--                                                                    <div id="contents" class="hidden comment-box"> --}}
-                                    {{--                                                                        <div class="editor-container"> --}}
-                                    {{--                                                                            <div class="avatarr">MM</div> --}}
-                                    {{--                                                                            <div> --}}
-                                    {{--                                                                                <!-- editor --> --}}
-
-                                    {{--                                                                                <!-- <div class="editor-container"> --}}
-                                    {{--                                                                            <button --}}
-                                    {{--                                                                                class="your-create-contact create-contact">comment</button> --}}
-                                    {{--                                                                            <button --}}
-                                    {{--                                                                                class="your-comment-cancel">Cancel</button> --}}
-                                    {{--                                                                        </div> --> --}}
-                                    {{--                                                                            </div> --}}
-                                    {{--                                                                        </div> --}}
-                                    {{--                                                                    </div> --}}
-                                    {{--                                                                </div> --}}
-
-
-                                    {{--                                                                <button type="button" --}}
-                                    {{--                                                                        class="dropdown-toggle custom-drop-btn-design" --}}
-                                    {{--                                                                        id="dropdownMenuButtonassociate" --}}
-                                    {{--                                                                        data-bs-toggle="dropdown" --}}
-                                    {{--                                                                        aria-expanded="false"> --}}
-                                    {{--                                                                    3 --}}
-                                    {{--                                                                    association --}}
-                                    {{--                                                                </button> --}}
-                                    {{--                                                                <ul class="dropdown-menu" --}}
-                                    {{--                                                                    aria-labelledby="dropdownMenuButtonassociate"> --}}
-                                    {{--                                                                    <div> --}}
-
-                                    {{--                                                                        <div --}}
-                                    {{--                                                                            class="dropdown-content-wraper"> --}}
-                                    {{--                                                                            <ul --}}
-                                    {{--                                                                                class="nested-select-list"> --}}
-                                    {{--                                                                                <li --}}
-                                    {{--                                                                                    class="checkbox-item"> --}}
-
-                                    {{--                                                                                    <label>Companies --}}
-                                    {{--                                                                                        0</label> --}}
-                                    {{--                                                                                </li> --}}
-                                    {{--                                                                                <li --}}
-                                    {{--                                                                                    class="checkbox-item"> --}}
-
-                                    {{--                                                                                    <label>Carts --}}
-                                    {{--                                                                                        0</label> --}}
-                                    {{--                                                                                </li> --}}
-                                    {{--                                                                                <li --}}
-                                    {{--                                                                                    class="checkbox-item"> --}}
-
-                                    {{--                                                                                    <label>Contacts --}}
-                                    {{--                                                                                        0</label> --}}
-                                    {{--                                                                                </li> --}}
-                                    {{--                                                                                <li --}}
-                                    {{--                                                                                    class="checkbox-item"> --}}
-
-                                    {{--                                                                                    <label>Leads --}}
-                                    {{--                                                                                        0</label> --}}
-                                    {{--                                                                                </li> --}}
-                                    {{--                                                                                <li --}}
-                                    {{--                                                                                    class="checkbox-item"> --}}
-
-                                    {{--                                                                                    <label>Deals --}}
-                                    {{--                                                                                        0</label> --}}
-                                    {{--                                                                                </li> --}}
-                                    {{--                                                                                <li --}}
-                                    {{--                                                                                    class="checkbox-item"> --}}
-
-                                    {{--                                                                                    <label>Orders --}}
-                                    {{--                                                                                        0</label> --}}
-                                    {{--                                                                                </li> --}}
-                                    {{--                                                                                <!-- Add more items as needed --> --}}
-                                    {{--                                                                            </ul> --}}
-                                    {{--                                                                            <div> --}}
-                                    {{--                                                                                <div --}}
-                                    {{--                                                                                    class="search-box-select"> --}}
-                                    {{--                                                                                    <input --}}
-                                    {{--                                                                                        type="text" --}}
-                                    {{--                                                                                        placeholder="Search current associations" --}}
-                                    {{--                                                                                        class="search-input"> --}}
-                                    {{--                                                                                </div> --}}
-                                    {{--                                                                                <div --}}
-                                    {{--                                                                                    class="select-contact-box-space"> --}}
-                                    {{--                                                                                    <p --}}
-                                    {{--                                                                                        class="select-contact"> --}}
-                                    {{--                                                                                        Contacts --}}
-                                    {{--                                                                                    </p> --}}
-
-                                    {{--                                                                                    <input --}}
-                                    {{--                                                                                        type="checkbox" --}}
-                                    {{--                                                                                        id="contact2"> --}}
-                                    {{--                                                                                    <label --}}
-                                    {{--                                                                                        for="contact2">HoeoSQMLp --}}
-                                    {{--                                                                                        becelhmerthewatt@yahoo.com</label> --}}
-                                    {{--                                                                                </div> --}}
-                                    {{--                                                                            </div> --}}
-
-                                    {{--                                                                        </div> --}}
-                                    {{--                                                                    </div> --}}
-                                    {{--                                                                </ul> --}}
-
-
-                                    {{--                                                            </div> --}}
-                                    {{--                                                            <div class="collpase-divider mt-2 mb-2"></div> --}}
-                                    {{--                                                            <div class=" mt-2 mb-2"> --}}
-                                    {{--                                                                <a href="#" class="activities-addition-links">View --}}
-                                    {{--                                                                    full --}}
-                                    {{--                                                                    activity</a> --}}
-                                    {{--                                                            </div> --}}
-                                    {{--                                                        </div> --}}
-
-                                    {{--                                                    </div> --}}
-                                    {{--                                                </div> --}}
-
-
-                                    {{--                                                <div class="activity"> --}}
-                                    {{--                                                    <div class="association-activities-box"> --}}
-                                    {{--                                                        <h2>Companies</h2> --}}
-                                    {{--                                                        <div> --}}
-                                    {{--                                                            <i class="fa fa-plus companies-add-forms open-form-btn" --}}
-                                    {{--                                                               aria-hidden="true"> Add</i> --}}
-                                    {{--                                                        </div> --}}
-
-                                    {{--                                                    </div> --}}
-                                    {{--                                                    <p class="user_cont text-center"> No associated objects of --}}
-                                    {{--                                                        this --}}
-                                    {{--                                                        type --}}
-                                    {{--                                                        exist or you don't have permission to view them.</p> --}}
-                                    {{--                                                </div> --}}
-
-                                    {{--                                            </div> --}}
-                                    {{--                                        </div> --}}
-                                    {{--                                    </div> --}}
-
-
-                                    <div class="tab-pane fade active show" id="profile" role="tabpanel"
-                                         aria-labelledby="profile-tab">
-
-                                        <div class="activ_head mt-3">
-
-                                            <!-- Searchbox input -->
-                                            <div class="search-containers">
-                                                <form id="search-form" style="margin:0;">
-                                                    <input type="text" class="search-inputs"
-                                                           placeholder="Search activities" name="query">
-                                                    <button class="search-btns">
-                                                        <i class="fa fa-search" aria-hidden="true"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-
-                                            <!-- dropdown  -->
-                                            <div class="dropdown">
-                                                {{--                                                <button class="new-activity-dropdown btn-secondary dropdown-toggle" --}}
-                                                {{--                                                        type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" --}}
-                                                {{--                                                        aria-expanded="false"> --}}
-                                                {{--                                                    Collapse all --}}
-                                                {{--                                                </button> --}}
-                                                {{--                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> --}}
-                                                {{--                                                    <li><a class="dropdown-item" href="#">Action</a></li> --}}
-                                                {{--                                                    <li><a class="dropdown-item" href="#">Another action</a> --}}
-                                                {{--                                                    </li> --}}
-                                                {{--                                                    <li><a class="dropdown-item" href="#">Something else --}}
-                                                {{--                                                            here</a></li> --}}
-                                                {{--                                                </ul> --}}
-                                            </div>
-
-
-                                        </div>
-
-                                        <div class="custom-tabs-row">
-                                            <ul class="nav nav-tabs newtabs-space" id="myTab" role="tablist">
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize disabled" id="act-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                            role="tab" aria-controls="act" aria-selected="true">Activity
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize active" id="notes-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#notes" type="button"
-                                                            role="tab" aria-controls="notes" aria-selected="true">Notes
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize" id="emails-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#email" type="button"
-                                                            role="tab" aria-controls="emails" aria-selected="true">
-                                                        Emails
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link customize disabled" id="calls-tab"
-                                                            data-bs-toggle="tab" data-bs-target="#act" type="button"
-                                                            role="tab" aria-controls="calls" aria-selected="true">Calls
-                                                    </button>
-                                                </li>
-                                                {{--                                                <li class="nav-item" role="presentation"> --}}
-                                                {{--                                                    <button class="nav-link customize" id="email-tab" --}}
-                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#email" type="button" --}}
-                                                {{--                                                            role="tab" aria-controls="email" aria-selected="false" --}}
-                                                {{--                                                            tabindex="-1">Emails --}}
-                                                {{--                                                    </button> --}}
-                                                {{--                                                </li> --}}
-                                                {{--                                                <li class="nav-item" role="presentation"> --}}
-                                                {{--                                                    <button class="nav-link customize" id="call-tab" --}}
-                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#call" type="button" --}}
-                                                {{--                                                            role="tab" aria-controls="call" aria-selected="false" --}}
-                                                {{--                                                            tabindex="-1">Calls --}}
-                                                {{--                                                    </button> --}}
-                                                {{--                                                </li> --}}
-                                                {{--                                                <li class="nav-item" role="presentation"> --}}
-                                                {{--                                                    <button class="nav-link customize" id="task-tab" --}}
-                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#task" type="button" --}}
-                                                {{--                                                            role="tab" aria-controls="task" aria-selected="false" --}}
-                                                {{--                                                            tabindex="-1">Tasks --}}
-                                                {{--                                                    </button> --}}
-                                                {{--                                                </li> --}}
-                                                {{--                                                <li class="nav-item" role="presentation"> --}}
-                                                {{--                                                    <button class="nav-link customize" id="meeting-tab" --}}
-                                                {{--                                                            data-bs-toggle="tab" data-bs-target="#meeting" type="button" --}}
-                                                {{--                                                            role="tab" aria-controls="meeting" aria-selected="false" --}}
-                                                {{--                                                            tabindex="-1">Meetings --}}
-                                                {{--                                                    </button> --}}
-                                                {{--                                                </li> --}}
-                                            </ul>
-                                            <div class="tab-content" id="myTabContent">
-                                                {{--                                                <div class="tab-pane fade show active" id="act" role="tabpanel" --}}
-                                                {{--                                                     aria-labelledby="act-tab"> --}}
-
-
-                                                {{--                                                    <div> --}}
-                                                {{--                                                        <div> --}}
-                                                {{--                                                            <p class="recent-filters"> Filter by: --}}
-                                                {{--                                                                <span class="activities-seprater">7 --}}
-                                                {{--                                                                                                                        activities</span> --}}
-                                                {{--                                                            </p> --}}
-                                                {{--                                                        </div> --}}
-                                                {{--                                                        <p class="date-by-order"> May 2021</p> --}}
-                                                {{--                                                        <div class="data-highlights"> --}}
-                                                {{--                                                            <div class="data-top-heading-header"> --}}
-                                                {{--                                                                <h2>Life Cycle</h2> --}}
-                                                {{--                                                                <p>12/03/2024 4:48 PM GMT+5</p> --}}
-                                                {{--                                                            </div> --}}
-                                                {{--                                                            <p class="user_cont"> No associated objects of this --}}
-                                                {{--                                                                type --}}
-                                                {{--                                                                exist or you don't have permission to view them. --}}
-                                                {{--                                                                <span class="activities-seprater"> View detail --}}
-                                                {{--                                                                                                                        <i class="fa fa-external-link" --}}
-                                                {{--                                                                                                                           aria-hidden="true"></i> --}}
-                                                {{--                                                                                                                    </span> --}}
-                                                {{--                                                            </p> --}}
-                                                {{--                                                        </div> --}}
-
-                                                {{--                                                        <div class="recent-activities"> --}}
-
-
-                                                {{--                                                            <div class="email-box-container "> --}}
-                                                {{--                                                                <div class="toggle-btnss"> --}}
-                                                {{--                                                                    <div class="activ_head "> --}}
-                                                {{--                                                                        <div class="email-child-wrapper"> --}}
-                                                {{--                                                                            <i class="fa fa-caret-right" --}}
-                                                {{--                                                                               aria-hidden="true"></i> --}}
-                                                {{--                                                                            <di> --}}
-                                                {{--                                                                                <h2> --}}
-                                                {{--                                                                                    Email - #Professional Image --}}
-                                                {{--                                                                                    Editing --}}
-                                                {{--                                                                                    <span class="user_cont">from --}}
-                                                {{--                                                                                                                                                                                                                            Harry --}}
-                                                {{--                                                                                                                                                                                                                            Brown</span> --}}
-                                                {{--                                                                                </h2> --}}
-                                                {{--                                                                                <p class="user_cont">from Harry --}}
-                                                {{--                                                                                    Brown</p> --}}
-                                                {{--                                                                            </di> --}}
-                                                {{--                                                                        </div> --}}
-                                                {{--                                                                        <p>12/03/2024 4:48 PM GMT+5</p> --}}
-                                                {{--                                                                    </div> --}}
-                                                {{--                                                                </div> --}}
-
-
-                                                {{--                                                                <div> --}}
-                                                {{--                                                                    <!-- <div class="contact-us-text"> --}}
-                                                {{--                                                                    -- --}}
-                                                {{--                                                                </div> --> --}}
-                                                {{--                                                                    <div class="contentdisplay "> --}}
-
-                                                {{--                                                                        <div class="new-profile-parent-wrapper"> --}}
-                                                {{--                                                                            <div class="new-profile-email-wrapper"> --}}
-                                                {{--                                                                                <div class="user_profile_img"> --}}
-                                                {{--                                                                                    <div class="avatarr">MS --}}
-                                                {{--                                                                                    </div> --}}
-                                                {{--                                                                                </div> --}}
-                                                {{--                                                                                <div class="user_profile_text"> --}}
-                                                {{--                                                                                    <p>Mike Stewar</p> --}}
-                                                {{--                                                                                    <p style="font-weight: 500"> --}}
-                                                {{--                                                                                        -- --}}
-                                                {{--                                                                                    </p> --}}
-                                                {{--                                                                                </div> --}}
-                                                {{--                                                                            </div> --}}
-
-                                                {{--                                                                            <div --}}
-                                                {{--                                                                                class="new-profile-email-wrapper open-email-form" --}}
-                                                {{--                                                                                style="position: relative"> --}}
-                                                {{--                                                                                <div class="activities-seprater "> --}}
-                                                {{--                                                                                    Reply --}}
-                                                {{--                                                                                </div> --}}
-
-                                                {{--                                                                                <div --}}
-                                                {{--                                                                                    class="activities-seprater open-form-btn"> --}}
-                                                {{--                                                                                    Forward --}}
-                                                {{--                                                                                </div> --}}
-                                                {{--                                                                                <div --}}
-                                                {{--                                                                                    class="activities-seprater open-form-btn"> --}}
-                                                {{--                                                                                    Delete --}}
-                                                {{--                                                                                </div> --}}
-                                                {{--                                                                            </div> --}}
-                                                {{--                                                                        </div> --}}
-                                                {{--                                                                    </div> --}}
-                                                {{--                                                                    <!-- <div class="user_profile-hidden activ_head " --}}
-                                                {{--                                                                    id="toggledContent01"> --}}
-                                                {{--                                                                    <div class=""> --}}
-                                                {{--                                                                        <div class="user_profile_img"> --}}
-                                                {{--                                                                            <div class="avatarr">MM</div> --}}
-                                                {{--                                                                        </div> --}}
-                                                {{--                                                                        <div class="user_profile_text"> --}}
-                                                {{--                                                                            <p>Mike Stewar mikestewar1932@outlook.com --}}
-                                                {{--                                                                            </p> --}}
-                                                {{--                                                                            <p style="font-weight: 500">-- --}}
-                                                {{--                                                                            </p> --}}
-                                                {{--                                                                        </div> --}}
-                                                {{--                                                                    </div> --}}
-                                                {{--                                                                    <div> --}}
-                                                {{--                                                                        <i class="fa fa-plus companies-add-forms open-form-btn" --}}
-                                                {{--                                                                            aria-hidden="true"> Add</i> --}}
-                                                {{--                                                                    </div> --}}
-                                                {{--                                                                </div> --> --}}
-                                                {{--                                                                </div> --}}
-                                                {{--                                                                <div class="user_cont user-email-template"> --}}
-                                                {{--                                                                    <p> --}}
-                                                {{--                                                                        Hi, <br> I hope you're doing well. I --}}
-                                                {{--                                                                        specialize --}}
-                                                {{--                                                                        in --}}
-                                                {{--                                                                        online reputation management and can --}}
-                                                {{--                                                                        help --}}
-                                                {{--                                                                        boost --}}
-                                                {{--                                                                        your --}}
-                                                {{--                                                                        business's presence by generating --}}
-                                                {{--                                                                        positive --}}
-                                                {{--                                                                        reviews --}}
-                                                {{--                                                                        and --}}
-                                                {{--                                                                        addressing any negative feedback. --}}
-                                                {{--                                                                    </p> --}}
-                                                {{--                                                                </div> --}}
-                                                {{--                                                                <!-- <div class="user_cont-toggler"> --}}
-                                                {{--                                                                <p> --}}
-                                                {{--                                                                    Hi, <br> I hope you're doing well. I specialize in --}}
-                                                {{--                                                                    online reputation management and can help boost your --}}
-                                                {{--                                                                    business's presence by generating positive reviews --}}
-                                                {{--                                                                    and --}}
-                                                {{--                                                                    addressing any negative feedback. --}}
-                                                {{--                                                                </p> --}}
-                                                {{--                                                            </div> --> --}}
-
-
-                                                {{--                                                            </div> --}}
-
-                                                {{--                                                            <div class="data-highlights"> --}}
-                                                {{--                                                                <div class="data-top-heading-header"> --}}
-                                                {{--                                                                    <h2>Life Cycle</h2> --}}
-                                                {{--                                                                    <p>This contact was created </p> --}}
-                                                {{--                                                                </div> --}}
-                                                {{--                                                                <p class="user_cont"> No associated objects of --}}
-                                                {{--                                                                    this --}}
-                                                {{--                                                                    type --}}
-                                                {{--                                                                    exist or you don't have permission to view --}}
-                                                {{--                                                                    them. --}}
-                                                {{--                                                                    <span class="activities-seprater"> View --}}
-                                                {{--                                                                                                                            detail --}}
-                                                {{--                                                                                                                            <i class="fa fa-external-link" --}}
-                                                {{--                                                                                                                               aria-hidden="true"></i> --}}
-                                                {{--                                                                                                                        </span> --}}
-                                                {{--                                                                </p> --}}
-                                                {{--                                                            </div> --}}
-                                                {{--                                                        </div> --}}
-                                                {{--                                                    </div> --}}
-                                                {{--                                                </div> --}}
-                                                <div class="tab-pane fade show active" id="notes" role="tabpanel"
-                                                     aria-labelledby="notes-tab">
-                                                    <div class="email-threading-row">
-                                                        <button class="threading-email-btn-two" data-bs-toggle="modal"
-                                                                data-bs-target="#addNoteModal">
-                                                            Create Notes
-                                                        </button>
-                                                    </div>
-                                                    <p class="date-by-order">{{ \Carbon\Carbon::now()->format('F Y') }}</p>
-
-                                                    @if($customer_contact->notes->count() > 0)
-                                                        @foreach($customer_contact->notes as $noteKey => $note)
-                                                            <div class="data-highlights">
-                                                                <div class="cstm_note">
-                                                                    <div class="row">
-                                                                        <div class="col-md-12">
-                                                                            <div class="data-top-heading-header">
-                                                                                <h2>Note</h2>
-                                                                                <p>
-                                                                                    {{ $note->created_at
-                                                                                        ? \Carbon\Carbon::parse($note->created_at)->timezone('Asia/Karachi')->format('M j, Y \a\t g:i A \G\M\TP')
-                                                                                        : '---' }}
-                                                                                </p>
-
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <!-- Edit & Delete Icons -->
-                                                                <div class="cstm_note_2">
-                                                                    <div class="row">
-                                                                        <div class="col-md-12 cstm_note_cont">
-                                                                            <p class="user_cont"
-                                                                               id="note-text-{{$note->id}}">
-                                                                                {{ $note->note ?? "No Note Available" }}
-                                                                            </p>
-                                                                            <div class="cstm_right_icon">
-                                                                                <!-- Edit Icon -->
-                                                                                <button class="p-0 border-0 cstm_btn">
-                                                                                    <i class="fas fa-edit me-2 editNoteModal"
-                                                                                       style="cursor: pointer;"
-                                                                                       data-bs-toggle="modal"
-                                                                                       data-bs-target="#editNoteModal"
-                                                                                       data-id="{{$note->id}}"
-                                                                                       data-note="{{$note->note}}"></i>
-                                                                                </button>
-                                                                                <!-- Delete Form -->
-                                                                                <form
-                                                                                    action="{{ route('admin.customer.contact.note.delete', $note->id) }}"
-                                                                                    method="POST"
-                                                                                    class="deleteNoteForm">
-                                                                                    @csrf
-                                                                                    @method('DELETE')
-                                                                                    <button type="submit"
-                                                                                            class="p-0 border-0 cstm_btn">
-                                                                                        <i class="fas fa-trash"></i>
-                                                                                    </button>
-                                                                                </form>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    @else
-                                                        <p class="note-para">
-                                                            Take notes about this record to keep track of important
-                                                            info.
-                                                            You can even @mention a teammate if you need to.
-                                                        </p>
-                                                    @endif
-                                                </div>
-
-
-                                                <div class="tab-pane fade" id="email" role="tabpanel"
-                                                     aria-labelledby="email-tab">
-
-
-                                                    <div class="email-threading-row">
-                                                        <p class="activities-seprater"> Thread email replies </p>
-                                                        <button class="threading-email-btn-one">
-                                                            Log Email
-                                                        </button>
-                                                        <button class="threading-email-btn-two open-email-form">
-                                                            Create Email
-                                                        </button>
-                                                    </div>
-
-
-
-                                                    <div>
-                                                        <p class="date-by-order">{{ now()->format('F Y') }}</p>
-
-                                                        <div class="recent-activities">
-                                                            <!-- Keep your existing HTML for other parts of the edit page -->
-                                                            @include('admin.customers.contacts.components.email')
-
-                                                        </div>
-                                                    </div>
-
-
-                                                </div>
-
-                                                {{-- <div class="tab-pane fade" id="call" role="tabpanel" --}}
-                                                {{--                                                     aria-labelledby="call-tab"> --}}
-                                                {{--                                                    <div class="email-threading-row"> --}}
-
-                                                {{--                                                        <button class="threading-email-btn-two"> --}}
-                                                {{--                                                            Make a call --}}
-                                                {{--                                                        </button> --}}
-                                                {{--                                                    </div> --}}
-                                                {{--                                                    <div class="data-highlights"> --}}
-                                                {{--                                                        <div class="data-top-heading-header"> --}}
-                                                {{--                                                            <h2>Life Cycle</h2> --}}
-                                                {{--                                                            <p>This contact was created </p> --}}
-                                                {{--                                                        </div> --}}
-                                                {{--                                                        <p class="user_cont"> No associated objects of this --}}
-                                                {{--                                                            type --}}
-                                                {{--                                                            exist or you don't have permission to view them. --}}
-                                                {{--                                                            <span class="activities-seprater"> View detail <i --}}
-                                                {{--                                                                    class="fa fa-external-link" --}}
-                                                {{--                                                                    aria-hidden="true"></i> --}}
-                                                {{--                                                                </span> --}}
-                                                {{--                                                        </p> --}}
-                                                {{--                                                    </div> --}}
-                                                {{--                                                </div> --}}
-
-                                                {{--                                                <div class="tab-pane fade" id="task" role="tabpanel" --}}
-                                                {{--                                                     aria-labelledby="task-tab"> --}}
-                                                {{--                                                    <div class="email-threading-row"> --}}
-
-                                                {{--                                                        <button class="threading-email-btn-two"> --}}
-                                                {{--                                                            Create a Task --}}
-                                                {{--                                                        </button> --}}
-                                                {{--                                                    </div> --}}
-                                                {{--                                                    <div class="data-highlights"> --}}
-                                                {{--                                                        <div class="data-top-heading-header"> --}}
-                                                {{--                                                            <h2>Life Cycle</h2> --}}
-                                                {{--                                                            <p>This contact was created </p> --}}
-                                                {{--                                                        </div> --}}
-                                                {{--                                                        <p class="user_cont"> No associated objects of this --}}
-                                                {{--                                                            type --}}
-                                                {{--                                                            exist or you don't have permission to view them. --}}
-                                                {{--                                                            <span class="activities-seprater"> View detail <i --}}
-                                                {{--                                                                    class="fa fa-external-link" --}}
-                                                {{--                                                                    aria-hidden="true"></i> --}}
-                                                {{--                                                                </span> --}}
-                                                {{--                                                        </p> --}}
-                                                {{--                                                    </div> --}}
-
-                                                {{--                                                </div> --}}
-
-                                                {{--                                                <div class="tab-pane fade" id="meeting" role="tabpanel" --}}
-                                                {{--                                                     aria-labelledby="meeting-tab"> --}}
-                                                {{--                                                    <div class="email-threading-row"> --}}
-
-                                                {{--                                                        <button class="threading-email-btn-two"> --}}
-                                                {{--                                                            Call a Meeting --}}
-                                                {{--                                                        </button> --}}
-                                                {{--                                                    </div> --}}
-                                                {{--                                                    <div class="data-highlights"> --}}
-                                                {{--                                                        <div class="data-top-heading-header"> --}}
-                                                {{--                                                            <h2>Life Cycle</h2> --}}
-                                                {{--                                                            <p>This contact was created </p> --}}
-                                                {{--                                                        </div> --}}
-                                                {{--                                                        <p class="user_cont"> No associated objects of this --}}
-                                                {{--                                                            type --}}
-                                                {{--                                                            exist or you don't have permission to view them. --}}
-                                                {{--                                                            <span class="activities-seprater"> View detail <i --}}
-                                                {{--                                                                    class="fa fa-external-link" --}}
-                                                {{--                                                                    aria-hidden="true"></i> --}}
-                                                {{--                                                                </span> --}}
-                                                {{--                                                        </p> --}}
-                                                {{--                                                    </div> --}}
-
-                                                {{--                                                </div> --}}
-                                            </div>
-                                        </div>
-
-
+                                    <div class="tab-pane fade" id="overview" role="tabpanel"
+                                        aria-labelledby="overview-tab">
+                                        @include('admin.customers.contacts.timeline.components.overview')
                                     </div>
-
+                                    <div class="tab-pane fade active show" id="activity" role="tabpanel"
+                                        aria-labelledby="activity-tab">
+                                        @include('admin.customers.contacts.timeline.components.activities')
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="main">
-                            </div>
                         </div>
-                        <div class="col-lg-3 ps-0">
 
+                        <div class="col-lg-3 ps-0">
                             <div class="right-sidebarr">
                                 <div class="collaborators ">
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
-
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample"
-                                                        aria-expanded="true" aria-controls="collapseExample">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExample"
+                                                    aria-expanded="true" aria-controls="collapseExample">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Company
                                                     <span> ( {{ $customer_contact->companies->count() }} )</span>
                                                 </button>
                                             </div>
-
                                         </div>
-
-                                        {{--                                        <div class="right_collab open-form-btn"> --}}
-                                        {{--                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true"> --}}
-                                        {{--                                            </i> --}}
-                                        {{--                                            <span>Add</span> --}}
-                                        {{--                                        </div> --}}
-
+                                        <div class="right_collab">
+                                            <a href="{{ route('admin.customer.company.index') }}">
+                                                <i class="fa fa-plus" aria-hidden="true"> </i>
+                                                <span>Add</span>
+                                            </a>
+                                        </div>
                                     </div>
                                     <div class="collapse show" id="collapseExample">
                                         <div class="card custom-collapse-cards card-body">
@@ -2409,7 +1818,7 @@
                                                     <span> Domain :
                                                         @if (!empty($customer_contact->company->domain))
                                                             <a href="https://{{ $customer_contact->company->domain }}"
-                                                               target="_blank">
+                                                                target="_blank">
                                                                 {{ $customer_contact->company->domain }}
                                                             </a>
                                                         @else
@@ -2422,36 +1831,30 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExamplepayment"
-                                                        aria-expanded="true" aria-controls="collapseExamplepayment">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExamplepayment"
+                                                    aria-expanded="true" aria-controls="collapseExamplepayment">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Payments <span> ( {{ $customer_contact->payments->count() ?? '---' }} )
                                                     </span>
                                                 </button>
                                             </div>
-
                                         </div>
-                                        {{--                                        <div class="right_collab open-form-btn"> --}}
-                                        {{--                                            <i class="fa fa-plus create-contact " aria-hidden="true"> </i> --}}
-                                        {{--                                            <span>Add</span> --}}
-                                        {{--                                        </div> --}}
+                                        <div class="right_collab">
+                                            <a href="{{ route('admin.payment.index') }}">
+                                                <i class="fa fa-plus" aria-hidden="true"> </i>
+                                                <span>Add</span>
+                                            </a>
+                                        </div>
                                     </div>
-
                                     <div class="collapse show" id="collapseExamplepayment">
                                         <div class="card custom-collapse-cards card-body">
-
                                             <div class="col-md-12">
                                                 @if ($customer_contact->payments->count() == 0)
                                                     <p class="para_sec">Track payments associated with this record. A
@@ -2465,16 +1868,13 @@
                                                             class=" invoice_sec {{ $index >= 2 ? 'extra-payment d-none' : '' }}">
                                                             <span
                                                                 class="invoice_num">{{ optional($payment->invoice)->invoice_number ?? '---' }}
-
-
                                                                 @if ($payment->status == 0)
                                                                     <span
                                                                         class="badge bg-warning text-dark cstm_bdge">Due</span>
                                                                 @elseif($payment->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($payment->status == 2)
-                                                                    <span
-                                                                        class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($payment->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -2505,31 +1905,26 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
-
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#collapseExampleinvoice"
-                                                        aria-expanded="true" aria-controls="collapseExampleinvoice">
-                                                    <i class="fa fa-chevron-down toggle-icon"
-                                                       style="padding-right: 5px;"
-                                                       aria-hidden="true"></i>
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleinvoice"
+                                                    aria-expanded="true" aria-controls="collapseExampleinvoice">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
                                                     Invoices <span> ({{ $customer_contact->invoices->count() }}) </span>
                                                 </button>
                                             </div>
-
                                         </div>
-                                        {{--                                        <div class="right_collab open-form-btn"> --}}
-                                        {{--                                            <i class="fa fa-plus create-contact " aria-hidden="true"> </i> --}}
-                                        {{--                                            <span>Add</span> --}}
-                                        {{--                                        </div> --}}
+                                        <div class="right_collab">
+                                            <a href="{{ route('admin.invoice.index') }}">
+                                                <i class="fa fa-plus" aria-hidden="true"> </i>
+                                                <span>Add</span>
+                                            </a>
+                                        </div>
                                     </div>
-
                                     <div class="collapse show" id="collapseExampleinvoice">
                                         <div class="card custom-collapse-cards card-body">
                                             <div class="col-md-12">
@@ -2547,8 +1942,7 @@
                                                                 @elseif($invoice->status == 1)
                                                                     <span class="badge bg-success cstm_bdge">Paid</span>
                                                                 @elseif($invoice->status == 2)
-                                                                    <span
-                                                                        class="badge bg-danger cstm_bdge">Refund</span>
+                                                                    <span class="badge bg-danger cstm_bdge">Refund</span>
                                                                 @elseif($invoice->status == 3)
                                                                     <span class="badge bg-primary cstm_bdge">Charge
                                                                         Back</span>
@@ -2578,7 +1972,6 @@
                                             @endif
                                         </div>
                                     </div>
-
                                     <div class="collapse " id="collapseExamplepay">
                                         <div class="card custom-collapse-cards card-body">
                                             <p class="contact-card-subscription-para">
@@ -2591,42 +1984,33 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="collpase-divider mt-2 mb-2"></div>
-
-
-                                    {{--                                    <div class="right_collaboratrs-box"> --}}
-                                    {{--                                        <div class="collapse-header-prent-box"> --}}
-                                    {{--                                            <div class="collapse-header-box"> --}}
-
-                                    {{--                                                <button class="btn custom-btn-collapse" type="button" --}}
-                                    {{--                                                        data-bs-toggle="collapse" data-bs-target="#collapseExampleatt" --}}
-                                    {{--                                                        aria-expanded="true" aria-controls="collapseExampleatt"> --}}
-                                    {{--                                                    <i class="fa fa-caret-down" style="padding-right: 5px;" --}}
-                                    {{--                                                       aria-hidden="true"></i> --}}
-                                    {{--                                                    Attachments --}}
-                                    {{--                                                </button> --}}
-                                    {{--                                            </div> --}}
-
-                                    {{--                                        </div> --}}
-
-                                    {{--                                        <div class="right_collab open-form-btn"> --}}
-                                    {{--                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true"> --}}
-                                    {{--                                            </i> --}}
-                                    {{--                                            <span>Add</span> --}}
-                                    {{--                                        </div> --}}
-
-                                    {{--                                    </div> --}}
-                                    {{--                                    <div class="collapse " id="collapseExampleatt"> --}}
-                                    {{--                                        <div class="card custom-collapse-cards card-body"> --}}
-                                    {{--                                            <p class="contact-card-subscription-para"> --}}
-                                    {{--                                                See the businesses or organizations associated with this record. --}}
-                                    {{--                                            </p> --}}
-                                    {{--                                        </div> --}}
-                                    {{--                                    </div> --}}
-
-                                    {{--                                    <div class="collpase-divider mt-2 mb-2"></div> --}}
-
+                                    <div class="right_collaboratrs-box">
+                                        <div class="collapse-header-prent-box">
+                                            <div class="collapse-header-box">
+                                                <button class="btn custom-btn-collapse" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleatt"
+                                                    aria-expanded="true" aria-controls="collapseExampleatt">
+                                                    <i class="fa fa-caret-down" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
+                                                    Attachments
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="right_collab open-form-btn">
+                                            <i class="fa fa-plus create-contact open-form-btn" aria-hidden="true">
+                                            </i>
+                                            <span>Add</span>
+                                        </div>
+                                    </div>
+                                    <div class="collapse " id="collapseExampleatt">
+                                        <div class="card custom-collapse-cards card-body">
+                                            <p class="contact-card-subscription-para">
+                                                See the businesses or organizations associated with this record.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="collpase-divider mt-2 mb-2"></div>
                                 </div>
                             </div>
 
@@ -2637,8 +2021,6 @@
             </div>
         </section>
     </div>
-
-
     @include('admin.customers.contacts.notes-add-modal')
     @include('admin.customers.contacts.notes-edit-modal')
     @include('admin.customers.companies.custom-form')
@@ -2649,8 +2031,38 @@
 
         {{--        MY SCRIPT --}}
         <script>
-            $(document).ready(function () {
-                $('.showhide-payment, .showhide-invoice').click(function () {
+            // Make it globally available
+            window.initializeTooltips = function (context = document) {
+                try {
+                    document.querySelectorAll('.tooltip.show, .tooltip.fade').forEach(t => t.remove());
+
+                    const tooltipElements = context.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+                    tooltipElements.forEach(el => {
+                        const instance = bootstrap.Tooltip.getInstance(el);
+                        if (instance) instance.dispose();
+
+                        new bootstrap.Tooltip(el, {
+                            sanitize: false,
+                            customClass: 'custom-tooltip',
+                            html: true,
+                            boundary: 'window',
+                            container: 'body' 
+                        });
+                    });
+
+                } catch (error) {
+                    console.error("❌ Tooltip initialization error:", error);
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', function() {
+                window.initializeTooltips();
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('.showhide-payment, .showhide-invoice').click(function() {
                     // Determine which type: "payment" or "invoice"
                     let type = $(this).hasClass('showhide-payment') ? 'payment' : 'invoice';
 
@@ -2669,20 +2081,20 @@
         </script>
 
         <script>
-            $(document).ready(function () {
-                $('.toggle-collapse').each(function () {
+            $(document).ready(function() {
+                $('.toggle-collapse').each(function() {
                     var $button = $(this);
                     var target = $button.data('bs-target'); // Get target id from data-bs-target
                     var $collapse = $(target);
 
                     // On show event
-                    $collapse.on('show.bs.collapse', function () {
+                    $collapse.on('show.bs.collapse', function() {
                         $button.find('.toggle-icon').removeClass('fa-chevron-right').addClass(
                             'fa-chevron-down');
                     });
 
                     // On hide event
-                    $collapse.on('hide.bs.collapse', function () {
+                    $collapse.on('hide.bs.collapse', function() {
                         $button.find('.toggle-icon').removeClass('fa-chevron-down').addClass(
                             'fa-chevron-right');
                     });
@@ -2702,8 +2114,8 @@
             }
 
             // Second comment function
-            $(document).ready(function () {
-                $('#toggleButton').click(function () {
+            $(document).ready(function() {
+                $('#toggleButton').click(function() {
                     const contents = $('#contents');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2715,21 +2127,21 @@
                 });
             });
             // select to function
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Toggle dropdown visibility
-                $(".dropdown-toggle").on("click", function () {
+                $(".dropdown-toggle").on("click", function() {
                     $(".dropdown-content").toggle();
                 });
                 // Filter list based on search input
-                $(".search-input").on("input", function () {
+                $(".search-input").on("input", function() {
                     const filter = $(this).val().toLowerCase();
-                    $(".checkbox-item").each(function () {
+                    $(".checkbox-item").each(function() {
                         const label = $(this).find("label").text().toLowerCase();
                         $(this).toggle(label.includes(filter));
                     });
                 });
                 // Close dropdown if clicked outside
-                $(document).on("click", function (e) {
+                $(document).on("click", function(e) {
                     if (!$(e.target).closest(".dropdown").length) {
                         $(".dropdown-content").hide();
                     }
@@ -2737,15 +2149,15 @@
             });
             // $('select>option:eq(3)').attr('selected', true);
             // Searching Input function
-            $(document).ready(function () {
+            $(document).ready(function() {
                 // Expand and collapse the search bar
-                $(".search-btns").on("click", function (e) {
+                $(".search-btns").on("click", function(e) {
                     e.preventDefault(); // Prevent form submission on button click
                     $(".search-containers").toggleClass("expanded");
                     $(".search-inputs").focus();
                 });
                 // Handle form submission for search
-                $("#search-form").on("submit", function (e) {
+                $("#search-form").on("submit", function(e) {
                     e.preventDefault(); // Prevent default form submission
                     const query = $(".search-inputs").val().trim();
                     if (query) {
@@ -2758,46 +2170,32 @@
                     }
                 });
                 // Collapse the search bar when clicking outside
-                $(document).on("click", function (e) {
+                $(document).on("click", function(e) {
                     if (!$(e.target).closest(".search-containers").length) {
                         $(".search-containers").removeClass("expanded");
                     }
                 });
             });
 
-            // NEw
-            // Function hide and show
-            $(document).ready(function () {
-                $(".toggle-btnss").click(function () {
-                    let targetId = $(this).data("target");
-                    $(targetId).slideToggle(); // Only toggle this email's content
-
-                    // Rotate caret icon
-                    $(this).find("i.fa").toggleClass("fa-caret-right fa-caret-down");
-                });
-            });
-
-            //new
-
             // EMAIL TEMPLATE OPEN AND CLOSE
-            $(document).ready(function () {
+            $(document).ready(function() {
                 const emailTemplate = $('#emailTemplate');
 
                 // Open form
-                $('.open-email-form').click(function () {
+                $('.open-email-form').click(function() {
                     emailTemplate.addClass('open');
 
                 });
 
                 // Close form
-                $('.close-btn').click(function () {
+                $('.close-btn').click(function() {
                     emailTemplate.removeClass('open');
 
                 });
             });
             // view threads function
-            $(document).ready(function () {
-                $('#toggleButtonThread').click(function () {
+            $(document).ready(function() {
+                $('#toggleButtonThread').click(function() {
                     const contents = $('#thread');
                     if (contents.hasClass('hidden')) {
                         contents.removeClass('hidden');
@@ -2811,8 +2209,8 @@
                 });
             });
             // read more text function
-            $('.moreless-button').click(function () {
-                $('.moretext').slideToggle();
+            $('.moreless-button').click(function() {
+                $('.moretext').toggle();
                 if ($('.moreless-button').text() == "See more") {
                     $(this).text("See less")
                 } else {
@@ -2822,27 +2220,903 @@
 
             // Copy Clipboard Email
 
-            $(document).ready(function () {
-                // Initialize Bootstrap tooltips
-                $('[data-bs-toggle="tooltip"]').tooltip();
+$(document).ready(function() {
 
-                $(document).on('click', '.copyEmail', async function () {
-                    try {
-                        let emailText = $("#customerEmail").text().trim();
-                        await navigator.clipboard.writeText(emailText);
+        // Handle click-triggered tooltips to close when clicking elsewhere
+    $(document).on('click', function(e) {
+        // Close all click-triggered tooltips when clicking outside
+        if (!$(e.target).closest('.toggle-tooltip-icon').length) {
+            $('.toggle-tooltip-icon').each(function() {
+                const tooltip = bootstrap.Tooltip.getInstance(this);
+                if (tooltip) {
+                    tooltip.hide();
+                }
+            });
+        }
+    });
 
-                        // Change tooltip to "Copied!" and show it
-                        $(this).attr('data-bs-original-title', 'Copied!').tooltip('show');
+    // Copy email functionality
+    $(document).on('click', '.copyEmail', async function() {
+        const $icon = $(this);
+        const email = $icon.data('email');
+        
+        try {
+            await navigator.clipboard.writeText(email);
+            
+            // Show success feedback
+            $icon
+                .attr('data-bs-original-title', 'Copied!')
+                .tooltip('show');
+            
+            // Reset after 2 seconds
+            setTimeout(() => {
+                $icon.attr('data-bs-original-title', 'Copy email to clipboard');
+            }, 2000);
+            
+        } catch (err) {
+            console.error('Copy failed:', err);
+        }
+    });
+});
 
-                        // Reset tooltip text after 2 seconds
-                        setTimeout(() => {
-                            $(this).attr('data-bs-original-title', 'Copy to clipboard');
-                        }, 2000);
-                    } catch (err) {
-                        console.error('Clipboard copy failed:', err);
+
+        </script>
+
+        {{-- // --}}
+<script>
+    $(document).on('click', '.reply-btn', function() {
+        let fromEmail = `{{ $customer_contact->email }}`;
+        let subject = $(this).data('subject');
+        let date = $(this).data('date');
+        let body = $(this).data('body');
+        let threadId = $(this).data('thread-id');
+        let inReplyTo = $(this).data('in-reply-to');
+        let references = $(this).data('references');
+
+        try {
+            if (typeof body === "string" && body.trim().startsWith('"')) {
+                body = JSON.parse(body);
+            }
+        } catch (e) {}
+
+        // Prefill To/Subject
+        $('#toFieldInput').val(fromEmail);
+        $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+
+        // Clear editor + set quoted history
+        $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
+
+        // Store metadata
+        $('#thread_id').val(threadId || '');
+        $('#in_reply_to').val(inReplyTo || '');
+        $('#references').val(references ? JSON.stringify(references) : '');
+
+        toggleQuotedHistory(true);
+        $('#emailTemplate').addClass('open');
+        
+        // Show the show-quoted button only for reply
+        $('.show-quoted-btn').show();
+    });
+
+    $(document).on('click', '.forward-btn', function() {
+        let fromEmail = `{{ $customer_contact->email }}`;
+        let subject = $(this).data('subject');
+        let date = $(this).data('date');
+        let body = $(this).data('body');
+        let originalMessageId = $(this).data('message-id');
+
+        try {
+            if (typeof body === "string" && body.trim().startsWith('"')) {
+                body = JSON.parse(body);
+            }
+        } catch (e) {
+            console.warn('Failed to parse body:', e);
+        }
+
+        // Clear To field (user will specify new recipients)
+        $('#toFieldInput').val('');
+
+        // Prepend "Fwd:" to subject if not already present
+        $('#emailSubject').val(subject.startsWith("Fwd:") ? subject : "Fwd: " + subject);
+
+        // Format forwarded content in quoted history
+        $('.quoted-history').html(`
+                <p><b>---------- Forwarded message ----------</b></p>
+                <p><b>From:</b> ${fromEmail}<br>
+                <b>Sent:</b> ${date}<br>
+                <b>Subject:</b> ${subject}</p>
+                ${body}
+            `);
+
+        // Set email content with new body and quoted history
+        let newContent = $('#emailBody').val() || ''; // Assuming #emailBody is the textarea for new content
+        $('#emailBody').val(newContent + $('.quoted-history').html());
+
+        // Store metadata for forwarding
+        $('#is_forward').val('true');
+        $('#forward_id').val(originalMessageId || '');
+
+        // Clear reply-specific fields (not needed for forward)
+        $('#thread_id').val('');
+        $('#in_reply_to').val('');
+        $('#references').val('');
+
+        // Show quoted history and open email template
+        toggleQuotedHistory(true);
+        $('#emailTemplate').addClass('open');
+        
+        // Show the show-quoted button only for forward
+        $('.show-quoted-btn').show();
+    });
+
+    $(document).on('click', '.replyall-btn', function() {
+        let fromEmail = ``;
+        let subject = $(this).data('subject');
+        let date = $(this).data('date');
+        let body = $(this).data('body');
+        let threadId = $(this).data('thread-id');
+        let inReplyTo = $(this).data('in-reply-to');
+        let references = $(this).data('references');
+
+        // Get recipients (TO + CC)
+        let toRecipients = $(this).data('to') || [];
+        let ccRecipients = $(this).data('cc') || [];
+        // Exclude the current user's own email from the list
+        let allRecipients = [...toRecipients, ...ccRecipients]
+            .map(r => typeof r === 'string' ? r : r.email)
+            .filter(email => email && email !== fromEmail);
+
+        try {
+            if (typeof body === "string" && body.trim().startsWith('"')) {
+                body = JSON.parse(body);
+            }
+        } catch (e) {}
+
+        // Prefill To/Subject
+        $('#toFieldInput').val(allRecipients.join(', '));
+        $('#emailSubject').val(subject.startsWith("Re:") ? subject : "Re: " + subject);
+
+        // Clear editor + set quoted history
+        $('.quoted-history').html(`<p><b>On ${date}, ${fromEmail} wrote:</b></p>${body}`);
+
+        // Store metadata
+        $('#thread_id').val(threadId || '');
+        $('#in_reply_to').val(inReplyTo || '');
+        $('#references').val(references ? JSON.stringify(references) : '');
+
+        toggleQuotedHistory(true);
+        $('#emailTemplate').addClass('open');
+        
+        // Show the show-quoted button only for forward
+        $('.show-quoted-btn').show();
+    });
+
+    $(document).on('click', '.open-email-form', () => {
+        $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
+        toggleQuotedHistory(false);
+        $('#emailTemplate').addClass('open');
+        
+        // Hide the show-quoted button for new email
+        $('.show-quoted-btn').hide();
+    });
+
+    $(document).on('click', '.close-btn', () => {
+        $('#emailTemplate').removeClass('open');
+        toggleQuotedHistory(false);
+        $('#thread_id, #in_reply_to, #references, #emailSubject, .quoted-history').val('');
+        
+        // Hide the show-quoted button when closing
+        $('.show-quoted-btn').hide();
+    });
+
+    function toggleQuotedHistory(show = false) {
+        let $wrapper = $('.quoted-history-wrapper');
+        if (!$wrapper.length) return;
+        if (show) {
+            $wrapper.removeClass('d-none');
+        } else {
+            $wrapper.addClass('d-none');
+        }
+    }
+</script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const refreshButton = document.getElementById('refresh-emails');
+                const fetchButton = document.getElementById('fetch-emails');
+                const showMoreContainer = document.getElementById('show-more-container');
+                const showMoreBtn = document.getElementById('show-more-btn');
+                const customerEmail = "{{ $customer_contact->email }}";
+                let folder = 'all';
+                let currentPage = {{ $page }};
+                const limit = {{$limit}};
+                const noEmailsPlaceholder = document.querySelector('.no-emails-placeholder');
+
+                const tabs = document.querySelectorAll('.nav-link.customize');
+                const timelineSection = document.getElementById('timeline-section');
+                const timelineLoader = document.getElementById('timeline-loader');
+                const noTimelinePlaceholder = document.getElementById('no-timeline-placeholder');
+
+                // Show More click handler
+                if (showMoreBtn) {
+                    showMoreBtn.addEventListener("click", function() {
+                        currentPage++;
+                        refreshTimeline(true); // append
+                    });
+                }
+
+                window.updateFilterActivityCount = function (total_count) {
+                    // Only target the .activities-seprater inside .recent-activities
+                    const filterSpan = document.querySelector('#activities-container .activities-seprater');
+
+
+                    if (filterSpan) {
+                        filterSpan.textContent = `Filter activity (3/${total_count})`;
+                    } else {
+                        console.warn('⚠️ .recent-activities .activities-seprater not found');
                     }
+                };
+
+                // Get the active tab
+                function getActiveTab() {
+                    const activeTab = document.querySelector('.nav-link.customize.active');
+                    return activeTab ? activeTab.getAttribute('data-tab') : 'activities';
+                }
+
+                // Render Timeline (HTML string only)
+                function renderTimeline(timeline) {
+                    if (!timeline || timeline.trim() === "") {
+                        return '<p class="text-muted">No timeline items found.</p>';
+                    }
+                    return timeline; // Already a single HTML string
+                }
+
+                // Fetch Timeline (Refresh)
+                window.refreshTimeline = function (append = false) {
+                    const activeTab = getActiveTab();
+                    const section = document.getElementById(`${activeTab}-section`) || timelineSection;
+                    if (timelineLoader) timelineLoader.style.display = 'block';
+                    if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
+
+                    // Disable all buttons during fetch
+                    if (refreshButton) refreshButton.disabled = true;
+                    if (fetchButton) fetchButton.disabled = true;
+                    if (showMoreBtn) showMoreBtn.disabled = true;
+
+                    fetch("{{ route('admin.customer.contact.timeline.refresh') }}" +
+                        "?customer_email=" + encodeURIComponent(customerEmail) +
+                        "&folder=" + encodeURIComponent("{{ request()->query('folder', 'all') }}") +
+                        "&tab=" + encodeURIComponent(activeTab) +
+                        "&page=" + currentPage +
+                        "&limit=" + limit)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (timelineLoader) timelineLoader.style.display = 'none';
+
+                        // Re-enable all buttons
+                        if (refreshButton) refreshButton.disabled = false;
+                        if (fetchButton) fetchButton.disabled = false;
+                        if (showMoreBtn) showMoreBtn.disabled = false;
+
+                        if (data.error) {
+                            console.warn("⚠️ Server response:", data.error);
+                            toastr.warning("We couldn't load the timeline right now.");
+                            return;
+                        }
+
+                        if (!data.timeline || data.timeline.trim() === "") {
+                            if (currentPage === 1 && section) {
+                                section.innerHTML = '';
+                                if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'block';
+                            }
+                            if (showMoreContainer) showMoreContainer.style.display = 'none';
+                            toastr.info("No timeline items available.");
+                            return;
+                        }
+
+                        const html = renderTimeline(data.timeline);
+                        if (append && section) {
+                            section.insertAdjacentHTML('beforeend', html);
+                        } else if (section) {
+                            section.innerHTML = html;
+                        }
+
+                        // Call global tooltip function
+                        if (typeof window.initializeTooltips === 'function') {
+                            window.initializeTooltips(section);
+                        }
+
+                        updateFilterActivityCount(data.total_count);
+
+
+                        if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
+                        // Show/hide "Show More" button based on available items
+                        const shownItems = currentPage * limit;
+                        if (showMoreContainer) {
+                            showMoreContainer.style.display = (shownItems < data.total_count) ? 'block' : 'none';
+                        }
+
+
+                        // toastr.success("Timeline loaded successfully.");
+
+                    })
+                    .catch(err => {
+                        if (timelineLoader) timelineLoader.style.display = 'none';
+                        // Re-enable all buttons
+                        if (refreshButton) refreshButton.disabled = false;
+                        if (fetchButton) fetchButton.disabled = false;
+                        if (showMoreBtn) showMoreBtn.disabled = false;
+                        console.error("❌ Error fetching timeline:", err);
+                        toastr.error("Something went wrong while fetching the timeline. Please try again.");
+                    });
+                }
+
+                // Refresh button: reset to first page & reload
+                if (refreshButton) {
+                    refreshButton.addEventListener('click', function() {
+                        currentPage = 1;
+                        refreshTimeline(false); // reload first page
+                        
+                    });
+                }
+
+                // Fetch new timeline items
+                if (fetchButton) {
+                    fetchButton.addEventListener('click', function () {
+                        const activeTab = getActiveTab();
+
+                        if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'none';
+                        if (timelineLoader) timelineLoader.style.display = 'block';
+
+                        // Disable all buttons during fetch
+                        if (refreshButton) refreshButton.disabled = true;
+                        if (fetchButton) fetchButton.disabled = true;
+                        if (showMoreBtn) showMoreBtn.disabled = true;
+
+                        fetch("{{ route('admin.customer.contact.timeline.fetch-remote') }}" +
+                            "?customer_email=" + encodeURIComponent(customerEmail) +
+                            "&tab=" + encodeURIComponent(activeTab), {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (timelineLoader) timelineLoader.style.display = 'none';
+                                // Re-enable all buttons
+                                if (refreshButton) refreshButton.disabled = false;
+                                if (fetchButton) fetchButton.disabled = false;
+                                if (showMoreBtn) showMoreBtn.disabled = false;
+
+                                if (data.status === "error") {
+                                    refreshTimeline();
+                                    toastr.error(data.message || "Something went wrong.");
+                                    return;
+                                }
+
+                                if (data.status === "success") {
+                                    refreshTimeline();
+                                    toastr.success(data.message);
+                                }
+
+                                if (data.status === "warning") {
+                                    refreshTimeline();
+                                    console.log(data.message);
+                                }
+
+                                // Fallback: if no timeline items appear after fetch
+                                setTimeout(() => {
+                                    const section = document.getElementById(`${activeTab}-section`) || timelineSection;
+                                    if (section && section.innerHTML.trim() === "") {
+                                        if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'block';
+                                    }
+                                }, 500);
+                            })
+                            .catch(error => {
+                                if (timelineLoader) timelineLoader.style.display = 'none';
+                                // Re-enable all buttons
+                                if (refreshButton) refreshButton.disabled = false;
+                                if (fetchButton) fetchButton.disabled = false;
+                                if (showMoreBtn) showMoreBtn.disabled = false;
+                                console.error(error);
+                                toastr.error("Failed to fetch timeline items. Please try again later.");
+                                if (noTimelinePlaceholder) noTimelinePlaceholder.style.display = 'block';
+                            });
+                    });
+                }
+
+                // Tab click handler to set active tab and refresh
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function () {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        currentPage = 1;
+                    });
                 });
+
+                // Tabs
+                function setActiveTab(folder) {
+                    document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+                        tab.classList.remove('active');
+                        if (tab.getAttribute('data-folder') === folder) {
+                            tab.classList.add('active');
+                        }
+                    });
+                }
+
+                document.querySelectorAll('#email-folders .nav-link').forEach(tab => {
+                    tab.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        folder = this.getAttribute('data-folder');
+                        console.log(`Switching to folder: ${folder}`);
+                        currentPage = 1;
+                        setActiveTab(folder);
+                    });
+                });
+
+                setActiveTab(folder);
             });
         </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Event delegation for toggle thread buttons (works with dynamic content)
+    document.addEventListener('click', function(e) {
+        // Check if the click is on a toggle-thread-btn or its children
+        if (e.target.closest('.toggle-thread-btn')) {
+            const button = e.target.closest('.toggle-thread-btn');
+            
+            // Find the closest email-box-container
+            const parentBox = button.closest('.email-box-container');
+            if (!parentBox) return;
+
+            // Then find its thread-emails section inside
+            const threadContainer = parentBox.querySelector('.thread-emails');
+            if (!threadContainer) return;
+
+            // Toggle visibility
+            const isHidden = threadContainer.style.display === 'none' || threadContainer.style.display === '';
+            threadContainer.style.display = isHidden ? 'block' : 'none';
+
+            // Update button text
+            const count = button.textContent.match(/\d+/)?.[0] || 0;
+            button.textContent = isHidden
+                ? `Hide Thread (${count})`
+                : `View Thread (${count})`;
+        }
+    });
+});
+</script>
+
+
+<script>
+
+    // jQuery-based email and activity toggling
+    $(document).ready(function() {
+        // Function to toggle the email box content
+        function toggleEmailContent($container) {
+            const $emailContent = $container.find(".contentdisplay, .contentdisplaytwo, .user_toggle");
+            const $caret = $container.find(".toggle-email-caret").first();
+            const wasOpen = $caret.hasClass("fa-caret-down"); // Check caret state
+            $emailContent.toggle(); // Instant toggle
+            $caret.toggleClass("fa-caret-right fa-caret-down");
+
+            // If closing email box, hide all activity timelines
+            if (wasOpen) {
+                $container.find(".activity-section .timeline").hide();
+                $container.find(".toggle-activity").removeClass("fa-caret-down").addClass("fa-caret-right");
+            }
+        }
+
+        // Function to toggle the activity timeline
+        function toggleActivityTimeline($container, target) {
+            const $timeline = $container.find(target);
+            const $caret = $container.find(`.toggle-activity[data-target='${target}']`);
+
+            if ($timeline.css('display') === 'none') {
+                $timeline.show(); // Instant show
+                $caret.removeClass("fa-caret-right").addClass("fa-caret-down");
+            } else {
+                $timeline.hide(); // Instant hide
+                $caret.removeClass("fa-caret-down").addClass("fa-caret-right");
+            }
+        }
+
+        // Main email caret or header click
+        $(".card-box").on("click", ".toggle-email-caret, .toggle-email-header", function(e) {
+            e.stopPropagation();
+            const $container = $(this).closest(".email-box-container");
+            toggleEmailContent($container);
+        });
+
+        // Activity toggle (caret or row)
+        $(".card-box").on("click", ".toggle-activity, .toggle-activity-row", function(e) {
+            e.stopPropagation();
+
+            const $container = $(this).closest(".email-box-container");
+            const $caret = $(this).hasClass("toggle-activity-row") 
+                ? $(this).find(".toggle-activity") 
+                : $(this);
+
+            // Clean up target (remove leading # if exists)
+            const rawTarget = $caret.data("target");
+            const target = rawTarget.replace(/^#/, "");
+            const $activityBox = $container.find(`#${target}`);
+
+            // Check email state using caret class
+            const $emailCaret = $container.find(".toggle-email-caret").first();
+            const isEmailOpen = $emailCaret.hasClass("fa-caret-down");
+
+            if (!isEmailOpen) {
+                // Open email box, then activity timeline
+                toggleEmailContent($container);
+                if ($activityBox.css('display') === 'none') { // Only show if not visible
+                    toggleActivityTimeline($container, `#${target}`);
+                }
+            } else {
+                // Toggle activity directly
+                toggleActivityTimeline($container, `#${target}`);
+            }
+        });
+
+        // Collapse All
+        $(document).on("click", ".dropdown-item:contains('Collapse All')", function(e) {
+            e.preventDefault();
+            $(".contentdisplay, .contentdisplaytwo").hide();
+            $(".toggle-email-caret").removeClass("fa-caret-down").addClass("fa-caret-right");
+            $(".activity-section .timeline").hide();
+            $(".toggle-activity").removeClass("fa-caret-down").addClass("fa-caret-right");
+        });
+
+        // Expand All
+        $(document).on("click", ".dropdown-item:contains('Expand All')", function(e) {
+            e.preventDefault();
+            $(".contentdisplay, .contentdisplaytwo").show();
+            $(".toggle-email-caret").removeClass("fa-caret-right").addClass("fa-caret-down");
+            // Keep activities collapsed to avoid clutter
+        });
+    });
+</script>
+            </script>
+        <script>
+            $(document).on('click', '.toggle-form-section', function () {
+                const content = $(this).closest('.data-highlights').find('.form-submissions-content');
+                const icon = $(this).find('.toggle-icon');
+
+                content.slideToggle(300);
+
+                if (icon.hasClass('open')) {
+                    icon.removeClass('open').css('transform', 'rotate(0deg)');
+                } else {
+                    icon.addClass('open').css('transform', 'rotate(90deg)');
+                }
+            });
+        </script>
+<script>
+$(document).on('click', '.retry-email-link', function () {
+    const emailId = $(this).data('id');
+    const $link = $(this);
+    const $emailBox = $link.closest('.email-box-container');
+
+    // Disable retry link temporarily
+    $link.text('Retrying...').css('pointer-events', 'none');
+
+    $.ajax({
+        url: "{{ route('admin.customer.contact.retry.email', '') }}/" + emailId,
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (res) {
+            toastr.success(res.message || 'Email resent successfully.');
+
+            // The "Sent" block HTML
+            const sentBlock = `
+                <div class="email-folder d-flex align-items-center mt-1">
+                    <span class="folder-dot me-1" style="color: #28a745;">&bull;</span>
+                    <span class="folder-name text-capitalize">Sent</span>
+                </div>
+            `;
+
+            // Find and replace *each* alert-danger block with the Sent badge
+            $emailBox.find('.alert.alert-danger').each(function () {
+                const $alert = $(this);
+                $alert.after(sentBlock); // add sent after alert
+                $alert.remove(); // then remove alert
+            });
+
+            // If no alerts found (failsafe), append in both key sections
+            if (!$emailBox.find('.email-folder').length) {
+                // Append in header part if exists
+                const $header = $emailBox.find('.user_profile_text').first();
+                if ($header.length) $header.append(sentBlock);
+
+                // Append in body part if exists
+                const $body = $emailBox.find('.contentdisplaytwo').first();
+                if ($body.length) $body.prepend(sentBlock);
+            }
+
+            // Re-enable link
+            $link.text('Try Again').css('pointer-events', 'auto');
+        },
+        error: function (xhr) {
+            const msg = xhr.responseJSON?.message || 'Retry failed. Please try again later.';
+            toastr.error(msg);
+            $link.text('Try Again').css('pointer-events', 'auto');
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-form');
+    const searchInput = document.querySelector('.search-inputs');
+    
+    // Initialize searchable data attributes on all content
+    initializeSearchableData();
+    
+    if (searchForm && searchInput) {
+        searchInput.addEventListener('input', function() {
+            filterContent(this.value.trim().toLowerCase());
+        });
+        
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            filterContent(searchInput.value.trim().toLowerCase());
+        });
+    }
+    
+    // Initialize data attributes for searchable content
+    function initializeSearchableData() {
+        // Add data attributes to all searchable elements
+        document.querySelectorAll('[data-searchable]').forEach(element => {
+            element.removeAttribute('data-searchable');
+        });
+        
+        // Activities section
+        const activitiesSection = document.getElementById('activities-section');
+        if (activitiesSection) {
+            activitiesSection.querySelectorAll('.data-highlights, .email-box-container, .card-box').forEach(card => {
+                card.setAttribute('data-searchable', 'true');
+                card.setAttribute('data-search-content', extractSearchContent(card));
+            });
+        }
+        
+        // Notes section
+        const notesSection = document.getElementById('notes-section');
+        if (notesSection) {
+            notesSection.querySelectorAll('.data-highlights').forEach(card => {
+                card.setAttribute('data-searchable', 'true');
+                card.setAttribute('data-search-content', extractSearchContent(card));
+            });
+        }
+        
+        // Emails section
+        const emailsSection = document.getElementById('emails-section');
+        if (emailsSection) {
+            emailsSection.querySelectorAll('.email-box-container').forEach(card => {
+                card.setAttribute('data-searchable', 'true');
+                card.setAttribute('data-search-content', extractSearchContent(card));
+            });
+        }
+    }
+    
+    // Extract all searchable text from an element
+    function extractSearchContent(element) {
+        const content = [];
+        
+        // Get all text content, excluding interactive elements
+        const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode: function(node) {
+                    // Skip script, style, and hidden elements
+                    if (node.parentElement.tagName === 'SCRIPT' || 
+                        node.parentElement.tagName === 'STYLE' ||
+                        node.parentElement.style.display === 'none' ||
+                        node.parentElement.classList.contains('d-none')) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            },
+            false
+        );
+        
+        let textNode;
+        while (textNode = walker.nextNode()) {
+            const text = textNode.textContent.trim();
+            if (text && text.length > 1) { // Ignore single characters/whitespace
+                content.push(text.toLowerCase());
+            }
+        }
+        
+        return content.join(' ');
+    }
+    
+    function filterContent(searchTerm) {
+        const activeTab = getActiveTab();
+        // Re-initialize data in case content changed
+        initializeSearchableData();
+        
+        // Filter based on active tab container
+        const container = getActiveTabContainer(activeTab);
+        if (!container) return;
+        
+        filterContainer(container, searchTerm);
+    }
+    
+    function getActiveTab() {
+        const activeTab = document.querySelector('.nav-link.customize.active');
+        return activeTab ? activeTab.getAttribute('data-tab') : 'activities';
+    }
+    
+    function getActiveTabContainer(tab) {
+        const containers = {
+            'activities': document.getElementById('activities-section'),
+            'notes': document.getElementById('notes-section'),
+            'emails': document.getElementById('emails-section')
+        };
+        return containers[tab] || containers['activities'];
+    }
+    
+    function filterContainer(container, searchTerm) {
+        const searchableElements = container.querySelectorAll('[data-searchable="true"]');
+        let hasVisibleResults = false;
+        
+        searchableElements.forEach(element => {
+            const searchContent = element.getAttribute('data-search-content') || '';
+            
+            if (searchTerm === '' || searchContent.includes(searchTerm)) {
+                element.style.display = '';
+                hasVisibleResults = true;
+                
+                // Show associated month headers
+                showAssociatedMonthHeader(element);
+            } else {
+                element.style.display = 'none';
+                
+                // Hide month headers if needed
+                hideAssociatedMonthHeader(element);
+            }
+        });
+        
+        // Handle empty states
+        handleEmptyStates(container, hasVisibleResults, searchTerm);
+        
+        // Show no results message
+        showNoResultsMessage(!hasVisibleResults && searchTerm !== '', container);
+    }
+    
+    function showAssociatedMonthHeader(element) {
+        const monthHeader = element.previousElementSibling;
+        if (monthHeader && monthHeader.classList.contains('date-by-order')) {
+            monthHeader.style.display = '';
+        }
+    }
+    
+    function hideAssociatedMonthHeader(element) {
+        const monthHeader = element.previousElementSibling;
+        if (monthHeader && monthHeader.classList.contains('date-by-order')) {
+            setTimeout(() => hideMonthHeaderIfNoVisibleContent(monthHeader), 0);
+        }
+    }
+    
+    function hideMonthHeaderIfNoVisibleContent(monthHeader) {
+        let hasVisibleContent = false;
+        let nextElement = monthHeader.nextElementSibling;
+        
+        while (nextElement && !nextElement.classList.contains('date-by-order')) {
+            if (nextElement.style.display !== 'none' && 
+                nextElement.hasAttribute('data-searchable')) {
+                hasVisibleContent = true;
+                break;
+            }
+            nextElement = nextElement.nextElementSibling;
+        }
+        
+        if (!hasVisibleContent) {
+            monthHeader.style.display = 'none';
+        }
+    }
+    
+    function handleEmptyStates(container, hasVisibleResults, searchTerm) {
+        // Handle email empty placeholder
+        const noEmailsPlaceholder = container.querySelector('.no-emails-placeholder');
+        if (noEmailsPlaceholder) {
+            noEmailsPlaceholder.style.display = (searchTerm === '' && !hasVisibleResults) ? '' : 'none';
+        }
+        
+        // Handle notes empty state
+        const notePara = container.querySelector('.note-para');
+        if (notePara) {
+            notePara.style.display = (searchTerm === '' && !hasVisibleResults) ? '' : 'none';
+        }
+    }
+    
+    function showNoResultsMessage(show, container) {
+        let noResultsMsg = container.querySelector('#no-results-message');
+        
+        if (show && !noResultsMsg) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'alert alert-info mt-3';
+            noResultsMsg.textContent = 'No content found matching your search.';
+            container.appendChild(noResultsMsg);
+        } else if (!show && noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+    
+    // Observe DOM changes for dynamic content
+    function initializeMutationObserver() {
+        const observer = new MutationObserver(function(mutations) {
+            let shouldReinitialize = false;
+            
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldReinitialize = true;
+                }
+            });
+            
+            if (shouldReinitialize) {
+                setTimeout(initializeSearchableData, 100);
+                // Re-apply current filter
+                const searchInput = document.querySelector('.search-inputs');
+                if (searchInput && searchInput.value) {
+                    filterContent(searchInput.value.trim().toLowerCase());
+                }
+            }
+        });
+        
+        // Observe all relevant containers
+        const containers = [
+            document.getElementById('activities-section'),
+            document.getElementById('notes-section'), 
+            document.getElementById('emails-section')
+        ].filter(Boolean);
+        
+        containers.forEach(container => {
+            observer.observe(container, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
+    
+    // Initialize tab listeners
+    function initializeTabListeners() {
+        document.addEventListener('click', function(e) {
+            const tab = getActiveTab();
+            //todo this is temporary logic
+            if (tab == 'chats' || tab == 'projects') {
+                const showMoreBtn = document.getElementById('show-more-btn');
+                if (showMoreBtn) {
+                    showMoreBtn.style.display = 'none';
+                }
+            }
+
+            if (e.target.closest('.nav-link.customize')) {
+                setTimeout(() => {
+                    const searchInput = document.querySelector('.search-inputs');
+                    if (searchInput) {
+                        filterContent(searchInput.value.trim().toLowerCase());
+                    }
+                }, 100);
+            }
+        });
+    }
+    
+    // Initialize everything
+    initializeTabListeners();
+    initializeMutationObserver();
+});
+</script>
+
+
     @endpush
 @endsection

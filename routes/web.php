@@ -190,6 +190,7 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
 });
 require __DIR__ . '/admin-old-routes.php';
 require __DIR__ . '/admin-routes.php';
+require __DIR__ . '/customer-routes.php';
 require __DIR__ . '/developer-routes.php';
 Route::get('/csrf-token', function () {
     session()->invalidate();
@@ -253,3 +254,11 @@ Route::get('invoice', [CheckoutController::class, 'index'])->name('invoice');
 Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::get('twilio-sms/status/{sid?}', [SmsServiceContoller::class, 'smsStatus'])->name('twilio.sms.status');
 
+
+
+Route::get('/emails/open/{id}', [App\Http\Controllers\EmailTrackingController::class, 'trackOpen'])->name('emails.track.open');
+Route::get('/emails/click/{id}', [App\Http\Controllers\EmailTrackingController::class, 'trackClick'])->name('emails.track.click');
+
+Route::post('/emails/bounce', [App\Http\Controllers\EmailTrackingController::class, 'trackBounce'])->name('emails.track.bounce');
+Route::post('/emails/delivery', [App\Http\Controllers\EmailTrackingController::class, 'trackDelivery'])->name('emails.track.delivery');
+Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController::class, 'trackSpamReport'])->name('emails.track.spam_report');

@@ -156,7 +156,7 @@
             let client_company = data?.client_company;
             $('#manage-form').data('id', client_company.id);
 
-            $('#c_contact_key').val(client_company.c_contact_key);
+            $('#c_contact_key').val(client_company.c_contact_key).trigger('change');
             $('#name').val(client_company.name);
             $('#email').val(client_company.email);
             $('#url').val(client_company.url);

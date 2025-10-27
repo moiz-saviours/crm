@@ -1,4 +1,10 @@
 <style>
+    button.btn.btn-sm.btn-primary {
+        width: 45px;
+    }
+    button.btn.btn-sm.btn-danger {
+        width: 45px;
+    }
     .custom-form .fh-1 {
         background: var(--nf-header-bg);
     }
@@ -53,6 +59,7 @@
         background-color: #ff5722;
         color: #fff;
         border: none;
+        margin-top: 20px;
     }
 
     .search-bar input {

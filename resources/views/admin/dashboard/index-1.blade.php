@@ -94,7 +94,7 @@
                 <!-- Page title and information -->
                <div class="dsh_btn">
                    <h1 class="page-title mb-2">Dashboard </h1>
-                   <button class="start-tour-btn my-btn tour-dashboard1-alldata" data-toggle="tooltip" title="Take a Tour" data-tour="dashboard1"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                   <button class="start-tour-btn my-btn tour-dashboard1-alldata" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="dashboard1"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
 
                </div>
                 <h2 class="h5">Welcome to the CRM Dashboard.</h2>

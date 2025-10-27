@@ -1,15 +1,14 @@
 <?php
 
-use App\Http\Controllers\Api\{
-    ApiAuthorizePaymentController,
+use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Api\{ApiAuthorizePaymentController,
     ApiPaypalPaymentController,
     ApiSecurePaymentController,
-    ApiStripePaymentController
-};
-use App\Http\Controllers\Admin\LeadController;
+    ApiStripePaymentController};
 use App\Http\Controllers\ApiInvoiceController;
 use App\Http\Controllers\ApiPaymentAttachmentController;
 use App\Http\Controllers\SmsServiceContoller;
+use App\Http\Controllers\UserActivityController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -141,3 +140,18 @@ Route::post('twilio/status-callback', [SmsServiceContoller::class, 'statusCallba
 
 Route::post('/brand-leads', [LeadController::class, 'storeFromScript']);
 
+Route::post('/track-activity', [UserActivityController::class, 'store']);
+
+Route::get('customer-contact', function () {
+    return response()->json([
+        "id" => 1,
+        "name" => "Smith John",
+        "email" => "smith.john@customer-portal.com",
+        "phone" => "1234567890",
+        "ip_address" => null,
+        "status" => 1,
+        "deleted_at" => null,
+        "updated_at" => "2025-02-06T17:42:05.000000Z",
+        "created_at" => "2025-02-04T18:50:32.000000Z"
+    ]);
+});

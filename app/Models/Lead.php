@@ -36,6 +36,8 @@ class Lead extends Model
         'status',
         'lead_response',
         'device_info',
+        'visitor_id',
+        'raw_data',
     ];
 
     public function brand(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -55,5 +57,10 @@ class Lead extends Model
     public function leadStatus(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(LeadStatus::class, 'lead_status_id');
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class, 'visitor_id', 'visitor_id');
     }
 }

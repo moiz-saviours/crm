@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerContact;
 use App\Models\Email;
 use App\Models\EmailAttachment;
 use App\Models\UserPseudoRecord;
@@ -17,348 +18,624 @@ use Illuminate\Validation\ValidationException;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Illuminate\Support\Facades\Artisan;
+use DOMDocument;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Config;
+use App\Mail\OutgoingEmail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Response;
 
 class EmailController extends Controller
 {
-    public function fetch(Request $request)
-    {
-        try {
-            $customerEmail = $request->query('customer_email');
-            $folder = $request->query('folder', 'inbox');
-            $page = (int)$request->query('page', 1);
-            $limit = (int)$request->query('limit', 100);
-            $offset = ($page - 1) * $limit;
-            // Log the request parameters for debugging
-            Log::info('Fetching emails from database', [
-                'customer_email' => $customerEmail,
-                'folder' => $folder,
-                'page' => $page,
-                'limit' => $limit,
-            ]);
-            if (!$customerEmail) {
-                return response()->json(['error' => 'Customer email is required'], 400);
-            }
-            $query = Email::where(function ($q) use ($customerEmail, $folder) {
-                if ($folder === 'sent') {
-                    $q->orWhere(function ($subQ) use ($customerEmail) {
-                        $subQ->orWhereJsonContains('to', [['email' => $customerEmail]])->where('type', 'outgoing');
-                    });
-                }
-                $q->orWhere('from_email', $customerEmail)->orWhereJsonContains('cc', [['email' => $customerEmail]])->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
-            });
-            // Filter by folder if specified
-            // if ($folder !== 'all') {
-            //     $query->where('folder', $folder);
-            // }
-            // Apply pagination
-            $emails = $query->orderBy('message_date', 'desc')->skip($offset)->take($limit)->with(['attachments' => function ($q) {
-                $q->select('id', 'email_id', 'original_name as filename', 'size', 'mime_type as type', 'storage_path');
-            }])
-                ->get()
-                ->map(function ($email) {
-                    // Format email data to match the expected structure for the view
-                    return [
-                        'uuid' => 'email-' . $email->id,
-                        'from' => [
-                            [
-                                'name' => $email->from_name,
-                                'email' => $email->from_email,
-                            ],
-                        ],
-                        'to' => $email->to ?? [],
-                        'subject' => $email->subject,
-                        'date' => $email->message_date,
-                        'body' => [
-                            'html' => $email->body_html,
-                            'text' => $email->body_text,
-                        ],
-                        'attachments' => $email->attachments->map(function ($attachment) {
-                            return [
-                                'filename' => $attachment->filename,
-                                'type' => $attachment->type,
-                                'size' => $attachment->size,
-                                'download_url' => $attachment->storage_path ? Storage::url($attachment->storage_path) : null,
-                            ];
-                        })->toArray(),
-                    ];
-                });
-            $folders = Email::where(function ($q) use ($customerEmail) {
-                $q->where('from_email', $customerEmail)
-                    ->orWhereJsonContains('to', [['email' => $customerEmail]])
-                    ->orWhereJsonContains('cc', [['email' => $customerEmail]])
-                    ->orWhereJsonContains('bcc', [['email' => $customerEmail]]);
-            })
-                ->distinct()
-                ->pluck('folder')
-                ->filter()
-                ->values()
-                ->toArray();
-            return response()->json([
-                'emails' => $emails,
-                'folders' => $folders,
-                'folder' => $folder,
-                'page' => $page,
-                'limit' => $limit,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Something went wrong please try again', [
-                'error' => $e->getMessage(),
-                'customer_email' => $customerEmail,
-                'folder' => $folder,
-            ]);
-            return response()->json(['error' => 'Failed to fetch emails. Please try again later.'], 500);
-        }
-    }
 
-    public function fetchNewEmails(Request $request)
-    {
-        try {
-            $customerEmail = $request->query('customer_email');
-            if (!$customerEmail) {
-                return response()->json(['error' => 'Customer email is required'], 400);
-            }
-            $user = Auth::guard('admin')->user();
-            $pseudoEmails = UserPseudoRecord::where('morph_id', $user->id)
-                ->where('morph_type', get_class($user))
-                ->where('imap_type', 'imap')
-                ->pluck('pseudo_email')
-                ->toArray();
-            if (empty($pseudoEmails)) {
-                return response()->json(['error' => 'No IMAP accounts found for the current user'], 400);
-            }
-            $command = ['emails:fetch', '--address=' . $customerEmail];
-            foreach ($pseudoEmails as $email) {
-                $command[] = '--account=' . $email;
-            }
-            $exitCode = Artisan::call(implode(' ', $command));
-            if ($exitCode !== 1) {
-                Log::error('Failed to run emails:fetch command', [
-                    'customer_email' => $customerEmail,
-                    'pseudo_emails' => $pseudoEmails,
-                    'exit_code' => $exitCode,
-                    'file' => __FILE__,
-                    'line' => __LINE__,
-                    'error' => isset($e) ? $e->getMessage() : null,
-                ]);
-                return response()->json(['error' => 'Failed to fetch new emails'], 500);
-            }
-            return response()->json(['success' => true, 'message' => 'New emails fetched successfully']);
-        } catch (\Exception $e) {
-            Log::error('Error fetching new emails', [
-                'customer_email' => $customerEmail,
-                'error' => $e->getMessage(),
-            ]);
-            return response()->json(['error' => 'Failed to fetch new emails. Please try again later.',
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-            ], 500);
-        }
-    }
 
+
+    private function getExtensionFromMimeType(string $mimeType): string
+    {
+        $extensions = [
+            'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'application/zip' => 'zip',
+        ];
+        return $extensions[strtolower($mimeType)] ?? 'bin';
+    }
+    private function normalizeMsgId($id)
+    {
+        if (empty($id)) {
+            return null;
+        }
+
+        $normalized = trim($id, " <>\t\n\r");
+
+        // If it contains @, extract the UUID part (your sent emails use UUIDs)
+        if (str_contains($normalized, '@')) {
+            $parts = explode('@', $normalized);
+            $uuidPart = $parts[0];
+
+            // Check if it's a valid UUID
+            if (Str::isUuid($uuidPart)) {
+                return $uuidPart;
+            }
+        }
+
+        return $normalized;
+    }
     public function sendEmail(Request $request): JsonResponse
     {
+
+
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
             'email_content' => 'required|string',
-            'to' => 'required|string',
+            'to' => 'required|array|min:1',
+            'to.*' => 'required|email',
             'from' => 'required|email',
-            'cc' => 'sometimes|string|nullable',
-            'bcc' => 'sometimes|string|nullable',
-            'attachments.*' => 'sometimes|file|mimes:pdf,doc,docx,jpg,png,zip|max:10240', // 10MB max per file
+            'cc' => 'sometimes|array',
+            'cc.*' => 'email',
+            'bcc' => 'sometimes|array',
+            'bcc.*' => 'email',
+            'attachments.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,png,zip,mp4,mov,avi|max:10240',
+        ], [
+            'to.min' => 'No valid recipients specified.',
+            'to.*.email' => 'One or more recipients are not valid email addresses.',
         ]);
+
+        $emailContent = $validated['email_content'] ?? '';
+        $totalImageSize = 0;
+
+        // Find all base64 images in the email content
+        preg_match_all('/data:image\/[^;]+;base64,([A-Za-z0-9+\/=]+)/', $emailContent, $matches);
+
+        foreach ($matches[1] as $base64String) {
+            $decoded = base64_decode($base64String, true);
+            if ($decoded !== false) {
+                $totalImageSize += strlen($decoded);
+            }
+        }
+
+        // 5 MB limit for total embedded image size
+        $maxTotalSize = 5 * 1024 * 1024;
+
+        if ($totalImageSize > $maxTotalSize) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Embedded images are too large. Please reduce total image size (max 5 MB).'
+            ], 422);
+        }
+
+        // Optional: validate overall HTML size
+        $totalContentSize = strlen($emailContent);
+        if ($totalContentSize > 7 * 1024 * 1024) { // 7 MB total
+            return response()->json([
+                'success' => false,
+                'message' => 'Email content is too large. Please simplify or reduce embedded content (max 7 MB).'
+            ], 422);
+        }
+
+
+
+
         try {
-            $sender = $this->findSender($request->from);
+            $sender = $this->findSender($validated['from']);
             if (!$sender) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Sender not authorized or not found'
+                    'message' => 'Sender not authorized or not found',
                 ], 403);
             }
-            // Check if sender is UserPseudoRecord and has SMTP credentials
+
             if (!$sender instanceof UserPseudoRecord || empty($sender->server_password) || empty($sender->server_host)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid or missing SMTP credentials for sender'
+                    'message' => 'Invalid or missing SMTP credentials for sender',
                 ], 403);
             }
-            $toEmails = $this->parseEmailList($request->to);
-            $ccEmails = $this->parseEmailList($request->cc);
-            $bccEmails = $this->parseEmailList($request->bcc);
+
+            $toEmails = $validated['to'] ?? [];
+            $ccEmails = $validated['cc'] ?? [];
+            $bccEmails = $validated['bcc'] ?? [];
             if (empty($toEmails)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No valid recipients specified'
+                    'message' => 'No valid recipients specified',
                 ], 400);
             }
-            $fromEmail = $request->from;
+
+            $fromEmail = $validated['from'];
             $fromName = $this->getSenderName($sender, $fromEmail);
-            // Parse addresses for storage
-            $parsedTo = $this->parseEmailListForStorage($toEmails);
-            $parsedCc = $this->parseEmailListForStorage($ccEmails);
-            $parsedBcc = $this->parseEmailListForStorage($bccEmails);
-            // Handle attachments
-            $attachments = null;
-            $storedAttachments = [];
-            if ($request->hasFile('attachments')) {
-                $attachmentsDir = 'attachments/outgoing/' . uniqid();
-                foreach ($request->file('attachments') as $file) {
-                    $originalName = $file->getClientOriginalName();
-                    $storageName = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
-                    $storagePath = $attachmentsDir . '/' . $storageName;
-                    if (Storage::put($storagePath, file_get_contents($file->getRealPath()))) {
-                        $mimeType = $file->getMimeType();
-                        $storedAttachments[] = [
-                            'original_name' => $originalName,
-                            'storage_name' => $storageName,
-                            'storage_path' => $storagePath,
-                            'size' => $file->getSize(),
-                            'mime_type' => $mimeType,
-                        ];
-                    }
+            $toWithNames = $this->getRecipientsWithNames($toEmails);
+            $ccWithNames = $this->getRecipientsWithNames($ccEmails, 'cc');
+            $bccWithNames = $this->getRecipientsWithNames($bccEmails, 'bcc');
+
+            // Handle thread, message ID, and references
+            $threadFromRequest = $request->input('thread_id');
+            $inReplyToRequest = $request->input('in_reply_to');
+            $referencesRequest = $request->input('references'); // could be string or JSON
+
+            // Create a message-id for this outgoing email
+            $appDomain = parse_url(config('app.url'), PHP_URL_HOST) ?: (explode('@', $fromEmail)[1] ?? 'localhost');
+            // Generate a clean UUID for message ID (no domain)
+            $messageId = (string) Str::uuid() . '@' . (parse_url(config('app.url'), PHP_URL_HOST) ?? 'localhost');
+
+            // --- choose thread id ---
+            // --- choose thread id ---
+            if (!empty($threadFromRequest)) {
+                $threadId = $threadFromRequest;
+            } elseif (!empty($inReplyToRequest)) {
+                // Normalize the in_reply_to to match your database format
+                $normalizedInReplyTo = $this->normalizeMsgId(trim($inReplyToRequest));
+                $parent = Email::where('message_id', $normalizedInReplyTo)->first();
+
+                if ($parent) {
+                    $threadId = $parent->thread_id;
+                    Log::info('Found parent email for threading', [
+                        'parent_id' => $parent->id,
+                        'parent_message_id' => $parent->message_id,
+                        'thread_id' => $threadId
+                    ]);
+                } else {
+                    // If parent not found, use the in_reply_to as thread ID
+                    $threadId = $normalizedInReplyTo;
+                    Log::warning('Parent email not found for in_reply_to, using it as thread ID', [
+                        'in_reply_to' => $normalizedInReplyTo
+                    ]);
                 }
-                $attachments = $storedAttachments;
+            } else {
+                // New email → use this message-id as thread id
+                $threadId = $this->normalizeMsgId($messageId);
             }
-            // Store email in database as outgoing
+
+            // Build references header
+            $references = '';
+            if (!empty($referencesRequest)) {
+                $references = is_array($referencesRequest) ? implode(' ', $referencesRequest) : $referencesRequest;
+            }
+
+            if (!empty($inReplyToRequest)) {
+                $normalizedInReplyTo = $this->normalizeMsgId(trim($inReplyToRequest));
+                $references = trim(($references ? $references . ' ' : '') . $normalizedInReplyTo);
+
+                // Also ensure the parent's references are included
+                $parent = Email::where('message_id', $normalizedInReplyTo)->first();
+                if ($parent && !empty($parent->references)) {
+                    $parentRefs = $parent->references;
+                    $references = trim("{$parentRefs} {$references}");
+                }
+            }
+
+            // Handle reply: Fetch original email and concatenate with new content
+            $emailContent = $validated['email_content'];
+            $textContent = strip_tags($emailContent);
+            $subject = $validated['subject'];
+
+            if (!empty($inReplyToRequest)) {
+                $originalEmail = Email::where('message_id', $inReplyToRequest)->first();
+                if ($originalEmail) {
+                    // Get the original email's body (prefer HTML if available, fallback to text)
+                    $originalBody = $originalEmail->body_html ?: $originalEmail->body_text;
+                    $originalFrom = $originalEmail->from_name ?: $originalEmail->from_email;
+                    $originalDate = $originalEmail->message_date->format('D, M d, Y \a\t H:i:s');
+
+                    // Format the original email as a quoted reply
+                    $quotedBody = "<br><br><div style='border-left: 2px solid #ccc; padding-left: 10px;'>";
+                    $quotedBody .= "<p>From: {$originalFrom}<br>";
+                    $quotedBody .= "Sent: {$originalDate}<br>";
+                    $quotedBody .= "Subject: {$originalEmail->subject}</p>";
+                    $quotedBody .= $originalBody;
+                    $quotedBody .= "</div>";
+
+                    // Concatenate new content with quoted original content
+                    $emailContent = $emailContent . $quotedBody;
+
+                    // Text version for AltBody
+                    $textQuotedBody = "\n\n> From: {$originalFrom}\n> Sent: {$originalDate}\n> Subject: {$originalEmail->subject}\n\n";
+                    $textQuotedBody .= strip_tags($originalBody);
+                    $textContent = strip_tags($emailContent) . $textQuotedBody;
+
+                    // Add "Re:" prefix to subject if not already present
+                    if (!str_starts_with(strtolower($subject), 're:')) {
+                        $subject = 'Re: ' . $subject;
+                    }
+                } else {
+                    // Log if original email not found
+                    Log::warning('Original email not found for in_reply_to', [
+                        'in_reply_to' => $inReplyToRequest,
+                    ]);
+                }
+            }
+            // Handle forward
+            $forwardIdRequest = $request->input('forward_id');
+            if (!empty($forwardIdRequest)) {
+                $originalEmail = Email::where('message_id', $forwardIdRequest)->first();
+                if ($originalEmail) {
+                    $originalBody = $originalEmail->body_html ?: $originalEmail->body_text;
+                    $originalFrom = $originalEmail->from_name ?: $originalEmail->from_email;
+                    $originalDate = $originalEmail->message_date->format('D, M d, Y \a\t H:i:s');
+
+                    // Build forwarded section in HTML
+                    $quotedBody = "<br><br><div style='border-left: 2px solid #ccc; padding-left: 10px;'>";
+                    $quotedBody .= "<p>----- Forwarded Message -----<br>";
+                    $quotedBody .= "From: {$originalFrom}<br>";
+                    $quotedBody .= "Sent: {$originalDate}<br>";
+                    $quotedBody .= "To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "<br>";
+                    $quotedBody .= "Subject: {$originalEmail->subject}</p>";
+                    $quotedBody .= $originalBody;
+                    $quotedBody .= "</div>";
+
+                    // Concatenate new content with quoted original content
+                    $emailContent = $emailContent . $quotedBody;
+
+                    // Text version for AltBody
+                    $textQuotedBody = "\n\n----- Forwarded Message -----\n";
+                    $textQuotedBody .= "> From: {$originalFrom}\n> Sent: {$originalDate}\n> To: " . implode(', ', array_column($originalEmail->to ?? [], 'email')) . "\n> Subject: {$originalEmail->subject}\n\n";
+                    $textQuotedBody .= strip_tags($originalBody);
+                    $textContent = strip_tags($emailContent) . $textQuotedBody;
+
+                    // Add "Fwd:" prefix if missing
+                    if (!str_starts_with(strtolower($subject), 'fwd:')) {
+                        $subject = 'Fwd: ' . $subject;
+                    }
+                } else {
+                    Log::warning('Original email not found for forward_id', [
+                        'forward_id' => $forwardIdRequest,
+                    ]);
+                }
+
+            }
+
+            // Store email record
             $email = Email::create([
                 'pseudo_record_id' => $sender->id,
-                'thread_id' => md5($validated['subject'] . $fromEmail . time()),
-                'message_id' => null,
+                'thread_id' => $threadId,
+                'message_id' => $messageId,
+                'in_reply_to' => $inReplyToRequest,
+                'references' => $references,
                 'from_email' => $fromEmail,
                 'from_name' => $fromName,
-                'to' => $parsedTo,
-                'cc' => $parsedCc,
-                'bcc' => $parsedBcc,
-                'subject' => $validated['subject'],
-                'body_html' => $validated['email_content'],
-                'body_text' => strip_tags($validated['email_content']),
-                'imap_uid' => null,
+                'to' => $toWithNames,
+                'cc' => $ccWithNames,
+                'bcc' => $bccWithNames,
+                'subject' => $subject,
+                'body_html' => $emailContent,
+                'body_text' => $textContent,
                 'imap_folder' => 'Sent',
                 'type' => 'outgoing',
                 'folder' => 'sent',
                 'is_read' => true,
                 'message_date' => now(),
-                'received_at' => now(),
+                'sent_at' => null, // Set after successful send
             ]);
-            // Store attachments if any
-            if (!empty($storedAttachments)) {
-                foreach ($storedAttachments as $att) {
-                    EmailAttachment::create([
+            $email->update(['send_status' => 'pending']);
+
+            // Store attachments based on size
+            $storedAttachments = [];
+
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $mimeType = $file->getMimeType();
+                    $size = $file->getSize();
+                    $extension = $file->getClientOriginalExtension() ?: $this->getExtensionFromMimeType($mimeType);
+
+                    // Calculate size in MB
+                    $sizeInMb = $size / (1024 * 1024);
+
+                    $attachmentAttributes = [
                         'email_id' => $email->id,
-                        'original_name' => $att['original_name'],
-                        'storage_name' => $att['storage_name'],
-                        'size' => $att['size'],
-                        'storage_path' => $att['storage_path'],
-                        'mime_type' => $att['mime_type'],
+                        'original_name' => $originalName,
+                        'mime_type' => $mimeType,
+                        'size' => $size,
+                        'extension' => $extension,
+                    ];
+
+                    if ($sizeInMb > 2) {
+                        // Store as file if > 2MB
+                        $storageName = 'attachments/' . uniqid('email_' . $email->id . '_') . '.' . $extension;
+                        try {
+                            Storage::disk('public')->put($storageName, file_get_contents($file->getRealPath()));
+                            $attachmentAttributes['storage_name'] = $storageName;
+                            $attachmentAttributes['storage_path'] = Storage::disk('public')->path($storageName);
+                            $storedAttachments[] = $attachmentAttributes + ['content' => file_get_contents($file->getRealPath())];
+                            Log::info("Stored attachment {$originalName} as file: {$storageName}");
+                        } catch (\Exception $e) {
+                            Log::error('Failed to store attachment as file', [
+                                'email_id' => $email->id,
+                                'original_name' => $originalName,
+                                'error' => $e->getMessage(),
+                            ]);
+                            continue;
+                        }
+                    } else {
+                        // Store as base64 in database if ≤ 2MB
+                        $attachmentAttributes['base64_content'] = base64_encode(file_get_contents($file->getRealPath()));
+                        $storedAttachments[] = $attachmentAttributes + ['content' => file_get_contents($file->getRealPath())];
+                        Log::info("Stored attachment {$originalName} as base64 in database");
+                    }
+                    // Store attachment record in DB
+                    try {
+                        EmailAttachment::create($attachmentAttributes);
+                        Log::info("Attachment {$originalName} saved successfully for email #{$email->id}");
+                    } catch (\Exception $e) {
+                        Log::error('Failed to save attachment to database', [
+                            'email_id' => $email->id,
+                            'original_name' => $originalName,
+                            'error' => $e->getMessage(),
+                        ]);
+                        continue;
+                    }
+                }
+            }
+
+
+            // Wrap URLs for tracking
+            $content = $this->wrapUrlsForTracking($emailContent, $email->id);
+            $textContent = strip_tags($content);
+
+            // Update email body in DB
+            $email->update(['body_html' => $content, 'body_text' => $textContent]);
+
+            // PHPMailer setup
+            $mailer = new PHPMailer(true);
+            $mailer->isSMTP();
+            $mailer->Host = $sender->server_host;
+            $mailer->Port = 465;
+            $mailer->SMTPSecure = 'ssl';
+            $mailer->SMTPAuth = true;
+            $mailer->Username = $sender->server_username ?? $sender->pseudo_email;
+            $mailer->Password = $sender->server_password;
+
+            $mailer->setFrom($fromEmail, $fromName);
+            $mailer->Subject = $subject;
+            $mailer->isHTML(true);
+
+            $mailer->addCustomHeader('Message-ID', "<{$messageId}>");
+            if (!empty($inReplyToRequest)) {
+                $mailer->addCustomHeader('In-Reply-To', "<{$inReplyToRequest}>");
+            }
+            if (!empty($references)) {
+                // normalize space-separated list, wrap each in <>
+                $refList = collect(explode(' ', $references))
+                    ->filter()
+                    ->map(fn($r) => '<' . trim($r, '<> ') . '>')
+                    ->implode(' ');
+                $mailer->addCustomHeader('References', $refList);
+            }
+
+            // Add tracking pixel to the mail body
+            $trackingPixel = '<img src="' . route('emails.track.open', ['id' => $email->id]) . '" width="1" height="1" alt="" />';
+            $mailer->Body = $content . $trackingPixel;
+            $mailer->AltBody = $textContent;
+            // Add recipients
+            foreach ($toWithNames as $r) {
+                $mailer->addAddress($r['email'], $r['name'] ?? '');
+            }
+
+            foreach ($ccWithNames as $r) {
+                $mailer->addCC($r['email'], $r['name'] ?? '');
+            }
+            foreach ($bccWithNames as $r) {
+                $mailer->addBCC($r['email'], $r['name'] ?? '');
+            }
+
+            // Add attachments
+            foreach ($storedAttachments as $attachment) {
+                if (isset($attachment['storage_path']) && Storage::disk('public')->exists($attachment['storage_name'])) {
+                    // File-based attachment
+                    $mailer->addAttachment(
+                        $attachment['storage_path'],
+                        $attachment['original_name'],
+                        'binary',
+                        $attachment['mime_type']
+                    );
+                } elseif (isset($attachment['base64_content'])) {
+                    // Base64 attachment
+                    $mailer->addStringAttachment(
+                        base64_decode($attachment['base64_content']),
+                        $attachment['original_name'],
+                        'binary',
+                        $attachment['mime_type']
+                    );
+                } else {
+                    Log::warning('Attachment data not found', [
+                        'email_id' => $email->id,
+                        'original_name' => $attachment['original_name'],
                     ]);
                 }
             }
-            // Send the email using PHPMailer with SMTP credentials
-            $this->sendMail(
-                $validated,
-                $toEmails,
-                $fromEmail,
-                $fromName,
-                $ccEmails,
-                $bccEmails,
-                $attachments,
-                $sender
-            );
-            Log::info('Email sent and stored successfully', [
+            // Send email
+            $mailer->send();
+
+            // Mark sent_at and update DB
+            $email->update([
+                'sent_at' => now(),
+                'send_status' => 'sent',
+                'error_message' => null,
+                'last_attempt_at' => now(),
+            ]);
+
+            Log::info('Email sent successfully', [
                 'email_id' => $email->id,
                 'from' => $fromEmail,
                 'to' => $toEmails,
+                'subject' => $subject,
             ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Email sent successfully',
                 'email_id' => $email->id,
             ]);
         } catch (ValidationException $e) {
-            throw $e;
-        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
             Log::error('Email sending failed', [
                 'error' => $e->getMessage(),
-                'from' => $request->from ?? null,
-                'to' => $request->to ?? null,
+                'from' => $validated['from'] ?? null,
+                'to' => $validated['to'] ?? null,
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
+
+            // 🔴 Update failed email record if it exists
+            if (isset($email) && $email instanceof \App\Models\Email) {
+                $email->update([
+                    'send_status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                    'last_attempt_at' => now(),
+                    'retry_count' => $email->retry_count + 1,
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send email. Please try again.'
+                'message' => 'Failed to send email. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+    }
+
+    public function retryEmail($id): JsonResponse
+    {
+        $email = Email::findOrFail($id);
+
+        // Reset status before retrying
+        $email->update([
+            'send_status' => 'pending',
+            'error_message' => null,
+            'last_attempt_at' => now(),
+        ]);
+
+        try {
+            // Prepare request for sendEmail()
+            $request = new Request([
+                'subject' => $email->subject,
+                'email_content' => $email->body_html ?? $email->body_text,
+                'to' => collect($email->to)->pluck('email')->toArray(),
+                'cc' => collect($email->cc)->pluck('email')->toArray(),
+                'bcc' => collect($email->bcc)->pluck('email')->toArray(),
+                'from' => $email->from_email,
+            ]);
+
+            // Call sendEmail() and capture JsonResponse
+            $response = $this->sendEmail($request);
+
+            // Extract data and status from JsonResponse
+            $data = $response->getData(true);
+            $status = $response->getStatusCode();
+
+            // Check for success or error
+            if ($status >= 200 && $status < 300 && !empty($data['success'])) {
+                $email->update([
+                    'send_status' => 'sent',
+                    'retry_count' => $email->retry_count + 1,
+                    'sent_at' => now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Email resent successfully.',
+                ]);
+            } else {
+                // Update as failed if sendEmail() returned an error
+                $email->update([
+                    'send_status' => 'failed',
+                    'error_message' => $data['error'] ?? 'Unknown error',
+                    'retry_count' => $email->retry_count + 1,
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Retry failed: ' . ($data['error'] ?? 'Unknown error'),
+                ], 500);
+            }
+
+        } catch (Exception $e) {
+            Log::error('Email retry failed', [
+                'email_id' => $email->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $email->update([
+                'send_status' => 'failed',
+                'error_message' => $e->getMessage(),
+                'retry_count' => $email->retry_count + 1,
+                'last_attempt_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Retry failed: ' . $e->getMessage(),
             ], 500);
         }
     }
 
-    private function sendMail(
-        array            $validated,
-        array            $toEmails,
-        string           $fromEmail,
-        string           $fromName,
-        array            $ccEmails,
-        array            $bccEmails,
-        ?array           $attachments = null,
-        UserPseudoRecord $sender
-    ): void
-    {
-        // Look for SMTP-specific credentials if available
-        $smtpRecord = $sender->imap_type === 'smtp'
-            ? $sender
-            : UserPseudoRecord::where('pseudo_email', $sender->pseudo_email)
-                ->where('imap_type', 'smtp')
-                ->first();
-        $smtpCredentials = $smtpRecord ?? $sender;
-        // Validate SMTP credentials
-        if (empty($smtpCredentials->server_host) || empty($smtpCredentials->server_password)) {
-            throw new Exception('Missing SMTP host or password');
-        }
-        // Initialize PHPMailer
-        $mailer = new PHPMailer(true);
-        try {
-            // Server settings
-            $mailer->isSMTP();
-            $mailer->Host = $smtpCredentials->server_host;
-            $mailer->Port = 465;
-            $mailer->SMTPSecure = 'ssl';
-            $mailer->SMTPAuth = true;
-            $mailer->Username = $smtpCredentials->server_username ?? $smtpCredentials->pseudo_email;
-            $mailer->Password = $smtpCredentials->server_password;
-            // Sender and recipients
-            $mailer->setFrom($fromEmail, $fromName);
-            $mailer->addReplyTo($fromEmail, $fromName);
-            $mailer->addCustomHeader('Return-Path', $fromEmail);
-            foreach ($toEmails as $toEmail) {
-                $mailer->addAddress($toEmail);
-            }
-            foreach ($ccEmails as $ccEmail) {
-                $mailer->addCC($ccEmail);
-            }
-            foreach ($bccEmails as $bccEmail) {
-                $mailer->addBCC($bccEmail);
-            }
-            // Attachments
-            if ($attachments) {
-                foreach ($attachments as $attachment) {
-                    $mailer->addAttachment(
-                        Storage::path($attachment['storage_path']),
-                        $attachment['original_name'],
-                        'base64',
-                        $attachment['mime_type']
-                    );
-                }
-            }
-            // Content
-            $mailer->isHTML(true);
-            $mailer->Subject = $validated['subject'];
-            $mailer->Body = $validated['email_content'];
-            $mailer->AltBody = strip_tags($validated['email_content']);
-            // Send the email
-            $mailer->send();
 
-        } catch (Exception $e) {
-            throw new Exception('PHPMailer error: ' . $mailer->ErrorInfo);
-        }
+    /**
+     * Fetch Recipients names for email addresses
+     */
+    private function getRecipientsWithNames(array $emails, string $type = 'to'): array
+    {
+        return array_map(function ($email) use ($type) {
+            $model = $type == 'to'
+                ? CustomerContact::where('email', $email)->whereNotNull('name')->first() ?? UserPseudoRecord::where('pseudo_email', $email)->whereNotNull('pseudo_name')->first()
+                : UserPseudoRecord::where('pseudo_email', $email)->whereNotNull('pseudo_name')->first() ?? CustomerContact::where('email', $email)->whereNotNull('name')->first();
+            return ['email' => $email, 'name' => $model instanceof UserPseudoRecord ? $model->pseudo_name : $model?->name];
+        }, $emails);
     }
+
+    protected function wrapUrlsForTracking(string $content, ?int $emailId): string
+    {
+        if (!$emailId) {
+            return $content;
+        }
+
+        $pattern = '/(https?:\/\/[^\s<]+)/i';
+        $content = preg_replace_callback($pattern, function ($matches) {
+            $url = $matches[1];
+            return "<a href=\"{$url}\">{$url}</a>";
+        }, $content);
+
+        // Load HTML safely
+        $doc = new \DOMDocument();
+        @$doc->loadHTML(
+            mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'),
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+
+        // Process links
+        $links = $doc->getElementsByTagName('a');
+        foreach ($links as $link) {
+            if ($link->hasAttribute('href')) {
+                $originalUrl = $link->getAttribute('href');
+
+                if (!preg_match('/^https?:\/\//i', $originalUrl)) {
+                    continue;
+                }
+
+                if (strpos($originalUrl, route('emails.track.click', ['id' => $emailId])) === 0) {
+                    continue;
+                }
+
+                $encoded = urlencode(base64_encode($originalUrl));
+                $trackingUrl = route('emails.track.click', ['id' => $emailId]) . '?url=' . $encoded;
+
+                $link->setAttribute('href', $trackingUrl);
+                $link->setAttribute('target', '_blank');
+                $link->setAttribute('rel', 'noopener noreferrer');
+            }
+        }
+
+        return $doc->saveHTML() ?: $content;
+    }
+
 
     private function parseEmailListForStorage(array $emails): ?array
     {
@@ -386,15 +663,9 @@ class EmailController extends Controller
 
     private function findSender(string $email): ?object
     {
-        return Admin::where('email', $email)
-            ->orWhere('pseudo_email', $email)
-            ->first()
-            ?? User::where('email', $email)
-            ->orWhere('pseudo_email', $email)
-            ->first()
-            ?? UserPseudoRecord::where('pseudo_email', $email)
-                ->where('imap_type', 'imap')
-                ->first();
+        return UserPseudoRecord::where('pseudo_email', $email)
+            ->where('imap_type', 'imap')
+            ->first();
     }
 
     private function getSenderName($sender, string $defaultEmail): string
@@ -402,12 +673,40 @@ class EmailController extends Controller
         return $sender->pseudo_name ?? explode('@', $defaultEmail)[0];
     }
 
-    private function parseEmailList(?string $emails): array
+    public function download($id)
     {
-        if (empty($emails)) {
-            return [];
+        try {
+            $attachment = EmailAttachment::findOrFail($id);
+
+            // Check if attachment is stored as a file
+            if ($attachment->storage_path && Storage::disk('public')->exists($attachment->storage_name)) {
+                return Storage::disk('public')->download(
+                    $attachment->storage_name,
+                    $attachment->original_name,
+                    ['Content-Type' => $attachment->mime_type]
+                );
+            }
+
+            // Check if attachment is stored as base64
+            if ($attachment->base64_content) {
+                $decoded = base64_decode($attachment->base64_content);
+                if ($decoded === false) {
+                    return response()->json(['error' => 'Failed to decode attachment data'], 500);
+                }
+
+                return Response::make($decoded, 200, [
+                    'Content-Type' => $attachment->mime_type ?? 'application/octet-stream',
+                    'Content-Disposition' => 'attachment; filename="' . ($attachment->original_name ?? 'attachment.' . $attachment->extension) . '"',
+                ]);
+            }
+
+            return response()->json(['error' => 'Attachment data not found'], 404);
+        } catch (\Exception $e) {
+            \Log::error('Attachment Download Error', [
+                'attachment_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['error' => 'Failed to download attachment'], 500);
         }
-        $parsed = json_decode($emails, true);
-        return is_array($parsed) ? array_filter($parsed) : [];
     }
 }

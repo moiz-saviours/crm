@@ -56,13 +56,13 @@
 
         .email-child-wrapper {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             gap: 12px;
             background-color: #fff;
         }
 
         .email-child-wrapper input, .email-child-wrapper tags.tagify {
-            width: 500px;
+            width: 90%;
             border: none;
         }
 
@@ -951,19 +951,31 @@
         }
 
         .main-content-email-box {
-            max-width: 720px;
+            max-width: 100%;
         }
 
         .rich-email-editor {
             min-height: 100px;
-            max-height: 400px;
+            max-height: 280px;
             overflow: auto;
-            border: none !important;
+            border: none;
             padding: 5px 10px;
         }
 
         .rich-email-editor.ql-container.ql-snow .ql-editor::before {
             padding: 0px 10px;
+        }
+
+        .ql-container.ql-snow {
+            border: none;
+        }
+        .ql-editor.ql-blank {
+            min-height: 100px;
+        }
+        .quoted-history-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            margin-left: 25px;
         }
 
         .email-minimized .email-template-body,
@@ -975,7 +987,45 @@
         .email-minimized .email-divider {
             display: none;
         }
+.quoted-history-container {
+    position: relative;
+    margin-top: 10px;
+}
+.quoted-history-container img {
+    max-width: 300px !important;
+}
+        .show-quoted-btn {
+            background: #f0f0f0; /* light highlight */
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 11px; /* bigger size */
+            font-weight: bold;
+            cursor: pointer;
+            color: #333;
+            padding: 5px 15px;
+            margin-bottom: 5px;
+            transition: all 0.2s ease-in-out;
 
+            position: absolute;
+            left: 0;
+            top: 0;
+            line-height: 1;
+
+            transform: translateY(-100%); /* move it just above the quoted box */
+            z-index: 2;
+            display: none;
+        }
+        .quoted-history {
+            padding-right:20px !important ;
+            text-align: left !important;
+        }
+        button.show-quoted-btn.btn.btn-sm.btn-outline-secondary {
+            padding: 6px 18px;
+            margin: 8px 30px;
+        }
+        .card_sec .card {
+            box-shadow: none !important
+        }
 
     </style>
 @endpush
@@ -993,7 +1043,7 @@
                         <i class="fa fa-times close-btn" aria-hidden="true" style="cursor:pointer;"></i>
                     </div>
                 </div>
-                <div class="email-child-wrapper" style="  padding: 10px 20px;">
+                <div class="email-child-wrapper" style="display:none;padding: 10px 20px;">
                     <p class="email-titles-hide">Templates</p>
                     <p class="email-titles-show">Sequence <span><i class="fa fa-lock icon-display-email-box"
                                                                    aria-hidden="true"></i></span></p>
@@ -1048,8 +1098,7 @@
                 <div class="email-template-body">
                     <div class="email-child-wrapper" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> To </p>
-                        {{--                        <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
-                        {{--                                class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
+
                         <input
                             class="email-sender-name"
                             id="toFieldInput"
@@ -1062,8 +1111,7 @@
                     </div>
                     <div class="email-child-wrapper d-none" id="ccField" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Cc </p>
-                        {{--                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
-                        {{--                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
+
                         <input
                             class="email-sender-name" id="ccFieldInput"
                             type="email"
@@ -1074,8 +1122,7 @@
                     </div>
                     <div class="email-child-wrapper d-none" id="bccField" style="  padding: 5px 20px;">
                         <p class="email-sending-titles"> Bcc </p>
-                        {{--                    <p class="email-sender-name">{{$customer_contact->name ?? "---"}} <span--}}
-                        {{--                            class="email-sender-emailid">({{$customer_contact->email ?? "---"}})</span></p>--}}
+
                         <input
                             class="email-sender-name" id="bccFieldInput"
                             name="bcc"
@@ -1086,42 +1133,29 @@
                     <div class="email-sending-box">
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles">From</p>
-                            <p class="email-sender-name" style="min-width: 550px;">
-                                <select name="from_email" id="from_email" class="form-select form-control"
-                                        style="width: auto; display: inline-block;border:none;">
-                                    @foreach($pseudo_emails as $item)
-                                        <option value="{{ $item['email'] }}"
-                                                data-name="{{ $item['name'] }}"
-                                                data-company="{{ $item['company'] }}"
-                                            {{ $loop->first ? 'selected' : '' }}>
-                                            {{ $item['name'] }} ({{ $item['email'] }})
-                                        </option>
-                                    @endforeach
-                                </select>
+                            <p class="email-sender-name" style="min-width: 520px;">
+                                @if($pseudo_emails->isNotEmpty())
+                                    <select name="from_email" class="form-select form-control from_email"
+                                            style="width: auto; display: inline-block; border: none;">
+                                        @foreach($pseudo_emails as $item)
+                                            <option value="{{ $item['email'] }}"
+                                                    data-name="{{ $item['name'] }}"
+                                                    data-company="{{ $item['company'] }}"
+                                                {{ $loop->first ? 'selected' : '' }}>
+                                                {{ $item['name'] }} ({{ $item['email'] }})
+                                            </option>
+                                        @endforeach
+                                    </select>
 
-                                <span id="from_company">
+                                    <span id="from_company">
                                         from {{ $pseudo_emails->first()['company'] ?? 'Unknown' }}
-                                </span>
+                                    </span>
+                                @else
+                                    <span class="text-muted fst-italic">No sender email available</span>
+                                @endif
                             </p>
-                            {{--                            <p class="email-sender-name" style="min-width: 550px;">--}}
-                            {{--                                {{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}--}}
-                            {{--                                @php--}}
-                            {{--                                    $email = auth()->user()->pseudo_email ?? env('MAIL_USERNAME');--}}
-                            {{--                                    $domain = $email ? substr(strrchr($email, "@"), 1) : '';--}}
-                            {{--                                    $brand = $email ? App\Models\Brand::where('url', 'like', '%'.$domain.'%')->first() : null;--}}
-                            {{--                                    $company = $brand?->name ?: $domain;--}}
-                            {{--                                @endphp--}}
 
-                            {{--                                @if($company)--}}
-                            {{--                                    from {{ $company }}--}}
-                            {{--                                @endif--}}
-                            {{--                                <span class="email-sender-emailid {{ $domain ? 'has-domain' : '' }}">--}}
-                            {{--            ( {{ $email }} )--}}
-                            {{--        </span>--}}
-                            {{--                            </p>--}}
-                            {{--                            <input type="hidden" name="from_email" value="{{ $email }}">--}}
-                            {{--                            <input type="hidden" name="from_name"--}}
-                            {{--                                   value="{{ auth()->user()->pseudo_name ?? 'Unknown Sender' }}">--}}
+
                         </div>
                         <div class="email-child-wrapper">
                             <p class="email-sending-titles" onclick="toggleCcField(this)" style="padding:0 5px;">Cc</p>
@@ -1139,18 +1173,63 @@
                     </div>
                     <div class="email-divider"></div>
                     <div class="main-content-email-box">
-                        <div class="rich-email-editor" data-placeholder="Write your message..."></div>
+                        <!-- Editable body -->
+                        <div class="rich-email-editor"
+                             data-placeholder="Write your message...">
+                        </div>
+
+                        <!-- Quoted history (non-editable) -->
+                        <div class="quoted-history-container">
+                            <button class="show-quoted-btn btn btn-sm btn-outline-secondary " type="button" title="Show quoted">
+                                ...
+                            </button>
+
+                            <div class="quoted-history-wrapper">
+                                <div class="quoted-history"
+                                    style="display: none;border-left: 0px solid rgb(204, 204, 204);padding-left: 0px;padding-top: 15px;font-size: 13px;color: rgb(85, 85, 85);">
+                                    <!-- quoted content goes here -->
+                                    Previous email reply or forwarded message content...
+                                </div>
+                            </div>
+                        </div>
+
                         <input type="hidden" name="email_content" id="emailContent">
 
-                        {{--                        <textarea rows="3" class="rich-email-editor"--}}
-                        {{--                                  data-placeholder="Type your email here..."></textarea>--}}
+                        <!-- inside .main-content-email-box, next to #emailContent -->
+                        <input type="hidden" name="email_content" id="emailContent">
+                        <input type="hidden" name="thread_id" id="thread_id">
+                        <input type="hidden" name="in_reply_to" id="in_reply_to">
+                        <input type="hidden" name="references" id="references">
+
+                        <input type="hidden" name="is_forward" id="is_forward">
+                        <input type="hidden" name="forward_id" id="forward_id">
+
+
+                    </div>
+
+                </div>
+
+                <div class="email-footer-div">
+                    <!-- Buttons -->
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="email-footer-btn" id="sendEmailBtn">Send</button>
+                        <button class="email-footer-btn close-btn">Cancel</button>
+                        <input type="file" id="emailAttachment" name="attachments[]" multiple hidden>
+                        <label for="emailAttachment" style="cursor: pointer; display: inline-flex; align-items: center;">
+                            <i class="fa fa-paperclip fa-lg"></i>
+                        </label>
+                    </div>
+                    <!-- Attachment input and icon -->
+                    <div class="d-flex align-items-center mt-2">
+                        <!-- Attachment preview -->
+                        <div id="attachmentPreview" class="row mt-2 w-100"></div>
                     </div>
                 </div>
 
-                <div class="email-footer-div ">
-                    <button class="email-footer-btn" id="sendEmailBtn">Send</button>
-                    <button class="email-footer-btn close-btn gap-2">Cancel</button>
-                </div>
+
+
+
+
             </div>
 
         </div>
@@ -1159,7 +1238,7 @@
 @push('script')
     <script>
         $(function () {
-            $("#from_email").on("change", function () {
+            $(".from_email").on("change", function () {
                 let selected = $(this).find(":selected");
 
                 $("#from_name").val(selected.data("name"));
@@ -1182,9 +1261,12 @@
         }
         document.addEventListener('DOMContentLoaded', () => {
             const suggestions = [
-                {value: "john@example.com", name: "John Doe"},
-                {value: "jane@example.com", name: "Jane Smith"},
-                {value: "support@company.com", name: "Support"}
+                    @foreach($pseudo_emails as $item)
+                {
+                    value: "{{ $item['email'] }}",
+                    name: "{{ $item['name'] }}",
+                }{{ !$loop->last ? ',' : '' }}
+                    @endforeach
             ];
 
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1254,77 +1336,128 @@
 
                 const quill = window.quillInstances['editor_0'];
                 const emailContent = document.getElementById('emailContent');
+
                 if (quill) {
                     emailContent.value = quill.root.innerHTML;
                 }
 
-                const formData = new FormData();
+                // validation
+                const subjectEl = document.getElementById('emailSubject');
+                const fromEl = document.querySelector('[name="from_email"]');
+                const toEl = document.querySelector('[name="to"]');
+                const attachmentInputs = document.querySelectorAll('input[name="attachments[]"]');
+                const attachmentInput = document.getElementById('emailAttachment');
+                const attachmentPreview = document.getElementById('attachmentPreview');
 
+                let totalAttachmentSize = 0;
+                let valid = true;
+
+                // Form validation
+                if (!fromEl || !fromEl.value.trim()) {
+                    toastr.error("From email is required.");
+                    valid = false;
+                }
+
+                // To validation
+                if (!toEl.value.trim() || JSON.parse(toEl.value).length === 0) {
+                    toastr.error("At least one recipient (To) is required.");
+                    valid = false;
+                }
+
+                // Subject validation
+                if (!subjectEl.value.trim()) {
+                    toastr.error("Subject is required.");
+                    valid = false;
+                }
+
+                // Check total email content size including base64 images
+                const totalSize = new Blob([emailContent.value]).size;
+                if (totalSize > 1048576) {
+                    toastr.error("Total email content including images should not exceed 1 MB.");
+                    valid = false;
+                }
+
+                attachmentInputs.forEach(input => {
+                    if (input.files && input.files.length > 0) {
+                        Array.from(input.files).forEach(file => {
+                            totalAttachmentSize += file.size;
+                        });
+                    }
+                });
+
+                if (totalAttachmentSize > 10 * 1024 * 1024) { 
+                    toastr.error("Total attachment size must not exceed 10 MB.");
+                    valid = false;
+                }
+
+
+                // Stop if required fields invalid
+                if (!valid) {
+                    return;
+                }
+                //validation end
+
+                const formData = new FormData();
                 formData.append('email_content', emailContent.value);
+
                 formData.append('subject', document.getElementById('emailSubject').value);
 
-                const toTagify = document.querySelector('[name="to"]');
-                const ccTagify = document.querySelector('[name="cc"]');
-                const bccTagify = document.querySelector('[name="bcc"]');
+                const fields = ['to', 'cc', 'bcc'].map(n => document.querySelector(`[name="${n}"]`));
+                const extract = f => f && f.value.trim() ? JSON.parse(f.value).map(i => i.value) : [];
 
-                function extractEmails(tagifyField) {
-                    try {
-                        return JSON.parse(tagifyField.value).map(item => item.value);
-                    } catch (e) {
-                        return [];
+                fields.forEach((f, i) => extract(f).forEach(email =>
+                    formData.append(`${['to', 'cc', 'bcc'][i]}[]`, email)
+                ));
+
+                if (attachmentInput && attachmentInput.files.length > 0) {
+                    for (const file of attachmentInput.files) {
+                        formData.append('attachments[]', file);
                     }
                 }
 
-                const toEmails = extractEmails(toTagify);
-                const ccEmails = ccTagify ? extractEmails(ccTagify) : [];
-                const bccEmails = bccTagify ? extractEmails(bccTagify) : [];
-
-                formData.append('to', JSON.stringify(toEmails));
-                if (ccEmails.length) {
-                    formData.append('cc', JSON.stringify(ccEmails));
-                }
-                if (bccEmails.length) {
-                    formData.append('bcc', JSON.stringify(bccEmails));
-                }
                 formData.append('from', document.querySelector('[name="from_email"]').value);
                 formData.append('customer_id', "{{ $customer_contact->id ?? '' }}");
+                formData.append('thread_id', document.getElementById('thread_id').value || '');
+                formData.append('in_reply_to', document.getElementById('in_reply_to').value || '');
+                formData.append('references', document.getElementById('references').value || '');
 
-                {{--AjaxRequestPromise(`{{ route("admin.send.email") }}`, formData, 'POST', {useToastr: true})--}}
-                {{--    .then(response => {--}}
-                {{--        if (data.success) {--}}
-                {{--            console.log('Email sent successfully!');--}}
-                {{--            document.querySelector('.email-template').classList.remove('open');--}}
-                {{--        } else {--}}
-                {{--            console.log('Error sending email: ' + (data.message || 'Unknown error'));--}}
-                {{--        }--}}
-                {{--    })--}}
-                {{--    .catch(error => console.error('Error:', error));--}}
-                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: false})
+                formData.append('is_forward', document.getElementById('is_forward').value || '');
+                formData.append('forward_id', document.getElementById('forward_id').value || '');
+
+                AjaxRequestPromise(`{{ route("admin.customer.contact.send.email") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response.success) {
-                            toastr.success("Email sent successfully!");
-
+                            console.log('success', response);
+                            // Reset subject
                             document.getElementById('emailSubject').value = "";
 
+                            // Reset body
                             if (window.quillInstances && window.quillInstances['editor_0']) {
                                 window.quillInstances['editor_0'].root.innerHTML = "";
                             }
 
+                            // Reset cc/bcc
                             const ccField = document.querySelector('[name="cc"]');
                             const bccField = document.querySelector('[name="bcc"]');
-
                             if (ccField) ccField.value = "";
                             if (bccField) bccField.value = "";
-
-                            resetEmailTemplatePosition();
+                            
+                            allFiles = [];
+                            attachmentInput.value = "";
+                            attachmentPreview.innerHTML = "";
+                            
+                            window.refreshTimeline();
+                            window.resetEmailTemplatePosition();
 
                         } else {
-                            toastr.error(response.message || "Failed to send email");
+                            // toastr.error(response.message || "Failed to send email");
                         }
                     })
                     .catch(error => {
+                        window.refreshTimeline();
+                        window.resetEmailTemplatePosition();
                         console.error('Error:', error);
-                        toastr.error("Something went wrong while sending email!");
+                        // toastr.error("Something went wrong while sending email!");
                     });
 
             });
@@ -1332,7 +1465,7 @@
 
         // dynamic function for reset position
 
-        function resetEmailTemplatePosition() {
+        window.resetEmailTemplatePosition = function (context = document) {
             const emailTemplate = document.querySelector('#emailTemplate');
             if (emailTemplate) {
                 emailTemplate.classList.remove('open');
@@ -1433,7 +1566,7 @@
                     if (ccField) ccField.value = "";
                     if (bccField) bccField.value = "";
 
-                    resetEmailTemplatePosition();
+                    window.resetEmailTemplatePosition();
 
                 });
             });
@@ -1441,4 +1574,105 @@
 
 
     </script>
+<script>
+document.addEventListener("click", function (e) {
+    if (e.target.closest(".show-quoted-btn")) {
+        const btn = e.target.closest(".show-quoted-btn");
+        const quoted = btn.parentElement.querySelector(".quoted-history");
+
+        const isVisible = quoted.style.display === "block";
+        quoted.style.display = isVisible ? "none" : "block";
+
+        // Change button text between "..." and "Hide"
+        btn.textContent = isVisible ? "..." : "Hide";
+    }
+});
+</script>
+<script>
+    const attachmentInput = document.getElementById('emailAttachment');
+    const attachmentPreview = document.getElementById('attachmentPreview');
+
+    let allFiles = []; // keep track of all selected files
+
+    function getFileIcon(fileName) {
+        const ext = fileName.split('.').pop().toLowerCase();
+        switch (ext) {
+            case 'jpg':
+            case 'jpeg':
+            case 'png':
+            case 'gif':
+            case 'bmp':
+            case 'svg':
+                return '<i class="fa fa-file-image fa-lg text-primary"></i>';
+            case 'pdf':
+                return '<i class="fa fa-file-pdf fa-lg text-danger"></i>';
+            case 'doc':
+            case 'docx':
+                return '<i class="fa fa-file-word fa-lg text-primary"></i>';
+            case 'xls':
+            case 'xlsx':
+                return '<i class="fa fa-file-excel fa-lg text-success"></i>';
+            case 'zip':
+            case 'rar':
+            case '7z':
+                return '<i class="fa fa-file-archive fa-lg text-warning"></i>';
+            case 'txt':
+                return '<i class="fa fa-file-alt fa-lg text-secondary"></i>';
+            default:
+                return '<i class="fa fa-file fa-lg text-muted"></i>';
+        }
+    }
+
+    // Add new attachments
+    attachmentInput.addEventListener('change', function () {
+        const newFiles = Array.from(this.files);
+        allFiles = allFiles.concat(newFiles); // merge old + new
+        renderAttachmentPreview();
+    });
+
+    // Remove attachment
+    attachmentPreview.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-attachment');
+        if (!removeBtn) return;
+
+        const idx = parseInt(removeBtn.dataset.index);
+        allFiles.splice(idx, 1); // remove from allFiles
+        renderAttachmentPreview();
+    });
+
+    // Render attachments preview
+    function renderAttachmentPreview() {
+        attachmentPreview.innerHTML = ''; // clear preview
+
+        const dt = new DataTransfer(); // to update input.files
+        allFiles.forEach((file, index) => {
+            dt.items.add(file);
+
+            const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+            const fileIcon = getFileIcon(file.name);
+
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-6 mb-2';
+
+            colDiv.innerHTML = `
+                <div class="card_sec">
+                    <div class="card p-2 d-flex align-items-center justify-content-between" style="flex-direction: row;">
+                        <span class="me-2">${fileIcon}</span>
+                        <div class="flex-grow-1 text-truncate" title="${file.name}">
+                            ${file.name} (${fileSize})
+                        </div>
+                        <span class="text-danger ms-2 remove-attachment" data-index="${index}" style="cursor:pointer;">
+                            <i class="fa fa-times"></i>
+                        </span>
+                    </div>   
+                </div>
+            `;
+
+            attachmentPreview.appendChild(colDiv);
+        });
+
+        // Update input files
+        attachmentInput.files = dt.files;
+    }
+</script>
 @endpush

@@ -17,6 +17,9 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
+{{--Flat Date Picker--}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
 <style type="text/css">
@@ -307,6 +310,27 @@
 {{--Jquery UI--}}
 <link rel="stylesheet" href="{{asset ('assets/themes/nifty/assets/css/jquery-ui.css')}}">
 <style>
+    /** TootTip Styling Starting */
+    .tooltip .tooltip-inner {
+        background-color: var(--bs-primary);
+        color: var(--bs-primary-color);
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+    .tooltip.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-start .tooltip-arrow::before {
+        border-left-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-end .tooltip-arrow::before {
+        border-right-color: var(--bs-primary);
+    }
+    /** TootTip Styling Ending */
 
     /* Full-screen loader styles */
 
@@ -317,8 +341,8 @@
 
     #loader {
         position: fixed;
-        top: 0;
-        left: 0;
+        /*top: 41px;*/
+        /*left: 219px;*/
         width: 100%;
         height: 100%;
         background-color: rgb(255 255 255); /* Semi-transparent background */
@@ -393,7 +417,7 @@ Detailed information and more samples can be found in the documentation.
     /** Datatable */
 
     div.dt-container div.dt-length select {
-        min-width: 60px;
+        min-width: 105px;
     }
 
     .dt-buttons button.btn.btn-secondary {
@@ -477,7 +501,9 @@ Detailed information and more samples can be found in the documentation.
         margin-right: 20px;
         display: inline-block;
     }
-
+    .table tr .text-left {
+        text-align: left !important;
+    }
     .table.dataTable.table.table-striped > tbody > tr:nth-of-type(2n+1).selected > *,
     .table.dataTable.table > tbody > tr.selected > * {
         box-shadow: inset 0 0 0 9999px var(--bs-primary);
@@ -724,12 +750,21 @@ Detailed information and more samples can be found in the documentation.
         color: var(--nf-sidebar-color) !important;
 
     }
-    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible{
+
+    .select2-container--default .select2-search--dropdown .select2-search__field:focus-visible {
         color: var(--nf-sidebar-color) !important;
-        border: none !important;
+        border-radius: 5px !important;
+        outline: none !important;
 
     }
+
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: var(--bs-primary); !important;
+        background-color: var(--bs-primary);
+    !important;
+    }
+
+    .nav_icons {
+        width: 25px;
+        height: 25px;
     }
 </style>

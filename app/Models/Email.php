@@ -45,6 +45,7 @@ class Email extends Model
         'message_date',
         'sent_at',
         'received_at',
+        'send_status', 'error_message', 'retry_count', 'last_attempt_at'
     ];
     protected $casts = [
         'to' => 'array',
@@ -77,5 +78,10 @@ class Email extends Model
     {
         return $this->belongsToMany(EmailLabel::class, EmailLabelPivot::class, 'email_id', 'label_id', 'id', 'id')
             ->withTimestamps();
+    }
+
+    public function events()
+    {
+        return $this->hasMany(EmailEvent::class,'email_id','id');
     }
 }

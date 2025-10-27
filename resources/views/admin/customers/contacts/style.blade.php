@@ -385,4 +385,67 @@
         max-height: 100px;
     }
 
+    /*New style for user activity*/
+    .form-infromation p {
+        margin: 3px;
+    }
+    .main-heading {
+        color: var(--bs-primary);
+        font-weight: 500;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 17px;
+    }
+    .name-title {
+        color: var(--nf-mainnav-bg);
+        font-weight: 500;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .name-content {
+        margin-bottom: 19px;
+    }
+    .form-infromation .name-content {
+        margin-bottom: 8px;
+    }
+    .form-infromation .main-heading {
+        margin-bottom: 8px;
+    }
+    .cstm_form_cont {
+        display:block;
+        padding: 0px 23px;
+    }
+    .toggle-form-section {
+        transition: transform 0.3s;
+    }
+    .toggle-form-section i {
+        color: var(--bs-primary);
+    }
+    .submt_form_name {
+        color: var(--bs-primary);
+        font-weight: 500;
+    }
+    .cont_p {
+        padding: 0px 15px;
+
+    }
+
+    table.dataTable {
+        width: auto !important;
+        table-layout: fixed;
+    }
+
+    table.dataTable thead th {
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+    }
+
+    table.dataTable tbody td.text-nowrap {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+    }
+
 </style>

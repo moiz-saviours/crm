@@ -17,6 +17,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Services\ImapService;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Email;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+use App\Models\Conversation;
 
 class ContactController extends Controller
 {
@@ -27,7 +34,6 @@ class ContactController extends Controller
         $this->imapService = $imapService;
     }
 
-
     /**
      * Display a listing of the resource.
      */
@@ -37,7 +43,9 @@ class ContactController extends Controller
         $brands = Brand::all();
         $teams = Team::all();
         $countries = config('countries');
-        $customer_contacts = CustomerContact::all();
+        $customer_contacts = CustomerContact::get()->sortByDesc(function ($contact) {
+            return $contact->last_activity ? strtotime($contact->last_activity) : 0;
+        })->values();
         return view('admin.customers.contacts.index', compact('customer_contacts', 'brands', 'teams', 'countries'));
     }
 
@@ -128,79 +136,544 @@ class ContactController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-public function edit(CustomerContact $customer_contact)
+
+
+protected function getTimeline($customerEmail, $folder = "all", $page, $limit, $tab = 'activities')
 {
-    if (!$customer_contact->id) {
-        return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
+    $customerContact = CustomerContact::where('email', $customerEmail)->first();
+    if (!$customerContact) {
+        return ['timeline' => [], 'page' => $page, 'limit' => $limit, 'count' => 0];
     }
 
-    $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes');
+    $customerContact->load('notes', 'lead.activities');
+    $user = Auth::guard('admin')->user();
+    $auth_pseudo_emails = UserPseudoRecord::where('morph_id', $user->id)
+        ->where('morph_type', get_class($user))
+        ->where('imap_type', 'imap')
+        ->pluck('pseudo_email')
+        ->toArray();
 
-    $teams = Team::where('status', 1)->orderBy('name')->get();
-    $countries = config('countries');
-    $brands = Brand::pluck('name', 'url');
+    $query = Email::with('events');
 
-    $resolveCompany = function ($email) use ($brands) {
-        $domain = substr(strrchr($email, "@"), 1);
-        $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
-        return $brand ?? $domain;
-    };
+    // Your existing folder logic (keep this as is)
+    if ($folder == 'inbox') {
+        $query->where('from_email', $customerEmail)
+            ->where(function ($q) use ($auth_pseudo_emails) {
+                foreach ($auth_pseudo_emails as $email) {
+                    $q->orWhereJsonContains('to', ['email' => $email])
+                        ->orWhereJsonContains('cc', ['email' => $email])
+                        ->orWhereJsonContains('bcc', ['email' => $email]);
+                }
+            });
+    } elseif ($folder == 'sent') {
+        $query->whereIn('from_email', $auth_pseudo_emails);
+    } elseif ($folder == 'drafts') {
+        $query->where('folder', 'drafts')
+            ->whereIn('from_email', $auth_pseudo_emails);
+    } elseif ($folder == 'spam') {
+        $query->where('folder', 'spam')
+            ->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+                $q->where('from_email', $customerEmail)
+                    ->orWhereIn('from_email', $auth_pseudo_emails);
+            });
+    } elseif ($folder == 'trash') {
+        $query->where('folder', 'trash');
+    } elseif ($folder == 'archive') {
+        $query->where('folder', 'archive');
+    } else {
+        $query->where(function ($q) use ($customerEmail, $auth_pseudo_emails) {
+            $q->where('from_email', $customerEmail)
+                ->orWhereJsonContains('to', ['email' => $customerEmail])
+                ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
 
-    $auth_pseudo_emails = [];
-    if (auth()->user()->pseudo_email) {
-        $auth_pseudo_emails[] = [
-            'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
-            'email' => auth()->user()->pseudo_email,
-            'company' => $resolveCompany(auth()->user()->pseudo_email),
-        ];
+            if (!empty($auth_pseudo_emails)) {
+                $q->orWhere(function ($sub) use ($customerEmail, $auth_pseudo_emails) {
+                    $sub->where('from_email', $customerEmail)
+                        ->where(function ($nested) use ($auth_pseudo_emails) {
+                            foreach ($auth_pseudo_emails as $addr) {
+                                $nested->orWhereJsonContains('to', ['email' => $addr])
+                                    ->orWhereJsonContains('cc', ['email' => $addr])
+                                    ->orWhereJsonContains('bcc', ['email' => $addr]);
+                            }
+                        });
+                    $sub->orWhere(function ($nested) use ($customerEmail, $auth_pseudo_emails) {
+                        $nested->whereIn('from_email', $auth_pseudo_emails)
+                            ->where(function ($nn) use ($customerEmail) {
+                                $nn->orWhereJsonContains('to', ['email' => $customerEmail])
+                                    ->orWhereJsonContains('cc', ['email' => $customerEmail])
+                                    ->orWhereJsonContains('bcc', ['email' => $customerEmail]);
+                            });
+                    });
+                });
+            }
+        });
     }
 
-    $userPseudoEmails = User::whereNotNull('pseudo_email')
-        ->get(['id', 'pseudo_name', 'pseudo_email'])
-        ->map(fn($user) => [
-            'name' => $user->pseudo_name ?? 'Unknown Sender',
-            'email' => $user->pseudo_email,
-            'company' => $resolveCompany($user->pseudo_email),
+    if ($folder !== 'all') {
+        $query->where('folder', $folder);
+    }
+
+    $offset = ($page - 1) * $limit;
+    // Get the main emails for pagination - LATEST MESSAGES FIRST
+    $emails = $query->clone()
+        ->with(['attachments', 'events'])
+        ->orderBy('message_date', 'desc') // Latest messages first
+        ->skip($offset)
+        ->take($limit)
+        ->get();
+
+    // Get all thread IDs from the paginated emails
+    $threadIds = $emails->pluck('thread_id')
+        ->filter()
+        ->unique()
+        ->values()
+        ->toArray();
+
+    // Get ALL emails for these thread IDs (for thread context)
+    $allThreadEmails = Email::whereIn('thread_id', $threadIds)
+        ->with(['attachments', 'events'])
+        ->orderBy('message_date', 'asc') // Chronological order within threads
+        ->get()
+        ->groupBy('thread_id');
+
+    // Format emails with thread context
+$formattedEmails = $emails->map(function ($email) use ($allThreadEmails) {
+    // Get ALL emails in this thread (chronological order)
+    $allEmailsInThread = $allThreadEmails->get($email->thread_id, collect());
+
+        // ✅ Only include emails up to (and including) current one
+        $visibleThreadEmails = $allEmailsInThread->filter(function ($threadEmail) use ($email) {
+            return strtotime($threadEmail->message_date) <= strtotime($email->message_date);
+        });
+
+        // Get other (past) emails in thread (excluding current email)
+        $otherThreadEmails = $visibleThreadEmails
+            ->where('id', '!=', $email->id)
+            ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
+            ->values()
+            ->toArray();
+
+        // Conversation flow for this email (chronological up to itself)
+        $conversationFlow = $visibleThreadEmails
+            ->map(fn($threadEmail) => $this->formatEmailForTimeline($threadEmail))
+            ->values()
+            ->toArray();
+
+        return array_merge($this->formatEmailForTimeline($email), [
+            'thread_emails' => $otherThreadEmails,
+            'thread_email_count' => count($otherThreadEmails),
+            'conversation_flow' => $conversationFlow,
+            'is_thread_starter' => $visibleThreadEmails->first()->id === $email->id,
+            'thread_has_multiple_emails' => $visibleThreadEmails->count() > 1,
         ]);
+    });
 
-    $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
-        ->map(fn($pseudo) => [
-            'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
-            'email' => $pseudo->pseudo_email,
-            'company' => $resolveCompany($pseudo->pseudo_email),
-        ]);
+    // Rest of your timeline building code remains the same...
+    $total_count =
+    ($formattedEmails?->count() ?? 0)
+    + ($customerContact->notes?->count() ?? 0)
+    + (($customerContact->lead && $customerContact->lead->activities)
+        ? $customerContact->lead->activities->count()
+        : 0);
 
-    $pseudo_emails = collect($auth_pseudo_emails)
-        ->merge($userPseudoEmails)
-        ->merge($extraPseudoEmails)
-        ->unique('email')
-        ->values();
+    $timeline = [];
+    if ($tab === 'activities' || $tab === 'emails') {
+        foreach ($formattedEmails as $email) {
+            $timeline[] = [
+                'type' => 'email',
+                'date' => $email['date'],
+                'data' => $email,
+            ];
+        }
+    }
+    if ($tab === 'activities' || $tab === 'notes') {
+        foreach ($customerContact->notes as $note) {
+            $timeline[] = [
+                'type' => 'note',
+                'date' => $note->created_at,
+                'data' => $note,
+            ];
+        }
+    }
+    if ($tab === 'activities') {
+        if ($customerContact->lead && $customerContact->lead->activities) {
+            foreach ($customerContact->lead->activities as $activity) {
+                $decoded = json_decode($activity->event_data);
+                $activity->data = $decoded;
+                if ($activity->event_type === 'conversion') {
+                    $timeline[] = [
+                        'type' => 'conversion',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                }elseif ($activity->event_type === 'converted_status_changed') {
+                    $timeline[] = [
+                        'type' => 'conversion',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                }
+                elseif ($activity->event_type === 'form_submission') {
+                    $timeline[] = [
+                        'type' => 'form_submission',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                }
+                else {
+                    $timeline[] = [
+                        'type' => 'activity',
+                        'date' => $activity->created_at,
+                        'data' => $activity,
+                    ];
+                }
+            }
+        }
+    }
 
-    // Initialize empty email data for the view (to be populated by AJAX)
-    $emails = [];
-    $folders = [];
-    $folder = request()->get('folder', 'inbox');
-    $page = (int) request()->get('page', 1);
-    $limit = 5;
-    $imapError = null;
+    // Sort entire timeline by date (latest first)
+    usort($timeline, function ($a, $b) {
+        return strtotime($b['date']) - strtotime($a['date']);
+    });
 
-    return view('admin.customers.contacts.edit', compact(
-        'customer_contact',
-        'brands',
-        'teams',
-        'pseudo_emails',
-        'countries',
-        'emails',
-        'folders',
-        'folder',
-        'page',
-        'limit',
-        'imapError'
-    ));
+    // ✅ Correct pagination slice
+    $offset = ($page - 1) * $limit;
+    $paginatedTimeline = array_slice($timeline, $offset, $limit);
+
+    return [
+        'customer_contact' => $customerContact,
+        'timeline' => $paginatedTimeline,
+        'page' => $page,
+        'limit' => $limit,
+        'count' => count($paginatedTimeline),
+        "{$tab}_total" => count($timeline),  // total items in this tab
+        'total_count' => $total_count,
+    ];
 }
 
+/**
+ * Format email for timeline display
+ */
+
+private function processHtmlForDisplay($html, $text = null)
+{
+    // If no HTML but we have text, create basic HTML from text
+    if (!$html && $text) {
+        return nl2br(htmlspecialchars($text));
+    }
+
+    if (!$html) {
+        return 'No content';
+    }
+
+    // Apply CSS inlining for display
+    try {
+        $cssToInlineStyles = new CssToInlineStyles();
+        $inlinedHtml = $cssToInlineStyles->convert($html);
+    } catch (\Exception $e) {
+        // If CSS inlining fails, use original HTML
+        $inlinedHtml = $html;
+    }
+
+    // Remove unwanted tags for display
+    $patterns = [
+        '/<!DOCTYPE[^>]*>/i',
+        '/<html[^>]*>/i',
+        '/<\/html>/i',
+        '/<head[^>]*>.*?<\/head>/is',
+        '/<title[^>]*>.*?<\/title>/is',
+        '/<meta[^>]*>/i',
+    ];
+
+    $cleanedHtml = preg_replace($patterns, '', $inlinedHtml);
+
+    // Extract body content if exists, otherwise use the whole thing
+    if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $cleanedHtml, $matches)) {
+        return $matches[1];
+    }
+
+    return $cleanedHtml;
+}
+private function formatEmailForTimeline(Email $email)
+{
+        // Count engagement events
+    $openCount = $email->events->where('event_type', 'open')->count();
+    $clickCount = $email->events->where('event_type', 'click')->count();
+
+    // Determine if engagement events exist
+    $hasEngagement = ($openCount > 0 || $clickCount > 0);
+
+    // Hide send status if engagement events exist
+    $displaySendStatus = !$hasEngagement;
+
+    return [
+        'id' => $email->id,
+        'uuid' => 'email-' . $email->id,
+        'thread_id' => $email->thread_id,
+        'message_id' => $email->message_id,
+        'subject' => $email->subject,
+        'from' => [
+            'name' => $email->from_name,
+            'email' => $email->from_email,
+        ],
+        'to' => $email->to ?? [],
+        'cc' => $email->cc ?? [],
+        'bcc' => $email->bcc ?? [],
+        'date' => $email->message_date,
+        'type' => $email->type,
+        'folder' => $email->folder,
+        'send_status' => $email->send_status,
+        'open_count' => $openCount,
+        'click_count' => $clickCount,
+        'bounce_count' => $email->events->where('event_type', 'bounce')->count(),
+        'spam_count' => $email->events->where('event_type', 'spam')->count(),
+        'show_send_status' => $displaySendStatus, // 👈 new field for blade check
+        'body' => [
+            'html' => $this->processHtmlForDisplay($email->body_html, $email->body_text),
+            'text' => $email->body_text,
+        ],
+        'attachments' => $email->attachments->map(fn($a) => [
+            'id' => $a->id,
+            'original_name' => $a->original_name,
+            'mime_type' => $a->mime_type,
+            'size' => $a->size,
+            'data' => $a->base64_content
+                ? 'data:' . $a->mime_type . ';base64,' . $a->base64_content
+                : null,
+        ])->toArray(),
+        'events' => $email->events->map(fn($e) => [
+            'id' => $e->id,
+            'event_type' => $e->event_type,
+            'created_at' => $e->created_at,
+        ])->toArray(),
+    ];
+}
+
+    public function refresh(Request $request)
+    {
+        try {
+            $customerEmail = urldecode(trim($request->query('customer_email')));
+            $folder = $request->query('folder', 'all');
+            $tab = $request->query('tab', 'activities');
+            $page = (int) $request->query('page', 1);
+            $limit = (int) $request->query('limit', 10);
+            if (empty($customerEmail)) {
+                return response()->json(['error' => 'Customer email is required'], 400);
+            }
+
+            $data = $this->getTimeline($customerEmail, $folder, $page, $limit, $tab);
+
+            $customerContact = $data['customer_contact']; // set separately
+
+            $htmlTimeline = collect($data['timeline'])->map(function ($item) use ($customerContact) {
+                if ($item['type'] === 'note') {
+                    return view('admin.customers.contacts.timeline.partials.card-box.note', ['item' => $item])->render();
+                } elseif ($item['type'] === 'email') {
+                    return view('admin.customers.contacts.timeline.partials.card-box.email', ['item' => $item])->render();
+                } elseif ($item['type'] === 'activity') {
+                    return view(
+                        'admin.customers.contacts.timeline.partials.card-box.activity',
+                        [
+                            'item' => $item,
+                            'customer_contact' => $customerContact
+                        ]
+                    )->render();
+                } elseif ($item['type'] === 'conversion') {
+                    return view('admin.customers.contacts.timeline.partials.card-box.conversion', ['item' => $item])->render();
+                }
+                return '';
+            })->implode('');
+
+            return response()->json([
+                'timeline' => $htmlTimeline,
+                'page' => $data['page'],
+                'limit' => $data['limit'],
+                'count' => $data['count'],
+                "{$tab}_total" => $data["{$tab}_total"],
+                'total_count' => $data['total_count'],
+
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Processing complete.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function fetchRemote(Request $request)
+    {
+        try {
+            $customerEmail = $request->query('customer_email');
+            $tab = $request->query('tab', 'activities');
+            if (!$customerEmail) {
+                Log::warning('Customer email missing for fetchRemote');
+                return response()->json([
+                    'status' => 'warning',
+                    'message' => 'No customer email provided. Please try again.'
+                ], 200);
+            }
+
+            $user = Auth::guard('admin')->user();
+            $pseudoEmails = UserPseudoRecord::where('morph_id', $user->id)
+                ->where('morph_type', get_class($user))
+                ->where('imap_type', 'imap')
+                ->pluck('pseudo_email')
+                ->toArray();
+
+            if (empty($pseudoEmails)) {
+                Log::warning('No pseudo emails found for user', ['user_id' => $user->id]);
+                return response()->json([
+                    'status' => 'warning',
+                    'message' => 'No accounts found for this user. Please check settings.'
+                ], 200);
+            }
+
+            // Only fetch new emails, as notes/activities/conversions are typically updated locally
+            if ($tab === 'activities' || $tab === 'emails') {
+                $command = ['emails:fetch', '--address=' . $customerEmail];
+                foreach ($pseudoEmails as $email) {
+                    $command[] = '--account=' . $email;
+                }
+
+                $exitCode = Artisan::call(implode(' ', $command));
+
+                if ($exitCode !== 0) {
+                    Log::error('Failed to run emails:fetch command for timeline', [
+                        'customer_email' => $customerEmail,
+                        'pseudo_emails' => $pseudoEmails,
+                        'exit_code' => $exitCode,
+                    ]);
+                    return response()->json([
+                        'status' => 'warning',
+                        'message' => 'Unable to fetch new timeline items at the moment. Please try again later.'
+                    ], 200);
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'New timeline items fetched successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching new timeline', [
+                'customer_email' => $request->query('customer_email'),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ]);
+            return response()->json([
+                'status' => 'warning',
+                'message' => 'Something went wrong while fetching timeline items. Please try again later.'
+            ], 200);
+        }
+    }
+
+    public function edit(Request $request, CustomerContact $customer_contact)
+    {
+        if (!$customer_contact->id) {
+            return response()->json(['error' => 'Oops! Customer contact not found!'], 404);
+        }
+        $customer_contact->load('creator', 'company', 'invoices', 'payments', 'notes', 'lead.activities');
+        $teams = Team::where('status', 1)->orderBy('name')->get();
+        $countries = config('countries');
+        $brands = Brand::pluck('name', 'url');
+        $resolveCompany = function ($email) use ($brands) {
+            $domain = substr(strrchr($email, "@"), 1);
+            $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
+            return $brand ?? $domain;
+        };
+        $page = (int)request()->get('page', 1);
+        $limit = (int)request()->get('limit', default: 10);
+
+        // UPDATE THIS: Get conversation from URL parameter or fallback to existing logic
+        if ($request->has('conversation_id')) {
+            $conversation = Conversation::find($request->conversation_id);
+            
+            // Verify the conversation belongs to this customer contact
+            if ($conversation && (
+                ($conversation->sender_type === get_class($customer_contact) && $conversation->sender_id === $customer_contact->id) ||
+                ($conversation->receiver_type === get_class($customer_contact) && $conversation->receiver_id === $customer_contact->id)
+            )) {
+                // Conversation is valid for this customer contact
+            } else {
+                // Invalid conversation_id, fallback to default logic
+                $conversation = $this->getDefaultConversation($customer_contact);
+            }
+        } else {
+            // Use existing logic when no conversation_id in URL
+            $conversation = $this->getDefaultConversation($customer_contact);
+        }
 
 
+        // $auth_pseudo_emails = [];
+        // if (auth()->user()->pseudo_email) {
+        //     $auth_pseudo_emails[] = [
+        //         'name' => auth()->user()->pseudo_name ?? 'Unknown Sender',
+        //         'email' => auth()->user()->pseudo_email,
+        //         'company' => $resolveCompany(auth()->user()->pseudo_email),
+        //     ];
+        // }
+        // $userPseudoEmails = User::whereNotNull('pseudo_email')
+        //     ->get(['id', 'pseudo_name', 'pseudo_email'])
+        //     ->map(fn($user) => [
+        //         'name' => $user->pseudo_name ?? 'Unknown Sender',
+        //         'email' => $user->pseudo_email,
+        //         'company' => $resolveCompany($user->pseudo_email),
+        //     ]);
+        // $extraPseudoEmails = UserPseudoRecord::all(['pseudo_name', 'pseudo_email'])
+        //     ->map(fn($pseudo) => [
+        //         'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+        //         'email' => $pseudo->pseudo_email,
+        //         'company' => $resolveCompany($pseudo->pseudo_email),
+        //     ]);
+        // $pseudo_emails = collect($auth_pseudo_emails)
+        //     ->merge($userPseudoEmails)
+        //     ->merge($extraPseudoEmails)
+        //     ->unique('email')
+        //     ->values();
+
+        $pseudo_emails = auth()->user()
+            ->pseudo_records()
+            ->get(['pseudo_name', 'pseudo_email'])
+            ->map(fn($pseudo) => [
+                'name' => $pseudo->pseudo_name ?? 'Unknown Sender',
+                'email' => $pseudo->pseudo_email,
+                'company' => $resolveCompany($pseudo->pseudo_email),
+            ]);
+        $emailsResponse = $this->getTimeline($customer_contact->email, 'all', $page, $limit, 'activities');
+        $timeline = $emailsResponse['timeline'] ?? [];
+        $total_count = $emailsResponse['total_count'] ?? 0;
+        $imapError = null;
+        return view('admin.customers.contacts.edit', compact(
+            'customer_contact',
+            'brands',
+            'teams',
+            'pseudo_emails',
+            'countries',
+            'page',
+            'limit',
+            'imapError',
+            'timeline',
+            'total_count',
+            'conversation'
+        ));
+    }
+
+    private function getDefaultConversation($customer_contact)
+    {
+        return Conversation::where([
+            'sender_type' => get_class(auth()->user()),
+            'sender_id' => auth()->id(),
+            'receiver_type' => get_class($customer_contact),
+            'receiver_id' => $customer_contact->id,
+        ])->orWhere([
+            'sender_type' => get_class($customer_contact),
+            'sender_id' => $customer_contact->id,
+            'receiver_type' => get_class(auth()->user()),
+            'receiver_id' => auth()->id(),
+        ])->first();
+    }
 
     /**
      * Update the specified resource in storage.
@@ -275,7 +748,7 @@ public function edit(CustomerContact $customer_contact)
             if ($customer_contact->delete()) {
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
-            return response()->json(['error' => 'An error occurred while deleting the record.']);
+            return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }

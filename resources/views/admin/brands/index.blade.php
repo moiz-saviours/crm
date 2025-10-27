@@ -102,7 +102,7 @@
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
                             {{--                            <button type="button" class="create-contact open-form-btn" data-bs-target="#create-modal" data-bs-toggle="modal">Add New</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
                                     data-tour="brand_create"><i class="fas fa-exclamation-circle custom-dot"></i>
                             </button>
                             <button class="create-contact open-form-btn tour-createbrand">Create New</button>

@@ -52,7 +52,7 @@
                                 <input type="text" id="dateRangePicker" name="dateRangePicker"
                                        class="form-control dateRangePicker"/>
                             </div>
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour"
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
                                     data-tour="paymentcreate"><i class="fas fa-exclamation-circle custom-dot"></i>
                             </button>
                             <button class="create-contact open-form-btn tour-createpayment">Create New</button>
@@ -70,8 +70,8 @@
                             <li class="tab-item active" data-tab="home">Payments
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
                             <li style="margin: 9px 2px">
-                                <button class="my-btn start-tour-btn tour-paymenttitle" data-toggle="tooltip"
-                                        title="Take a Tour" data-tour="payment"><i
+                                <button class="my-btn start-tour-btn tour-paymenttitle"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="payment"><i
                                         class="fas fa-exclamation-circle custom-dot"></i></button>
                             </li>
                         </ul>
@@ -171,7 +171,7 @@
                                                 </td>
                                                 {{--                                                <td class="align-middle text-center table-actions">--}}
                                                 {{--                                                    <button type="button" class="btn btn-sm btn-primary editBtn"--}}
-                                                {{--                                                            data-id="{{ $payment->id }}" title="Edit"><i--}}
+                                                {{--                                                            data-id="{{ $payment->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i--}}
                                                 {{--                                                            class="fas fa-edit"></i></button>--}}
                                                 {{--                                                </td>--}}
                                             </tr>

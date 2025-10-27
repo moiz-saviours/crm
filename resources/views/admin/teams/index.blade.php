@@ -19,7 +19,7 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="start-tour-btn my-btn" data-toggle="tooltip" title="Take a Tour" data-tour="team_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="team_create"> <i class="fas fa-exclamation-circle custom-dot"></i> </button>
                             <button class="create-contact open-form-btn tour-createteam">Create New</button>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                         <ul class="tab-nav">
                             <li class="tab-item active" data-tab="home">Teams
                                 <i class="fa fa-times close-icon" aria-hidden="true"></i></li>
-                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-teamtitle" data-toggle="tooltip" title="Take a Tour" data-tour="teams"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
+                            <li style="margin: 9px 2px"><button class="my-btn start-tour-btn tour-teamtitle" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour" data-tour="teams"><i class="fas fa-exclamation-circle custom-dot"></i> </button></li>
 
                         </ul>
                     </div>
@@ -92,7 +92,7 @@
                                                 <td class="align-middle text-center text-nowrap">{{ $team->team_key }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ $team->name }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ $team->description }}</td>
-                                                <td class="align-middle text-center text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="{{ implode(', ', $team->brands->pluck('name')->toArray()) }}">
+                                                <td class="align-middle text-center text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ implode(', ', $team->brands->pluck('name')->toArray()) }}">
                                                     {{ implode(', ', $team->brands->pluck('name')->toArray()) }}
                                                 </td>
                                                 <td class="align-middle text-center text-nowrap">{{ optional($team->lead)->name }}</td>
@@ -103,10 +103,10 @@
                                                 </td>
                                                 <td class="align-middle text-center table-actions">
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $team->id }}" title="Edit"><i
+                                                            data-id="{{ $team->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
                                                             class="fas fa-edit"></i></button>
                                                     <button type="button" class="btn btn-sm btn-danger deleteBtn"
-                                                            data-id="{{ $team->id }}" title="Delete"><i
+                                                            data-id="{{ $team->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i
                                                             class="fas fa-trash"></i></button>
                                                 </td>
                                             </tr>

@@ -265,7 +265,7 @@
         <div class="content__header content__boxed overlapping">
             <div class="content__wrap">
                 <!-- Page title and information -->
-                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-toggle="tooltip" title="Take a Tour"
+                <button class="start-tour-btn my-btn tour-dashboard2-alldata" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
                         data-tour="dashboard2"><i class="fas fa-exclamation-circle custom-dot"></i></button>
                 <h1 class="page-title mb-2 all-data">Stats Dashboard</h1>
                 {{--                <h2 class="h5">Welcome to the Stats Dashboard.</h2>--}}

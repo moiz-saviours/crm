@@ -883,7 +883,7 @@
             .activ_head {
                 display: flex;
                 justify-content: space-between;
-                margin-bottom: 10px;
+                margin: 10px 0;
                 align-items: center;
             }
 

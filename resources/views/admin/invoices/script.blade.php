@@ -1,9 +1,4 @@
 <script>
-    <!---- SCRIPT BLADE----->
-    $(document).ready(function () {
-        console.log('Document ready fired');
-    });
-
     $(document).ready(function () {
         /** Valid Url */
         function isValidUrl(url) {
@@ -66,36 +61,133 @@
         }));
 
         /** Initializing Datatable */
+        var dataTables = [];
+
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
-                initializeDatatable($(this), index)
-            })
+                dataTables[index] = initializeDatatable($(this), index);
+            });
         }
-        var table;
 
-        function initializeDatatable(table_div, index) {
-            console.log(`Initializing table: ${table_div.attr('id')} - Instance: ${index}`);
-            if ($.fn.DataTable.isDataTable(table_div)) {
-                table_div.DataTable().destroy();
+        function getColumnIndex(table, headerText) {
+            const headers = table.find('thead th');
+            for (let i = 0; i < headers.length; i++) {
+                if ($(headers[i]).text().trim().toLowerCase() === headerText.toLowerCase()) {
+                    return i;
+                }
             }
-            table = table_div.DataTable({
+            return 0;
+        }
+        function initializeDatatable(table_div, index) {
+            const skipCols = [
+                0,
+                getColumnIndex(table_div, 'CREATED DATE'),
+                getColumnIndex(table_div, 'LAST ACTIVITY'),
+                getColumnIndex(table_div, 'STATUS'),
+                getColumnIndex(table_div, 'ACTION'),
+            ].filter(i => i !== null && i !== undefined).filter((value, index, self) => self.indexOf(value) === index);
+            let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
-                    "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                    "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-5'l><'col-sm-12 col-md-6'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
-                buttons: exportButtons,
-                order: [[1, 'desc']],
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        text: '<i class="fa fa-columns"></i> Columns',
+                        className: 'btn btn-secondary btn-sm',
+                        postfixButtons: ['colvisRestore'],
+                        columns: function (idx, data, node) {
+                            const header = $(table_div).find('thead th').eq(idx);
+                            const headerText = header.text().trim().toLowerCase();
+                            if (
+                                header.hasClass('no-col-vis') ||
+                                header.hasClass('select-checkbox') ||
+                                headerText.includes('action') ||
+                                headerText.includes('select')
+                            ) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    },
+                    ...exportButtons // keep your existing export buttons
+                ],
+                order: [[getColumnIndex(table_div, 'CREATED DATE'), 'desc']],
                 responsive: false,
                 scrollX: true,
                 scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
+                pageLength: 100,
+                lengthMenu: [[10, 25, 50, 100, -1], ['10 Rows', '25 Rows', '50 Rows', '100 Rows', 'Show All']],
                 columnDefs: [
                     {
                         orderable: false,
+                        targets: 0,
                         className: 'select-checkbox',
-                        targets: 0
+                        render: DataTable.render.select(),
+                    },
+                    {
+                        targets: getColumnIndex(table_div, 'CREATED DATE'),
+                        type: 'date',
+                        render: function (data, type, row) {
+                            if (type === 'sort') {
+                                return $(this).data('order') || data;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        targets: '_all',
+                        render: function (data, type, row, meta) {
+                            if (skipCols.includes(meta.col)) return data;
+                            if (!data) return '';
+                            if (type !== 'display') {
+                                return data;
+                            }
+                            const maxLength = 15;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data;
+
+                            function truncateTextNodes(node) {
+                                node.childNodes.forEach(child => {
+                                    if (child.nodeType === Node.TEXT_NODE) {
+                                        const txt = child.textContent;
+                                        if (txt && txt.trim().length > maxLength) {
+                                            child.textContent = txt.substring(0, maxLength) + '...';
+                                        }
+                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                        truncateTextNodes(child);
+                                    }
+                                });
+                            }
+
+                            truncateTextNodes(tempDiv);
+                            return tempDiv.innerHTML;
+                        },
+
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if (skipCols.includes(col)) {
+                                td.removeAttribute('title');
+                                return;
+                            }
+
+                            if (!cellData) {
+                                td.removeAttribute('title');
+                                return;
+                            }
+                            const temp = document.createElement('div');
+                            temp.innerHTML = cellData;
+                            const fullText = (temp.textContent || temp.innerText || '').trim();
+                            if (fullText.length > 15) {
+                                td.setAttribute('title', fullText);
+                            } else {
+                                td.removeAttribute('title');
+                            }
+                        }
                     },
                 ],
                 select: {
@@ -107,9 +199,10 @@
                     end: 1
                 },
             });
-            table.buttons().container().appendTo(`#right-icon-${index}`);
+            datatable.columns.adjust().draw();
+            datatable.buttons().container().appendTo(`#right-icon-${index}`);
+            return datatable;
         }
-
         /** Edit */
         $(document).on('click', '.editBtn', function (e) {
             e.preventDefault();
@@ -153,8 +246,8 @@
             const invoice = data?.invoice;
 
             $('#manage-form').data('id', invoice.id);
-            $('#brand_key').val(invoice.brand_key);
-            $('#team_key').val(invoice.team_key);
+            $('#brand_key').val(invoice.brand_key).trigger('change.select2');
+            $('#team_key').val(invoice.team_key).trigger('change');
             $('#type').val(invoice.type).trigger('change');
 
             $('#customer_contact_name').val(invoice.customer_contact?.name).prop('readonly', true);
@@ -199,6 +292,7 @@
             e.preventDefault();
             var dataId = $('#manage-form').data('id');
             var formData = new FormData(this);
+            let table = dataTables[0];
             @php
                 $baseUrl = '';
                 if (app()->environment('production')) {
@@ -230,57 +324,75 @@
                                 currency,
                                 status,
                                 due_date,
-                                date
+                                created_at,
+                                date,
                             } = response.data;
                             const index = table.rows().count() + 1;
                             const columns = `
-                        <td class="align-middle text-center text-nowrap"></td>
-                        <td class="align-middle text-center text-nowrap">${index}</td>
-                        <td class="align-middle text-center text-nowrap text-sm invoice-cell">
+                        <td class="align-middle text-left text-nowrap"></td>` +
+                                // <td class="align-middle text-left text-nowrap">${index}</td>
+                                // <td class="align-middle space-between text-nowrap" style="text-align: left;">
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Authorize : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Edp : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Stripe : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                                //         <span>Paypal : </span>
+                                //         <span>0-0</span>
+                                //     </div>
+                                // </td>
+                                `<td class="align-middle text-left text-nowrap text-sm invoice-cell">
                             <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
-                                                          title="Show transaction logs"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top" title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
-                        <td class="align-middle text-center text-nowrap">
-                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}
+                        <td class="align-middle text-left text-nowrap">
+                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}</td>
-                        <td class="align-middle text-center text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
-                        <td class="align-middle text-center text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
-                        <td class="align-middle space-between text-nowrap" style="text-align: left;">
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Amount:</span>
-                                <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Tax:</span>
-                                <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Tax Amount:</span>
-                                <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                <span style="width: 120px;">Total Amount:</span>
+                        <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">` +
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Amount:</span>
+                                //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax:</span>
+                                //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax Amount:</span>
+                                //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                                // </div>
+                                `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                 <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                             </div>
                         </td>
-                        <td class="align-middle text-center text-nowrap">
+                        <td class="align-middle text-left text-nowrap">
                             ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
                         </td>
-                        <td class="align-middle text-center text-nowrap">${due_date}</td>
-                        <td class="align-middle text-center text-nowrap">${date}</td>
-                        <td class="align-middle text-center table-actions">
+                        <td class="align-middle text-left text-nowrap">${due_date}</td>
+                        <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
+                        <td class="align-middle text-left table-actions">
                         <button type="button" class="btn btn-sm btn-primary copyBtn"
                                                             data-id="${id}"
                                                             data-invoice-key="${invoice_key}"
                                                             data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
-                                                            title="Copy Invoice Url"><i
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Invoice Url"><i
                                                             class="fas fa-copy"></i></button>
-                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
-                                '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
-                                : ''}
+                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
+                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
+                                    : ''}
                         </td>`;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
 
@@ -307,7 +419,9 @@
                                 status,
                                 due_date,
                                 date,
-                                payment_attachments
+                                created_at,
+                                payment_attachments,
+                                gateway_counts,
                             } = response.data;
                             const index = table.row($('#tr-' + id)).index();
                             const rowData = table.row(index).data();
@@ -322,87 +436,121 @@
                                     }
                                 }, 0);
                             }
+                            // const gatewayCountsHtml = `
+                            //     ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Authorize : </span>
+                            //         <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Edp : </span>
+                            //         <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Stripe : </span>
+                            //         <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Paypal : </span>
+                            //         <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
+                            //     </div>` : ''}
+                            // `;
+                            // if (decodeHtml(rowData[2]) !== gatewayCountsHtml) {
+                            //     table.cell(index, 2).data(gatewayCountsHtml).draw();
+                            // }
                             // Update columns in the table dynamically
                             // Column 3: Invoice Number & Invoice Key
-                            if (decodeHtml(rowData[2]) !== `${invoice_number}<br>${invoice_key}`) {
-                                table.cell(index, 2).data(`
+                            if (decodeHtml(rowData[1]) !== `${invoice_number}<br>${invoice_key}`) {
+                                table.cell(index, 1).data(`
                                     <span class="invoice-number">${invoice_number}</span><br>
                             <span class="invoice-key view-transactions text-primary"
-                                                          title="Show transaction logs"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top" title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                                 `).draw();
                             }
 
                             // Column 4: Brand
-                            if (decodeHtml(rowData[3]) !== `${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`) {
-                                table.cell(index, 3).data(`${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a><br> ${brand.brand_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}`) {
+                                table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}`).draw();
                             }
 
                             // Column 5: Team
-                            if (decodeHtml(rowData[4]) !== `${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`) {
-                                table.cell(index, 4).data(`${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a><br> ${team.team_key}` : '---'}`).draw();
+                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}`) {
+                                table.cell(index, 3).data(`${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}`).draw();
                             }
 
                             // Column 6: Customer Contact
-                            if (decodeHtml(rowData[5]) !== `${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`) {
-                                table.cell(index, 5).data(`${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`).draw();
+                            if (decodeHtml(rowData[4]) !== `${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`) {
+                                table.cell(index, 4).data(`${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}`).draw();
                             }
                             // Column 7: Agent
-                            if (decodeHtml(rowData[6]) !== `${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`) {
-                                table.cell(index, 6).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
+                            if (decodeHtml(rowData[5]) !== `${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`) {
+                                table.cell(index, 5).data(`${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}`).draw();
                             }
 
-                            const newContent = `
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Amount:</span>
-                                    <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Tax:</span>
-                                    <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Tax Amount:</span>
-                                    <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; gap: 10px;">
-                                    <span style="width: 120px;">Total Amount:</span>
+                            const newContent = `` +
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Amount:</span>
+                                //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax:</span>
+                                //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax Amount:</span>
+                                //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                                // </div>
+                                `<div style="display: flex; justify-content: space-between; gap: 10px;">
                                     <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
                                 </div>`;
                             // Column 8: Amount
-                            if (decodeHtml(rowData[7]) !== newContent) {
-                                table.cell(index, 7).data(newContent).draw();
+                            if (decodeHtml(rowData[6]) !== newContent) {
+                                table.cell(index, 6).data(newContent).draw();
                             }
 
                             // Column 9: Status
 
                             const statusHtml = status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : '';
-                            if (decodeHtml(rowData[8]) !== statusHtml) {
-                                table.cell(index, 8).data(statusHtml).draw();
+                            if (decodeHtml(rowData[7]) !== statusHtml) {
+                                table.cell(index, 7).data(statusHtml).draw();
                             }
 
                             // Column 10: Due Date
-                            if (decodeHtml(rowData[9]) !== due_date) {
-                                table.cell(index, 9).data(due_date).draw();
+                            if (decodeHtml(rowData[8]) !== due_date) {
+                                table.cell(index, 8).data(due_date).draw();
                             }
                             // Column 11: Date
-                            if (decodeHtml(rowData[10]) !== date) {
-                                table.cell(index, 10).data(date).draw();
+                            if (decodeHtml(rowData[9]) !== date) {
+                                table.cell(index, 9).data(date).draw();
+
+                                const cell = table.cell(index, 9);
+                                const cellNode = cell.node();
+                                $(cellNode)
+                                    .data('order', created_at)
+                                    .html(date);
+
+                                table.draw();
                             }
                             // Column 12: Actions
                             let actionsHtml = '';
                             if (brand) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary copyBtn" data-id="${id}" data-invoice-key="${invoice_key}" data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Invoice Url"><i class="fas fa-copy" aria-hidden="true"></i></button> `;
                             }
                             if (payment_attachments && payment_attachments.length > 0) {
-                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> `;
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> `;
+                            } else {
+                                actionsHtml += `<button type="button" class="btn btn-sm btn-primary disabled" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip"></i>0</button> `;
                             }
                             if (status != 1) {
-                                actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
-                                                <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
+                                actionsHtml += `<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit" aria-hidden="true"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>`;
                             }
-                            if (normalizeHtml(decodeHtml(rowData[11])) !== normalizeHtml(actionsHtml)) {
-                                table.cell(index, 11).data(actionsHtml).draw();
+                            if (normalizeHtml(decodeHtml(rowData[10])) !== normalizeHtml(actionsHtml)) {
+                                table.cell(index, 10).data(actionsHtml).draw();
                             }
                             $('#manage-form')[0].reset();
                             $('#formContainer').removeClass('open')
@@ -421,6 +569,7 @@
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');
+            let table = dataTables[0];
             AjaxDeleteRequestPromise(`{{ route("admin.invoice.delete", "") }}/${id}`, null, 'DELETE', {
                 useDeleteSwal: true,
                 useToastr: true,
@@ -456,7 +605,7 @@
                 type: 'GET',
                 data: {invoice_key: invoice_key},
                 beforeSend: function () {
-                    $('#transactionLogs').html('<tr><td colspan="4" class="text-center">Loading...</td></tr>');
+                    $('#transactionLogs').html('<tr><td colspan="4" class="text-left">Loading...</td></tr>');
                 },
                 success: function (response) {
                     if (response.status === 'success' && response.logs.length > 0) {
@@ -471,26 +620,39 @@
                                 second: '2-digit',
                                 hour12: true
                             });
+                            let responseMessage = '';
+                            if (log.status === 'success') {
+                                responseMessage = log.response_message || '---';
+                            } else {
+                                responseMessage = log.error_message || '---';
+                            }
+                            let paymentStatus = log.status === 'success' ?
+                                '<span class="badge bg-success">Paid</span>' :
+                                '<span class="badge bg-danger">Not Paid</span>';
                             rows += `
                         <tr>
-                            <td>${index + 1}</td>
-                            <td>${log.merchant ?? ""}</td>
-                            <td>${log.last_4 ?? ""}</td>
-                            <td>${log.transaction_id ?? ""}</td>
-                            <td>${log.amount ?? ""}</td>
-                            <td>${log.status == 'success' ? log?.response_message ?? "" : log?.error_message ?? ""}</td>
-                            <td>${log.status == 'success' ? '<span class="text-success">Paid</span>' : '<span class="text-danger">Not Paid</span>'}</td>
-                            <td>${formattedDate}</td>
+                            <td class="align-middle">${index + 1}</td>
+                            <td class="align-middle">${log.merchant ?? "---"}</td>
+                            <td class="align-middle">${log.last_4 ?? "---"}</td>
+                            <td class="align-middle">${log.transaction_id ?? "---"}</td>
+                            <td class="align-middle">$${parseFloat(log.amount || 0).toFixed(2)}</td>
+                            <td class="align-middle">${responseMessage}</td>
+                            <td class="align-middle">${log.response_code_message || "---"}</td>
+                            <td class="align-middle">${log.avs_message || "---"}</td>
+                            <td class="align-middle">${log.cvv_message || "---"}</td>
+                            <td class="align-middle">${log.cavv_message || "---"}</td>
+                            <td class="align-middle">${paymentStatus}</td>
+                            <td class="align-middle">${formattedDate}</td>
                         </tr>`;
                         });
                         $('#transactionLogs').html(rows);
                     } else {
-                        $('#transactionLogs').html('<tr><td colspan="12" class="text-center">No transactions found</td></tr>');
+                        $('#transactionLogs').html('<tr><td colspan="12" class="text-left">No transactions found</td></tr>');
                     }
                     $('#transactionModal').modal('show');
                 },
                 error: function () {
-                    $('#transactionLogs').html('<tr><td colspan="12" class="text-center text-danger">Error fetching data</td></tr>');
+                    $('#transactionLogs').html('<tr><td colspan="12" class="text-left text-danger">Error fetching data</td></tr>');
                 }
             });
         });
@@ -508,7 +670,7 @@
                 type: 'GET',
                 data: {invoice_key: invoice_key},
                 beforeSend: function () {
-                    $tableBody.html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+                    $tableBody.html('<tr><td colspan="6" class="text-left">Loading...</td></tr>');
                 },
                 success: function (response) {
                     $tableBody.empty();
@@ -529,10 +691,10 @@
                                         const fileName = attachment.original_name || attachment.file_name;
                                         const createdAt = attachment.created_at || payment_attachment.created_at;
                                         const $row = $('<tr>').html(`
-                                            <td class="align-middle text-center">${attachment.id}</td>
-                                            <td class="align-middle text-center">${fileName}</td>
-                                            <td class="align-middle text-center">${fileType}</td>
-                                            <td class="align-middle text-center">
+                                            <td class="align-middle text-left">${attachment.id}</td>
+                                            <td class="align-middle text-left">${fileName}</td>
+                                            <td class="align-middle text-left">${fileType}</td>
+                                            <td class="align-middle text-left">
                                                 <button class="btn btn-sm btn-outline-primary view-file-btn"
                                                         data-url="${fileUrl}"
                                                         data-name="${fileName}"
@@ -540,8 +702,8 @@
                                                     <i class="fas fa-eye"></i> View
                                                 </button>
                                             </td>
-                                            <td class="align-middle text-center">${new Date(createdAt).toLocaleString()}</td>
-                                            <td class="align-middle text-center">
+                                            <td class="align-middle text-left">${new Date(createdAt).toLocaleString()}</td>
+                                            <td class="align-middle text-left">
                                                 <a href="${fileUrl}" download="${fileName}" class="btn btn-sm btn-outline-primary download-btn">
                                                     <i class="fas fa-download"></i> Download
                                                 </a>
@@ -554,7 +716,7 @@
                                 console.error('Error parsing attachments:', e);
                                 $tableBody.append(`
                             <tr>
-                                <td colspan="6" class="text-center text-danger">
+                                <td colspan="6" class="text-left text-danger">
                                     Error loading attachments for payment ${parentIndex + 1}
                                 </td>
                             </tr>
@@ -563,15 +725,15 @@
                         });
 
                         if (!hasValidAttachments) {
-                            $tableBody.html('<tr><td colspan="6" class="text-center">No valid attachments found.</td></tr>');
+                            $tableBody.html('<tr><td colspan="6" class="text-left">No valid attachments found.</td></tr>');
                         }
                     } else {
-                        $tableBody.html('<tr><td colspan="6" class="text-center">No payment attachments found.</td></tr>');
+                        $tableBody.html('<tr><td colspan="6" class="text-left">No payment attachments found.</td></tr>');
                     }
                     $('#paymentProofModal').modal('show');
                 },
                 error: function () {
-                    $tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error fetching data</td></tr>');
+                    $tableBody.html('<tr><td colspan="6" class="text-left text-danger">Error fetching data</td></tr>');
                 }
             });
         });
@@ -675,7 +837,7 @@
         {{--                const dropdownHtml = `--}}
         {{--                            <div class="form-group mb-3">--}}
         {{--                                <label for="merchant_select_${type}" class="form-label">Select Merchant</label>--}}
-        {{--                                <select class="form-control form-select" id="merchant_select_${type}" name="merchants[${type}]" title="Please select a ${type} merchant" required>--}}
+        {{--                                <select class="form-control form-select" id="merchant_select_${type}" name="merchants[${type}]" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a ${type} merchant" required>--}}
         {{--                                    <option value="" selected disabled>Please select a ${type} merchant</option>--}}
         {{--                                    ${merchant_types[type].map(merchant => `--}}
         {{--                                        <option value="${merchant.id}">${merchant.name}</option>--}}
@@ -753,7 +915,7 @@
                                     const dropdownHtml = `
                                     <div class="form-group mb-3">
                                         <label for="merchant_select_${safeType}" class="form-label">Select Merchant</label>
-                                        <select class="form-control form-select" id="merchant_select_${safeType}" name="merchants[${type}]" title="Please select a ${type} merchant" required>
+                                        <select class="form-control form-select" id="merchant_select_${safeType}" name="merchants[${type}]" data-bs-toggle="tooltip" data-bs-placement="top" title="Please select a ${type} merchant" required>
                                             <option value="" selected disabled>Please select a ${type} merchant</option>
                                             ${merchant_types[type].map(merchant => `
                                                 <option value="${merchant.id}">${merchant.name} ( Limit : ${merchant.limit} ) </option>
@@ -794,5 +956,195 @@
                     return 'fas fa-question-circle';
             }
         }
+
+        $('#dateRangePicker').daterangepicker({
+            timePicker: true,
+            timePicker24Hour: false,
+            timePickerIncrement: 1,
+            locale: {
+                format: 'YYYY-MM-DD h:mm:ss A',
+            },
+            startDate: moment().startOf('month').startOf('day'),
+            endDate: moment().endOf('month').endOf('day'),
+            ranges: {
+                'Today': [moment().startOf('day'), moment().endOf('day')],
+                'Yesterday': [moment().subtract(1, 'days').startOf('day'), moment().subtract(1, 'days').endOf('day')],
+                'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+                'Last 30 Days': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment().endOf('day')],
+                'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
+            }
+        });
+
+        $('#teamSelect, #brandSelect').change(function () {
+            filterInvoices();
+        });
+        $('#dateRangePicker').on('apply.daterangepicker', function () {
+            filterInvoices();
+        });
+        @if(isset($actual_dates['start_date']) && isset($actual_dates['end_date']))
+        let actualStart = moment("{{ $actual_dates['start_date'] }}", "YYYY-MM-DD h:mm:ss A");
+        let actualEnd = moment("{{ $actual_dates['end_date'] }}", "YYYY-MM-DD h:mm:ss A");
+
+        $('#dateRangePicker').data('daterangepicker').setStartDate(actualStart);
+        $('#dateRangePicker').data('daterangepicker').setEndDate(actualEnd);
+        @endif
+        function filterInvoices() {
+            const teamKey = $('#teamSelect').val();
+            const brandKey = $('#brandSelect').val();
+            const dates = $('#dateRangePicker').data('daterangepicker');
+
+            let table = dataTables[0];
+            table.clear().draw(); // Clear existing rows
+
+            @php
+                $baseUrl = '';
+                if (app()->environment('production')) {
+                    $baseUrl = url('');
+                } elseif (app()->environment('development')) {
+                    $baseUrl = url('');
+                } else {
+                    $baseUrl = url('');
+                }
+            @endphp
+            let basePath = `{{$baseUrl}}`;
+
+            AjaxRequestPromise(`{{ route("admin.invoice.filter") }}`, {
+                team_key: teamKey,
+                brand_key: brandKey,
+                start_date: dates.startDate.format('YYYY-MM-DD h:mm:ss A'),
+                end_date: dates.endDate.format('YYYY-MM-DD h:mm:ss A'),
+            }, 'GET', {useToastr: false})
+                .then(response => {
+                    if (response && response.success && response.data) {
+                        if (response.actual_dates) {
+                            const actualStart = moment(response.actual_dates.start_date, 'YYYY-MM-DD h:mm:ss A');
+                            const actualEnd = moment(response.actual_dates.end_date, 'YYYY-MM-DD h:mm:ss A');
+                            $('#dateRangePicker').data('daterangepicker').setStartDate(actualStart);
+                            $('#dateRangePicker').data('daterangepicker').setEndDate(actualEnd);
+                            if (response.actual_dates.start_date !== dates.startDate.format('YYYY-MM-DD h:mm:ss A') ||
+                                response.actual_dates.end_date !== dates.endDate.format('YYYY-MM-DD h:mm:ss A')) {
+                                toastr.info('Date range adjusted to show available records');
+                            }
+                        }
+                        response.data.forEach(function (invoice, index) {
+                            const {
+                                id,
+                                invoice_number,
+                                invoice_key,
+                                brand,
+                                team,
+                                customer_contact,
+                                agent,
+                                amount, tax_type, tax_value,
+                                tax_amount, total_amount,
+                                currency,
+                                status,
+                                due_date,
+                                date,
+                                created_at,
+                                payment_attachments,
+                                gateway_counts,
+                            } = invoice;
+                            index++;
+                            let totalAttachments = 0;
+                            if (payment_attachments && payment_attachments.length > 0) {
+                                totalAttachments = payment_attachments.reduce((count, payment) => {
+                                    try {
+                                        const attachments = JSON.parse(payment.attachments);
+                                        return count + (attachments ? attachments.length : 0);
+                                    } catch (e) {
+                                        return count;
+                                    }
+                                }, 0);
+                            }
+                            // const gatewayCountsHtml = `
+                            //     ${(gateway_counts.m.includes('authorize') || gateway_counts.s.authorize > 0 || gateway_counts.f.authorize > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Authorize : </span>
+                            //         <span>${gateway_counts.s.authorize}-<span class="text-danger">${gateway_counts.f.authorize}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('edp') || gateway_counts.s.edp > 0 || gateway_counts.f.edp > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Edp : </span>
+                            //         <span>${gateway_counts.s.edp}-<span class="text-danger">${gateway_counts.f.edp}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('stripe') || gateway_counts.s.stripe > 0 || gateway_counts.f.stripe > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Stripe : </span>
+                            //         <span>${gateway_counts.s.stripe}-<span class="text-danger">${gateway_counts.f.stripe}</span></span>
+                            //     </div>` : ''}
+                            //     ${(gateway_counts.m.includes('paypal') || gateway_counts.s.paypal > 0 || gateway_counts.f.paypal > 0) ? `
+                            //     <div style="display:flex;justify-content:space-between;gap:10px;">
+                            //         <span>Paypal : </span>
+                            //         <span>${gateway_counts.s.paypal}-<span class="text-danger">${gateway_counts.f.paypal}</span></span>
+                            //     </div>` : ''}
+                            // `;
+                            const columns = `
+                        <td class="align-middle text-left text-nowrap"></td>` +
+                                // <td class="align-middle text-left text-nowrap">${index}</td>
+                                // <td class="align-middle text-left text-nowrap">${gatewayCountsHtml}</td>
+                                `<td class="align-middle text-left text-nowrap text-sm invoice-cell">
+                            <span class="invoice-number">${invoice_number}</span><br>
+                            <span class="invoice-key view-transactions text-primary"
+                                                          title="Show transaction logs"
+                                                          style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
+                        </td>
+                        <td class="align-middle text-left text-nowrap">
+                            ${brand ? `<a href="{{route('admin.brand.index')}}?search=${brand.name}">${brand.name}</a>` : '---'}
+                        </td>
+                        <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('admin.team.index')}}?search=${team.name}">${team.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="{{route('admin.customer.contact.index')}}?search=${customer_contact.name}">${customer_contact.name}</a>` : '---'}</td>
+                        <td class="align-middle text-left text-nowrap">${agent ? `<a href="{{route('admin.employee.index')}}?search=${agent.name}">${agent.name}</a>` : '---'}</td>
+                        <td class="align-middle space-between text-nowrap" style="text-align: left;">` +
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Amount:</span>
+                                //     <span>${currency} ${parseFloat(amount).toFixed(2)}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax:</span>
+                                //     <span>${tax_type === 'percentage' ? '%' : (tax_type === 'fixed' ? currency : '')} ${tax_value ?? 0}</span>
+                                // </div>
+                                // <div style="display: flex; justify-content: space-between; gap: 10px;">
+                                //     <span style="width: 120px;">Tax Amount:</span>
+                                //     <span>${currency} ${parseFloat(tax_amount).toFixed(2)}</span>
+                                // </div>
+                                `<div style="display: flex; justify-content: space-between; gap: 10px;">
+                                <span>${currency} ${parseFloat(total_amount).toFixed(2)}</span>
+                            </div>
+                        </td>
+                        <td class="align-middle text-left text-nowrap">
+                            ${status == 0 ? '<span class="badge bg-warning text-dark">Due</span>' : status == 1 ? '<span class="badge bg-success">Paid</span>' : status == 2 ? '<span class="badge bg-danger">Refund</span>' : status == 3 ? '<span class="badge bg-danger">Charge Back</span>' : ''}
+                        </td>
+                        <td class="align-middle text-left text-nowrap">${due_date}</td>
+                        <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
+                        <td class="align-middle text-left table-actions">
+                        <button type="button" class="btn btn-sm btn-primary copyBtn"
+                                                            data-id="${id}"
+                                                            data-invoice-key="${invoice_key}"
+                                                            data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
+                                                            title="Copy Invoice Url"><i
+                                                            class="fas fa-copy"></i></button>
+                            ${payment_attachments && payment_attachments.length > 0 ? `<button type="button" class="btn btn-sm btn-primary view-payment-proofs" data-invoice-key="${invoice_key}" title="View Payment Proofs"><i class="fas fa-paperclip" aria-hidden="true"></i>  ${totalAttachments}  </button> ` : '<button type="button" class="btn btn-sm btn-primary disabled" data-bs-toggle="tooltip" data-bs-placement="top" title="View Payment Proofs"><i class="fas fa-paperclip"></i>0</button>'}
+                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
+                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
+                                    : ''}
+                        </td>`;
+                            table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                        })
+                    }
+                })
+
+                .catch(error => console.error('An error occurred while updating the record.', error))
+        }
+
+        $('#dateRangePicker').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(
+                picker.startDate.format('YYYY-MM-DD h:mm:ss A') + ' - ' +
+                picker.endDate.format('YYYY-MM-DD h:mm:ss A')
+            );
+        });
     });
 </script>
