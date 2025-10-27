@@ -687,7 +687,7 @@
 
                 socket.on('new_message', (data) => {
                     console.log('📨 Socket received message:', data);
-                    if (data.conversation_id === currentConversationId && data.sender_type !==
+                    if (data.conversation_id == currentConversationId && data.sender_type !==
                         'App\\Models\\CustomerContact') {
                         addMessageToChat(data.content, false, data);
                     }
