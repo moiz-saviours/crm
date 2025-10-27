@@ -554,7 +554,8 @@
                     <div class="sidebar-header text-center">
                         <h5 class="mb-3">Conversations</h5>
                         <div class="search-container">
-                            <input type="text" class="search-input" placeholder="Search Conversations..." id="contactSearch">
+                            <input type="text" class="search-input" placeholder="Search Conversations..."
+                                id="contactSearch">
                             <i class="fas fa-search search-icon"></i>
                         </div>
                     </div>
@@ -649,8 +650,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
-
     <script>
+        // Dynamic configuration from Laravel
+        const socketConfig = {
+            url: '{{ config('socketio.url', 'http://localhost:6001') }}',
+            path: '{{ config('socketio.path', '/socket.io') }}',
+            environment: '{{ config('app.env', 'local') }}'
+        };
+
+
         // Global variables - MOVE THESE OUTSIDE THE PHP CONDITION
         let currentConversationId = {{ $conversation->id ?? 'null' }};
         const customer = @json($customer ?? null);
@@ -662,10 +670,12 @@
         // Initialize socket function - SIMPLER FIX
         function initializeSocket() {
             if (!socket) {
-                console.log('🔌 Initializing Socket.IO connection...');
-                socket = io('{{ config('socketio.url') }}');
+                socket = io(socketConfig.url, {
+                    path: socketConfig.path,
+                    transports: ['websocket', 'polling']
+                });
             }
-            
+
             // Only add event listeners if socket exists
             if (socket) {
                 socket.on('connect', () => {
@@ -674,19 +684,20 @@
                         socket.emit('join_conversation', currentConversationId);
                     }
                 });
-                
+
                 socket.on('new_message', (data) => {
-                    if (data.conversation_id == currentConversationId && data.sender_type !== 'App\\Models\\CustomerContact') {
-                        console.log('rendering message');
+                    console.log('📨 Socket received message:', data);
+                    if (data.conversation_id === currentConversationId && data.sender_type !==
+                        'App\\Models\\CustomerContact') {
                         addMessageToChat(data.content, false, data);
                     }
                 });
-                
+
                 socket.on('connect_error', (error) => {
                     console.error('❌ Socket connection error:', error);
                 });
             }
-            
+
             return socket;
         }
 
@@ -730,12 +741,13 @@
             });
             // Load messages for specific conversation
             function loadMessages(conversationId) {
-                fetch(`{{ route('customer.chat.conversations.messages', ['customer_contact' => $customer->special_key, 'conversation' => ':conversationId']) }}`.replace(':conversationId', conversationId))
-                .then(response => response.json())
-                .then(messages => {
-                    document.getElementById('loadingMessages').style.display = 'none';
-                    renderMessages(messages);
-                })
+                fetch(`{{ route('customer.chat.conversations.messages', ['customer_contact' => $customer->special_key, 'conversation' => ':conversationId']) }}`
+                        .replace(':conversationId', conversationId))
+                    .then(response => response.json())
+                    .then(messages => {
+                        document.getElementById('loadingMessages').style.display = 'none';
+                        renderMessages(messages);
+                    })
                     .catch(error => {
                         console.error('Error loading messages:', error);
                         document.getElementById('loadingMessages').innerHTML =
@@ -913,7 +925,7 @@
                         addMessageToChat(message, true);
 
                         // Send to backend via AJAX
-                            fetch(`{{ route('customer.chat.message.send', ['customer_contact' => $customer->special_key]) }}`, {
+                        fetch(`{{ route('customer.chat.message.send', ['customer_contact' => $customer->special_key]) }}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -978,43 +990,43 @@
         @endif
     </script>
     <script>
-            // SEARCH FUNCTIONALITY:
-    document.getElementById('contactSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const contactItems = document.querySelectorAll('.contact-item');
+        // SEARCH FUNCTIONALITY:
+        document.getElementById('contactSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const contactItems = document.querySelectorAll('.contact-item');
 
-        contactItems.forEach(item => {
-            const contactName = item.querySelector('.contact-name').textContent.toLowerCase();
-            const lastMessage = item.querySelector('.contact-last-message').textContent.toLowerCase();
+            contactItems.forEach(item => {
+                const contactName = item.querySelector('.contact-name').textContent.toLowerCase();
+                const lastMessage = item.querySelector('.contact-last-message').textContent.toLowerCase();
 
-            if (contactName.includes(searchTerm) || lastMessage.includes(searchTerm)) {
-                item.style.display = 'flex';
+                if (contactName.includes(searchTerm) || lastMessage.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // ADD this at the end of your JavaScript:
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', function(event) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlConversationId = urlParams.get('conversation_id');
+
+            if (urlConversationId) {
+                loadSelectedConversation(urlConversationId);
             } else {
-                item.style.display = 'none';
+                // No conversation in URL, show no conversation state
+                document.getElementById('noConversationState').style.display = 'flex';
+                document.getElementById('chatInputContainer').style.display = 'none';
+                document.getElementById('chatMessages').innerHTML = '';
+
+                // Remove active state from all contacts
+                document.querySelectorAll('.contact-item').forEach(item => {
+                    item.classList.remove('active');
+                });
             }
         });
-    });
-
-    // ADD this at the end of your JavaScript:
-    // Handle browser back/forward buttons
-    window.addEventListener('popstate', function(event) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlConversationId = urlParams.get('conversation_id');
-        
-        if (urlConversationId) {
-            loadSelectedConversation(urlConversationId);
-        } else {
-            // No conversation in URL, show no conversation state
-            document.getElementById('noConversationState').style.display = 'flex';
-            document.getElementById('chatInputContainer').style.display = 'none';
-            document.getElementById('chatMessages').innerHTML = '';
-            
-            // Remove active state from all contacts
-            document.querySelectorAll('.contact-item').forEach(item => {
-                item.classList.remove('active');
-            });
-        }
-    });
     </script>
 </body>
 

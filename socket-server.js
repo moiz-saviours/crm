@@ -3,33 +3,33 @@ import { Server } from 'socket.io';
 
 const ENV = process.env.APP_ENV || 'local';
 const PORT = process.env.SOCKETIO_PORT || 6001;
-const URL = process.env.SOCKETIO_URL || 6001;
 
-let allowedOrigins = [];
-let socketPath = '/socket.io';
-switch (ENV) {
-    case 'production':
-        allowedOrigins = ['*'];
-        socketPath = '/socket.io';
-        break;
+// Dynamic configuration based on environment
+const config = {
+    local: {
+        origin: ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:3000"],
+        path: '/socket.io'
+    },
+    development: {
+        origin: ["https://payusinginvoice.com"],
+        path: '/crm-development/socket.io'
+    },
+    production: {
+        origin: ["https://payusinginvoice.com"],
+        path: '/socket.io'
+    }
+};
 
-    case 'development':
-        allowedOrigins = ['*'];
-        socketPath = '/crm-development/socket.io';
-        break;
+const currentConfig = config[ENV] || config.local;
 
-    default: // local
-        allowedOrigins = ['*'];
-        socketPath = '/socket.io';
-        break;
-}
 const server = createServer();
 const io = new Server(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: currentConfig.origin,
+        methods: ["GET", "POST"],
+        credentials: true
     },
-    path: socketPath,
+    path: currentConfig.path,
     transports: ['websocket', 'polling']
 });
 
@@ -60,7 +60,6 @@ io.on('connection', (socket) => {
                 created_at: new Date().toISOString(),
                 attachments: data.attachments || []
             };
-            // Broadcast to all users in the conversation
             io.to(`conversation_${data.conversation_id}`).emit('new_message', messageData);
             console.log('Message sent to conversation:', data.conversation_id);
         } catch (error) {
@@ -69,26 +68,15 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle typing indicators
-    socket.on('typing_start', (data) => {
-        socket.to(`conversation_${data.conversation_id}`).emit('user_typing', {
-            user_id: data.user_id,
-            user_name: data.user_name
-        });
-    });
-
-    socket.on('typing_stop', (data) => {
-        socket.to(`conversation_${data.conversation_id}`).emit('user_stop_typing', {
-            user_id: data.user_id
-        });
-    });
-
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
         activeConversations.delete(socket.id);
     });
 });
+
 server.listen(PORT, () => {
     console.log(`✅ Socket.IO server running on port ${PORT}`);
-    console.log(`📍 ${URL}:${PORT}`);
+    console.log(`📍 Environment: ${ENV}`);
+    console.log(`📍 CORS Origins: ${currentConfig.origin.join(', ')}`);
+    console.log(`📍 Socket Path: ${currentConfig.path}`);
 });
