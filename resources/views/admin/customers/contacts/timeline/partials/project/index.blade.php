@@ -103,10 +103,10 @@ $(document).ready(function() {
     }
 
     // Project modal handling
-    $(document).on('click', '.project-card', function() {
-        const projectId = $(this).data('project-id');
-        loadProjectDetails(projectId);
-    });
+    // $(document).on('click', '.project-card', function() {
+    //     const projectId = $(this).data('project-id');
+    //     loadProjectDetails(projectId);
+    // });
 
     function loadProjectDetails(projectId) {
         $.ajax({
