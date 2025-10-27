@@ -533,7 +533,7 @@
             ],
             'App\Models\CustomerContact' => [
                 'icon' => '<i class="fas fa-comments text-info"></i>',
-                'title' => 'General Support',
+                'title' => $conversation->receiver->name ?? 'Not Provided',
             ],
         ];
 
@@ -551,15 +551,19 @@
             <!-- Sidebar for Conversations -->
             <div class="col-md-3">
                 <div class="chat-sidebar">
-                    <div class="sidebar-header">
-                        <h5 class="mb-3">Your Conversations</h5>
+                    <div class="sidebar-header text-center">
+                        <h5 class="mb-3">Conversations</h5>
+                        <div class="search-container">
+                            <input type="text" class="search-input" placeholder="Search Conversations..." id="contactSearch">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
                     </div>
 
                     <div class="contacts-list" id="contactsList">
                         @foreach ($conversations as $conv)
                             @php
                                 $contextInfo = getContextInfo($conv);
-                                $isActive = $conv->id === ($conversation->id ?? null);
+                                $isActive = $conv->id == ($conversation->id ?? null);
                             @endphp
                             <div class="contact-item {{ $isActive ? 'active' : '' }}"
                                 data-conversation-id="{{ $conv->id }}"
@@ -647,6 +651,45 @@
     <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
     <script>
+        // Global variables - MOVE THESE OUTSIDE THE PHP CONDITION
+        let currentConversationId = {{ $conversation->id ?? 'null' }};
+        const customer = @json($customer ?? null);
+        const customerSpecialKey = '{{ $customer->special_key ?? '' }}';
+
+        // Socket.io configuration
+        let socket = null;
+
+        // Initialize socket function - SIMPLER FIX
+        function initializeSocket() {
+            if (!socket) {
+                console.log('🔌 Initializing Socket.IO connection...');
+                socket = io('{{ config('socketio.url') }}');
+            }
+            
+            // Only add event listeners if socket exists
+            if (socket) {
+                socket.on('connect', () => {
+                    console.log('✅ Socket connected with ID:', socket.id);
+                    if (currentConversationId && currentConversationId !== 'null') {
+                        socket.emit('join_conversation', currentConversationId);
+                    }
+                });
+                
+                socket.on('new_message', (data) => {
+                    if (data.conversation_id == currentConversationId && data.sender_type !== 'App\\Models\\CustomerContact') {
+                        console.log('rendering message');
+                        addMessageToChat(data.content, false, data);
+                    }
+                });
+                
+                socket.on('connect_error', (error) => {
+                    console.error('❌ Socket connection error:', error);
+                });
+            }
+            
+            return socket;
+        }
+
         // Context info helper function
         function getContextInfo(conversation) {
             const contextType = conversation.context_type;
@@ -678,30 +721,21 @@
         }
 
         @if (!$error && $conversation)
-            // Global variables
-            let currentConversationId = {{ $conversation->id }};
-            const customer = @json($customer);
-            const customerSpecialKey = '{{ $customer->special_key }}';
 
-            // Socket.io configuration
-            const socket = io('{{ config('socketio.url') }}');
-
-            // Join current conversation room
-            socket.emit('join_conversation', currentConversationId);
 
             document.addEventListener('DOMContentLoaded', function() {
+                initializeSocket(); // Initialize socket on page load
                 loadMessages(currentConversationId);
                 initializeChat();
             });
-
             // Load messages for specific conversation
             function loadMessages(conversationId) {
-                fetch(`/customer/chat/${customerSpecialKey}/conversations/${conversationId}/messages`)
-                    .then(response => response.json())
-                    .then(messages => {
-                        document.getElementById('loadingMessages').style.display = 'none';
-                        renderMessages(messages);
-                    })
+                fetch(`{{ route('customer.chat.conversations.messages', ['customer_contact' => $customer->special_key, 'conversation' => ':conversationId']) }}`.replace(':conversationId', conversationId))
+                .then(response => response.json())
+                .then(messages => {
+                    document.getElementById('loadingMessages').style.display = 'none';
+                    renderMessages(messages);
+                })
                     .catch(error => {
                         console.error('Error loading messages:', error);
                         document.getElementById('loadingMessages').innerHTML =
@@ -715,7 +749,7 @@
                 chatMessages.innerHTML = '';
 
                 messages.forEach(message => {
-                    const isSent = message.sender_type === 'App\\Models\\CustomerContact';
+                    const isSent = message.sender_type == 'App\\Models\\CustomerContact';
                     addMessageToChat(message.content, isSent, message);
                 });
 
@@ -723,29 +757,41 @@
             }
 
             // Select different conversation
+            // Select different conversation
             function selectConversation(conversationId) {
+                console.log('🎯 Selecting conversation:', conversationId);
+
                 // Update active state
                 document.querySelectorAll('.contact-item').forEach(item => {
-                    item.classList.toggle('active', item.dataset.conversationId == conversationId);
+                    if (item && item.dataset.conversationId == conversationId) {
+                        item.classList.add('active');
+                    } else if (item) {
+                        item.classList.remove('active');
+                    }
                 });
 
-                // Leave previous conversation room
-                socket.emit('leave_conversation', currentConversationId);
+                // Leave previous conversation room if socket exists
+                if (socket && currentConversationId) {
+                    socket.emit('leave_conversation', currentConversationId);
+                }
 
                 // Update current conversation
                 currentConversationId = conversationId;
+
+                // ✅ USE THE EXISTING INITIALIZE FUNCTION (remove the duplicate code below)
+                initializeSocket();
 
                 // Join new conversation room
                 socket.emit('join_conversation', currentConversationId);
 
                 // Show loading and load messages
                 document.getElementById('chatMessages').innerHTML = `
-                <div class="text-center py-4 text-muted" id="loadingMessages">
-                    <div class="spinner-border spinner-border-sm" role="status">
-                        <span class="visually-hidden">Loading messages...</span>
-                    </div>
-                    Loading messages...
-                </div>`;
+    <div class="text-center py-4 text-muted" id="loadingMessages">
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading messages...</span>
+        </div>
+        Loading messages...
+    </div>`;
 
                 loadMessages(conversationId);
             }
@@ -829,10 +875,10 @@
                     const timeDiv = document.createElement('div');
                     timeDiv.className = `small text-muted mt-1 ${isSent ? 'text-end' : 'text-start'}`;
                     timeDiv.textContent = (messageData ? new Date(messageData.created_at) : new Date()).toLocaleTimeString(
-                    [], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
+                        [], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
                     attachmentsWrap.appendChild(timeDiv);
 
                     messageDiv.appendChild(attachmentsWrap);
@@ -848,7 +894,7 @@
 
             // Helper function to format file size
             function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
+                if (bytes == 0) return '0 Bytes';
                 const k = 1024;
                 const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -867,7 +913,7 @@
                         addMessageToChat(message, true);
 
                         // Send to backend via AJAX
-                        fetch(`/customer/chat/${customerSpecialKey}/message`, {
+                            fetch(`{{ route('customer.chat.message.send', ['customer_contact' => $customer->special_key]) }}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -905,7 +951,7 @@
                 sendButton.addEventListener('click', sendMessage);
 
                 messageTextarea.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key == 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         sendMessage();
                     }
@@ -924,21 +970,51 @@
                 });
             }
 
-            // Socket.io event listeners
-            socket.on('new_message', (data) => {
-                // Only add message if it's for the current conversation and from support
-                if (data.conversation_id === currentConversationId && data.sender_type !==
-                    'App\\Models\\CustomerContact') {
-                    addMessageToChat(data.content, false, data);
-                }
-            });
-
             // Scroll to bottom of chat
             function scrollToBottom() {
                 const chatMessages = document.getElementById('chatMessages');
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         @endif
+    </script>
+    <script>
+            // SEARCH FUNCTIONALITY:
+    document.getElementById('contactSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const contactItems = document.querySelectorAll('.contact-item');
+
+        contactItems.forEach(item => {
+            const contactName = item.querySelector('.contact-name').textContent.toLowerCase();
+            const lastMessage = item.querySelector('.contact-last-message').textContent.toLowerCase();
+
+            if (contactName.includes(searchTerm) || lastMessage.includes(searchTerm)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+
+    // ADD this at the end of your JavaScript:
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(event) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlConversationId = urlParams.get('conversation_id');
+        
+        if (urlConversationId) {
+            loadSelectedConversation(urlConversationId);
+        } else {
+            // No conversation in URL, show no conversation state
+            document.getElementById('noConversationState').style.display = 'flex';
+            document.getElementById('chatInputContainer').style.display = 'none';
+            document.getElementById('chatMessages').innerHTML = '';
+            
+            // Remove active state from all contacts
+            document.querySelectorAll('.contact-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+    });
     </script>
 </body>
 

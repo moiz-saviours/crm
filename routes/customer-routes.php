@@ -84,7 +84,7 @@ Route::post('/customer/chat/{customer_contact:special_key}/message', function (R
         'success' => true,
         'message' => $message->load('sender', 'attachments')
     ]);
-});
+})->name('customer.chat.message.send');
 
 // Get messages for specific conversation
 Route::get('/customer/chat/{customer_contact:special_key}/conversations/{conversation}/messages', function (CustomerContact $customer_contact, Conversation $conversation) {
@@ -114,7 +114,7 @@ Route::get('/customer/chat/{customer_contact:special_key}/conversations/{convers
     });
 
     return response()->json($messages);
-});
+})->name('customer.chat.conversations.messages');
 
 // Get all conversations for customer
 Route::get('/customer/chat/{customer_contact:special_key}/conversations', function (CustomerContact $customer_contact) {
