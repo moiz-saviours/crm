@@ -19,9 +19,9 @@ class ProjectsTableSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-        try {
+public function run(): void
+{
+    try {
         // Get existing records from related tables
         $brands = Brand::all();
         $customerContacts = CustomerContact::all()
@@ -45,140 +45,171 @@ class ProjectsTableSeeder extends Seeder
         $teamKeys = $teams->pluck('team_key')->toArray();
         $brandsKeys = $brands->pluck('brand_key')->toArray();
 
-
-
-
-        $projects = [];
-        $projectAttachments = [];
-        $projectMembers = [];
-
+        $totalProjects = 0;
+        $totalAttachments = 0;
+        $totalMembers = 0;
         $projectCounter = 1;
 
-        $teamKey = null;
-        if (!empty($teamIds)) {
-            $team = $teams[($projectCounter - 1) % count($teams)];
-            $teamKey = $team->team_key ?? null;
-        }
+        $this->command->info("Starting project creation process...");
+        $this->command->info("Customers to process: " . $customerContacts->count());
+        $this->command->info("Projects per customer: 10");
+        $this->command->line("");
 
-        $brandKey = null;
-        if (!empty($brandIds)) {
-            $brand = $brands[($projectCounter - 1) % count($brands)];
-            $brandKey = $brand->brand_key ?? null;
-        }
-
-        // 🔁 Create 50 projects for each customer
+        //Create 10 projects for each customer
         foreach ($customerContacts as $customerContact) {
+            $this->command->info("Processing Customer: {$customerContact->id} ({$customerContact->name})");
+            
             try {
-            for ($i = 1; $i <= 10; $i++) {
+                for ($i = 1; $i <= 10; $i++) {
+                    // Randomly assign an admin as the creator
+                    $admin = $admins->random();
 
-                // Randomly assign an admin as the creator
-                $admin = $admins->random();
+                    $teamKey = null;
+                    if (!$teams->isEmpty()) {
+                        $team = $teams[($projectCounter - 1) % count($teams)];
+                        $teamKey = $team->team_key ?? null;
+                    }
 
-                // Prepare project record
-                $projects[] = [
-                    'special_key' => Project::generateSpecialKey(),
-                    'cus_contact_key' => $customerContact->special_key ?? CustomerContact::generateSpecialKey(),
-                    'brand_key' => $brandKey,
-                    'team_key' => $teamKey,
-                    'type' => $this->getProjectType($projectCounter),
-                    'value' => $this->getProjectValue($projectCounter),
-                    'label' => 'Project ' . $projectCounter . ' - Customer ' . $customerContact->id,
-                    'theme_color' => $this->getThemeColor($projectCounter),
-                    'project_status' => $this->getProjectStatus($projectCounter),
-                    'is_progress' => $projectCounter % 4 !== 0,
-                    'progress' => $this->getProgress($projectCounter),
-                    'bill_type' => $this->getBillType($projectCounter),
-                    'total_rate' => $this->getTotalRate($projectCounter),
-                    'estimated_hours' => $this->getEstimatedHours($projectCounter),
-                    'start_date' => $this->getStartDate($projectCounter),
-                    'deadline' => $this->getDeadline($projectCounter),
-                    'tags' => json_encode($this->getTags($projectCounter)),
-                    'description' => $this->getDescription($projectCounter) . ' (For Customer ' . $customerContact->id . ')',
-                    'is_notify' => $projectCounter % 5 !== 0,
-                    'creator_type' => 'App\Models\Admin',
-                    'creator_id' => $admin->id,
-                    'status' => $projectCounter % 100 === 0 ? 0 : 1, // Every 100th project is inactive
-                    'created_at' => Carbon::now()->subDays(rand(0, 365)),
-                    'updated_at' => Carbon::now()->subDays(rand(0, 365)),
-                ];
+                    $brandKey = null;
+                    if (!$brands->isEmpty()) {
+                        $brand = $brands[($projectCounter - 1) % count($brands)];
+                        $brandKey = $brand->brand_key ?? null;
+                    }
 
-                $projectCounter++;
-            }
+                    // Create project one by one
+                    $project = Project::create([
+                        'special_key' => Project::generateSpecialKey(),
+                        'cus_contact_key' => $customerContact->special_key ?? CustomerContact::generateSpecialKey(),
+                        'brand_key' => $brandKey,
+                        'team_key' => $teamKey,
+                        'type' => $this->getProjectType($projectCounter),
+                        'value' => $this->getProjectValue($projectCounter),
+                        'label' => 'Project ' . $projectCounter . ' - Customer ' . $customerContact->id,
+                        'theme_color' => $this->getThemeColor($projectCounter),
+                        'project_status' => $this->getProjectStatus($projectCounter),
+                        'is_progress' => $projectCounter % 4 !== 0,
+                        'progress' => $this->getProgress($projectCounter),
+                        'bill_type' => $this->getBillType($projectCounter),
+                        'total_rate' => $this->getTotalRate($projectCounter),
+                        'estimated_hours' => $this->getEstimatedHours($projectCounter),
+                        'start_date' => $this->getStartDate($projectCounter),
+                        'deadline' => $this->getDeadline($projectCounter),
+                        'tags' => $this->getTags($projectCounter),
+                        'description' => $this->getDescription($projectCounter) . ' (For Customer ' . $customerContact->id . ')',
+                        'is_notify' => $projectCounter % 5 !== 0,
+                        'creator_type' => 'App\Models\Admin',
+                        'creator_id' => $admin->id,
+                        'status' => $projectCounter % 100 === 0 ? 0 : 1,
+                        'created_at' => Carbon::now()->subDays(rand(0, 365)),
+                        'updated_at' => Carbon::now()->subDays(rand(0, 365)),
+                    ]);
+
+                    $totalProjects++;
+                    
+                    // Show project creation details
+                    $this->command->line("Project #{$projectCounter}: {$project->label} (ID: {$project->id})");
+
+                    // Create exactly 2 attachments for this project
+                    $projectAttachments = [];
+                    for ($j = 1; $j <= 2; $j++) {
+                        $attachmentData = [
+                            'project_id' => $project->id,
+                            'file_name' => $this->getFileName($projectCounter, $j),
+                            'file_path' => $this->getFilePath($projectCounter, $j),
+                            'file_type' => $this->getFileType($j),
+                            'file_size' => rand(1024, 10485760),
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ];
+                        
+                        DB::table('project_attachments')->insert($attachmentData);
+                        $projectAttachments[] = $attachmentData['file_name'];
+                        $totalAttachments++;
+                    }
+
+                    $this->command->line("   📎 Attachments: " . implode(', ', $projectAttachments));
+
+                    // Create members for this project
+                    $memberCount = rand(3, 5);
+                    $usedMemberIds = [$project->creator_id];
+                    $memberRoles = [];
+
+                    // Add creator as Project Manager
+                    DB::table('project_members')->insert([
+                        'project_id' => $project->id,
+                        'member_type' => 'App\Models\Admin',
+                        'member_id' => $project->creator_id,
+                        'role' => 'Project Manager',
+                        'is_active' => true,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                    $memberRoles[] = 'Project Manager';
+                    $totalMembers++;
+
+                    // Add additional random admins
+                    for ($k = 2; $k <= $memberCount; $k++) {
+                        $memberId = $this->getMemberId($admins, $k, $usedMemberIds);
+                        $usedMemberIds[] = $memberId;
+                        $role = $this->getMemberRole($k);
+
+                        DB::table('project_members')->insert([
+                            'project_id' => $project->id,
+                            'member_type' => 'App\Models\Admin',
+                            'member_id' => $memberId,
+                            'role' => $role,
+                            'is_active' => $k !== $memberCount,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ]);
+                        $memberRoles[] = $role;
+                        $totalMembers++;
+                    }
+
+                    $this->command->line("   👥 Members: {$memberCount} members (" . implode(', ', array_unique($memberRoles)) . ")");
+                    
+                    // Show batch summary every 100 projects
+                    if ($projectCounter % 100 === 0) {
+                        $this->command->info("");
+                        $this->command->info("Batch Summary (Up to Project #{$projectCounter}):");
+                        $this->command->info("Projects: {$totalProjects}");
+                        $this->command->info("Attachments: {$totalAttachments}");
+                        $this->command->info("Members: {$totalMembers}");
+                        $this->command->line("");
+                    }
+
+                    $projectCounter++;
+                }
+
+                $this->command->info("Completed Customer: {$customerContact->id} - 10 projects created");
+                $this->command->line("");
+
             } catch (\Throwable $e) {
-                $this->command->error("❌ Error while generating projects for Customer ID {$customerContact->id}: " . $e->getMessage());
-                break;
+                $this->command->error("Error while generating projects for Customer ID {$customerContact->id}: " . $e->getMessage());
+                $this->command->error("Continuing with next customer...");
+                continue;
             }
         }
 
-        // Insert all projects
-        DB::table('projects')->insert($projects);
-        $insertedProjects = Project::all();
+        // Final summary
+        $this->command->info("PROJECT CREATION COMPLETED!");
+        $this->command->info("=================================");
+        $this->command->info("FINAL SUMMARY:");
+        $this->command->info("Total Projects: {$totalProjects}");
+        $this->command->info("Total Attachments: {$totalAttachments}");
+        $this->command->info("Total Members: {$totalMembers}");
+        $this->command->info("Attachments per project: " . number_format($totalAttachments / $totalProjects, 2));
+        $this->command->info("Members per project: " . number_format($totalMembers / $totalProjects, 2));
+        $this->command->info("=================================");
 
-        // 🔗 Create attachments and members for each project
-        foreach ($insertedProjects as $index => $project) {
-            try {
-            // Attachments (2–4 per project)
-            $attachmentCount = rand(2, 4);
-            for ($j = 1; $j <= $attachmentCount; $j++) {
-                $projectAttachments[] = [
-                    'project_id' => $project->id,
-                    'file_name' => $this->getFileName($index + 1, $j),
-                    'file_path' => $this->getFilePath($index + 1, $j),
-                    'file_type' => $this->getFileType($j),
-                    'file_size' => rand(1024, 10485760),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            }
-
-            // Members (3–5 per project)
-            $memberCount = rand(3, 5);
-            $usedMemberIds = [$project->creator_id];
-
-            // Add creator as Project Manager
-            $projectMembers[] = [
-                'project_id' => $project->id,
-                'member_type' => 'App\Models\Admin',
-                'member_id' => $project->creator_id,
-                'role' => 'Project Manager',
-                'is_active' => true,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ];
-
-            // Add additional random admins
-            for ($k = 2; $k <= $memberCount; $k++) {
-                $memberId = $this->getMemberId($admins, $k, $usedMemberIds);
-                $usedMemberIds[] = $memberId;
-
-                $projectMembers[] = [
-                    'project_id' => $project->id,
-                    'member_type' => 'App\Models\Admin',
-                    'member_id' => $memberId,
-                    'role' => $this->getMemberRole($k),
-                    'is_active' => $k !== $memberCount,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            }
-            } catch (\Throwable $e) {
-                $this->command->error("⚠️ Error while processing Project ID {$project->id}: " . $e->getMessage());
-                break;
-            }
-
-        }
-
-        } catch (\Throwable $e) {
-            $this->command->error('❌ Seeder stopped due to unexpected error: ' . $e->getMessage());
-        }
-        // Insert attachments and members
-        DB::table('project_attachments')->insert($projectAttachments);
-        DB::table('project_members')->insert($projectMembers);
-
-        $this->command->info('Created ' . count($projects) . ' projects (' . $customerContacts->count() . ' customers × 50 projects each)');
-        $this->command->info('Created ' . count($projectAttachments) . ' project attachments');
-        $this->command->info('Created ' . count($projectMembers) . ' project member assignments');
+    } catch (\Throwable $e) {
+        $this->command->error('Seeder stopped due to unexpected error: ' . $e->getMessage());
+        $this->command->info("Partial Summary:");
+        $this->command->info("Projects created: {$totalProjects}");
+        $this->command->info("Attachments created: {$totalAttachments}");
+        $this->command->info("Members created: {$totalMembers}");
     }
+}
 
 
     private function getFileName(int $projectIndex, int $attachmentIndex): string
