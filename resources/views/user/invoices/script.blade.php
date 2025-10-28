@@ -362,10 +362,10 @@
                                                           title="Show transaction logs"
                                                           style="cursor: pointer;" data-invoice-key="${invoice_key}"><b style="font-weight: 600;">${invoice_key}</b></span>
                         </td>
-                        <td class="align-middle text-center text-nowrap">${brand ? brand.name : "---"}</td>
-                        <td class="align-middle text-center text-nowrap">${team ? team.name : "---"}</td>
-                        <td class="align-middle text-center text-nowrap">${customer_contact ? customer_contact.name : "---"}</td>
-                        <td class="align-middle text-center text-nowrap">${agent ? agent.name : "---"}</td>
+                        <td class="align-middle text-center text-nowrap">${brand?.name}</td>
+                        <td class="align-middle text-center text-nowrap">${team?.name}</td>
+                        <td class="align-middle text-center text-nowrap">${customer_contact?.name}</td>
+                        <td class="align-middle text-center text-nowrap">${agent?.name}</td>
                         <td class="align-middle space-between text-nowrap" style="text-align: left;">
                             <div style="display: flex; justify-content: space-between; gap: 10px;">
                                 <span style="width: 120px;">Amount:</span>
