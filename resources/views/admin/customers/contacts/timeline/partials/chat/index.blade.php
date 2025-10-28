@@ -481,16 +481,15 @@
                 transports: ['websocket', 'polling']
             });
             isSocketInitialized = true;
-
-            console.log(socket);
-            console.log('Socket connected with ID:', socket.id);
+            
             console.log('🔄 Connecting to Socket.IO...');
             console.log('URL:', socketConfig.url);
             console.log('Path:', socketConfig.path);
             console.log('Environment:', socketConfig.environment);
-            
+
             // Add socket event listeners
             socket.on('connect', () => {
+                console.log('✅ Socket connected with ID:', socket.id);
                 // Join current conversation after connection
                 if (window.conversationId) {
                     socket.emit('join_conversation', window.conversationId);

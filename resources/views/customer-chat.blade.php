@@ -681,7 +681,7 @@
                 socket.on('connect', () => {
 
                     console.log(socket);
-                    console.log('Socket connected with ID:', socket.id ?? 'No Id Provided');
+                    console.log('Socket connected with ID:', socket.id);
                     console.log('Connecting to Socket.IO...');
                     console.log('URL:', socketConfig.url);
                     console.log('Path:', socketConfig.path);
