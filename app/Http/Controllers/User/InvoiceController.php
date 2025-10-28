@@ -86,7 +86,7 @@ class InvoiceController extends Controller
                         }
                     },
                 ],
-                'agent_id' => 'nullable|integer',
+                'agent_id' => 'required|integer',
 //            'agent_type' => 'required|string|in:admins,users',
                 'description' => 'nullable|string|max:500',
                 'amount' => 'required|numeric|min:1|max:' . config('invoice.max_amount'),
