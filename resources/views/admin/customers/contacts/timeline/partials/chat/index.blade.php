@@ -476,7 +476,8 @@
 
         if (!isSocketInitialized) {
 
-            console.log('✅ Socket connected with ID:', socket.id);
+            console.log(socket);
+            console.log('Socket connected with ID:', socket.id ?? 'No Id Provided');
             console.log('🔄 Connecting to Socket.IO...');
             console.log('URL:', socketConfig.url);
             console.log('Path:', socketConfig.path);
@@ -490,7 +491,6 @@
             
             // Add socket event listeners
             socket.on('connect', () => {
-                console.log('✅ Socket connected with ID:', socket.id);
                 // Join current conversation after connection
                 if (window.conversationId) {
                     socket.emit('join_conversation', window.conversationId);
