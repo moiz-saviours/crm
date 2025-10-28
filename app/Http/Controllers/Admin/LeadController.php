@@ -10,6 +10,7 @@ use App\Models\LeadStatus;
 use App\Models\Team;
 use App\Models\UserActivity;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -504,14 +505,11 @@ class LeadController extends Controller
             /** ----------------------------------------------------------------
              * STEP 1: Validate brand token & create raw record
              * ----------------------------------------------------------------*/
-
             $submissions = collect($request->input('submissions', []));
             $submission = $submissions->first() ?? [];
-
             try {
                 $scriptToken = $request->input('script_token') ?? ($submission['script_token'] ?? null);
                 $brand = Brand::all()->first(fn($b) => $b->script_token === $scriptToken);
-
                 // Assigned team key (first team of brand)
                 $team_Key = $brand?->assignedTeams->first()?->team?->team_key;
 
@@ -522,7 +520,6 @@ class LeadController extends Controller
                 ]);
 
             }
-
             $leadId = $lead->id;
             /** ----------------------------------------------------------------
              * STEP 2: Prepare device info
@@ -583,8 +580,6 @@ class LeadController extends Controller
             /** ----------------------------------------------------------------
              * STEP 3: Map form data to proper fields
              * ----------------------------------------------------------------*/
-
-
             $formData = collect($submission['form_data'] ?? [])
                 ->mapWithKeys(fn($value, $key) => [strtolower($key) => $value])
                 ->toArray();
@@ -677,11 +672,20 @@ class LeadController extends Controller
     {
         try {
             $lead = Lead::findOrFail($id);
-            $deviceInfo = json_decode($lead->device_info, true);
+            if (!empty($lead->raw_data)) {
+                $this->updateLeadFromRawData($lead);
+            }
+            if (empty($lead->email)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No valid email address found in lead data. Cannot convert to customer.'
+                ], 422);
+            }
             $existingContact = CustomerContact::where('email', $lead->email)->first();
             if ($existingContact) {
                 $customer_contact = $existingContact;
             } else {
+                $deviceInfo = json_decode($lead->device_info, true);
                 $customer_contact = new CustomerContact([
                     'brand_key' => $lead->brand_key,
                     'team_key' => null,
@@ -705,7 +709,7 @@ class LeadController extends Controller
                 $lead_data['lead_status_id'] = $lead_status->id;
             }
             $lead->update($lead_data);
-            $lead->load('customer_contact:id,special_key,name', 'leadStatus:id,name');
+            $lead->load('customer_contact:id,special_key,name', 'leadStatus:id,name', 'brand:brand_key,name');
             UserActivity::create([
                 'event_type' => 'conversion',
                 'visitor_id' => $lead->visitor_id,
@@ -725,11 +729,59 @@ class LeadController extends Controller
                     : 'Lead converted to Customer successfully!',
                 'data' => $lead
             ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Record not found. Please try again later.'], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Update lead fields from raw_data using same logic as storeFromScript
+     */
+    private function updateLeadFromRawData(Lead $lead)
+    {
+        $rawData = json_decode($lead->raw_data, true);
+        $submissions = collect($rawData['submissions'] ?? []);
+        $submission = $submissions->first() ?? [];
+        $formData = collect($submission['form_data'] ?? [])->mapWithKeys(fn($value, $key) => [strtolower($key) => $value])->toArray();
+        $fieldMapping = [
+            'name' => ['fname', 'name', 'firstname', 'first-name', 'first_name', 'fullname', 'full_name', 'yourname', 'your-name'],
+            'email' => ['email', 'your-email', 'email-address', 'user_email'],
+            'phone' => ['tel', 'tele', 'number', 'num', 'phone', 'telephone', 'your-phone', 'phone-number', 'phonenumber'],
+            'note' => ['message', 'msg', 'desc', 'description', 'note'],
+        ];
+        $dataToSave = [];
+        foreach ($fieldMapping as $column => $possibleFields) {
+            foreach ($possibleFields as $field) {
+                if (isset($formData[$field])) {
+                    $dataToSave[$column] = $formData[$field];
+                    break;
+                }
+            }
+        }
+        if (empty($lead->brand_key)) {
+            $scriptToken = $rawData['script_token'] ?? ($submission['script_token'] ?? null);
+            if ($scriptToken) {
+                try {
+                    $brand = Brand::all()->first(fn($b) => $b->script_token === $scriptToken);
+                    if ($brand) {
+                        $dataToSave['brand_key'] = $brand->brand_key;
+                    }
+                } catch (\Exception $e) {
+                    Log::channel('webToLead')->warning('Brand lookup failed during conversion', [
+                        'lead_id' => $lead->id,
+                        'script_token' => $scriptToken,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+        if (!empty($dataToSave)) {
+            $lead->update($dataToSave);
         }
     }
 }
