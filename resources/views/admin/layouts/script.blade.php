@@ -819,14 +819,27 @@
     }
 
     window.resetHooks = [];
-    function resetFields() {
+    function resetFields(action = 'open') {
         $('.second-fields').fadeOut();
         $('.first-fields').fadeIn();
         $('.first-field-inputs').prop('required', true);
         $('.second-field-inputs').prop('required', false);
         $('.image-div').css('display', 'none');
         $('.extra-dynamic-fields').empty();
-        $('.unique-select-2').val('').trigger('change');
+        if (action === 'closed') {
+            $('.unique-select-2').each(function () {
+                var $select = $(this);
+                var firstValidOption = $select.find('option').filter(function () {
+                    return $(this).val() !== '';
+                }).first();
+
+                if (firstValidOption.length) {
+                    $select.val(firstValidOption.val()).trigger('change');
+                } else {
+                    $select.val('').trigger('change');
+                }
+            });
+        }
         let placeholderMsg = $('.extra-dynamic-fields-to-show')?.html()?.trim();
         if (placeholderMsg) {
             $('.extra-dynamic-fields').html(placeholderMsg);
@@ -891,7 +904,7 @@
             $('.open-form-btn, .editBtn').click(function () {
                 manageForm[0].reset();
                 manageForm.removeData('id');
-                resetFields();
+                resetFields('open');
                 // Show message if no access
                 if ($(this).hasClass('void')) {
                     $(this).attr('title', "You don't have access to create a record.")
@@ -927,7 +940,7 @@
             // Close the form
             formContainer.removeClass('open');
             $('.form-container').removeClass('open');
-            resetFields();
+            resetFields('closed');
 
             // Reset the form if available
             if (manageForm.length > 0) {
@@ -1024,7 +1037,7 @@
         document.currentScript?.remove()
     }();
 
-        $(document).ready(function() {
+    $(document).ready(function() {
         $('.unique-select-2').select2({
             placeholder: "Select an option",
             allowClear: true,
