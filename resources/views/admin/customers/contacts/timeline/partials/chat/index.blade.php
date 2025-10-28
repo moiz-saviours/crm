@@ -476,9 +476,15 @@
 
         if (!isSocketInitialized) {
 
+            console.log('✅ Socket connected with ID:', socket.id);
+            console.log('🔄 Connecting to Socket.IO...');
+            console.log('URL:', socketConfig.url);
+            console.log('Path:', socketConfig.path);
+            console.log('Environment:', socketConfig.environment);
+
             socket = io(socketConfig.url, {
                 path: socketConfig.path,
-                transports: ['polling']
+                transports: ['websocket', 'polling']
             });
             isSocketInitialized = true;
             
