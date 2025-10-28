@@ -519,6 +519,7 @@
                         toastr.success(res?.message || 'Lead converted successfully.');
                         const lead = res.data;
                         const customer_contact = lead.customer_contact;
+                        const brand = lead.brand;
                         const lead_status = lead.lead_status;
                         $(`#tr-${lead.id} .convertBtn`).removeClass('convertBtn').addClass('disabled').removeAttr('data-id');
                         const index = table.row($('#tr-' + lead.id)).index();
@@ -526,17 +527,17 @@
                         if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`) {
                             table.cell(index, 1).data(`${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`).draw();
                         }
+                        if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : brand.name}`) {
+                            table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : brand.name}`).draw();
+                        }
                         if (decodeHtml(rowData[5]) !== 'Converted') {
                             table.cell(index, 5).data(lead_status.name).draw();
                         }
                     } else {
-                        toastr.error(res?.message || 'Conversion failed.');
                         $btn.prop('disabled', false).removeClass('disabled');
                     }
                 })
                 .catch(err => {
-                    const msg = err?.message || 'Something went wrong!';
-                    toastr.error(msg);
                     $btn.prop('disabled', false).removeClass('disabled');
                 });
         }
