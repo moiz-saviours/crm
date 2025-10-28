@@ -151,8 +151,6 @@ class UserActivityController extends Controller
                 }
             }
 
-            \Log::info('Detected UserActivity IP:', ['ip' => $userIp]);
-
             // Step 2: Get location info from ip-api.com
             $ipapiRes = Http::timeout(5)->get("http://ip-api.com/json/{$userIp}");
             if ($ipapiRes->successful()) {
