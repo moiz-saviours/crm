@@ -326,8 +326,18 @@
                                 due_date,
                                 created_at,
                                 date,
+                                payment_attachments,
                             } = response.data;
                             const index = table.rows().count() + 1;
+                            let totalAttachments = 0;
+                            if (payment_attachments && payment_attachments.length > 0) {
+                                totalAttachments = payment_attachments.reduce((count, payment) => {
+                                    try {
+                                        const attachments = JSON.parse(payment.attachments);
+                                        return count + (attachments ? attachments.length : 0);
+                                    } catch(e) { return count; }
+                                }, 0);
+                            }
                             const columns = `
                         <td class="align-middle text-left text-nowrap"></td>` +
                                 // <td class="align-middle text-left text-nowrap">${index}</td>
@@ -384,16 +394,49 @@
                         <td class="align-middle text-left text-nowrap">${due_date}</td>
                         <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
                         <td class="align-middle text-left table-actions">
-                        <button type="button" class="btn btn-sm btn-primary copyBtn"
-                                                            data-id="${id}"
-                                                            data-invoice-key="${invoice_key}"
-                                                            data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
-                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Invoice Url"><i
-                                                            class="fas fa-copy"></i></button>
-                            ${status != 1 ? '<br><button type="button" class="btn btn-sm btn-primary editBtn mt-2" data-id="' + id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class = "fas fa-edit" aria-hidden="true"> </i></button> ' +
-                                    '<button type="button" class="btn btn-sm btn-danger deleteBtn mt-2" data-id="' + id + '" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"><i class="fas fa-trash" aria-hidden="true"></i></button>'
-                                    : ''}
-                        </td>`;
+    <!-- Copy Button -->
+    <button type="button" class="btn btn-sm btn-primary copyBtn"
+        data-id="${id}"
+        data-invoice-key="${invoice_key}"
+        data-invoice-url="${basePath}/invoice?InvoiceID=${invoice_key}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="Copy Invoice Url">
+        <i class="fas fa-copy"></i>
+    </button>
+
+    <!-- Payment Attachment Button -->
+    <button type="button" class="btn btn-sm btn-primary disabled"
+        data-id="${id}"
+        data-invoice-key="${invoice_key}"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="View Payment Attachments">
+        <i class="fas fa-paperclip"></i>
+        ${totalAttachments ?? 0}
+    </button>
+
+    <!-- Edit & Delete Buttons -->
+    ${status != 1 ? `
+        <br>
+        <button type="button" class="btn btn-sm btn-primary editBtn mt-2"
+            data-id="${id}"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Edit">
+            <i class="fas fa-edit" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn btn-sm btn-danger deleteBtn mt-2"
+            data-id="${id}"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Delete">
+            <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+    ` : ''}
+</td>
+
+`;
                             table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
 
                             $('#manage-form')[0].reset();
