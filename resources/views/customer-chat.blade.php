@@ -672,7 +672,7 @@
             if (!socket) {
                 socket = io(socketConfig.url, {
                     path: socketConfig.path,
-                    transports: ['websocket', 'polling']
+                    transports: ['polling']
                 });
             }
 
@@ -693,8 +693,12 @@
                     }
                 });
 
+                socket.on('disconnect', (reason) => {
+                    console.log('⚠️ Socket disconnected:', reason);
+                });
+
                 socket.on('connect_error', (error) => {
-                    console.error('❌ Socket connection error:', error);
+                    console.error('Socket connection error:', error);
                 });
             }
 

@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col-md-4">
         <div class="chat-sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header text-center">
                 <h5 class="mb-3">Conversations</h5>
                 <div class="search-container">
                     <input type="text" class="search-input" placeholder="Search Conversations..." id="contactSearch">
@@ -66,7 +66,7 @@
             </div>
 
             <!-- Attachment Preview -->
-            <div class="attachment-preview d-none" id="attachmentPreview"></div>
+            <div class="attachment-preview d-none" id="ChatAttachmentPreview"></div>
 
 
 
@@ -116,6 +116,14 @@
 <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 
 <script>
+    // Dynamic configuration from Laravel
+    const socketConfig = {
+        url: '{{ config('socketio.url', 'http://localhost:6001') }}',
+        path: '{{ config('socketio.path', '/socket.io') }}',
+        environment: '{{ config('app.env', 'local') }}'
+    };
+
+
     // Global variables
     //todo need to handle customer id
     window.conversationId = {{ $conversation->id ?? 'null' }}; // Make it globally accessible
@@ -132,20 +140,24 @@
         type: '{{ addslashes(get_class($customer_contact ?? null)) }}',
         id: {{ $customer_contact->id ?? 'null' }}
     };
-
+    // ADD this global variable at the top:
+    let isSocketInitialized = false;
     // Initialize based on conversation existence
     document.addEventListener('DOMContentLoaded', function() {
+        
         // Get conversation_id from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const urlConversationId = urlParams.get('conversation_id');
+        
+        // Initialize socket first
+        initializeSocket();
         
         if (urlConversationId) {
             // Set the global conversationId from URL
             window.conversationId = urlConversationId;
             loadSelectedConversation(urlConversationId);
-        } else if (conversationId) {
+        } else if (window.conversationId) {
             // Use the existing conversationId from PHP
-            window.conversationId = conversationId;
             initializeChatWithConversation();
         } else {
             initializeNoConversationState();
@@ -153,6 +165,8 @@
         
         loadConversationsAsContacts(); // Load conversations list
     });
+
+
 
     // UPDATE the loadConversationsAsContacts function:
         function loadConversationsAsContacts() {
@@ -389,11 +403,23 @@
 
     // ADD THIS FUNCTION after selectConversation:
     function loadSelectedConversation(conversationId) {
+        
         // Update global conversationId
         window.conversationId = conversationId;
         
+        // Get DOM elements safely
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInputContainer = document.getElementById('chatInputContainer');
+        const noConversationState = document.getElementById('noConversationState');
+        const noMessagesState = document.getElementById('noMessagesState');
+        
+        if (!chatMessages) {
+            console.error('❌ chatMessages element not found');
+            return;
+        }
+        
         // Show loading state
-        document.getElementById('chatMessages').innerHTML = `
+        chatMessages.innerHTML = `
             <div class="text-center py-4 text-muted" id="loadingMessages">
                 <div class="spinner-border spinner-border-sm" role="status">
                     <span class="visually-hidden">Loading messages...</span>
@@ -402,25 +428,30 @@
             </div>
         `;
         
-        // Show chat input
-        document.getElementById('chatInputContainer').style.display = 'block';
+        // Show chat input if element exists
+        if (chatInputContainer) {
+            chatInputContainer.style.display = 'block';
+        }
         
-        // Hide no conversation state
-        const noConversationState = document.getElementById('noConversationState');
-        if (noConversationState) noConversationState.style.display = 'none';
+        // Hide no conversation state if it exists
+        if (noConversationState) {
+            noConversationState.style.display = 'none';
+        }
         
-        // Hide no messages state
-        const noMessagesState = document.getElementById('noMessagesState');
-        if (noMessagesState) noMessagesState.classList.add('d-none');
+        // Hide no messages state if it exists
+        if (noMessagesState) {
+            noMessagesState.classList.add('d-none');
+        }
         
         // Load messages for the selected conversation
         loadMessages();
         
-        // Update active state in sidebar
-        document.querySelectorAll('.contact-item').forEach(item => {
-            if (item.dataset.conversationId == conversationId) {
+        // Update active state in sidebar safely
+        const contactItems = document.querySelectorAll('.contact-item');
+        contactItems.forEach(item => {
+            if (item && item.dataset && item.dataset.conversationId == conversationId) {
                 item.classList.add('active');
-            } else {
+            } else if (item && item.classList) {
                 item.classList.remove('active');
             }
         });
@@ -432,53 +463,89 @@
             }
             socket.emit('join_conversation', conversationId);
             window.previousConversationId = conversationId;
+        } else {
+            initializeSocket();
         }
         
         // Reinitialize chat functionality for new conversation
         initializeChatFunctionality();
     }
 
+    // ADD this function to safely initialize socket:
+    function initializeSocket() {
+
+        if (!isSocketInitialized) {
+
+            socket = io(socketConfig.url, {
+                path: socketConfig.path,
+                transports: ['polling']
+            });
+            isSocketInitialized = true;
+            
+            // Add socket event listeners
+            socket.on('connect', () => {
+                console.log('✅ Socket connected with ID:', socket.id);
+                // Join current conversation after connection
+                if (window.conversationId) {
+                    socket.emit('join_conversation', window.conversationId);
+                }
+            });
+            
+            socket.on('new_message', (data) => {
+                if (data.sender_id !== currentUser.id || data.sender_type !== currentUser.type) {
+                    addNewMessage(data.content, false, data);
+                    updateConversationList();
+                }
+            });
+            
+            socket.on('disconnect', (reason) => {
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error('❌ Socket connection error:', error);
+            });
+        }
+    }
+
 
     // Handle conversation selection
-    function selectConversation(conversationId) {
-        // Update URL without reloading page
-        const url = new URL(window.location.href);
-        url.searchParams.set('conversation_id', conversationId);
-        window.history.pushState({}, '', url.toString());
-        
-        // Load the selected conversation
-        loadSelectedConversation(conversationId);
+function selectConversation(conversationId) {
+    
+    // Don't do anything if already on this conversation
+    if (window.conversationId == conversationId) {
+        return;
     }
+    
+    // Update URL without reloading page
+    const url = new URL(window.location.href);
+    url.searchParams.set('conversation_id', conversationId);
+    window.history.pushState({}, '', url.toString());
+    
+    // Load the selected conversation
+    loadSelectedConversation(conversationId);
+}
 
     // Update conversation list when new messages arrive
     function updateConversationList() {
         loadConversationsAsContacts();
     }
 
-    // ADD this global variable at the top:
-    let isSocketInitialized = false;
+
 
     // UPDATE the initializeChatWithConversation function:
     function initializeChatWithConversation() {
-        if (!isSocketInitialized) {
-            socket = io('{{ config('socketio.url') }}');
-            isSocketInitialized = true;
-        }
-
-        socket.emit('join_conversation', conversationId);
         
-        // Store previous conversation ID for socket management
-        window.previousConversationId = conversationId;
+        // Make sure socket is initialized
+        if (!socket || !isSocketInitialized) {
+            initializeSocket();
+        }
+        
+        // Join conversation via socket
+        socket.emit('join_conversation', window.conversationId);
+        window.previousConversationId = window.conversationId;
 
         loadMessages();
         initializeChatFunctionality();
-
-        socket.on('new_message', (data) => {
-            if (data.sender_id !== currentUser.id || data.sender_type !== currentUser.type) {
-                addNewMessage(data.content, false, data);
-                updateConversationList();
-            }
-        });
     }
 
     // When no conversation exists
@@ -542,30 +609,49 @@
     // Load messages via AJAX and render using partial
     function loadMessages() {
         // Use the global conversationId which gets updated when switching
-        const currentConvId = window.conversationId || conversationId;
+        const currentConvId = window.conversationId;
+        
         
         if (!currentConvId) {
-            document.getElementById('noMessagesState').classList.remove('d-none');
+            const noMessagesState = document.getElementById('noMessagesState');
+            if (noMessagesState) noMessagesState.classList.remove('d-none');
             return;
         }
 
         fetch(`{{ route('admin.customer.contact.conversations.messages', ':conversationId') }}`.replace(':conversationId', currentConvId))
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                document.getElementById('loadingMessages').style.display = 'none';
+                
+                const loadingMessages = document.getElementById('loadingMessages');
+                const chatMessages = document.getElementById('chatMessages');
+                const noMessagesState = document.getElementById('noMessagesState');
+                
+                if (loadingMessages) loadingMessages.style.display = 'none';
 
-                if (data.messages && data.messages.length > 0) {
-                    document.getElementById('chatMessages').innerHTML = data.html;
+                if (data.messages && data.messages.length > 0 && data.html) {
+                    chatMessages.innerHTML = data.html;
                     initializeTooltips();
                     scrollToBottom();
+                    
+                    // Hide no messages state
+                    if (noMessagesState) noMessagesState.classList.add('d-none');
                 } else {
-                    document.getElementById('noMessagesState').classList.remove('d-none');
+                    // Show no messages state
+                    if (noMessagesState) noMessagesState.classList.remove('d-none');
+                    if (chatMessages) chatMessages.innerHTML = ''; // Clear loading
                 }
             })
             .catch(error => {
-                console.error('Error loading messages:', error);
-                document.getElementById('loadingMessages').innerHTML =
-                    '<div class="text-danger">Failed to load messages</div>';
+                console.error('❌ Error loading messages:', error);
+                const loadingMessages = document.getElementById('loadingMessages');
+                if (loadingMessages) {
+                    loadingMessages.innerHTML = '<div class="text-danger">Failed to load messages</div>';
+                }
             });
     }
 
@@ -726,7 +812,7 @@ function initializeChatFunctionality() {
     const messageTextarea = document.getElementById('messageTextarea');
     const fileInput = document.getElementById('fileInput');
     const imageInput = document.getElementById('imageInput');
-    const attachmentPreview = document.getElementById('attachmentPreview');
+    const ChatAttachmentPreview = document.getElementById('ChatAttachmentPreview');
     
     let selectedFiles = [];
 
@@ -777,9 +863,9 @@ function initializeChatFunctionality() {
 
     // --- Render preview ---
     function renderAttachmentPreview() {
-        attachmentPreview.innerHTML = '';
+        ChatAttachmentPreview.innerHTML = '';
         if (selectedFiles.length > 0) {
-            attachmentPreview.classList.remove('d-none');
+            ChatAttachmentPreview.classList.remove('d-none');
             selectedFiles.forEach((file, index) => {
                 const isImage = file.type.startsWith('image/');
                 const icon = isImage ? 'fa-file-image' : 'fa-file';
@@ -791,16 +877,16 @@ function initializeChatFunctionality() {
                         <i class="fas fa-times"></i>
                     </span>
                 `;
-                attachmentPreview.appendChild(item);
+                ChatAttachmentPreview.appendChild(item);
                 updateInputStates();
             });
         } else {
-            attachmentPreview.classList.add('d-none');
+            ChatAttachmentPreview.classList.add('d-none');
         }
     }
 
     // --- Remove attachment ---
-    attachmentPreview.addEventListener('click', e => {
+    ChatAttachmentPreview.addEventListener('click', e => {
         if (e.target.closest('.remove-attachment')) {
             const index = e.target.closest('.remove-attachment').dataset.index;
             selectedFiles.splice(index, 1);
