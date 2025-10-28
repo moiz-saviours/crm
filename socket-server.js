@@ -4,16 +4,15 @@ import { Server } from 'socket.io';
 
 const app = express();
 const server = createServer(app);
-const PORT = process.env.PORT || 443; // Use same port as your web server
+const PORT = process.env.PORT || 3110; // Use same port as your web server
 
 const io = new Server(server, {
     cors: {
         origin: ["https://payusinginvoice.com"],
         methods: ["GET", "POST"],
-        credentials: false
     },
-    path: '/crm-development/socket.io',
-    transports: ['polling'], // Only use polling, no websocket
+    path: '/crm-development/socket.io', // Match the path
+    transports: ['polling'],
     allowEIO3: true
 });
 

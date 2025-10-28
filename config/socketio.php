@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'url' => env('SOCKETIO_URL', 'http://localhost:6001'),
+    'url' => env('SOCKETIO_URL', 'http://localhost:3110'),
     'path' => env('SOCKETIO_PATH', '/socket.io'),
     'host' => env('SOCKETIO_HOST', 'localhost'),
-    'port' => env('SOCKETIO_PORT', 6001),
+    'port' => env('SOCKETIO_PORT', 3110),
 ];
