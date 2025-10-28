@@ -679,7 +679,7 @@ class LeadController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'No valid email address found in lead data. Cannot convert to customer.'
-                ], 422);
+                ], 404);
             }
             $existingContact = CustomerContact::where('email', $lead->email)->first();
             if ($existingContact) {
