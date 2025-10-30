@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MessageController;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Message;
+use App\Models\MessageAttachment;
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customer-contact', function () {
@@ -416,5 +420,82 @@ Route::middleware('auth:sanctum')->group(function () {
             'data' => $message
         ]);
     });
-    Route::post('/message', [MessageController::class, 'store']);
+
+   Route::post('/message', function (Request $request) {
+
+        $validator = Validator::make($request->all(), [
+            'content' => 'nullable|string|max:5000',
+            'conversation_id' => 'required|exists:conversations,id',
+            'message_type' => 'required|in:text,image,video,audio,file,system,attachment',
+            'attachments' => 'nullable|array|max:3',
+            'attachments.*' => 'nullable|file|max:3072|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        if (empty($request->content) && !$request->hasFile('attachments')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Message content or attachment is required.',
+            ], 422);
+        }
+
+        $message = Message::create([
+            'conversation_id' => $request->conversation_id,
+            'sender_type' => 'user',
+            'sender_id' => auth()->user()->id, 
+            'content' => $request->content,
+            'message_type' => $request->message_type,
+            'message_status' => 'delivered', 
+        ]);
+
+        $attachmentsData = [];
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('message_attachments', 'public');
+
+                $attachment = MessageAttachment::create([
+                    'message_id' => $message->id,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+
+                $attachmentsData[] = [
+                    'id' => $attachment->id,
+                    'file_name' => $attachment->file_name,
+                    'file_url' => asset('storage/' . $attachment->file_path),
+                    'file_type' => $attachment->file_type,
+                    'file_size' => $attachment->file_size,
+                ];
+            }
+        }
+
+        $messageData = [
+            'id' => $message->id,
+            'conversation_id' => $message->conversation_id,
+            'sender_type' => 'customer',
+            'sender_id' => $message->sender_id,
+            'content' => $message->content,
+            'message_type' => $message->message_type,
+            'message_status' => $message->message_status,
+            'created_at' => $message->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $message->updated_at->format('Y-m-d H:i:s'),
+            'attachments' => $attachmentsData,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message sent successfully',
+            'data' => $messageData,
+        ], 201);
+});
+
 });
