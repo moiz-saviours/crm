@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
 class CustomerContact extends Model
 {
-    use Notifiable, SoftDeletes, ActivityLoggable;
+    use HasApiTokens, Notifiable, SoftDeletes, ActivityLoggable;
 
     protected $table = 'customer_contacts';
     protected $primaryKey = 'id';
@@ -41,7 +42,7 @@ class CustomerContact extends Model
      *
      * @var array
      */
-    protected $appends = ['last_activity', 'last_activity_formatted','created_at_formatted'];
+    protected $appends = ['last_activity', 'last_activity_formatted', 'created_at_formatted'];
 
     /**
      * Generate a unique special key.
@@ -108,6 +109,7 @@ class CustomerContact extends Model
             return "{$activityDate->format('M d, Y g:i A')} GMT+5";
         }
     }
+
     /**
      * Get the formatted created at for display
      */
