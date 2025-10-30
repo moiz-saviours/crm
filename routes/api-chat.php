@@ -434,7 +434,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'errors' => $validator->errors(),
             ], 422);
         }
-        if (empty($request->content) && !$request->hasFile('attachments')) {
+        if (empty($request->get('content')) && !$request->hasFile('attachments')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Message content or attachment is required.',
@@ -444,7 +444,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'conversation_id' => $request->conversation_id,
             'sender_type' => 'user',
             'sender_id' => auth()->user()->id,
-            'content' => $request->content,
+            'content' => $request->get('content'),
             'message_type' => $request->message_type,
             'message_status' => 'delivered',
         ]);
