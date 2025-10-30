@@ -25,7 +25,9 @@
             return decodeHtmlEntities(data);
         };
 
-        const exportButtons = ['copy', 'excel', 'csv', 'pdf', 'print'].map(type => ({
+        const exportButtons = [
+            // 'copy', 'excel', 'csv', 'pdf', 'print'
+        ].map(type => ({
             extend: type,
             text: type == "copy"
                 ? '<i class="fas fa-copy"></i>'
@@ -61,32 +63,147 @@
         //         scrollX: true,
         //     });
         // }
+        var dataTables = [];
+
         if ($('.initTable').length) {
             $('.initTable').each(function (index) {
-                initializeDatatable($(this), index)
-            })
+                dataTables[index] = initializeDatatable($(this), index);
+            });
         }
 
+
+        function getColumnIndex(table, headerText) {
+            const headers = table.find('thead th');
+            for (let i = 0; i < headers.length; i++) {
+                if ($(headers[i]).text().trim().toLowerCase() === headerText.toLowerCase()) {
+                    return i;
+                }
+            }
+            return 0;
+        }
         function initializeDatatable(table_div, index) {
-            var table = table_div.DataTable({
+            const skipCols = [
+                0,
+                getColumnIndex(table_div, 'CREATED DATE'),
+                getColumnIndex(table_div, 'LAST ACTIVITY'),
+                getColumnIndex(table_div, 'STATUS'),
+                getColumnIndex(table_div, 'ACTION'),
+            ].filter(i => i !== null && i !== undefined).filter((value, index, self) => self.indexOf(value) === index);
+
+            let datatable = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
-                    "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                    "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-5'l><'col-sm-12 col-md-6'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
                     "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
-                buttons: exportButtons,
-                order: [[1, 'asc']],
+                buttons: [
+                    {
+                        extend: 'colvis',
+                        text: '<i class="fa fa-columns"></i> Columns',
+                        className: 'btn btn-secondary btn-sm',
+                        postfixButtons: ['colvisRestore'],
+                        columns: function (idx, data, node) {
+                            const header = $(table_div).find('thead th').eq(idx);
+                            const headerText = header.text().trim().toLowerCase();
+                            if (
+                                header.hasClass('no-col-vis') ||
+                                header.hasClass('select-checkbox') ||
+                                headerText.includes('action') ||
+                                headerText.includes('select')
+                            ) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    },
+                    ...exportButtons // keep your existing export buttons
+                ],
+                order: [[getColumnIndex(table_div, 'CREATED DATE'), 'desc']],
                 responsive: false,
+                autoWidth: true,
                 scrollX: true,
-                scrollY:  ($(window).height() - 350),
+                scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
+                pageLength: 100,
+                lengthMenu: [[10, 25, 50, 100, -1], ['10 Rows', '25 Rows', '50 Rows', '100 Rows', 'Show All']],
                 columnDefs: [
                     {
                         orderable: false,
+                        targets: 0,
                         className: 'select-checkbox',
-                        targets: 0
+                        render: DataTable.render.select(),
                     },
+                    {
+                        targets: getColumnIndex(table_div, 'CREATED DATE'),
+                        type: 'date',
+                        render: function (data, type, row) {
+                            if (type === 'sort') {
+                                return $(this).data('order') || data;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        targets: '_all',
+                        render: function (data, type, row, meta) {
+                            if (skipCols.includes(meta.col)) return data;
+                            if (!data) return '';
+                            if (type !== 'display') return data;
+
+                            const maxLength = 15;
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = data;
+
+                            function truncateTextNodes(node) {
+                                node.childNodes.forEach(child => {
+                                    if (child.nodeType === Node.TEXT_NODE) {
+                                        const txt = child.textContent;
+                                        if (txt && txt.trim().length > maxLength) {
+                                            child.textContent = txt.substring(0, maxLength) + '...';
+                                        }
+                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                        truncateTextNodes(child);
+                                    }
+                                });
+                            }
+
+                            truncateTextNodes(tempDiv);
+                            return tempDiv.innerHTML;
+                        },
+
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            if (skipCols.includes(col) || !cellData) {
+                                td.innerHTML = cellData || '';
+                                return;
+                            }
+                            const temp = document.createElement('div');
+                            temp.innerHTML = cellData;
+                            const fullText = (temp.textContent || temp.innerText || '').trim();
+                            const tooltipDiv = document.createElement('div');
+                            tooltipDiv.classList.add('truncate-cell');
+                            tooltipDiv.innerHTML = td.innerHTML;
+                            td.innerHTML = '';
+                            td.appendChild(tooltipDiv);
+                            if (fullText.length > 15) {
+                                tooltipDiv.setAttribute('title', fullText);
+                                tooltipDiv.setAttribute('data-bs-toggle', 'tooltip');
+                                tooltipDiv.setAttribute('data-bs-placement', 'top');
+                            }
+                            new bootstrap.Tooltip(tooltipDiv);
+                        }
+                    },
+
+                    {width: '5%', targets: 0},  // checkbox or icon column
+                    {width: '20%', targets: 1},  // NAME
+                    {width: '10%', targets: 2},  // BRAND
+                    {width: '15%', targets: 3},  // TEAM
+                    {width: '30%', targets: 4},  // CREATED DATE
+                    {width: '5%', targets: 5},  // LEAD STATUS
+                    {width: '6%', targets: 6},  // COUNTRY
+                    {width: '5%', targets: 7},  // MESSAGE (usually longer)
+                    {width: '7%', targets: 8},  // ACTION buttons
                 ],
                 select: {
                     style: 'os',
@@ -94,10 +211,11 @@
                 },
                 fixedColumns: {
                     start: 0,
-                    end: 0
+                    end: 1
                 },
             });
-            table.buttons().container().appendTo(`#right-icon-${index}`);
+            datatable.columns.adjust().draw();
+            datatable.buttons().container().appendTo(`#right-icon`);
             {{--table_div.on('dblclick', 'td.editable', function () {--}}
             {{--    var $this = $(this);--}}
             {{--    var currentText = $this.text();--}}
@@ -195,7 +313,14 @@
             });
             @endif
 
+            return datatable;
         }
+        dataTables[0].on('draw', function () {
+            const tooltipElements = document.querySelectorAll('[data-bs-toggle="tooltip"], [title]');
+            tooltipElements.forEach(el => {
+                new bootstrap.Tooltip(el);
+            });
+        });
 
         {{--    /** Create Record */--}}
         {{--    $('#create-form').on('submit', function (e) {--}}
@@ -325,5 +450,99 @@
         {{--    setDataAndShowEditModel(data);--}}
         {{--    @endif--}}
         {{--    @php session()->forget('edit_company') @endphp--}}
+
+
+        /** Convert Lead to Customer */
+        $(document).on('click', '.convertBtn', function (e) {
+            e.preventDefault();
+
+            const $btn = $(this);
+            const leadId = $btn.data('id');
+
+            if (!leadId) {
+                toastr.error('Invalid lead ID.');
+                return;
+            }
+
+            const url = `{{ route('lead.convert', '') }}/${leadId}`;
+
+            convertLeadToCustomer(url, $btn);
+        });
+
+        function convertLeadToCustomer(url, $btn) {
+            $btn.prop('disabled', true).addClass('disabled');
+            let table = dataTables[0];
+
+            AjaxRequestPromise(url, null, 'POST', {useToastr: false})
+                .then(res => {
+                    if (res?.success) {
+                        toastr.success(res?.message || 'Lead converted successfully.');
+                        const lead = res.data;
+                        const customer_contact = lead.customer_contact;
+                        const brand = lead.brand;
+                        const lead_status = lead.lead_status;
+
+                        // Find DataTable row by matching lead ID in the first column or data attribute
+                        let rowNode = table.row(function (idx, data, node) {
+                            return $(node).attr('id') === `tr-${lead.id}`;
+                        });
+
+                        if (!rowNode.node()) {
+                            $btn.prop('disabled', false).removeClass('disabled');
+                            console.warn(`Row not found for Lead ID: ${lead.id}`);
+                            return;
+                        }
+
+                        const rowIndex = rowNode.index();
+                        const rowData = table.row(rowIndex).data();
+
+                        // Update specific columns dynamically
+                        table.cell(rowIndex, 1).data(
+                            `${customer_contact
+                                ? `<a href="${getEditRoute('{{ route('customer.contact.edit', ':id') }}', customer_contact.id)}"
+                            data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="${customer_contact.name}">${customer_contact.name}</a>`
+                                : lead.name}`
+                        );
+
+                        table.cell(rowIndex, 2).data( `${brand ? `<a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : brand.name}`
+                        );
+
+                        table.cell(rowIndex, 5).data(lead_status?.name || 'Converted');
+
+                        // Disable button and redraw row
+                        $(rowNode.node()).find('.convertBtn')
+                            .removeClass('convertBtn')
+                            .addClass('disabled')
+                            .prop('disabled', true)
+                            .removeAttr('data-id');
+
+                        table.row(rowIndex).invalidate().draw(false); // Redraw the row only, no full table reload
+
+                    } else {
+                        $btn.prop('disabled', false).removeClass('disabled');
+                    }
+                })
+                .catch(err => {
+                    $btn.prop('disabled', false).removeClass('disabled');
+                });
+        }
+
+        function getEditRoute(route, id) {
+            if (!route || !id) return '#';
+            return route.replace(':id', id);
+        }
+        function makeAcronym(text) {
+            if (!text) return "";
+            const words = text.trim().split(/\s+/);
+            let acronym = words.map(word => word.charAt(0).toUpperCase()).join('');
+            const lastWord = words[words.length - 1];
+            if (lastWord.toLowerCase().endsWith('s')) {
+                acronym += 's';
+            }
+            return acronym;
+        }
+
     });
+
 </script>

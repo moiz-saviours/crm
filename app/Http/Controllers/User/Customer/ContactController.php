@@ -91,8 +91,8 @@ class ContactController extends Controller
         $brands = Brand::where('status', 1)->orderBy('name')->get();
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $countries = config('countries');
-        // return view('user.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
-        return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
+         return view('user.customers.contacts.edit', compact('customer_contact', 'brands', 'teams', 'countries'));
+        //return response()->json(['customer_contact' => $customer_contact, 'brands' => $brands, 'teams' => $teams, 'countries' => $countries]);
     }
 
     /**
