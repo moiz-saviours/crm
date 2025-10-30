@@ -119,6 +119,7 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
         Route::prefix('leads')->group(function () {
             Route::post('/change-lead-status', [LeadController::class, 'change_lead_status'])->name('change.lead-status');
         });
+        Route::post('lead/convert/{id}', [LeadController::class, 'convert_to_customer'])->name('convert');
     });
     Route::get('/lead-status', [LeadStatusController::class, 'index'])->name('lead-status.index');
     /** Invoices Routes */
