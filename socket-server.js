@@ -1,17 +1,18 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
-// Environment variables with defaults
-const ENV = process.env.APP_ENV || 'local';
-const PORT = process.env.SOCKETIO_PORT || 6001;
+// Environment variables for subdomain
+const ENV = process.env.APP_ENV || 'production';
+const PORT = process.env.SOCKETIO_PORT || 3000;
 const SOCKET_PATH = process.env.SOCKETIO_PATH || '/socket.io';
-const ALLOWED_ORIGINS = process.env.SOCKETIO_ORIGINS || '*';
+const ALLOWED_ORIGINS = process.env.SOCKETIO_ORIGINS || 'https://payusinginvoice.com';
 
 const server = createServer();
 const io = new Server(server, {
     cors: {
         origin: ALLOWED_ORIGINS,
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST"],
+        credentials: false
     },
     path: SOCKET_PATH,
     transports: ['websocket', 'polling']
@@ -73,9 +74,9 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`Socket.IO Server Started`);
-    console.log(`Port: ${PORT}`);
-    console.log(`Environment: ${ENV}`);
-    console.log(`Path: ${SOCKET_PATH}`);
-    console.log(`Origins: ${ALLOWED_ORIGINS}`);
+    console.log(`🚀 Socket.IO Server Running on Subdomain`);
+    console.log(`📍 Port: ${PORT}`);
+    console.log(`🌐 Allowed Origin: ${ALLOWED_ORIGINS}`);
+    console.log(`🛣️ Path: ${SOCKET_PATH}`);
+    console.log(`💻 Subdomain: socket-io-server.payusinginvoice.com`);
 });
