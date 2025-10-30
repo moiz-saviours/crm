@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Validator;
 
 Route::get('/user', function (Request $request) {
     return new UserResource($request->user());
-})->middleware('auth:sanctum', 'abilities:create,update,read');
+})->middleware('auth:sanctum', 'abilities:user:read');
 Route::post('login', function (Request $request) {
     return response()->json([
         "status" => "success",
@@ -162,7 +162,12 @@ Route::post('customer/login', function (Request $request) {
         return response()->json(['error' => 'Invalid credentials'], 400);
     }
     $tokenExpiration = $request->remember ? now()->addDay() : now()->addHours(12);
-    $token = $user->createToken('User Login Token', ['create', 'update', 'read'], $tokenExpiration)->plainTextToken;
+    $token = $user->createToken('Customer Login Token', [
+        'customer:read',
+        'project:read',
+        'message:read',
+        'message:create',
+    ], $tokenExpiration)->plainTextToken;
     return response()->json([
         'status' => 'success',
         'token' => $token,
@@ -187,5 +192,5 @@ Route::get('customer', function (Request $request) {
         "updated_at" => $user->updated_at?->toISOString(),
         "created_at" => $user->created_at?->toISOString()
     ]);
-})->middleware('auth:sanctum', 'abilities:create,update,read');
+})->middleware('auth:sanctum,customer', 'abilities:customer:read');
 require __DIR__ . '/api-chat.php';
