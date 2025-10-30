@@ -4,251 +4,7 @@
 @section('content')
     @push('style')
         @include('user.leads.style')
-        <style>
-            td.align-middle.text-center.text-nowrap.editable:hover select{
-                border: 1px solid #000;
-                border-radius: 5px;
-            }
-            td.align-middle.text-center.text-nowrap.editable[data] , td.align-middle.text-center.text-nowrap.editable{
-                cursor:pointer;
-            }
-            .void {
-                cursor: not-allowed;
-            }
 
-            .custm_header {
-                padding: 2px 20px 2px 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .actions {
-                display: flex;
-            }
-
-            .actions h1 {
-                margin: auto;
-                color: #52a0bf;
-                font-size: 15px;
-            }
-
-            .filters,
-            .table-controls {
-                display: flex;
-                justify-content: space-between;
-                padding: 10px 20px;
-                border-bottom: 1px solid #ddd;
-            }
-
-            .filters .filter-tabs button,
-            .actions button {
-                padding: 5px 12px;
-                border: 1px solid #ff5722;
-                border-radius: 4px;
-                background-color: #fff;
-                cursor: pointer;
-            }
-
-            .filters .actions .create-contact {
-                background-color: #ff5722;
-                color: #fff;
-                border: none;
-            }
-
-            .search-bar input {
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                width: 250px;
-            }
-
-            .contacts-table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            .contacts-table th,
-            .contacts-table td {
-                padding: 10px;
-                text-align: left;
-                /*border: 1px solid #ddd;*/
-            }
-
-            .contacts-table th {
-                /*background-color: #f1f5f9;*/
-                font-weight: bold;
-            }
-
-            .contacts-table tbody tr:hover {
-                background-color: #f9f9f9;
-            }
-
-
-            .header .new_head h1 {
-                font-size: 20px;
-                color: #52a0bf;
-                font-weight: 700;
-
-            }
-
-            .header_btn {
-                padding: 0px 30px;
-                color: #ff5722;
-                margin: 0px 10px;
-            }
-
-            .custom-tabs {
-                margin: 0px 0px 4px 0px;
-                display: flex;
-            }
-
-            .tab-nav {
-                display: flex;
-                justify-content: space-around;
-                list-style: none;
-                padding: 0;
-                margin: 0;
-                width: 70%;
-            }
-
-            .tab-buttons {
-                margin-left: 100px;
-            }
-
-            .tab-item {
-                padding: 10px 20px;
-                cursor: pointer;
-                border: 1px solid #cbd6e2;
-                background: #f9f9f9;
-                width: 100%;
-                transition: background 0.3s ease;
-            }
-
-            .tab-item.active {
-                background: #fff;
-                border-bottom: none;
-
-            }
-
-            .tab-item.active i {
-                float: right;
-                font-size: 14px;
-                margin: auto;
-            }
-
-            .tab-content {
-                /*padding: 10px;*/
-                /*margin-top: 10px;*/
-            }
-
-            .tab-pane {
-                display: none;
-            }
-
-            .tab-pane.active {
-                display: block;
-
-            }
-
-            .fltr-sec {
-                padding-top: 20px;
-            }
-
-            .table-li {
-                display: flex;
-            }
-
-            .table-li .page-title {
-                font-size: 14px;
-                padding: 0px 30px 0px 0px;
-
-                font-weight: 700;
-            }
-
-            .right-icon i {
-                float: right;
-                margin: 0px 4px;
-                border: 1px solid #ccc;
-                padding: 5px;
-                border-radius: 5px;
-                font-size: 12px;
-            }
-
-            .custom-form .form-container {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 500px;
-                height: 100%;
-                background: #ffffff;
-                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-                transition: right 0.5s ease;
-                box-sizing: border-box;
-                z-index: 1001;
-            }
-
-            .custom-form .form-container.open {
-                right: 0;
-            }
-
-            .custom-form .form-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 15px 20px;
-                background: #52a0bf;
-                color: white;
-                font-size: 18px;
-                font-weight: bold;
-            }
-
-            .custom-form .form-header .close-btn {
-                font-size: 20px;
-                font-weight: bold;
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-            }
-
-            .custom-form .form-body {
-                padding: 20px;
-            }
-
-            .custom-form .form-body label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: 500;
-            }
-
-            .custom-form .form-body input:not(.is-invalid) {
-                width: 100%;
-                padding: 8px;
-                margin-bottom: 15px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-            }
-
-            .custom-form .form-body button {
-                width: 100%;
-                padding: 10px;
-                background: #52a0bf;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-            .close-icon {
-                display: none;
-            }
-
-            .tab-item.active .close-icon {
-                display: inline;
-            }
-
-        </style>
     @endpush
 
     <section id="content" class="content">
@@ -266,14 +22,15 @@
 {{--                            <button class="header_btn" disabled>Actions <i class="fa fa-caret-down" aria-hidden="true"></i>--}}
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
-                            <button class="create-contact open-form-btn void">Create New</button>
+
+                            <button class="create-record open-form-btn void">Create New</button>
                         </div>
                     </div>
                 </header>
             </div>
         </div>
         <div class="content__boxed tour-userleadalldata">
-            <div class="content__wrap">
+            <div class="">
                 <div class="container" style="min-width: 100%;">
                     <div class="custom-tabs">
                         <ul class="tab-nav">
@@ -314,47 +71,64 @@
 {{--                                    </div>--}}
 {{--                                </div>--}}
                                 <div class="card-body">
-                                    <table id="allLeadsTable" class="table table-striped datatable-exportable
-                            stripe row-border order-column nowrap
-                            initTable
-                            ">
+                                    @php
+                                        function makeAcronym($text) {
+                                            $words = preg_split('/\s+/', trim($text));
+                                            $acronym = '';
+                                            foreach ($words as $word) {
+                                                $acronym .= strtoupper(substr($word, 0, 1));
+                                            }
+                                            $lastWord = end($words);
+                                            if (strtolower(substr($lastWord, -1)) === 's') {
+                                                $acronym .= 's';
+                                            }
+                                            return $acronym;
+                                        }
+                                    @endphp
+                                    <table id="allLeadTable" class="table table-striped datatable-exportable
+                                        stripe row-border order-column nowrap
+                                        initTable
+                                        ">
                                         <thead>
                                         <tr>
                                             <th></th>
-                                            <th class="align-middle text-center text-nowrap">ID</th>
-                                            <th class="align-middle text-center text-nowrap">BRAND</th>
-                                            <th class="align-middle text-center text-nowrap">CLIENT</th>
-                                            <th class="align-middle text-center text-nowrap">NAME</th>
-                                            <th class="align-middle text-center text-nowrap">EMAIL</th>
-                                            <th class="align-middle text-center text-nowrap">PHONE NUMBER</th>
-                                            <th class="align-middle text-center text-nowrap">ADDRESS</th>
-                                            <th class="align-middle text-center text-nowrap">CITY</th>
-                                            <th class="align-middle text-center text-nowrap">STATE</th>
-                                            <th class="align-middle text-center text-nowrap">ZIPCODE</th>
-                                            <th class="align-middle text-center text-nowrap">COUNTRY</th>
-                                            <th class="align-middle text-center text-nowrap">LEAD STATUS</th>
-                                            <th class="align-middle text-center text-nowrap">NOTE</th>
-                                            <th class="align-middle text-center text-nowrap">CREATE DATE</th>
+                                            <th class="align-middle text-left text-nowrap">NAME</th>
+                                            <th class="align-middle text-left text-nowrap">BRAND</th>
+                                            <th class="align-middle text-left text-nowrap">TEAM</th>
+                                            <th class="align-middle text-left text-nowrap">CREATE DATE</th>
+                                            <th class="align-middle text-left text-nowrap">LEAD STATUS</th>
+                                            <th class="align-middle text-left text-nowrap">COUNTRY</th>
+                                            <th class="align-middle text-left text-nowrap">MESSAGE</th>
+                                            <th class="align-middle text-left text-nowrap">ACTION</th>
+
                                         </tr>
                                         </thead>
                                         <tbody>
                                         @foreach($all_leads as $lead)
                                             <tr id="tr-{{$lead->id}}">
-                                                <td class="align-middle text-center text-nowrap"></td>
-                                                <td class="align-middle text-center text-nowrap">{{$loop->iteration}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{optional($lead->brand)->name ?? "---"}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{optional($lead->client)->name ?? "---"}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->name}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->email}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->phone}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->address}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->city}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->state}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->zipcode}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{$lead->country}}</td>
-                                                <td class="align-middle text-center text-nowrap editable" data-id="{{ $lead->id }}" data-field="leadStatus">{{optional($lead->leadStatus)->name}}</td>
-                                                <td class="align-middle text-center text-nowrap">{{htmlspecialchars($lead->note)}}</td>
-                                                <td class="align-middle text-center text-nowrap">
+                                                <td class="align-middle text-left text-nowrap"></td>
+                                                <td class="align-middle text-left text-nowrap">
+                                                    @if(isset($lead->customer_contact))
+                                                        <a href="{{route('customer.contact.edit',[$lead->customer_contact->id])}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $lead->customer_contact->name }}">{{ $lead->customer_contact->name }}</a>
+                                                    @else
+                                                        {{$lead->name}}
+                                                    @endif
+                                                </td>
+                                                <td class="align-middle text-left text-nowrap">
+                                                    @if(isset($lead->brand))
+                                                        <a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{$lead->brand->name}}">{{ makeAcronym($lead->brand->name) }}</a>
+                                                    @else
+
+                                                    @endif
+                                                </td>
+                                                <td class="align-middle text-left text-nowrap">
+                                                    @if(isset($lead->team))
+                                                        <a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $lead->team->name }}">{{ $lead->team->name }}</a>
+                                                    @else
+
+                                                    @endif
+                                                </td>
+                                                <td class="align-middle text-left text-nowrap">
                                                     @if ($lead->created_at->isToday())
                                                         Today
                                                         at {{ $lead->created_at->timezone('GMT+5')->format('g:i A') }}
@@ -363,6 +137,23 @@
                                                         {{ $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') }}
                                                         GMT+5
                                                     @endif
+                                                </td>
+                                                <td class="align-middle text-left text-nowrap editable" data-id="{{ $lead->id }}" data-field="leadStatus">{{optional($lead->leadStatus)->name}}</td>
+                                                <td class="align-middle text-left text-nowrap">{{$lead->country}}</td>
+                                                <td class="align-middle text-left text-nowrap">{{ htmlspecialchars(strlen($lead->note) > 18 ? substr($lead->note, 0, 18) . '...' : $lead->note) }}</td>
+                                                <td class="align-middle text-left table-actions">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-success @if(isset($lead->leadStatus)
+                                                        && $lead->leadStatus->name != 'Converted'
+                                                        && empty($lead->cus_contact_key)) convertBtn @else disabled @endif"
+                                                            @if(isset($lead->leadStatus)
+                                                        && $lead->leadStatus->name != 'Converted'
+                                                        && empty($lead->cus_contact_key)) data-id="{{ $lead->id }}"
+                                                            @endif
+                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
+                                                        <i class="fas fa-user-check"></i>
+                                                    </button>
+
                                                 </td>
                                             </tr>
                                         @endforeach
