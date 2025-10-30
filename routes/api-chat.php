@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Message;
 use App\Models\MessageAttachment;
 
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customer-contact', function () {
         return response()->json([
@@ -145,7 +144,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ]
         ];
         return response()->json($response);
-    });
+    })->middleware('auth:sanctum,customer', 'abilities:project:read');
     Route::get('/projects/{id}', function (Request $request, $id) {
         $projectsWithChat = [
             [
@@ -219,7 +218,7 @@ Route::middleware('auth:sanctum')->group(function () {
             'success' => true,
             'data' => $project
         ]);
-    });
+    })->middleware('auth:sanctum,customer', 'abilities:project:read');
     Route::get('/conversations/{conversationId}/messages', function (Request $request, $conversationId) {
         $messages = [
             [
@@ -343,7 +342,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ]
         ];
         return response()->json($response);
-    });
+    })->middleware('auth:sanctum,customer', 'abilities:message:read');
     Route::get('/messages/{id}', function (Request $request, $id) {
         $messages = [
             [
@@ -419,9 +418,8 @@ Route::middleware('auth:sanctum')->group(function () {
             'success' => true,
             'data' => $message
         ]);
-    });
-
-   Route::post('/message', function (Request $request) {
+    })->middleware('auth:sanctum,customer', 'abilities:message:read');
+    Route::post('/message', function (Request $request) {
 
         $validator = Validator::make($request->all(), [
             'content' => 'nullable|string|max:5000',
@@ -430,36 +428,30 @@ Route::middleware('auth:sanctum')->group(function () {
             'attachments' => 'nullable|array|max:3',
             'attachments.*' => 'nullable|file|max:3072|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar',
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors(),
             ], 422);
         }
-
         if (empty($request->content) && !$request->hasFile('attachments')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Message content or attachment is required.',
             ], 422);
         }
-
         $message = Message::create([
             'conversation_id' => $request->conversation_id,
             'sender_type' => 'user',
-            'sender_id' => auth()->user()->id, 
+            'sender_id' => auth()->user()->id,
             'content' => $request->content,
             'message_type' => $request->message_type,
-            'message_status' => 'delivered', 
+            'message_status' => 'delivered',
         ]);
-
         $attachmentsData = [];
-
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('message_attachments', 'public');
-
                 $attachment = MessageAttachment::create([
                     'message_id' => $message->id,
                     'file_name' => $file->getClientOriginalName(),
@@ -467,7 +459,6 @@ Route::middleware('auth:sanctum')->group(function () {
                     'file_type' => $file->getMimeType(),
                     'file_size' => $file->getSize(),
                 ]);
-
                 $attachmentsData[] = [
                     'id' => $attachment->id,
                     'file_name' => $attachment->file_name,
@@ -477,7 +468,6 @@ Route::middleware('auth:sanctum')->group(function () {
                 ];
             }
         }
-
         $messageData = [
             'id' => $message->id,
             'conversation_id' => $message->conversation_id,
@@ -490,12 +480,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'updated_at' => $message->updated_at->format('Y-m-d H:i:s'),
             'attachments' => $attachmentsData,
         ];
-
         return response()->json([
             'success' => true,
             'message' => 'Message sent successfully',
             'data' => $messageData,
         ], 201);
-});
-
+    })->middleware('auth:sanctum,customer', 'abilities:message:read');
 });
