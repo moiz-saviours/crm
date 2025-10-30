@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\MessageController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/customer-contact', function () {
@@ -142,7 +143,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json($response);
     });
     Route::get('/projects/{id}', function (Request $request, $id) {
-        // Static dummy data - same as in the projects list
         $projectsWithChat = [
             [
                 'id' => 1001,
@@ -416,29 +416,5 @@ Route::middleware('auth:sanctum')->group(function () {
             'data' => $message
         ]);
     });
-    /**TODO Send Message*/
-    Route::post('/messages', function (Request $request) {
-        $validated = $request->validate([
-            'conversation_id' => 'required|integer',
-            'sender_id' => 'required|integer',
-            'content' => 'required|string',
-            'message_type' => 'required|in:text,image,video,audio,file,system',
-        ]);
-        $newMessage = [
-            'id' => 6,
-            'conversation_id' => $validated['conversation_id'],
-            'sender_type' => 'user',
-            'sender_id' => $validated['sender_id'],
-            'content' => $validated['content'],
-            'message_type' => $validated['message_type'],
-            'message_status' => 'sent',
-            'created_at' => now()->toDateTimeString(),
-            'updated_at' => now()->toDateTimeString()
-        ];
-        return response()->json([
-            'success' => true,
-            'message' => 'Message created successfully',
-            'data' => $newMessage
-        ], 201);
-    });
+    Route::post('/message', [MessageController::class, 'store']);
 });

@@ -100,8 +100,9 @@ class MessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $message
-        ]);
+            'message' => 'Message sent successfully', 
+            'data' => $message
+        ], 201);
     }
 
 
