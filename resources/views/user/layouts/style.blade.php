@@ -17,6 +17,9 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
+{{--Flat Date Picker--}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <!-- Font Awesome Icons -->
 <script src="{{asset('assets/fonts/fontawsome.js')}}"></script>
 <style type="text/css">
@@ -307,7 +310,27 @@
 {{--Jquery UI--}}
 <link rel="stylesheet" href="{{asset ('assets/themes/nifty/assets/css/jquery-ui.css')}}">
 <style>
-
+    /** TootTip Styling Starting */
+    .tooltip .tooltip-inner {
+        background-color: var(--bs-primary);
+        color: var(--bs-primary-color);
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+    .tooltip.bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+        border-bottom-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-start .tooltip-arrow::before {
+        border-left-color: var(--bs-primary);
+    }
+    .tooltip.bs-tooltip-end .tooltip-arrow::before {
+        border-right-color: var(--bs-primary);
+    }
+    /** TootTip Styling Ending */
     /* Full-screen loader styles */
 
     .loader-light {
@@ -397,7 +420,7 @@ Detailed information and more samples can be found in the documentation.
     /** Datatable */
 
     div.dt-container div.dt-length select {
-        min-width: 60px;
+        min-width: 105px;
     }
 
     .dt-buttons button.btn.btn-secondary {
@@ -480,6 +503,9 @@ Detailed information and more samples can be found in the documentation.
         color: var(--bs-primary);
         margin-right: 20px;
         display: inline-block;
+    }
+    .table tr .text-left {
+        text-align: left !important;
     }
 
     .table.dataTable.table.table-striped > tbody > tr:nth-of-type(2n+1).selected > *,
