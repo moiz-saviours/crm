@@ -442,7 +442,7 @@ Route::middleware('auth:sanctum')->group(function () {
         }
         $message = Message::create([
             'conversation_id' => $request->conversation_id,
-            'sender_type' => 'user',
+            'sender_type' => 'App\Models\CustomerContact',
             'sender_id' => auth()->user()->id,
             'content' => $request->get('content'),
             'message_type' => $request->message_type,
