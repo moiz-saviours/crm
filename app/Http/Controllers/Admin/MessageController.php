@@ -74,7 +74,7 @@ class MessageController extends Controller
         $message = Message::create([
             'conversation_id' => $request->conversation_id,
             'sender_type' => get_class(auth()->user()),
-            'sender_id' => auth()->id(),
+            'sender_id' => auth()->user()->id,
             'content' => $request->content,
             'message_type' => $request->message_type,
             'message_status' => 'sent',
