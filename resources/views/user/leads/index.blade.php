@@ -23,7 +23,7 @@
 {{--                            </button>--}}
 {{--                            <button class="header_btn" disabled>Import</button>--}}
 
-                            <button class="create-record open-form-btn void">Create New</button>
+                            <button class="create-record open-form-btn ">Create New</button>
                         </div>
                     </div>
                 </header>
@@ -275,6 +275,7 @@
         </div>
     </section>
     <!-- Modal -->
+    @include('user.leads.custom-form')
 
     @push('script')
         @include('user.leads.script')
