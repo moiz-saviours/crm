@@ -7,6 +7,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -161,7 +162,22 @@ class AccountController extends Controller
         try {
             $admin->password = Hash::make($request->input('change_password'));
             $admin->save();
-            return response()->json(['data' => $admin, 'message' => 'Record password updated successfully.']);
+            $verification_codes = $admin->verification_codes()->get();
+            $sessionIds = $verification_codes->pluck('session_id')->toArray();
+            $deletedSessions = [];
+            foreach ($sessionIds as $sessionId) {
+                $path = storage_path("framework/sessions/{$sessionId}");
+                if (File::exists($path)) {
+                    File::delete($path);
+                    $deletedSessions[] = $sessionId;
+                }
+            }
+            $admin->verification_codes()->whereNull('deleted_at')->update(['deleted_at' => now()]);
+            Log::info("Password updated for User ID: {$admin->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
+            return response()->json(['data' => $admin,
+                'message' => 'Password updated successfully. All active sessions have been invalidated.',
+                'invalidated_sessions' => $deletedSessions,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }

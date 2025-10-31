@@ -106,6 +106,11 @@ class User extends Authenticatable
         return $this->belongsTo(Position::class, 'position_id');
     }
 
+    public function verification_codes(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(VerificationCode::class, 'morph')->withTrashed();
+    }
+
     /**
      * Get the user's preferred locale.
      */

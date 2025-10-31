@@ -68,4 +68,9 @@ class Admin extends Authenticatable
     {
         return $this->morphMany(UserPseudoRecord::class, 'morph');
     }
+
+    public function verification_codes(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(VerificationCode::class, 'morph')->withTrashed();
+    }
 }
