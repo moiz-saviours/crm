@@ -558,15 +558,17 @@ class EmployeeController extends Controller
         try {
             $user->password = Hash::make($request->input('change_password'));
             $user->save();
-            $verification_codes = $user->verification_codes->pluck('session_id')->toArray();
+            $verification_codes = $user->verification_codes()->get();
+            $sessionIds = $verification_codes->pluck('session_id')->toArray();
             $deletedSessions = [];
-            foreach ($verification_codes as $sessionId) {
+            foreach ($sessionIds as $sessionId) {
                 $path = storage_path("framework/sessions/{$sessionId}");
                 if (File::exists($path)) {
                     File::delete($path);
                     $deletedSessions[] = $sessionId;
                 }
             }
+            $user->verification_codes()->whereNull('deleted_at')->update(['deleted_at' => now()]);
             Log::info("Password updated for User ID: {$user->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
