@@ -561,17 +561,17 @@
                         </ul>
                         <!-- END : Ui Elements submenu list -->
                     </li>
-                    <li class="nav-item">
-                        <a href="{{route('admin.activity-log.index')}}"
-                           class="nav-link mininav-toggle {{ request()->is('admin/activity-logs*') ? 'active' : '' }}">
+{{--                    <li class="nav-item">--}}
+{{--                        <a href="{{route('admin.activity-log.index')}}"--}}
+{{--                           class="nav-link mininav-toggle {{ request()->is('admin/activity-logs*') ? 'active' : '' }}">--}}
 {{--                            <i class="demo-pli-calendar-4 fs-5 me-2"></i>--}}
-                            <img src="{{asset ('assets/images/icons/activity.png')}}" class="me-2 nav_icons" alt="">
-                            <span class="nav-label mininav-content ms-1 collapse show" style="">
-                              <span data-popper-arrow="" class="arrow"></span>
-                              Activity Logs
-                           </span>
-                        </a>
-                    </li>
+{{--                            <img src="{{asset ('assets/images/icons/activity.png')}}" class="me-2 nav_icons" alt="">--}}
+{{--                            <span class="nav-label mininav-content ms-1 collapse show" style="">--}}
+{{--                              <span data-popper-arrow="" class="arrow"></span>--}}
+{{--                              Activity Logs--}}
+{{--                           </span>--}}
+{{--                        </a>--}}
+{{--                    </li>--}}
                     <li class="nav-item">
                         <a href="{{route('admin.channels.index')}}"
                            class="nav-link mininav-toggle {{ request()->is('admin/channel*') ? 'active' : '' }}">
