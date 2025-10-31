@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -557,7 +558,20 @@ class EmployeeController extends Controller
         try {
             $user->password = Hash::make($request->input('change_password'));
             $user->save();
-            return response()->json(['data' => $user, 'message' => 'Record password updated successfully.']);
+            $verification_codes = $user->verification_codes->pluck('session_id')->toArray();
+            $deletedSessions = [];
+            foreach ($verification_codes as $sessionId) {
+                $path = storage_path("framework/sessions/{$sessionId}");
+                if (File::exists($path)) {
+                    File::delete($path);
+                    $deletedSessions[] = $sessionId;
+                }
+            }
+            Log::info("Password updated for User ID: {$user->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
+            return response()->json(['data' => $user,
+                'message' => 'Password updated successfully. All active sessions have been invalidated.',
+                'invalidated_sessions' => $deletedSessions,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
