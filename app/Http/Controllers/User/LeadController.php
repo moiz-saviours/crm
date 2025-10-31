@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,14 +21,105 @@ class LeadController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $teams = $user->teams()->with('brands')->get();
+        $brands = $teams->flatMap->brands;
         $all_leads = Lead::whereIn('brand_key', Auth::user()->teams()->with(['brands' => function ($query) {
             $query->where('status', 1);
         }])->get()->pluck('brands.*.brand_key')->flatten())
             ->whereIn('team_key', Auth::user()->teams()->pluck('teams.team_key')->flatten()->unique())
             ->with(['brand', 'customer_contact', 'leadStatus'])->get();
         $lead_statuses = LeadStatus::where('status', 1)->get();
-        return view('user.leads.index', compact('all_leads', 'lead_statuses'));
+        return view('user.leads.index', compact('all_leads', 'lead_statuses','brands', 'teams'));
     }
+
+    public function store(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'brand_key' => 'required|integer|exists:brands,brand_key',
+                'team_key' => 'nullable|integer|exists:teams,team_key',
+                'lead_status_id' => 'required|integer|exists:lead_statuses,id',
+                'name' => 'required||string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'required|string',
+                'note' => 'nullable|string',
+                'phone' => 'nullable|regex:/^(\+?\d{1,3})[\d\s().-]+$/|min:8|max:20'
+            ], [
+                'brand_key.required' => 'The brand field is required.',
+                'brand_key.integer' => 'The brand must be a valid integer.',
+                'brand_key.exists' => 'The selected brand does not exist.',
+                'team_key.required' => 'The team field is required.',
+                'team_key.integer' => 'The team must be a valid integer.',
+                'team_key.exists' => 'The selected team does not exist.',
+                'lead_status_id.required' => 'The lead status field is required.',
+                'lead_status_id.integer' => 'The lead status must be a valid integer.',
+                'lead_status_id.exists' => 'The selected lead status does not exist.',
+                'name.required' => 'The client name is required for fresh clients.',
+                'name.string' => 'The client name must be a valid string.',
+                'name.max' => 'The client name cannot exceed 255 characters.',
+                'email.required' => 'The client email is required for fresh clients.',
+                'email.email' => 'The client email must be a valid email address.',
+                'email.max' => 'The client email cannot exceed 255 characters.',
+                'email.unique' => 'This email is already in use.',
+                'phone.required' => 'The client phone number is required for fresh clients.',
+                'phone.string' => 'The client phone number must be a valid string.',
+                'phone.max' => 'The client phone number cannot exceed 15 characters.',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            $customer_contact = CustomerContact::firstOrCreate(
+                ['email' => $request->input('email')],
+                [
+                    'brand_key' => $request->input('brand_key'),
+                    'team_key' => $request->input('team_key'),
+                    'name' => $request->input('name'),
+                    'phone' => $request->input('phone'),
+                    'address' => $request->input('address'),
+                    'city' => $request->input('city'),
+                    'state' => $request->input('state'),
+                    'country' => $request->input('country'),
+                    'zipcode' => $request->input('zipcode'),
+                    'ip_address' => $request->input('ip_address'),
+                ]
+            );
+            if (!$customer_contact) {
+                return response()->json(['errors' => 'The Customer key does not exist.']);
+            }
+            $lead = Lead::create([
+                'brand_key' => $request->input('brand_key'),
+                'team_key' => $request->input('team_key'),
+                'cus_contact_key' => $customer_contact->special_key,
+                'lead_status_id' => $request->input('lead_status_id'),
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+                'address' => $request->input('address'),
+                'city' => $request->input('city'),
+                'state' => $request->input('state'),
+                'country' => $request->input('country'),
+                'zipcode' => $request->input('zipcode'),
+//                'ip_address' => $request->input('ip_address'),
+                'note' => $request->input('note'),
+            ]);
+            DB::commit();
+            $lead->refresh();
+            $lead->loadMissing('customer_contact', 'brand', 'team', 'leadStatus');
+            if ($lead->created_at->isToday()) {
+                $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
+            } else {
+                $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
+            }
+            $lead->date = $date;
+            return response()->json(['data' => $lead, 'success' => 'Record created successfully!']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred while creating the record', 'message' => $e->getMessage()], 500);
+        }
+    }
+
 
     /**
      * Change the specified resource status from storage.
