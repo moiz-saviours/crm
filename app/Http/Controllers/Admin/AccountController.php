@@ -162,15 +162,17 @@ class AccountController extends Controller
         try {
             $admin->password = Hash::make($request->input('change_password'));
             $admin->save();
-            $verification_codes = $admin->verification_codes->pluck('session_id')->toArray();
+            $verification_codes = $admin->verification_codes()->get();
+            $sessionIds = $verification_codes->pluck('session_id')->toArray();
             $deletedSessions = [];
-            foreach ($verification_codes as $sessionId) {
+            foreach ($sessionIds as $sessionId) {
                 $path = storage_path("framework/sessions/{$sessionId}");
                 if (File::exists($path)) {
                     File::delete($path);
                     $deletedSessions[] = $sessionId;
                 }
             }
+            $admin->verification_codes()->whereNull('deleted_at')->update(['deleted_at' => now()]);
             Log::info("Password updated for User ID: {$admin->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
             return response()->json(['data' => $admin,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
