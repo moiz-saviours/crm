@@ -451,6 +451,61 @@
         {{--    @endif--}}
         {{--    @php session()->forget('edit_company') @endphp--}}
 
+        /** Create Manage Record */
+        $('#manage-form').on('submit', function (e) {
+            e.preventDefault();
+            var dataId = $('#manage-form').data('id');
+            var formData = new FormData(this);
+            let table = dataTables[0];
+            if (!dataId) {
+                AjaxRequestPromise(`{{ route("lead.store") }}`, formData, 'POST', {useToastr: true})
+                    .then(response => {
+                        if (response?.data) {
+                            const {
+                                id,
+                                brand,
+                                team,
+                                customer_contact,
+                                name,
+                                country,
+                                lead_status,
+                                note,
+                                created_at,
+                                date,
+
+                            } = Object.fromEntries(
+                                Object.entries(response.data).map(([key, value]) => [key, value === null ? '' : value])
+                            );
+
+                            const index = table.rows().count() + 1;
+                            const converted = lead_status != 'Converted' && !customer_contact;
+                            const columns = `
+                                <td class="align-middle text-left text-nowrap"></td>
+                                <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}</td>
+                                <td class="align-middle text-left text-nowrap">
+                                    ${brand ? `<a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}
+                                </td>
+                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}</td>
+                                <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
+                                <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
+                                <td class="align-middle text-left text-nowrap">${country}</td>
+                                <td class="align-middle text-left text-nowrap">${note}</td>
+                                <td class="align-middle text-left table-actions">
+                                    <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
+.                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                </td>
+                                `;
+                            table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                            $('#manage-form')[0].reset();
+                            $('#formContainer').removeClass('open')
+                        }
+                    })
+                    .catch(error => console.error('An error occurred while updating the record.', error));
+            }
+
+        });
 
         /** Convert Lead to Customer */
         $(document).on('click', '.convertBtn', function (e) {
