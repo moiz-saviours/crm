@@ -29,10 +29,10 @@ class MessageController extends Controller
             ], 404);
         }
 
-        $messages = Message::with(['sender', 'attachments'])
+        $messages = Message::with(['sender:id,name', 'attachments'])
             ->where('conversation_id', $conversationId)
             ->orderBy('created_at', 'asc')
-            ->get();
+            ->get(['id','sender_id','sender_type','content','message_type','created_at']);
 
         $html = '';
         foreach ($messages as $message) {
@@ -63,7 +63,7 @@ class MessageController extends Controller
         }
 
         // Ensure at least content or attachment is provided
-        if (empty($request->content) && !$request->hasFile('attachments')) {
+        if (empty($request->get('content')) && !$request->hasFile('attachments')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Message content or attachment is required.'
@@ -75,7 +75,7 @@ class MessageController extends Controller
             'conversation_id' => $request->conversation_id,
             'sender_type' => get_class(auth()->user()),
             'sender_id' => auth()->user()->id,
-            'content' => $request->content,
+            'content' => $request->get('content'),
             'message_type' => $request->message_type,
             'message_status' => 'sent',
         ]);
@@ -96,7 +96,7 @@ class MessageController extends Controller
         }
 
         // Load relationships for frontend
-        $message->load('attachments', 'sender');
+        $message->load('attachments', 'sender:id,name');
 
         return response()->json([
             'success' => true,
@@ -181,7 +181,7 @@ class MessageController extends Controller
     // ADD THIS METHOD to your CustomerContactController:
     public function getConversations(CustomerContact $customer_contact)
     {
-        $conversations = Conversation::with(['sender', 'receiver', 'lastMessage'])
+        $conversations = Conversation::with(['sender:id,name', 'receiver:id,name', 'lastMessage'])
             ->where(function($query) use ($customer_contact) {
                 $query->where('sender_type', get_class(auth()->user()))
                     ->where('sender_id', auth()->user()->id)
@@ -206,7 +206,7 @@ public function getContextConversations(Request $request)
 {
     $customerContactId = $request->customer_contact_id;
     
-    $conversations = Conversation::with(['sender', 'receiver', 'lastMessage'])
+    $conversations = Conversation::with(['sender:id,name', 'receiver:id,name', 'lastMessage'])
         ->where(function($query) use ($customerContactId) {
             $query->where('sender_type', CustomerContact::class)
                   ->where('sender_id', $customerContactId);
@@ -217,7 +217,7 @@ public function getContextConversations(Request $request)
         })
         ->whereNotNull('context_type')
         ->orderBy('updated_at', 'desc')
-        ->get();
+        ->get(['id','sender_type','sender_id','receiver_type','receiver_id','context_type','context_id','updated_at']);
 
     return response()->json([
         'conversations' => $conversations
