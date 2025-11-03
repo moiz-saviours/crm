@@ -131,7 +131,7 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invo
 
 
     <!-- pdf download links -->
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
@@ -328,10 +328,10 @@ if (!empty($non_bank_methods)) {
     <div class="container-fluid">
         <div class="row first-row">
             <div class="col-md-12">
-                <div class="icon">
-                    <img src="{{asset('assets/images/other/printer-svgrepo-com.svg')}}" alt="" class="icon-i"
+                <div class="icon" style="cursor:pointer;">
+                    <img src="{{asset('assets/images/other/printer-svgrepo-com.svg')}}" alt="" class="icon-i" title="print"
                          onclick="printDiv('invoice')">
-                    <img src="{{asset('assets/images/other/down-line-svgrepo-com.svg')}}" alt="" class="icon-i2"
+                    <img src="{{asset('assets/images/other/down-line-svgrepo-com.svg')}}" alt="" class="icon-i2" title="download"
                          onclick="generatePDF()">
                 </div>
             </div>
@@ -1508,10 +1508,13 @@ if (!empty($non_bank_methods)) {
 <script>
     function generatePDF() {
         const element = document.getElementById('invoice');
-        html2pdf()
-            .from(element)
-            .save();
+        html2pdf(element);
     }
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [title]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
     function printDiv(divName) {
         const printContents = document.getElementById(divName).innerHTML;
         const originalContents = document.body.innerHTML;
