@@ -451,6 +451,58 @@
         {{--    @endif--}}
         {{--    @php session()->forget('edit_company') @endphp--}}
 
+        /** Edit */
+        $(document).on('click', '.editBtn', function () {
+            const id = $(this).data('id');
+            if (!id) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Record not found. Do you want to reload the page?',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonText: 'Reload',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            }
+            $('#manage-form')[0].reset();
+            $.ajax({
+                url: `{{route('lead.edit')}}/` + id,
+                type: 'GET',
+                success: function (response) {
+                    setDataAndShowEdit(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR, textStatus, errorThrown);
+                }
+            });
+        });
+
+        function setDataAndShowEdit(data) {
+            let lead = data?.lead;
+            $('#manage-form').data('id', lead.id);
+
+            $('#brand_key').val(lead.brand_key).trigger('change');
+            $('#team_key').val(lead.team_key).trigger('change');
+            $('#name').val(lead.name)
+            $('#email').val(lead.email);
+            $('#phone').val(lead.phone);
+            $('#lead_status_id').val(lead.lead_status_id).trigger('change');
+            $('#note').val(lead.note);
+
+            $('#manage-form').attr('action', `{{route('lead.update')}}/` + lead.id);
+            $('#formContainer').addClass('open')
+        }
+
+        const decodeHtml = (html) => {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        };
+
         /** Create Manage Record */
         $('#manage-form').on('submit', function (e) {
             e.preventDefault();
@@ -491,6 +543,9 @@
                                 <td class="align-middle text-left text-nowrap">${country}</td>
                                 <td class="align-middle text-left text-nowrap">${note}</td>
                                 <td class="align-middle text-left table-actions">
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
 .                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
                                         <i class="fas fa-user-check"></i>
@@ -503,6 +558,109 @@
                         }
                     })
                     .catch(error => console.error('An error occurred while updating the record.', error));
+            } else {
+                const url = $(this).attr('action');
+                AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
+                    .then(response => {
+                        if (response?.data) {
+                            const {
+                                id,
+                                brand,
+                                team,
+                                customer_contact,
+                                name,
+                                country,
+                                lead_status,
+                                note,
+                                date,
+
+                            } = Object.fromEntries(
+                                Object.entries(response.data).map(([key, value]) => [key, value === null ? '' : value])
+                            );
+
+                            const index = table.row($('#tr-' + id)).index();
+                            const rowData = table.row(index).data();
+
+                            // Column 2: Name
+                            if (decodeHtml(rowData[1]) !== `${customer_contact ? `<a href="${getEditRoute('{{ route('customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`) {
+                                table.cell(index, 1).data(`${customer_contact ? `<a href="${getEditRoute('{{ route('customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}`).draw();
+                            }
+                            // Column 3: Brand
+                            if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : ''}`) {
+                                table.cell(index, 2).data(`${brand ? `<a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}`).draw();
+                            }
+
+                            // Column 4: Team
+                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`) {
+                                table.cell(index, 3).data(`${team ? `<a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`).draw();
+                            }
+
+                            // Column 5: Created Date
+                            if (decodeHtml(rowData[4]) !== date) {
+                                table.cell(index, 4).data(date).draw();
+                            }
+
+                            // Column 6: Lead Status
+                            if (decodeHtml(rowData[5]) !== lead_status.name) {
+                                table.cell(index, 5).data(lead_status.name).draw();
+                            }
+
+                            // Column 7: Country
+                            if (decodeHtml(rowData[6]) !== country) {
+                                table.cell(index, 6).data(country).draw();
+                            }
+
+                            // Column 8: Note
+                            if (decodeHtml(rowData[7]) !== note) {
+                                table.cell(index, 7).data(note).draw();
+                            }
+
+                            // Column 9: Status
+                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
+                            if (decodeHtml(rowData[8]) !== statusHtml) {
+                                table.cell(index, 8).data(statusHtml).draw();
+                            }
+                            // Column 10: Actions - Update Convert Button
+                            const actionsCell = table.cell(index, 9);
+                            const currentActions = $(actionsCell.node());
+
+                            const convertBtn = currentActions.find('.btn-success');
+                            const isConvertible = lead_status.name == 'Converted' && customer_contact;
+
+                            if (convertBtn.length) {
+                                if (isConvertible) {
+                                    convertBtn.removeClass('convertBtn')
+                                        .addClass('disabled')
+                                        .removeAttr('data-id')
+                                        .prop('disabled', true);
+                                } else {
+                                    convertBtn.removeClass('disabled')
+                                        .addClass('convertBtn')
+                                        .attr('data-id', id)
+                                        .prop('disabled', false);
+                                }
+
+                                table.cell(index, 9).data(currentActions.html()).draw();
+                            } else {
+                                const converted = lead_status.name != 'Converted' && !customer_contact;
+                                const actionsHtml = `
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <button type="button" class="btn btn-sm btn-success ${converted ? 'convertBtn' : 'disabled'} " ${converted ? `data-id="${id}"` : ''}
+                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Convert to Customer">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                `;
+                                table.cell(index, 9).data(actionsHtml).draw();
+                            }
+                            $('#manage-form')[0].reset();
+                            $('#image-display').attr('src', null);
+                            $('#formContainer').removeClass('open')
+                        }
+                    })
+                    .catch(error => console.log(error));
             }
 
         });
