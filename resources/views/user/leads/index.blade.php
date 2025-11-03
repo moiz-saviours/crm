@@ -130,9 +130,7 @@
                                                 </td>
                                                 <td class="align-middle text-left text-nowrap">
                                                     @if ($lead->created_at->isToday())
-                                                        Today
-                                                        at {{ $lead->created_at->timezone('GMT+5')->format('g:i A') }}
-                                                        GMT+5
+                                                        Today at {{ $lead->created_at->timezone('GMT+5')->format('g:i A') }} GMT+5
                                                     @else
                                                         {{ $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') }}
                                                         GMT+5
@@ -142,6 +140,9 @@
                                                 <td class="align-middle text-left text-nowrap">{{$lead->country}}</td>
                                                 <td class="align-middle text-left text-nowrap">{{ htmlspecialchars(strlen($lead->note) > 18 ? substr($lead->note, 0, 18) . '...' : $lead->note) }}</td>
                                                 <td class="align-middle text-left table-actions">
+                                                    <button type="button" class="btn btn-sm btn-primary editBtn"
+                                                            data-id="{{ $lead->id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
+                                                            class="fas fa-edit"></i></button>
                                                     <button type="button"
                                                             class="btn btn-sm btn-success @if(isset($lead->leadStatus)
                                                         && $lead->leadStatus->name != 'Converted'
