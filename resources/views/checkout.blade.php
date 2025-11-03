@@ -1510,6 +1510,11 @@ if (!empty($non_bank_methods)) {
         const element = document.getElementById('invoice');
         html2pdf(element);
     }
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [title]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
     function printDiv(divName) {
         const printContents = document.getElementById(divName).innerHTML;
         const originalContents = document.body.innerHTML;
