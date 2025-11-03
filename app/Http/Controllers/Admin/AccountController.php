@@ -7,6 +7,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -161,7 +162,12 @@ class AccountController extends Controller
         try {
             $admin->password = Hash::make($request->input('change_password'));
             $admin->save();
-            return response()->json(['data' => $admin, 'message' => 'Record password updated successfully.']);
+            $deletedSessions = $this->destroy_session($admin);
+            Log::info("Password updated for User ID: {$admin->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
+            return response()->json(['data' => $admin,
+                'message' => 'Password updated successfully. All active sessions have been invalidated.',
+                'invalidated_sessions' => $deletedSessions,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
@@ -182,6 +188,7 @@ class AccountController extends Controller
                 }
             }
             if ($admin->delete()) {
+                $this->destroy_session($admin);
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
             return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
@@ -202,9 +209,40 @@ class AccountController extends Controller
             }
             $admin->status = $request->query('status');
             $admin->save();
+            $this->destroy_session($admin);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
+        }
+    }
+
+    /**
+     * Destroy all sessions and soft-delete verification codes for the given user.
+     *
+     * @param \App\Models\Admin $admin
+     * @return array  $deletedSessions
+     */
+    protected function destroy_session(Admin $admin): array
+    {
+        $deletedSessions = [];
+        try {
+            $verificationCodes = $admin->verification_codes()->get();
+            $sessionIds = $verificationCodes->pluck('session_id')->toArray();
+            foreach ($sessionIds as $sessionId) {
+                $path = storage_path("framework/sessions/{$sessionId}");
+                if (File::exists($path)) {
+                    File::delete($path);
+                    $deletedSessions[] = $sessionId;
+                }
+            }
+            $admin->verification_codes()->whereNull('deleted_at')->update(['deleted_at' => now()]);
+            return $deletedSessions;
+        } catch (\Exception $e) {
+            Log::error("Failed to destroy sessions for User ID: {$admin->id}. Error: {$e->getMessage()}", [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ]);
+            return [];
         }
     }
 }

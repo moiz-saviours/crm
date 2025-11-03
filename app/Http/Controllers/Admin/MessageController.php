@@ -100,9 +100,8 @@ class MessageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Message sent successfully', 
-            'data' => $message
-        ], 201);
+            'message' => $message
+        ]);
     }
 
 
@@ -185,7 +184,7 @@ class MessageController extends Controller
         $conversations = Conversation::with(['sender', 'receiver', 'lastMessage'])
             ->where(function($query) use ($customer_contact) {
                 $query->where('sender_type', get_class(auth()->user()))
-                    ->where('sender_id', auth()->id())
+                    ->where('sender_id', auth()->user()->id)
                     ->where('receiver_type', get_class($customer_contact))
                     ->where('receiver_id', $customer_contact->id);
             })
@@ -193,7 +192,7 @@ class MessageController extends Controller
                 $query->where('sender_type', get_class($customer_contact))
                     ->where('sender_id', $customer_contact->id)
                     ->where('receiver_type', get_class(auth()->user()))
-                    ->where('receiver_id', auth()->id());
+                    ->where('receiver_id', auth()->user()->id);
             })
             ->orderBy('updated_at', 'desc')
             ->get();
