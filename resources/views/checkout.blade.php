@@ -328,10 +328,10 @@ if (!empty($non_bank_methods)) {
     <div class="container-fluid">
         <div class="row first-row">
             <div class="col-md-12">
-                <div class="icon">
-                    <img src="{{asset('assets/images/other/printer-svgrepo-com.svg')}}" alt="" class="icon-i"
+                <div class="icon" style="cursor:pointer;">
+                    <img src="{{asset('assets/images/other/printer-svgrepo-com.svg')}}" alt="" class="icon-i" title="print"
                          onclick="printDiv('invoice')">
-                    <img src="{{asset('assets/images/other/down-line-svgrepo-com.svg')}}" alt="" class="icon-i2"
+                    <img src="{{asset('assets/images/other/down-line-svgrepo-com.svg')}}" alt="" class="icon-i2" title="download"
                          onclick="generatePDF()">
                 </div>
             </div>
