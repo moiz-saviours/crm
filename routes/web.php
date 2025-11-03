@@ -119,6 +119,8 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
         Route::prefix('leads')->group(function () {
             Route::post('/change-lead-status', [LeadController::class, 'change_lead_status'])->name('change.lead-status');
         });
+        Route::get('/edit/{lead?}', [LeadController::class, 'edit'])->name('edit');
+        Route::post('/update/{lead?}', [LeadController::class, 'update'])->name('update');
         Route::post('/store', [LeadController::class, 'store'])->name('store');
         Route::post('lead/convert/{id}', [LeadController::class, 'convert_to_customer'])->name('convert');
     });
