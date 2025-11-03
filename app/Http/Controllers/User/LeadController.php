@@ -120,6 +120,127 @@ class LeadController extends Controller
         }
     }
 
+    public function edit(Lead $lead)
+    {
+        $user = Auth::user();
+        $teams = $user->teams()->with('brands')->get();
+        $brands = $teams->flatMap->brands;
+
+        $brandKeys = $brands->pluck('brand_key');
+        $teamKeys = $teams->pluck('team_key');
+
+        $customer_contacts = CustomerContact::where('status', 1)
+            ->whereIn('brand_key', $brandKeys)
+            ->whereIn('team_key', $teamKeys)
+            ->orderBy('name')
+            ->get();
+        return response()->json(['lead' => $lead, 'brands' => $brands, 'teams' => $teams, 'customer_contacts' => $customer_contacts]);
+    }
+
+
+    /**
+     * Update the specified lead in storage.
+     */
+    public function update(Request $request, Lead $lead)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'brand_key' => 'nullable|integer',
+                'team_key' => 'nullable|integer',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'nullable|string',
+                'address' => 'nullable|string|max:255',
+                'city' => 'nullable|string|max:255',
+                'state' => 'nullable|string|max:255',
+                'country' => 'nullable|string|max:255',
+                'zipcode' => 'nullable|string|max:10',
+                'note' => 'nullable|string',
+                'status' => 'required|in:0,1',
+                'phone' => 'nullable|regex:/^(\+?\d{1,3})[\d\s().-]+$/|min:8|max:20'
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            DB::beginTransaction();
+            // Get previous status before update
+            $oldStatusId = $lead->lead_status_id;
+            $customer_contact = CustomerContact::withTrashed()->firstOrNew(
+                ['email' => $request->input('email')],
+                [
+                    'brand_key' => $request->input('brand_key'),
+                    'team_key' => $request->input('team_key'),
+                    'name' => $request->input('name'),
+                    'phone' => $request->input('phone'),
+                    'address' => $request->input('address'),
+                    'city' => $request->input('city'),
+                    'state' => $request->input('state'),
+                    'country' => $request->input('country'),
+                    'zipcode' => $request->input('zipcode'),
+                    'ip_address' => $request->input('ip_address'),
+                ]
+            );
+            if (!$customer_contact) {
+                return response()->json(['errors' => 'The Customer key does not exist.']);
+            }
+            $updateData = [
+                'brand_key' => $request->input('brand_key'),
+                'team_key' => $request->input('team_key'),
+                'lead_status_id' => $request->input('lead_status_id'),
+                'name' => $request->input('name'),
+                'phone' => $request->input('phone'),
+                'address' => $request->input('address'),
+                'city' => $request->input('city'),
+                'state' => $request->input('state'),
+                'country' => $request->input('country'),
+                'zipcode' => $request->input('zipcode'),
+                'note' => $request->input('note'),
+                'status' => $request->input('status'),
+            ];
+            if (is_null($lead->cus_contact_key) && $customer_contact->special_key) {
+                $updateData['cus_contact_key'] = $customer_contact->special_key;
+            }
+            if (is_null($lead->email) && $request->filled('email')) {
+                $updateData['email'] = $request->input('email');
+            }
+            $lead->update($updateData);
+            $convertedStatus = LeadStatus::where('name', 'Converted')->first();
+            // If old status was "Converted" but new one is different — log the change
+            if ($convertedStatus && $oldStatusId == $convertedStatus->id && $lead->lead_status_id != $convertedStatus->id) {
+                UserActivity::create([
+                    'event_type' => 'converted_status_changed',
+                    'visitor_id' => $lead->visitor_id,
+                    'event_data' => json_encode([
+                        'message' => 'Converted lead status was changed manually.',
+                        'lead_name' => $lead->name,
+                        'old_status' => 'Converted',
+                        'new_status' => $lead->leadStatus->name ?? 'Unknown',
+                        'changed_by' => auth()->user()->name ?? 'System',
+                    ]),
+                ]);
+            }
+            DB::commit();
+            $lead->loadMissing(['customer_contact' => function ($query) {
+                $query->withTrashed()->select('id', 'special_key', 'name');
+            },
+                'brand' => function ($query) {
+                    $query->withTrashed()->select('brand_key', 'name');
+                },
+                'team' => function ($query) {
+                    $query->withTrashed()->select('team_key', 'name');
+                }], 'leadStatus');
+            if ($lead->created_at->isToday()) {
+                $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
+            } else {
+                $date = $lead->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
+            }
+            $lead->date = $date;
+            return response()->json(['data' => $lead, 'success' => 'Record updated successfully!']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred while creating the record', 'message' => $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Change the specified resource status from storage.
