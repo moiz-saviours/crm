@@ -329,11 +329,9 @@ if (!empty($non_bank_methods)) {
         <div class="row first-row">
             <div class="col-md-12">
                 <div class="icon" style="cursor:pointer;">
-                    <img src="{{asset('assets/images/other/printer-svgrepo-com.svg')}}" alt="" class="icon-i"
-                         title="print"
+                    <img src="{{asset('assets/images/other/printer-svgrepo-com.svg')}}" alt="" class="icon-i" title="print"
                          onclick="printDiv('invoice')">
-                    <img src="{{asset('assets/images/other/down-line-svgrepo-com.svg')}}" alt="" class="icon-i2"
-                         title="download"
+                    <img src="{{asset('assets/images/other/down-line-svgrepo-com.svg')}}" alt="" class="icon-i2" title="download"
                          onclick="generatePDF()">
                 </div>
             </div>
@@ -358,14 +356,12 @@ if (!empty($non_bank_methods)) {
                                     ?>
                                 </div>
                                 <div class="col-md-6 col-4">
-                                    @if(htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') !== null && file_exists(htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8')))
-                                        <div class="brand-logo">
-                                            <img
-                                                src="<?= htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                                                class="img-fluid images" alt="<?= $brandData['name'] ?>"
-                                                onerror="this.parentElement.style.display='none'">
-                                        </div>
-                                    @endif
+                                    <div class="brand-logo">
+                                        <img
+                                            src="<?= htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                            class="img-fluid images" alt="<?= $brandData['name'] ?>"
+                                            onerror="this.parentElement.style.display='none'">
+                                    </div>
                                 </div>
                                 <div class="col-md-6 col-8 text-right ">
                                     <div class="invoice-detail">
