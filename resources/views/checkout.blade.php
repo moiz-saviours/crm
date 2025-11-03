@@ -131,7 +131,7 @@ if (!in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) && (isset($invo
 
 
     <!-- pdf download links -->
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
@@ -1508,9 +1508,7 @@ if (!empty($non_bank_methods)) {
 <script>
     function generatePDF() {
         const element = document.getElementById('invoice');
-        html2pdf()
-            .from(element)
-            .save();
+        html2pdf(element);
     }
     function printDiv(divName) {
         const printContents = document.getElementById(divName).innerHTML;
