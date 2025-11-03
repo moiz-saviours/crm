@@ -356,11 +356,14 @@ if (!empty($non_bank_methods)) {
                                     ?>
                                 </div>
                                 <div class="col-md-6 col-4">
-                                    <div class="brand-logo">
-                                        <img
-                                            src="<?= htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                                            class="img-fluid images" alt="<?= $brandData['name'] ?>">
-                                    </div>
+                                    @if(htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') !== null && file_exists(htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8')))
+                                        <div class="brand-logo">
+                                            <img
+                                                src="<?= htmlspecialchars($brandData['logo'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                                class="img-fluid images" alt="<?= $brandData['name'] ?>"
+                                                onerror="this.parentElement.style.display='none'">
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="col-md-6 col-8 text-right ">
                                     <div class="invoice-detail">
