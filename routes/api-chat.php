@@ -467,7 +467,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ], 422);
         }
         $message = Message::create([
-            'conversation_id' => $request->conversation_id,
+            'conversation_id' => (int)$request->conversation_id,
             'sender_type' => 'App\Models\CustomerContact',
             'sender_id' => auth()->user()->id,
             'content' => $request->get('content'),
