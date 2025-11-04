@@ -907,15 +907,13 @@ function initializeChatFunctionality() {
     imageInput.addEventListener('change', handleFileSelect);
     messageTextarea.addEventListener('input', updateInputStates);
 
-    // Replace the keydown event listener with this more user-friendly version:
     messageTextarea.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-            if (e.shiftKey) {
-                // Enter without Shift: Send message
+            if (e.ctrlKey) {
+                // Ctrl + Enter: Send message
                 e.preventDefault();
                 sendMessage();
             } else {
-                // Shift + Enter: Allow new line (default behavior)
                 return;
             }
         }
