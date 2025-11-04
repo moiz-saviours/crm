@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'finished',
                 'progress' => 100,
                 'deadline' => '2025-08-20',
-                'conversation_id' => 502,
+                'conversation_id' => 2,
             ],
             [
                 'id' => 1003,
@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'is_progress',
                 'progress' => 60,
                 'deadline' => '2025-11-30',
-                'conversation_id' => 503,
+                'conversation_id' => 3,
             ],
             [
                 'id' => 1005,
@@ -165,7 +165,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'finished',
                 'progress' => 100,
                 'deadline' => '2025-08-20',
-                'conversation_id' => 502,
+                'conversation_id' => 2,
             ],
             [
                 'id' => 1003,
@@ -185,7 +185,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'is_progress',
                 'progress' => 60,
                 'deadline' => '2025-11-30',
-                'conversation_id' => 503,
+                'conversation_id' => 3,
             ],
             [
                 'id' => 1005,
@@ -223,7 +223,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $messages = [
             [
                 'id' => 1,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => 'user',
                 'sender_id' => 1,
                 'content' => 'Hello, how is the website redesign coming along?',
@@ -234,7 +234,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 2,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => 'admin',
                 'sender_id' => 2,
                 'content' => 'Great! We\'ve completed 75% of the work so far.',
@@ -245,7 +245,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 3,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => 'user',
                 'sender_id' => 1,
                 'content' => 'design-mockup.png',
@@ -256,7 +256,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 4,
-                'conversation_id' => 502,
+                'conversation_id' => 2,
                 'sender_type' => 'user',
                 'sender_id' => 3,
                 'content' => 'When will the mobile app UI be ready?',
@@ -267,7 +267,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 5,
-                'conversation_id' => 503,
+                'conversation_id' => 3,
                 'sender_type' => 'admin',
                 'sender_id' => 2,
                 'content' => 'The e-commerce platform development is on track.',
@@ -280,10 +280,10 @@ Route::middleware('auth:sanctum')->group(function () {
         for ($i = 6; $i <= 20; $i++) {
             $messages[] = [
                 'id' => $i,
-                'conversation_id' => 501,
+                'conversation_id' => 3,
                 'sender_type' => $i % 2 == 0 ? 'admin' : 'user',
                 'sender_id' => $i % 2 == 0 ? 2 : 1,
-                'content' => "Sample text message number $i for conversation 501.",
+                'content' => "Sample text message number $i for conversation 3.",
                 'message_type' => 'text',
                 'message_status' => 'seen',
                 'created_at' => date('Y-m-d H:i:s', strtotime("2024-01-11 +$i hours")),
@@ -393,7 +393,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 4,
-                'conversation_id' => 502,
+                'conversation_id' => 2,
                 'sender_type' => 'user',
                 'sender_id' => 3,
                 'content' => 'When will the mobile app UI be ready?',
@@ -404,7 +404,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 5,
-                'conversation_id' => 503,
+                'conversation_id' => 3,
                 'sender_type' => 'admin',
                 'sender_id' => 2,
                 'content' => 'The e-commerce platform development is on track.',
