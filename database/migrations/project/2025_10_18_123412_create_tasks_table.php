@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            $table->integer('order_column')->nullable()->default(0);
 
             $table->unsignedBigInteger('project_id')->nullable()->default(null);
             $table->foreign('project_id')

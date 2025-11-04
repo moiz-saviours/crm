@@ -277,6 +277,11 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                 Route::post('/projects/update-move', [AdminProjectController::class, 'updateProjectMove'])
                     ->name('projects.update-move');
 
+                // Task routes
+                Route::get('/tasks/data', [AdminTaskController::class, 'getTasksData'])->name('tasks.data');
+                Route::get('/tasks/details', [AdminTaskController::class, 'getTaskDetails'])->name('tasks.details');
+                Route::post('/tasks/update-move', [AdminTaskController::class, 'updateTaskMove'])->name('tasks.update-move');
+
             });
         });
         /** Companies Routes */

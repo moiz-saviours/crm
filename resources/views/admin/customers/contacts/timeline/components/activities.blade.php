@@ -271,7 +271,7 @@
             @include('admin.customers.contacts.timeline.partials.project.index')
         </div>
                 <div class="tab-pane fade custom-tabs-row-scroll" id="tasks-container" role="tabpanel" aria-labelledby="task-tab">
-            @include('admin.customers.contacts.timeline.static-content.task')
+            @include('admin.customers.contacts.timeline.partials.task.index')
         </div>
         <div class="tab-pane fade" id="chats-container" role="tabpanel" aria-labelledby="chat-tab">
             @include('admin.customers.contacts.timeline.partials.chat.index')

@@ -3089,17 +3089,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize tab listeners
-    function initializeTabListeners() {
-        document.addEventListener('click', function(e) {
+    window.initializeTabListeners = function () {
+        document.addEventListener('click', function (e) {
             const tab = getActiveTab();
-            //todo this is temporary logic
-            if (tab == 'chats' || tab == 'projects') {
+
+            // Temporary logic for show-more button visibility
+            if (tab === 'chats' || tab === 'projects') {
                 const showMoreBtn = document.getElementById('show-more-btn');
                 if (showMoreBtn) {
                     showMoreBtn.style.display = 'none';
                 }
             }
 
+            // When Projects tab is active
+            if (tab === 'projects') {
+                if (typeof window.loadProjects === 'function') {
+                    window.loadProjects();
+                } else {
+                    console.warn('loadProjects() not found globally.');
+                }
+            }
+
+            // When Tasks tab is active
+            if (tab === 'tasks') {
+                if (typeof window.loadTasks === 'function') {
+                    window.loadTasks();
+                } else {
+                    console.warn('loadTasks() not found globally.');
+                }
+            }
+
+            // For customize button click
             if (e.target.closest('.nav-link.customize')) {
                 setTimeout(() => {
                     const searchInput = document.querySelector('.search-inputs');
@@ -3110,6 +3130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
     
     // Initialize everything
     initializeTabListeners();

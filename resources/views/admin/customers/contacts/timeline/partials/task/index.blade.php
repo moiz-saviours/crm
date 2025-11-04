@@ -1,12 +1,10 @@
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-
-            {{-- Project Filters --}}
+            {{-- Task Filters --}}
             <div class="row mb-4">
-                <div class="col-md-2">
-                    <select class="form-select" id="projectStatusFilter">
+                <div class="col-md-3">
+                    <select class="form-select" id="taskStatusFilter">
                         <option value="">All Status</option>
                         <option value="is_progress">In Progress</option>
                         <option value="on_hold">On Hold</option>
@@ -14,50 +12,41 @@
                         <option value="finished">Finished</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" id="projectValueFilter">
-                        <option value="">All Values</option>
-                        <option value="regular">Regular</option>
-                        <option value="standard">Standard</option>
-                        <option value="premium">Premium</option>
-                        <option value="exclusive">Exclusive</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" placeholder="Search projects..." id="projectSearchInput">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" placeholder="Search tasks..." id="taskSearchInput">
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-outline-secondary w-100" id="projectClearFilters">Clear</button>
+                    <button class="btn btn-outline-secondary w-100" id="taskClearFilters">Clear</button>
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Project
+                        <i class="fas fa-plus"></i> Task
                     </button>
                 </div>
             </div>
 
-            {{-- Project Boards --}}
-            <div class="row" id="projectsContainer">
-                {{-- Projects will be loaded here via AJAX --}}
+            {{-- Task Boards --}}
+            <div class="row" id="tasksContainer">
+                {{-- Tasks will be loaded here via AJAX --}}
             </div>
         </div>
     </div>
 </div>
 
-{{-- Project Details Modal --}}
-<div class="modal fade" id="projectModal" tabindex="-1" aria-hidden="true">
+{{-- Task Details Modal --}}
+<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="projectModalLabel">Project Details</h5>
+                <h5 class="modal-title" id="taskModalLabel">Task Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="projectModalBody">
-                {{-- Project details will be loaded here --}}
+            <div class="modal-body" id="taskModalBody">
+                {{-- Task details will be loaded here --}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Edit Project</button>
+                <button type="button" class="btn btn-primary">Edit Task</button>
             </div>
         </div>
     </div>
@@ -67,9 +56,12 @@
 $(document).ready(function() {
     const customerContactKey = '{{ $customer_contact->special_key }}';
 
-    // ========== PROJECTS ==========
+    /* =========================
+     *   PROJECTS SECTION
+     * ========================= */
     let projectRequest = null;
 
+    // Filter functionality
     $('#projectStatusFilter, #projectValueFilter, #projectSearchInput').on('change keyup', function() {
         loadProjects();
     });
@@ -80,6 +72,7 @@ $(document).ready(function() {
         loadProjects();
     });
 
+    // Global function for loading projects
     window.loadProjects = function () {
         if (projectRequest && projectRequest.readyState !== 4) {
             projectRequest.abort();
@@ -103,8 +96,8 @@ $(document).ready(function() {
             },
             success: function (response) {
                 $('#projectsContainer').html(response);
-                if (typeof initializeDragAndDrop === 'function') {
-                    initializeDragAndDrop();
+                if (typeof initializeProjectDragAndDrop === 'function') {
+                    initializeProjectDragAndDrop();
                 }
             },
             error: function (xhr, status) {
@@ -113,6 +106,7 @@ $(document).ready(function() {
         });
     };
 
+    // Project modal handling
     $(document).on('click', '.project-card', function() {
         const projectId = $(this).data('project-id');
         loadProjectDetails(projectId);
@@ -122,10 +116,7 @@ $(document).ready(function() {
         $.ajax({
             url: '{{ route("admin.customer.contact.projects.details") }}',
             method: 'GET',
-            data: { 
-                id: projectId,
-                cus_contact_key: customerContactKey
-            },
+            data: { id: projectId, cus_contact_key: customerContactKey },
             success: function(response) {
                 $('#projectModalBody').html(response);
                 $('#projectModal').modal('show');
@@ -136,8 +127,10 @@ $(document).ready(function() {
         });
     }
 
-    function initializeDragAndDrop() {
-        const sortableContainers = document.querySelectorAll('.sortable-container');
+    // Drag and Drop for Projects
+    function initializeProjectDragAndDrop() {
+        const sortableContainers = document.querySelectorAll('.sortable-container.project-column');
+
         sortableContainers.forEach(container => {
             new Sortable(container, {
                 group: { name: 'projects', pull: true, put: true },
@@ -196,9 +189,25 @@ $(document).ready(function() {
         });
     }
 
-    // ========== TASKS ==========
+
+
+    /* =========================
+     *   TASKS SECTION
+     * ========================= */
     let taskRequest = null;
 
+    // Filter functionality
+    $('#taskStatusFilter, #taskPriorityFilter, #taskSearchInput').on('change keyup', function() {
+        loadTasks();
+    });
+
+    $('#taskClearFilters').on('click', function() {
+        $('#taskStatusFilter, #taskPriorityFilter').val('');
+        $('#taskSearchInput').val('');
+        loadTasks();
+    });
+
+    // Global function for loading tasks
     window.loadTasks = function () {
         if (taskRequest && taskRequest.readyState !== 4) {
             taskRequest.abort();
@@ -207,6 +216,7 @@ $(document).ready(function() {
         const filters = {
             cus_contact_key: customerContactKey,
             status: $('#taskStatusFilter').val(),
+            priority: $('#taskPriorityFilter').val(),
             search: $('#taskSearchInput').val()
         };
 
@@ -219,29 +229,117 @@ $(document).ready(function() {
             beforeSend: function() {
                 $('#tasksContainer').html('<div class="text-center p-3">Loading tasks...</div>');
             },
-            success: function(response) {
+            success: function (response) {
                 $('#tasksContainer').html(response);
+                if (typeof initializeTaskDragAndDrop === 'function') {
+                    initializeTaskDragAndDrop();
+                }
             },
-            error: function(xhr, status) {
-                if (status !== 'abort') console.error('Error loading task details:', xhr);
+            error: function (xhr, status) {
+                if (status !== 'abort') console.error('Error loading tasks:', xhr);
             }
         });
     };
 
+    // Task modal handling
+    $(document).on('click', '.task-card', function() {
+        const taskId = $(this).data('task-id');
+        loadTaskDetails(taskId);
+    });
+
+    function loadTaskDetails(taskId) {
+        console.log('Loading details for task ID:', taskId);
+        $.ajax({
+            url: '{{ route("admin.customer.contact.tasks.details") }}',
+            method: 'GET',
+            data: { id: taskId, cus_contact_key: customerContactKey },
+            success: function(response) {
+                $('#taskModalBody').html(response);
+                $('#taskModal').modal('show');
+            },
+            error: function(xhr) {
+                console.error('Error loading task details:', xhr);
+            }
+        });
+    }
+
+    // Drag and Drop for Tasks
+    function initializeTaskDragAndDrop() {
+        const sortableContainers = document.querySelectorAll('.sortable-container.task-column');
+
+        sortableContainers.forEach(container => {
+            new Sortable(container, {
+                group: { name: 'tasks', pull: true, put: true },
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                filter: '.empty-column',
+                draggable: '.sortable-item',
+
+                onEnd: function(evt) {
+                    const taskId = evt.item.dataset.taskId;
+                    const oldStatus = evt.from.dataset.status;
+                    const newStatus = evt.to.dataset.status;
+                    const taskIds = Array.from(evt.to.querySelectorAll('.sortable-item'))
+                        .map(item => item.dataset.taskId)
+                        .filter(id => id);
+
+                    const emptyPlaceholder = evt.to.querySelector('.empty-column');
+                    if (emptyPlaceholder) emptyPlaceholder.remove();
+
+                    updateTaskMove(taskId, oldStatus, newStatus, taskIds);
+                },
+                onAdd: function(evt) {
+                    const emptyPlaceholder = evt.to.querySelector('.empty-column');
+                    if (emptyPlaceholder) emptyPlaceholder.remove();
+                },
+                onRemove: function(evt) {
+                    if (evt.from.children.length === 0) {
+                        evt.from.innerHTML = '<div class="text-center text-muted py-4 empty-column"><small>No tasks in this status</small></div>';
+                    }
+                }
+            });
+        });
+    }
+
+    function updateTaskMove(taskId, oldStatus, newStatus, taskIds) {
+        $.ajax({
+            url: '{{ route("admin.customer.contact.tasks.update-move") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                task_id: taskId,
+                old_status: oldStatus,
+                new_status: newStatus,
+                task_ids: taskIds,
+                cus_contact_key: customerContactKey
+            },
+            success: function(response) {
+                if (!response.success) loadTasks();
+            },
+            error: function(xhr) {
+                console.error('Error updating task move:', xhr);
+                loadTasks();
+            }
+        });
+    }
+
 });
 </script>
 
-
 @endpush
+
 <style>
-.project-board {
+/* Task-specific styles */
+.task-board {
     min-height: 400px;
     background: #f8f9fa;
     border-radius: 8px;
     padding: 15px;
 }
 
-.project-card {
+.task-card {
     background: white;
     border-radius: 8px;
     padding: 15px;
@@ -252,15 +350,20 @@ $(document).ready(function() {
     border-left: 4px solid #007bff;
 }
 
-.project-card:hover {
+.task-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.project-card.regular { border-left-color: #6c757d; }
-.project-card.standard { border-left-color: #007bff; }
-.project-card.premium { border-left-color: #28a745; }
-.project-card.exclusive { border-left-color: #ffc107; }
+.task-description {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.task-card.regular { border-left-color: #6c757d; }
+.task-card.standard { border-left-color: #007bff; }
+.task-card.premium { border-left-color: #28a745; }
+.task-card.exclusive { border-left-color: #ffc107; }
 
 .status-badge {
     font-size: 0.75rem;
@@ -278,7 +381,7 @@ $(document).ready(function() {
     margin-right: 5px;
 }
 
-.project-meta {
+.task-meta {
     font-size: 0.85rem;
     color: #6c757d;
 }
@@ -296,49 +399,49 @@ $(document).ready(function() {
     margin-right: 5px;
 }
 /* Horizontal Scroll Styles */
-#projectsHorizontalScroll {
+#tasksHorizontalScroll {
     scrollbar-width: thin;
     scrollbar-color: #dee2e6 #f8f9fa;
 }
 
-#projectsHorizontalScroll::-webkit-scrollbar {
+#tasksHorizontalScroll::-webkit-scrollbar {
     height: 8px;
 }
 
-#projectsHorizontalScroll::-webkit-scrollbar-track {
+#tasksHorizontalScroll::-webkit-scrollbar-track {
     background: #f8f9fa;
     border-radius: 10px;
 }
 
-#projectsHorizontalScroll::-webkit-scrollbar-thumb {
+#tasksHorizontalScroll::-webkit-scrollbar-thumb {
     background: #dee2e6;
     border-radius: 10px;
 }
 
-#projectsHorizontalScroll::-webkit-scrollbar-thumb:hover {
+#tasksHorizontalScroll::-webkit-scrollbar-thumb:hover {
     background: #adb5bd;
 }
 
-.project-column {
+.task-column {
     scrollbar-width: thin;
     scrollbar-color: #dee2e6 transparent;
 }
 
-.project-column::-webkit-scrollbar {
+.task-column::-webkit-scrollbar {
     width: 6px;
 }
 
-.project-column::-webkit-scrollbar-track {
+.task-column::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.project-column::-webkit-scrollbar-thumb {
+.task-column::-webkit-scrollbar-thumb {
     background: #dee2e6;
     border-radius: 10px;
 }
 
 /* Project Board Styles */
-.project-board {
+.task-board {
     background: #f8f9fa;
     border-radius: 12px;
     padding: 20px;
@@ -346,7 +449,7 @@ $(document).ready(function() {
     height: 100%;
 }
 
-.project-card {
+.task-card {
     background: white;
     border-radius: 8px;
     padding: 15px;
@@ -357,15 +460,15 @@ $(document).ready(function() {
     border: 1px solid #e9ecef;
 }
 
-.project-card:hover {
+.task-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.project-card.regular { border-left-color: #6c757d; }
-.project-card.standard { border-left-color: #007bff; }
-.project-card.premium { border-left-color: #28a745; }
-.project-card.exclusive { border-left-color: #ffc107; }
+.task-card.regular { border-left-color: #6c757d; }
+.task-card.standard { border-left-color: #007bff; }
+.task-card.premium { border-left-color: #28a745; }
+.task-card.exclusive { border-left-color: #ffc107; }
 
 .status-badge {
     font-size: 0.7rem;
@@ -386,14 +489,14 @@ $(document).ready(function() {
     padding: 3px 6px;
 }
 
-.project-meta {
+.task-meta {
     font-size: 0.8rem;
     color: #6c757d;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    #projectsHorizontalScroll {
+    #tasksHorizontalScroll {
         min-height: 500px;
     }
     
@@ -401,7 +504,7 @@ $(document).ready(function() {
         min-width: 280px;
     }
     
-    .project-board {
+    .task-board {
         padding: 15px;
     }
 }
@@ -436,14 +539,3 @@ $(document).ready(function() {
     user-select: none;
 }
 </style>
-
-
-{{-- <div id="projects-section">
-    <div class="text-center py-4 no-projects-placeholder">
-        <i class="fa fa-folder-open text-muted" style="font-size: 32px;"></i>
-        <p class="mt-2 text-muted">No projects available yet.</p>
-        <small class="text-secondary">
-            Once you create or assign projects, they’ll appear here.
-        </small>
-    </div>
-</div> --}}

@@ -9,7 +9,7 @@
                 </div>
                 
                 {{-- This div is the Sortable container --}}
-                <div class="project-column sortable-container" id="column-{{ $status }}" data-status="{{ $status }}">
+                <div class="project-column sortable-container" id="project-column-{{ $status }}" data-status="{{ $status }}">
                     @foreach($projects->where('project_status', $status) as $project)
                     <div class="project-card {{ $project->value }} mb-3 sortable-item" 
                          data-project-id="{{ $project->id }}">
