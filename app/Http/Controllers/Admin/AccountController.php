@@ -187,6 +187,8 @@ class AccountController extends Controller
                     }
                 }
             }
+            $admin->status = 0;
+            $admin->save();
             if ($admin->delete()) {
                 $this->destroy_session($admin);
                 return response()->json(['success' => 'The record has been deleted successfully.']);
@@ -227,7 +229,7 @@ class AccountController extends Controller
         $deletedSessions = [];
         try {
             $verificationCodes = $admin->verification_codes()->get();
-            $sessionIds = $verificationCodes->pluck('session_id')->toArray();
+            $sessionIds = $verificationCodes->whereNotNull('verified_at')->pluck('session_id')->toArray();
             foreach ($sessionIds as $sessionId) {
                 $path = storage_path("framework/sessions/{$sessionId}");
                 if (File::exists($path)) {
