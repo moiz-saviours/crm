@@ -907,6 +907,18 @@ function initializeChatFunctionality() {
     imageInput.addEventListener('change', handleFileSelect);
     messageTextarea.addEventListener('input', updateInputStates);
 
+    messageTextarea.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            if (e.ctrlKey) {
+                // Ctrl + Enter: Send message
+                e.preventDefault();
+                sendMessage();
+            } else {
+                return;
+            }
+        }
+    });
+
     // --- Send Message ---
     function sendMessage() {
         const message = messageTextarea.value.trim();

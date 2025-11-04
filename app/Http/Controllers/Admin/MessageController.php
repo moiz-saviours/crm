@@ -52,7 +52,7 @@ class MessageController extends Controller
             'conversation_id' => 'required|exists:conversations,id',
             'message_type' => 'required|in:text,image,video,audio,file,system,attachment',
             'attachments' => 'nullable|array|max:3',
-            'attachments.*' => 'nullable|file|max:3072|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar', // ✅ each <= 3MB
+            'attachments.*' => 'nullable|file|max:3072|mimes:jpg,jpeg,png,gif,mp4,mp3,wav,ogg,pdf,doc,docx,zip,rar',
         ]);
 
         if ($validator->fails()) {
@@ -62,7 +62,6 @@ class MessageController extends Controller
             ], 422);
         }
 
-        // Ensure at least content or attachment is provided
         if (empty($request->get('content')) && !$request->hasFile('attachments')) {
             return response()->json([
                 'success' => false,
@@ -70,7 +69,6 @@ class MessageController extends Controller
             ], 422);
         }
 
-        // Create message
         $message = Message::create([
             'conversation_id' => $request->conversation_id,
             'sender_type' => get_class(auth()->user()),
@@ -80,28 +78,59 @@ class MessageController extends Controller
             'message_status' => 'sent',
         ]);
 
-        // Handle file attachments (if any)
+        $attachmentsData = [];
+
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('message_attachments', 'public');
 
-                MessageAttachment::create([
+                $attachment = MessageAttachment::create([
                     'message_id' => $message->id,
                     'file_name' => $file->getClientOriginalName(),
                     'file_path' => $path,
                     'file_type' => $file->getMimeType(),
                     'file_size' => $file->getSize(),
                 ]);
+
+                // Build attachment data for response
+                $attachmentsData[] = [
+                    'id' => $attachment->id,
+                    'message_id' => $attachment->message_id,
+                    'file_name' => $attachment->file_name,
+                    'file_path' => $attachment->file_path,
+                    'file_url' => asset('storage/' . $attachment->file_path),
+                    'file_type' => $attachment->file_type,
+                    'file_size' => $attachment->file_size,
+                    'created_at' => $attachment->created_at->toISOString(),
+                    'updated_at' => $attachment->updated_at->toISOString(),
+                ];
             }
         }
 
-        // Load relationships for frontend
         $message->load('attachments', 'sender:id,name');
 
-        return response()->json([
+        $responseData = [
             'success' => true,
-            'message' => $message
-        ]);
+            'message' => [
+                'id' => $message->id,
+                'conversation_id' => $message->conversation_id,
+                'sender_type' => $message->sender_type,
+                'sender_id' => $message->sender_id,
+                'sender' => [
+                    'id' => $message->sender->id,
+                    'name' => $message->sender->name,
+                ],
+                'content' => $message->content,
+                'message_type' => $message->message_type,
+                'message_status' => $message->message_status,
+                'created_at' => $message->created_at->toISOString(),
+                'updated_at' => $message->updated_at->toISOString(),
+                'attachments' => $attachmentsData,
+            ],
+            'conversation_id' => $message->conversation_id
+        ];
+
+        return response()->json($responseData);
     }
 
 
