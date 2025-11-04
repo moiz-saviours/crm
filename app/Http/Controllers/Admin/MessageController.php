@@ -181,7 +181,7 @@ class MessageController extends Controller
     // ADD THIS METHOD to your CustomerContactController:
     public function getConversations(CustomerContact $customer_contact)
     {
-        $conversations = Conversation::with(['sender:id,name', 'receiver:id,name', 'lastMessage'])
+        $conversations = Conversation::with(['sender:id,name', 'receiver:id,name', 'lastMessage:content,conversation_id'])
             ->where(function($query) use ($customer_contact) {
                 $query->where('sender_type', get_class(auth()->user()))
                     ->where('sender_id', auth()->user()->id)
@@ -206,7 +206,7 @@ public function getContextConversations(Request $request)
 {
     $customerContactId = $request->customer_contact_id;
     
-    $conversations = Conversation::with(['sender:id,name', 'receiver:id,name', 'lastMessage'])
+    $conversations = Conversation::with(['sender:id,name', 'receiver:id,name', 'lastMessage:content,conversation_id'])
         ->where(function($query) use ($customerContactId) {
             $query->where('sender_type', CustomerContact::class)
                   ->where('sender_id', $customerContactId);
