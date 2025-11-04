@@ -911,12 +911,12 @@ function initializeChatFunctionality() {
     messageTextarea.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
-                // Shift + Enter: Allow new line (default behavior)
-                return;
-            } else {
                 // Enter without Shift: Send message
                 e.preventDefault();
                 sendMessage();
+            } else {
+                // Shift + Enter: Allow new line (default behavior)
+                return;
             }
         }
     });
