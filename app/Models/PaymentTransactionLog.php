@@ -43,6 +43,15 @@ class PaymentTransactionLog extends Model
         'card_year_expiry',
         'ip_address'
     ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'request_data',
+    ];
     /**
      * Relationships
      */
