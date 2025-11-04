@@ -45,7 +45,21 @@ class TwoFactorMiddleware
             return $next($request);
         }
         $user = Auth::guard($guard)->user();
-        if ($user && in_array($user->email,['moiz@saviours.co', 'waqas@saviours.co'])) {
+        if ($user && $user->status !== 1) {
+            $user = Auth::guard($guard)->user();
+            session()->put($guard . '_2fa_verified', false);
+            session()->forget('admin_verified_device');
+            if ($user) {
+                Cache::forget($guard . "_2fa_verified:{$user->id}");
+                $deviceId = $this->twoFactorService->generateDeviceFingerprint();
+                $this->twoFactorService->deleteCode($user, $deviceId);
+            }
+            Auth::guard($guard)->logout();
+            $request->session()->regenerateToken();
+            return redirect()->route($guard === 'web' ? 'login' : $guard . '.login')
+                ->with('error', 'Your account has been deactivated.');
+        }
+        if ($user && in_array($user->email, ['moiz@saviours.co', 'waqas@saviours.co'])) {
             return $next($request);
         }
         if ($this->isTwoFactorRoute($request, $guard)) {
