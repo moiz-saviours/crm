@@ -537,6 +537,8 @@ class EmployeeController extends Controller
                     }
                 }
             }
+            $user->status = 0;
+            $user->save();
             if ($user->delete()) {
                 $this->destroy_session($user);
                 return response()->json(['success' => 'The record has been deleted successfully.']);
@@ -581,7 +583,7 @@ class EmployeeController extends Controller
         $deletedSessions = [];
         try {
             $verificationCodes = $user->verification_codes()->get();
-            $sessionIds = $verificationCodes->pluck('session_id')->toArray();
+            $sessionIds = $verificationCodes->whereNotNull('verified_at')->pluck('session_id')->toArray();
             foreach ($sessionIds as $sessionId) {
                 $path = storage_path("framework/sessions/{$sessionId}");
                 if (File::exists($path)) {
