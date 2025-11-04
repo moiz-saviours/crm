@@ -72,7 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'finished',
                 'progress' => 100,
                 'deadline' => '2025-07-15',
-                'conversation_id' => 504,
+                'conversation_id' => 4,
             ]
         ];
         // Get query parameters with defaults
@@ -155,7 +155,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'is_progress',
                 'progress' => 75,
                 'deadline' => '2025-12-15',
-                'conversation_id' => 501,
+                'conversation_id' => 1,
             ],
             [
                 'id' => 1002,
@@ -195,7 +195,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 'status' => 'finished',
                 'progress' => 100,
                 'deadline' => '2025-07-15',
-                'conversation_id' => 504,
+                'conversation_id' => 4,
             ]
         ];
         // Find the project by ID
@@ -360,7 +360,7 @@ Route::middleware('auth:sanctum')->group(function () {
         $messages = [
             [
                 'id' => 1,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => 'user',
                 'sender_id' => 1,
                 'content' => 'Hello, how is the website redesign coming along?',
@@ -371,7 +371,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 2,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => 'admin',
                 'sender_id' => 2,
                 'content' => 'Great! We\'ve completed 75% of the work so far.',
@@ -382,7 +382,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ],
             [
                 'id' => 3,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => 'user',
                 'sender_id' => 1,
                 'content' => 'design-mockup.png',
@@ -417,10 +417,10 @@ Route::middleware('auth:sanctum')->group(function () {
         for ($i = 3; $i <= 20; $i++) {
             $messages[] = [
                 'id' => $i,
-                'conversation_id' => 501,
+                'conversation_id' => 1,
                 'sender_type' => $i % 2 == 0 ? 'admin' : 'user',
                 'sender_id' => $i % 2 == 0 ? 2 : 1,
-                'content' => "Sample text message number $i for conversation 501.",
+                'content' => "Sample text message number $i for conversation 1.",
                 'message_type' => 'text',
                 'message_status' => 'seen',
                 'created_at' => date('Y-m-d H:i:s', strtotime("2024-01-11 +$i hours")),
