@@ -26,6 +26,8 @@ use App\Http\Controllers\Admin\{
     TeamTargetController as AdminTeamTargetController,
     SalesKpiController as AdminSalesKpiController,
     EmailController as AdminEmailController,
+    DealController as AdminDealController,
+
 };
 use App\Http\Controllers\Admin\Customer\TaskController as AdminCustomerTaskController;
 use App\Http\Controllers\Admin\Customer\MessageController as AdminCustomerMessageController;
@@ -375,6 +377,18 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
             Route::delete('/delete/{client_account?}', [AdminPaymentMerchantController::class, 'delete'])->name('delete');
         });
     });
+
+    Route::name('deal.')->group(function () {
+        Route::get('/deals', [AdminDealController::class, 'index'])->name('index');
+        Route::prefix('deal')->group(function () {
+            Route::get('/create', [AdminDealController::class, 'create'])->name('create');
+            Route::post('/store', [AdminDealController::class, 'store'])->name('store');
+            Route::get('/edit/{deal?}', [AdminDealController::class, 'edit'])->name('edit');
+            Route::post('/update/{deal?}', [AdminDealController::class, 'update'])->name('update');
+            Route::delete('/destroy/{deal?}', [AdminDealController::class, 'delete'])->name('destroy');
+        });
+    });
+
     Route::prefix('activity-logs')->name('activity-log.')->group(function () {
         Route::get('/', [AdminActivityLogController::class, 'index'])->name('index');
     });

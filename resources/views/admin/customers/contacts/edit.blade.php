@@ -1835,6 +1835,55 @@
                                     <div class="right_collaboratrs-box">
                                         <div class="collapse-header-prent-box">
                                             <div class="collapse-header-box">
+                                                <button class="btn custom-btn-collapse toggle-collapse" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseExampleDeal"
+                                                    aria-expanded="true" aria-controls="collapseExampleDeal">
+                                                    <i class="fa fa-chevron-down toggle-icon" style="padding-right: 5px;"
+                                                        aria-hidden="true"></i>
+                                                    Deal
+                                                    <span> ( {{ $deals->count() }} )</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="right_collab">
+                                            <a href="{{ route('admin.deal.index') }}">
+                                                <i class="fa fa-plus" aria-hidden="true"> </i>
+                                                <span>Add</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="collapse show" id="collapseExampleDeal">
+                                        <div class="card custom-collapse-cards card-body">
+                                            @if($deals->count() > 0)
+                                                @foreach($deals as $deal)
+                                                    <div class="col-md-12">
+                                                        <div class="company_sec">
+                                                            <span><strong>Deal Name:</strong> {{ $deal->name }}</span>
+                                                            <span><strong>Amount:</strong> ${{ number_format($deal->amount, 2) }}</span>
+                                                            <span><strong>Close Date:</strong> {{ $deal->close_date ? $deal->close_date->format('M d, Y') : 'N/A' }}</span>
+                                                            <span><strong>Deal Stage:</strong> 
+                                                                <span class="badge bg-primary badge-sm" style="font-size: 0.75rem; padding: 0.25em 0.5em;">
+                                                                        {{ $deal->getDealStageNameAttribute() }}
+                                                                </span>
+                                                            </span>
+
+
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="col-md-12">
+                                                    <div class="company_sec text-center">
+                                                        <span>No deals found</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="collpase-divider mt-2 mb-2"></div>
+                                    <div class="right_collaboratrs-box">
+                                        <div class="collapse-header-prent-box">
+                                            <div class="collapse-header-box">
 
                                                 <button class="btn custom-btn-collapse toggle-collapse" type="button"
                                                     data-bs-toggle="collapse" data-bs-target="#collapseExamplepayment"

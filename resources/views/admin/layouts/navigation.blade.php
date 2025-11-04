@@ -512,6 +512,17 @@
                            </span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{route('admin.deal.index')}}"
+                           class="nav-link mininav-toggle {{ request()->is('admin/deal*') ? 'active' : '' }}">
+{{--                            <i class="demo-pli-gears fs-5 me-2"></i>--}}
+                            <img src="{{asset ('assets/images/icons/status.png')}}" class="me-2 nav_icons" alt="">
+                            <span class="nav-label mininav-content ms-1 collapse show" style="">
+                              <span data-popper-arrow="" class="arrow"></span>
+                              Deals
+                           </span>
+                        </a>
+                    </li>
                     {{--                    <li class="nav-item has-sub">--}}
                     {{--                        <a href="javascript:void(0)"--}}
                     {{--                           class="mininav-toggle nav-link collapsed {{ request()->is('admin/lead-status*') ? 'active' : '' }}"><i--}}

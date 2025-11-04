@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 use App\Models\Conversation;
+use App\Models\Deal;
 
 class ContactController extends Controller
 {
@@ -578,6 +579,10 @@ private function formatEmailForTimeline(Email $email)
         $teams = Team::where('status', 1)->orderBy('name')->get();
         $countries = config('countries');
         $brands = Brand::pluck('name', 'url');
+        $deals = Deal::with(['company', 'contact'])
+        ->where('cus_contact_key', $customer_contact->special_key)
+        ->orderBy('close_date', 'desc')
+        ->get();
         $resolveCompany = function ($email) use ($brands) {
             $domain = substr(strrchr($email, "@"), 1);
             $brand = $brands->first(fn($name, $url) => str_contains($url, $domain));
@@ -656,7 +661,8 @@ private function formatEmailForTimeline(Email $email)
             'imapError',
             'timeline',
             'total_count',
-            'conversation'
+            'conversation',
+            'deals'
         ));
     }
 
