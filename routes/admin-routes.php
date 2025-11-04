@@ -26,9 +26,10 @@ use App\Http\Controllers\Admin\{
     TeamTargetController as AdminTeamTargetController,
     SalesKpiController as AdminSalesKpiController,
     EmailController as AdminEmailController,
-    MessageController as AdminMessageController,
-    ProjectController as AdminProjectController,
 };
+use App\Http\Controllers\Admin\Customer\TaskController as AdminCustomerTaskController;
+use App\Http\Controllers\Admin\Customer\MessageController as AdminCustomerMessageController;
+use App\Http\Controllers\Admin\Customer\ProjectController as AdminCustomerProjectController;
 use App\Http\Controllers\UserActivityController;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Route;
@@ -266,21 +267,21 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
                     ->name('timeline.fetch-remote');
                 Route::post('/retry/email/{id}', [AdminEmailController::class, 'retryEmail'])->name('retry.email');
 
-                Route::post('/messages', [AdminMessageController::class, 'store'])->name('messages.store');
-                Route::get('/conversations/{conversation}/messages', [AdminMessageController::class, 'getConversationMessages'])->name('conversations.messages');
-                Route::post('/conversations', [AdminMessageController::class, 'storeConversation'])->name('conversations.store');
-                Route::get('/conversations/context', [AdminMessageController::class, 'getContextConversations'])->name('conversations.context');
+                Route::post('/messages', [AdminCustomerMessageController::class, 'store'])->name('messages.store');
+                Route::get('/conversations/{conversation}/messages', [AdminCustomerMessageController::class, 'getConversationMessages'])->name('conversations.messages');
+                Route::post('/conversations', [AdminCustomerMessageController::class, 'storeConversation'])->name('conversations.store');
+                Route::get('/conversations/context', [AdminCustomerMessageController::class, 'getContextConversations'])->name('conversations.context');
 
-                Route::get('/projects/data', [AdminProjectController::class, 'getProjectsData'])->name('projects.data');
-                Route::get('/projects/details', [AdminProjectController::class, 'getProjectDetails'])->name('projects.details');
+                Route::get('/projects/data', [AdminCustomerProjectController::class, 'getProjectsData'])->name('projects.data');
+                Route::get('/projects/details', [AdminCustomerProjectController::class, 'getProjectDetails'])->name('projects.details');
 
-                Route::post('/projects/update-move', [AdminProjectController::class, 'updateProjectMove'])
+                Route::post('/projects/update-move', [AdminCustomerProjectController::class, 'updateProjectMove'])
                     ->name('projects.update-move');
 
                 // Task routes
-                Route::get('/tasks/data', [AdminTaskController::class, 'getTasksData'])->name('tasks.data');
-                Route::get('/tasks/details', [AdminTaskController::class, 'getTaskDetails'])->name('tasks.details');
-                Route::post('/tasks/update-move', [AdminTaskController::class, 'updateTaskMove'])->name('tasks.update-move');
+                Route::get('/tasks/data', [AdminCustomerTaskController::class, 'getTasksData'])->name('tasks.data');
+                Route::get('/tasks/details', [AdminCustomerTaskController::class, 'getTaskDetails'])->name('tasks.details');
+                Route::post('/tasks/update-move', [AdminCustomerTaskController::class, 'updateTaskMove'])->name('tasks.update-move');
 
             });
         });
