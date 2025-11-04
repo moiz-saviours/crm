@@ -277,6 +277,19 @@ Route::middleware('auth:sanctum')->group(function () {
                 'updated_at' => '2024-01-16 16:30:00'
             ]
         ];
+        for ($i = 6; $i <= 20; $i++) {
+            $messages[] = [
+                'id' => $i,
+                'conversation_id' => 501,
+                'sender_type' => $i % 2 == 0 ? 'admin' : 'user',
+                'sender_id' => $i % 2 == 0 ? 2 : 1,
+                'content' => "Sample text message number $i for conversation 501.",
+                'message_type' => 'text',
+                'message_status' => 'seen',
+                'created_at' => date('Y-m-d H:i:s', strtotime("2024-01-11 +$i hours")),
+                'updated_at' => date('Y-m-d H:i:s', strtotime("2024-01-11 +$i hours"))
+            ];
+        }
         $limit = $request->get('limit', 50);
         $offset = $request->get('offset', 0);
         $sort = $request->get('sort', 'created_at');
@@ -399,8 +412,21 @@ Route::middleware('auth:sanctum')->group(function () {
                 'message_status' => 'seen',
                 'created_at' => '2024-01-16 16:25:00',
                 'updated_at' => '2024-01-16 16:30:00'
-            ]
+            ],
         ];
+        for ($i = 3; $i <= 20; $i++) {
+            $messages[] = [
+                'id' => $i,
+                'conversation_id' => 501,
+                'sender_type' => $i % 2 == 0 ? 'admin' : 'user',
+                'sender_id' => $i % 2 == 0 ? 2 : 1,
+                'content' => "Sample text message number $i for conversation 501.",
+                'message_type' => 'text',
+                'message_status' => 'seen',
+                'created_at' => date('Y-m-d H:i:s', strtotime("2024-01-11 +$i hours")),
+                'updated_at' => date('Y-m-d H:i:s', strtotime("2024-01-11 +$i hours"))
+            ];
+        }
         $message = null;
         foreach ($messages as $msg) {
             if ($msg['id'] == $id) {
