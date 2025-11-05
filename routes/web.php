@@ -192,10 +192,10 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
     /** Save Setting Route */
     Route::post('/save-settings', [SettingController::class, 'saveSettings'])->name('save.settings');
 });
-require __DIR__ . '/admin-old-routes.php';
+//require __DIR__ . '/admin-old-routes.php';
 require __DIR__ . '/admin-routes.php';
 require __DIR__ . '/customer-routes.php';
-require __DIR__ . '/developer-routes.php';
+//require __DIR__ . '/developer-routes.php';
 Route::get('/csrf-token', function () {
     session()->invalidate();
     session()->regenerate();
