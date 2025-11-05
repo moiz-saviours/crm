@@ -15,14 +15,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['guest:admin'])->group(function () {
-        Route::get('register', [AdminRegisteredAdminController::class, 'create'])->name('register');
-        Route::post('register', [AdminRegisteredAdminController::class, 'store']);
+//        Route::get('register', [AdminRegisteredAdminController::class, 'create'])->name('register');
+//        Route::post('register', [AdminRegisteredAdminController::class, 'store']);
         Route::get('login', [AdminAuthenticatedSessionController::class, 'create'])->name('login');
         Route::post('login', [AdminAuthenticatedSessionController::class, 'store']);
-        Route::get('forgot-password', [AdminPasswordResetLinkController::class, 'create'])->name('password.request');
-        Route::post('forgot-password', [AdminPasswordResetLinkController::class, 'store'])->name('password.email');
-        Route::get('reset-password/{token}', [AdminNewPasswordController::class, 'create'])->name('password.reset');
-        Route::post('reset-password', [AdminNewPasswordController::class, 'store'])->name('password.store');
+//        Route::get('forgot-password', [AdminPasswordResetLinkController::class, 'create'])->name('password.request');
+//        Route::post('forgot-password', [AdminPasswordResetLinkController::class, 'store'])->name('password.email');
+//        Route::get('reset-password/{token}', [AdminNewPasswordController::class, 'create'])->name('password.reset');
+//        Route::post('reset-password', [AdminNewPasswordController::class, 'store'])->name('password.store');
     });
     Route::middleware(['auth:admin'])->group(function () {
         Route::middleware('2fa:admin')->group(function () {
@@ -41,5 +41,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('password', [AdminPasswordController::class, 'update'])->name('password.update');
         Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('logout');
     });
-    
+
 });
