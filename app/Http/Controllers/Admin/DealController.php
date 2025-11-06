@@ -56,7 +56,7 @@ class DealController extends Controller
         ];
 
         $deals = Deal::whereBetween('created_at', [$actual_dates['start_date'], $actual_dates['end_date']])
-            ->with(['company', 'contact', 'creator'])
+            ->with(['company', 'contact'])
             ->get();
 
         if ($deals->isEmpty() && !isset($validated['start_date']) && !isset($validated['end_date'])) {
@@ -65,7 +65,7 @@ class DealController extends Controller
                 $startDate = Carbon::parse($lastRecordDate)->startOfMonth();
                 $endDate = Carbon::parse($lastRecordDate)->endOfMonth();
                 $deals = Deal::whereBetween('created_at', [$startDate, $endDate])
-                    ->with(['company', 'contact', 'creator'])
+                    ->with(['company', 'contact'])
                     ->get();
                 $actual_dates = [
                     'start_date' => $startDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
@@ -92,8 +92,8 @@ class DealController extends Controller
             ]);
         }
 
-        $companies = CustomerCompany::where('status', 1)->orderBy('name')->get();
-        $contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
+        $companies = CustomerCompany::where('status', 1)->orderBy('name')->get(['id', 'special_key','domain', 'name', 'email', 'phone']);
+        $contacts = CustomerContact::where('status', 1)->orderBy('name')->get(['id', 'special_key', 'name', 'email', 'phone']);
         $services = collect([
             ['id' => 1, 'name' => 'App Development'],
             ['id' => 2, 'name' => 'Animation Services'],
@@ -198,7 +198,10 @@ class DealController extends Controller
 
             DB::commit();
             $deal->refresh();
-            $deal->load(['company', 'contact', 'creator']);
+            $deal->load([
+                'company:id,special_key,domain,name,email,phone',
+                'contact:id,special_key,name,email,phone',
+            ]);
 
             if ($deal->created_at->isToday()) {
                 $date = "Today at " . $deal->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
@@ -226,17 +229,24 @@ class DealController extends Controller
      */
     public function show(Deal $deal)
     {
-        $deal->load(['company', 'contact', 'creator']);
+        $deal->load([
+            'company:id,special_key,domain,name,email,phone',
+            'contact:id,special_key,name,email,phone',
+        ]);
+
         return response()->json(['deal' => $deal]);
     }
+
 
     /**
      * Show the form for editing the specified deal.
      */
     public function edit(Deal $deal)
     {
-        $companies = CustomerCompany::where('status', 1)->orderBy('name')->get();
-        $contacts = CustomerContact::where('status', 1)->orderBy('name')->get();
+        $companies = CustomerCompany::where('status', 1)->orderBy('name')->get(['id', 'special_key','domain', 'name', 'email', 'phone']);
+            $contacts = CustomerContact::where('status', 1)
+        ->orderBy('name')
+        ->get(['id', 'special_key', 'name', 'email', 'phone']);
         $services = collect([
             ['id' => 1, 'name' => 'App Development'],
             ['id' => 2, 'name' => 'Animation Services'],
@@ -311,7 +321,10 @@ class DealController extends Controller
             $deal->update($updateData);
             DB::commit();
 
-            $deal->load(['company', 'contact', 'creator']);
+            $deal->load([
+                'company:id,special_key,domain,name,email,phone',
+                'contact:id,special_key,name,email,phone',
+            ]);
 
             if ($deal->created_at->isToday()) {
                 $date = "Today at " . $deal->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
