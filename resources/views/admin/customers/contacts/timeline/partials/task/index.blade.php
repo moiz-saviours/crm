@@ -60,13 +60,20 @@ $(document).ready(function() {
      *   TASKS SECTION
      * ========================= */
     let taskRequest = null;
+    let taskSearchTimeout = null;
 
     // Filter functionality
-    $('#taskStatusFilter, #taskPriorityFilter, #taskSearchInput').on('change keyup', function() {
+    $('#taskStatusFilter, #taskPriorityFilter').on('change', function() {
         loadTasks();
     });
 
+    $('#taskSearchInput').on('keyup', function() {
+        clearTimeout(taskSearchTimeout);
+        taskSearchTimeout = setTimeout(loadTasks, 500);
+    });
+
     $('#taskClearFilters').on('click', function() {
+        clearTimeout(taskSearchTimeout);
         $('#taskStatusFilter, #taskPriorityFilter').val('');
         $('#taskSearchInput').val('');
         loadTasks();
@@ -74,6 +81,8 @@ $(document).ready(function() {
 
     // Global function for loading tasks
     window.loadTasks = function () {
+        clearTimeout(taskSearchTimeout);
+        
         if (taskRequest && taskRequest.readyState !== 4) {
             taskRequest.abort();
         }

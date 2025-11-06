@@ -70,17 +70,27 @@ $(document).ready(function() {
     // ========== PROJECTS ==========
     let projectRequest = null;
 
-    $('#projectStatusFilter, #projectValueFilter, #projectSearchInput').on('change keyup', function() {
+    let searchTimeout = null;
+
+    $('#projectStatusFilter, #projectValueFilter').on('change', function() {
         loadProjects();
     });
 
+    $('#projectSearchInput').on('keyup', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(loadProjects, 500);
+    });
+
     $('#projectClearFilters').on('click', function() {
-        $('#projectStatusFilter, #projectValueFilter').val('');
+        clearTimeout(searchTimeout);
+        $('#projectStatusFilter', $('#projectValueFilter').val(''));
         $('#projectSearchInput').val('');
         loadProjects();
     });
 
     window.loadProjects = function () {
+        clearTimeout(searchTimeout);
+        
         if (projectRequest && projectRequest.readyState !== 4) {
             projectRequest.abort();
         }
