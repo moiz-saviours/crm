@@ -3153,7 +3153,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // When Projects tab is active
             if (tab === 'projects') {
                 if (typeof window.loadProjects === 'function') {
-                    window.loadProjects();
+                    // Check if projects are already loaded to avoid duplicate calls
+                    const projectsContainer = document.getElementById('projectsContainer');
+                    if (projectsContainer && projectsContainer.children.length === 0) {
+                        // Only load if container is empty
+                        window.loadProjects();
+                    } else {
+                        console.log('Projects already loaded, skipping reload');
+                    }
                 } else {
                     console.warn('loadProjects() not found globally.');
                 }
@@ -3162,11 +3169,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // When Tasks tab is active
             if (tab === 'tasks') {
                 if (typeof window.loadTasks === 'function') {
-                    window.loadTasks();
+                    // Check if tasks are already loaded to avoid duplicate calls
+                    const tasksContainer = document.getElementById('tasksContainer');
+                    if (tasksContainer && tasksContainer.children.length === 0) {
+                        // Only load if container is empty
+                        window.loadTasks();
+                    } else {
+                        console.log('Tasks already loaded, skipping reload');
+                    }
                 } else {
                     console.warn('loadTasks() not found globally.');
                 }
             }
+
 
             // For customize button click
             if (e.target.closest('.nav-link.customize')) {
