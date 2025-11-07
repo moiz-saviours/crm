@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\AssignTeamMember;
 use App\Models\Department;
 use App\Models\Position;
 use App\Models\Role;
@@ -13,19 +12,17 @@ use App\Models\UserPseudoRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
-class EmployeeController extends Controller
+class UserEmployeeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
+        
         $teams = Team::whereStatus(1)->get();
         $users = User::all();
+
         $departments = Department::whereIn('name', ['Sales', 'Operations'])->get();
         $roles = Role::whereHas('department', function ($query) {
             $query->where('name', 'Sales');
@@ -38,20 +35,9 @@ class EmployeeController extends Controller
             })
             ->get();
         $positions = Position::all();
-        return view('admin.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions'));
+        return view('user.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('admin.employees.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $messages = [
@@ -261,32 +247,25 @@ class EmployeeController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
+    public function edit(Request $request,$id)
     {
-        return view('admin.employees.show', compact('user'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Request $request, User $user)
-    {
+        $user = User::findOrfail($id);
+        if (!$id) {
+            return response()->json(['error' => 'Employee Id Is Not Found.'], 400);
+        }
         $teams = Team::whereStatus(1)->get();
         $firstTeam = $user->teams->first();
         $user->team_key = $firstTeam ? $firstTeam->team_key : null;
         $user->load('pseudo_records');
+
         if ($request->ajax()) {
             return response()->json(['user' => $user, 'teams' => $teams, 'extra_pseudos' => $user->pseudo_records]);
         }
-        return view('admin.employees.edit', compact('user', 'teams'));
+
+        return view('user.employees.edit', compact('user', 'teams'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, User $user)
     {
         $messages = [
@@ -523,36 +502,6 @@ class EmployeeController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function delete(User $user)
-    {
-        try {
-            if ($user->image) {
-                if (!filter_var($user->image, FILTER_VALIDATE_URL)) {
-                    $path = public_path('assets/images/employees/' . $user->image);
-                    if (File::exists($path)) {
-//                        File::delete($path);
-                    }
-                }
-            }
-            $user->status = 0;
-            $user->save();
-            if ($user->delete()) {
-                $this->destroy_session($user);
-                return response()->json(['success' => 'The record has been deleted successfully.']);
-            }
-            return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
-        }
-    }
-
-    /**
-     * Update password of specified resource in storage.
-     */
     public function update_password(Request $request, User $user)
     {
         $request->validate([
@@ -572,12 +521,6 @@ class EmployeeController extends Controller
         }
     }
 
-    /**
-     * Destroy all sessions and soft-delete verification codes for the given user.
-     *
-     * @param \App\Models\User $user
-     * @return array  $deletedSessions
-     */
     protected function destroy_session(User $user): array
     {
         $deletedSessions = [];
@@ -602,9 +545,6 @@ class EmployeeController extends Controller
         }
     }
 
-    /**
-     * Change the specified resource status from storage.
-     */
     public function change_status(Request $request, User $user)
     {
         try {
@@ -619,4 +559,5 @@ class EmployeeController extends Controller
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
+
 }

@@ -387,6 +387,22 @@
                             {{--                            @endcan--}}
                         @endif
 
+                         @if(\App\Helpers\NavigationHelper::hasAccess('employee.index'))
+                            {{--                            @can('viewAny', App\Models\ClientContact::class)--}}
+                            <li class="nav-item">
+                                <a href="{{route('employee.index')}}"
+                                    class="nav-link mininav-toggle {{ request()->is('employees/employees*') ? 'active' : '' }}">
+                                    <i class="demo-pli-add-user-star fs-5 me-2"></i>
+
+                                    <span class="nav-label mininav-content ms-1 collapse" style="">
+                        <span data-popper-arrow="" class="arrow"></span>
+                        Employees
+                        </span>
+                                </a>
+                            </li>
+                            {{--                            @endcan--}}
+                        @endif
+
                         @if(\App\Helpers\NavigationHelper::hasAccess('user.client.contact.index'))
                             {{--                            @can('viewAny', App\Models\ClientContact::class)--}}
                             <li class="nav-item">
