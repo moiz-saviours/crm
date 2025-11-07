@@ -49,6 +49,29 @@ return [
                 'routes' => [
                 ],
             ],
+            'IT Executive' => [
+                'routes' => [
+                    'user.dashboard',
+                    'team.index',
+                    'team.store',
+                    'team.edit',
+                    'team.show',
+                    'team.update',
+                    'team.change.status',
+                    'brand.index',
+                    'brand.store',
+                    'brand.edit',
+                    'brand.update',
+                    'brand.change.status',
+
+                    'employee.index',
+                    'employee.store',
+                    'employee.edit',
+                    'employee.update',
+                    'employee.change.status',
+                    'employee.update.password',
+                ],
+            ],
             'Accounts' => [
                 'routes' => [
                     'user.dashboard',
