@@ -45,9 +45,9 @@ class TwoFactorMiddleware
             return $next($request);
         }
         $user = Auth::guard($guard)->user();
-        if ($user && in_array($user->email,['moiz@saviours.co', 'waqas@saviours.co'])) {
-            return $next($request);
-        }
+//        if ($user && in_array($user->email,['moiz@saviours.co', 'waqas@saviours.co'])) {
+//            return $next($request);
+//        }
         if ($this->isTwoFactorRoute($request, $guard)) {
             if ($user) {
                 return $this->handleTwoFactorRoute($request, $guard, $next);
