@@ -266,7 +266,10 @@ Route::get('/emails/click/{id}', [App\Http\Controllers\EmailTrackingController::
 
 Route::post('/emails/bounce', [App\Http\Controllers\EmailTrackingController::class, 'trackBounce'])->name('emails.track.bounce');
 Route::post('/emails/delivery', [App\Http\Controllers\EmailTrackingController::class, 'trackDelivery'])->name('emails.track.delivery');
-Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController::class, 'trackSpamReport'])->name('emails.track.spam_report');Route::name('employee.')->group(function () {
+Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController::class, 'trackSpamReport'])->name('emails.track.spam_report');
+
+
+Route::name('employee.')->group(function () {
     Route::get('/employees', [UserEmployeeController::class, 'index'])->name('index');
     Route::prefix('employee')->group(function () {
         Route::post('/store', [UserEmployeeController::class, 'store'])->name('store');
