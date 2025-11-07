@@ -281,14 +281,14 @@ Route::name('employee.')->group(function () {
     });
 });
 Route::name('team.')->group(function () {
-    Route::get('/teams', [TeamMemberController::class, 'index'])->name('index');
+    Route::get('/teams', [TeamController::class, 'index'])->name('index');
     Route::prefix('team')->group(function () {
-        Route::get('/create', [TeamMemberController::class, 'create'])->name('create');
-        Route::post('/store', [TeamMemberController::class, 'store'])->name('store');
-        Route::get('/edit/{user?}', [TeamMemberController::class, 'edit'])->name('edit');
-        Route::post('/update/{user?}', [TeamMemberController::class, 'update'])->name('update');
-        Route::post('/update-password/{user?}', [TeamMemberController::class, 'update_password'])->name('update.password');
-        Route::get('/change-status/{user?}', [TeamMemberController::class, 'change_status'])->name('change.status');
-        Route::delete('/delete/{user?}', [TeamMemberController::class, 'delete'])->name('delete');
+        Route::get('/create', [TeamController::class, 'create'])->name('create');
+        Route::post('/store', [TeamController::class, 'store'])->name('store');
+        Route::get('/edit/{user?}', [TeamController::class, 'edit'])->name('edit');
+        Route::post('/update/{user?}', [TeamController::class, 'update'])->name('update');
+        Route::post('/update-password/{user?}', [TeamController::class, 'update_password'])->name('update.password');
+        Route::get('/change-status/{user?}', [TeamController::class, 'change_status'])->name('change.status');
+        Route::delete('/delete/{user?}', [TeamController::class, 'delete'])->name('delete');
     });
 });
