@@ -19,7 +19,7 @@ use App\Http\Controllers\User\{BrandController,
     PaymentTransactionLogController,
     ProfileController,
     TeamController,
-    TeamMemberController
+    TeamMemberController,
     UserEmployeeController
 };
 use Database\Seeders\PermissionSeeder;
@@ -275,5 +275,17 @@ Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController
         Route::get('/change-status/{user?}', [UserEmployeeController::class, 'change_status'])->name('change.status');
         Route::post('/update-password/{user?}', [UserEmployeeController::class, 'update_password'])->name('update.password');
 
+    });
+});
+Route::name('team.')->group(function () {
+    Route::get('/teams', [TeamMemberController::class, 'index'])->name('index');
+    Route::prefix('team')->group(function () {
+        Route::get('/create', [TeamMemberController::class, 'create'])->name('create');
+        Route::post('/store', [TeamMemberController::class, 'store'])->name('store');
+        Route::get('/edit/{user?}', [TeamMemberController::class, 'edit'])->name('edit');
+        Route::post('/update/{user?}', [TeamMemberController::class, 'update'])->name('update');
+        Route::post('/update-password/{user?}', [TeamMemberController::class, 'update_password'])->name('update.password');
+        Route::get('/change-status/{user?}', [TeamMemberController::class, 'change_status'])->name('change.status');
+        Route::delete('/delete/{user?}', [TeamMemberController::class, 'delete'])->name('delete');
     });
 });
