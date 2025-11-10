@@ -78,8 +78,8 @@
                         <li class="nav-item">
                             <a href="{{route('user.dashboard')}}"
                                class="nav-link mininav-toggle {{ request()->is('dashboard*') ? 'active' : '' }}">
-                                <i class="demo-pli-home fs-5 me-2"></i>
-
+{{--                                <i class="demo-pli-home fs-5 me-2"></i>--}}
+                                <img src="{{asset ('assets/images/icons/stats.png')}}" class="me-2 nav_icons" alt="">
                                 <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Dashboard
@@ -182,8 +182,8 @@
                             <li class="nav-item">
                                 <a href="{{route('customer.company.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('companies*') ? 'active' : '' }}">
-                                    <i class="demo-pli-address-book fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-address-book fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/customers.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Companies
@@ -215,8 +215,8 @@
                             <li class="nav-item">
                                 <a href="{{route('customer.contact.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('contact*') ? 'active' : '' }}">
-                                    <i class="demo-pli-address-book fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-address-book fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/customers.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Contacts
@@ -246,8 +246,8 @@
                             <li class="nav-item">
                                 <a href="{{route('team-member.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('team-members*') ? 'active' : '' }}">
-                                    <i class="demo-pli-add-user fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-add-user fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/experts.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Team Members
@@ -279,8 +279,8 @@
                             <li class="nav-item">
                                 <a href="{{route('team.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('teams*') ? 'active' : '' }}">
-                                    <i class="demo-pli-add-user fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-add-user fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/experts.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Team
@@ -312,8 +312,8 @@
                             <li class="nav-item">
                                 <a href="{{route('brand.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('brand*') ? 'active' : '' }}">
-                                    <i class="demo-pli-tag fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-tag fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/brand.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Brands
@@ -344,8 +344,8 @@
                             <li class="nav-item">
                                 <a href="{{route('lead.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('leads*') ? 'active' : '' }}">
-                                    <i class="demo-pli-mine fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-mine fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/leads.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Leads
@@ -392,8 +392,8 @@
                             <li class="nav-item">
                                 <a href="{{route('invoice.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('invoices*') ? 'active' : '' }}">
-                                    <i class="demo-pli-file fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-file fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/invoice.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Invoices
@@ -425,8 +425,8 @@
                             <li class="nav-item">
                                 <a href="{{route('employee.index')}}"
                                     class="nav-link mininav-toggle {{ request()->is('employees/employees*') ? 'active' : '' }}">
-                                    <i class="demo-pli-add-user-star fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-add-user-star fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/manager.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                         <span data-popper-arrow="" class="arrow"></span>
                         Employees
@@ -486,8 +486,8 @@
                             <li class="nav-item">
                                 <a href="{{route('user.payment.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('payments*') ? 'active' : '' }}">
-                                    <i class="demo-pli-wallet-2 fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-wallet-2 fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/payment.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Payments
@@ -575,7 +575,8 @@
                 <li class="nav-item has-sub">
                     <button type="button" class="nav-link"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="demo-pli-unlock fs-5 me-2"></i>
+{{--                        <i class="demo-pli-unlock fs-5 me-2"></i>--}}
+                        <img src="{{asset ('assets/images/icons/logout.png')}}" class="me-2 nav_icons" alt="">
                         <span class="nav-label ms-1">Logout</span>
                     </button>
                     <form method="POST" action="{{ route('logout') }}" id="logout-form"
