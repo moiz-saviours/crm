@@ -1,6 +1,15 @@
 <script>
     $(document).ready(function () {
 
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
         function decodeHtmlEntities(str) {
             return str ? $('<div>').html(str).text() : str;
         }
@@ -70,8 +79,9 @@
                 initializeDatatable($(this),index)
             })
         }
+        var table;
         function initializeDatatable(table_div,index){
-            var table = table_div.DataTable({
+            table = table_div.DataTable({
                 dom:
                 // "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'>>" +
                     "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
@@ -81,7 +91,7 @@
                 order: [[1, 'asc']],
                 responsive: false,
                 scrollX: true,
-                scrollY:  ($(window).height() - 350),
+                scrollY: ($(window).height() - 350),
                 scrollCollapse: true,
                 paging: true,
                 columnDefs: [
@@ -102,5 +112,247 @@
             });
             table.buttons().container().appendTo(`#right-icon-${index}`);
         }
+
+        const formContainer = $('#formContainer');
+        $('.open-form-btn').click(function () {
+            $(this).hasClass('void') ? $(this).attr('title', "You don't have access to create a record.").tooltip({placement: 'bottom'}).tooltip('show') : (formContainer.addClass('open'));
+        });
+
+        /** Edit */
+        $(document).on('click', '.editBtn', function () {
+            const id = $(this).data('id');
+            if (!id) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Record not found. Do you want to reload the page?',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonText: 'Reload',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+            }
+            $('#manage-form')[0].reset();
+            $.ajax({
+                url: `{{route('brand.edit')}}/` + id,
+                type: 'GET',
+                success: function (data) {
+                    setDataAndShowEdit(data);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR, textStatus, errorThrown);
+                }
+            });
+        });
+
+        var $defaultImage;
+        const $imageInput = $('#image'), $logoUrl = $('#logo_url'), $imageDisplay = $('#image-display'),
+            $imageDiv = $('#image-div');
+
+        const updateImage = (src) => {
+            $imageDisplay.attr('src', src || $defaultImage);
+            $imageDiv.toggle(!!src)
+        };
+        $imageInput.on('change', function () {
+            const file = this.files[0];
+            if (file) {
+                updateImage(URL.createObjectURL(file));
+                $logoUrl.val(null);
+            } else {
+                updateImage($logoUrl.val());
+            }
+        });
+        $logoUrl.on('input', function () {
+            if (!$imageInput.val()) updateImage($(this).val());
+        });
+        updateImage();
+        function updateParentCheckboxes() {
+            $('.multi-hierarchy-tree input[type="checkbox"]').each(function () {
+                let $this = $(this);
+
+                if ($this.attr('name') === 'client_accounts[]') {
+                    let companyCheckbox = $this.closest('ul').prev('label').find('input[type="checkbox"]');
+
+                    if ($this.closest('ul').find('input[type="checkbox"][name="client_accounts[]"]').length === $this.closest('ul').find('input[type="checkbox"][name="client_accounts[]"]:not(:checked)').length) {
+                        companyCheckbox.prop('checked', false);
+                    } else {
+                        companyCheckbox.prop('checked', true);
+                    }
+                }
+
+                // Check if it's a client company
+                if ($this.attr('name') === 'client_companies[]') {
+                    let contactCheckbox = $this.closest('ul').prev('label').find('input[type="checkbox"]');
+
+                    if ($this.closest('ul').find('input[type="checkbox"][name="client_companies[]"]').length === $this.closest('ul').find('input[type="checkbox"][name="client_companies[]"]:not(:checked)').length) {
+                        contactCheckbox.prop('checked', false);
+                    } else {
+                        contactCheckbox.prop('checked', true);
+                    }
+                }
+            });
+        }
+
+        function setDataAndShowEdit(data) {
+
+            $('#manage-form').data('id', data.id);
+
+            $('#brand_key').val(data.brand_key);
+            $('#name').val(data.name);
+            $('#email').val(data.email);
+            $('#description').val(data.description);
+            $('#url').val(data.url);
+            $('#status').val(data.status);
+            if (data.logo) {
+                var isValidUrl = data.logo.match(/^(https?:\/\/|\/|\.\/)/);
+                if (isValidUrl) {
+                    // $logoUrl.val(data.logo);
+                    $defaultImage = data.logo;
+                    updateImage(data.logo)
+                } else {
+                    // $logoUrl.val(`{{asset('assets/images/brand-logos/')}}/` + data.logo);
+                    $defaultImage = `{{asset('assets/images/brand-logos/')}}/` + data.logo;
+                    updateImage(`{{asset('assets/images/brand-logos/')}}/` + data.logo)
+                }
+                $imageDisplay.attr('alt', data.name);
+                $imageDiv.show();
+            }
+
+            data.client_contacts.forEach(function (data) {
+                $('#client_contact_' + data.id).prop('checked', true);
+            });
+
+            data.client_companies.forEach(function (data) {
+                $('#client_company_' + data.id).prop('checked', true);
+            });
+
+            data.client_accounts.forEach(function (data) {
+                $('#client_account_' + data.id).prop('checked', true);
+            });
+            updateParentCheckboxes();
+            $('#manage-form').attr('action', `{{route('brand.update')}}/` + data.id);
+            $('#formContainer').addClass('open')
+        }
+        const decodeHtml = (html) => {
+            const txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        };
+
+        /** Manage Record */
+        $('#manage-form').on('submit', function (e) {
+            e.preventDefault();
+            var dataId = $('#manage-form').data('id');
+            var formData = new FormData(this);
+            if (!dataId) {
+                AjaxRequestPromise(`{{ route('brand.store') }}`, formData, 'POST', {useToastr: true})
+                    .then(response => {
+                        if (response?.data) {
+                            const {id, logo,brand_key, name, url, status} = response.data;
+                            const logoUrl = isValidUrl(logo) ? logo : (logo ? `{{ asset('assets/images/brand-logos/') }}/${logo}` : '{{ asset("assets/images/no-image-available.png") }}');
+                            const index = table.rows().count() + 1;
+                            const scriptTag = `<script src="{{ asset('assets/js/wl-script.js') }}?token=${response.data.script_token}"><\/script>`;
+
+                            const columns = `
+                                <td class="align-middle text-center text-nowrap"></td>
+                                <td class="align-middle text-center text-nowrap">${index}</td>
+                                <td class="align-middle text-center text-nowrap">
+                                    ${logoUrl ? `<object data="${logoUrl}" class="avatar avatar-sm me-3" title="${name}">
+                                        <img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">
+                                    </object>`
+                                : null}
+                                </td>
+                                <td class="align-middle text-center text-nowrap">${brand_key}</td>
+                                <td class="align-middle text-center text-nowrap">${name}</td>
+                                <td class="align-middle text-center text-nowrap">${url}</td>
+                                <td class="align-middle text-center text-nowrap">
+                                    <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
+                                </td>
+                                <td class="align-middle text-center table-actions">
+                                    <button type="button" class="btn btn-sm btn-primary copyScriptBtn" data-script='${scriptTag}' title="Copy Script">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                </td>
+                        `;
+                            table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
+                            $('#manage-form')[0].reset();
+                            $('#image-display').attr('src', null);
+                            $('#formContainer').removeClass('open')
+                        }
+                    })
+                    .catch(error => console.error('An error occurred while updating the record.', error));
+            } else {
+                const url = $(this).attr('action');
+                AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
+                    .then(response => {
+                        if (response?.data) {
+                            const {id, logo, name, url, status} = response.data;
+                            const logoUrl = isValidUrl(logo) ? logo : (logo ? `{{ asset('assets/images/brand-logos/') }}/${logo}` : `{{ asset("assets/images/no-image-available.png") }}`);
+                            const index = table.row($('#tr-' + id)).index();
+                            const rowData = table.row(index).data();
+                            // Column 2: Image
+                            const imageHtml = logoUrl ? `<object data="${logoUrl}" class="avatar avatar-sm me-3" title="${name}"><img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3"  title="${name}"></object>` : '';
+                            if (decodeHtml(rowData[2]) !== imageHtml) {
+                                table.cell(index, 2).data(logoUrl ? `<object data="${logoUrl}" class="avatar avatar-sm me-3" title="${name}">
+                                                            <img src="${logoUrl}" alt="${name}" class="avatar avatar-sm me-3" title="${name}">
+                                                        </object>` : '').draw();
+                            }
+                            // Column 3: Name
+                            if (decodeHtml(rowData[4]) !== name) {
+                                table.cell(index, 4).data(name).draw();
+                            }
+
+                            // Column 5: Url
+                            if (decodeHtml(rowData[5]) !== url) {
+                                table.cell(index, 5).data(url).draw();
+                            }
+
+                            // Column 7: Status
+                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
+                            if (decodeHtml(rowData[6]) !== statusHtml) {
+                                table.cell(index, 6).data(statusHtml).draw();
+                            }
+                            $('#manage-form')[0].reset();
+                            $('#image-display').attr('src', null);
+                            $('#formContainer').removeClass('open')
+                        }
+                    })
+                    .catch(error => console.log(error));
+            }
+        });
+
+        /** Change Status*/
+        $('tbody').on('change', '.change-status', function () {
+            const statusCheckbox = $(this);
+            const status = +statusCheckbox.is(':checked');
+            const rowId = statusCheckbox.data('id');
+            AjaxRequestPromise(`{{route ('brand.change.status')}}/${rowId}?status=${status}`, null, 'GET', {useToastr: true})
+                .then(response => {
+                    const rowIndex = table.row($('#tr-' + rowId)).index();
+                    const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status ? "checked" : ""} data-bs-toggle="toggle">`;
+                    table.cell(rowIndex, 6).data(statusHtml).draw();
+                })
+                .catch(() => {
+                    statusCheckbox.prop('checked', !status);
+                });
+        });
+
+        // Copy Script Js
+        $(document).on('click', '.copyScriptBtn', function () {
+            const script = $(this).data('script');
+
+            navigator.clipboard.writeText(script).then(function () {
+                toastr.success("Script copied to clipboard!");
+            }, function (err) {
+                toastr.error("Failed to copy script.");
+            });
+        });
     });
 </script>

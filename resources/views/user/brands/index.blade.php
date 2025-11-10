@@ -24,6 +24,13 @@
                             {{--                            </button>--}}
                             {{--                            <button class="header_btn" disabled>Import</button>--}}
                             {{--                            <button class="create-contact open-form-btn void">Create New</button>--}}
+
+                            @if(\App\Helpers\NavigationHelper::hasAccess('brand.store'))
+                            <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Take a Tour"
+                                    data-tour="user_brand_create"><i class="fas fa-exclamation-circle custom-dot"></i>
+                            </button>
+                            <button class="create-contact open-form-btn user-tour-createbrand">Create New</button>
+                            @endif
                         </div>
                     </div>
                 </header>
@@ -92,7 +99,7 @@
                                     {{--                                    </div>--}}
                                     <div class="card-body">
                                         <table id="{{$team->team_key}}-Table" class="table table-striped datatable-exportable
-                            stripe row-border order-column nowrap initTable">
+                                               stripe row-border order-column nowrap initTable">
                                             <thead>
                                             <tr>
                                                 <th></th>
@@ -133,26 +140,65 @@
                                 </div>
                             </div>
                         @endforeach
+
                         @else
-                            <div class="tab-pane active" id="tab-pane-brands">
+                            @if(\App\Helpers\NavigationHelper::hasAccess('brand.store'))
+                              <div class="tab-pane active" id="tab-pane-brands">
                                 <div class="card"><div class="card-body">
                                         <table id="brands-Table" class="table table-striped datatable-exportable
-                            stripe row-border order-column nowrap initTable">
+                                stripe row-border order-column nowrap initTable">
                                             <thead>
                                             <tr>
-                                                <th></th>
+                                                <th class="align-middle text-center text-nowrap"></th>
                                                 <th class="align-middle text-center text-nowrap">S.NO</th>
                                                 <th class="align-middle text-center text-nowrap">LOGO</th>
+                                                <th class="align-middle text-center text-nowrap">Brand Key</th>
                                                 <th class="align-middle text-center text-nowrap">NAME</th>
                                                 <th class="align-middle text-center text-nowrap">URL</th>
+                                                <th class="align-middle text-center text-nowrap">STATUS</th>
+                                                <th class="align-middle text-center text-nowrap">ACTIONS</th>
                                             </tr>
                                             </thead>
                                             <tbody>
+                                            @foreach($brands as $brand)
+                                                <tr>
+                                                    <td class="align-middle text-center text-nowrap"></td>
+                                                    <td class="align-middle text-center text-nowrap">{{$loop->iteration}}</td>
+                                                    <td class="align-middle text-center text-nowrap">
+                                                        @php
+                                                            $logoUrl = filter_var($brand->logo, FILTER_VALIDATE_URL) ? $brand->logo : asset('assets/images/brand-logos/'.$brand->logo);
+                                                        @endphp
+                                                        <object data="{{ $logoUrl }}" class="avatar avatar-sm me-3" title="{{ $brand->name }}">
+                                                            <img src="{{ $logoUrl }}" alt="{{ $brand->name }}" class="avatar avatar-sm me-3" title="{{ $brand->name }}">
+                                                        </object>
+                                                    </td>
+                                                    <td class="align-middle text-center text-nowrap">{{$brand->brand_key}}</td>
+                                                    <td class="align-middle text-center text-nowrap">{{$brand->name}}</td>
+                                                    <td class="align-middle text-center text-nowrap">{{$brand->url}}</td>
+                                                    <td class="align-middle text-center text-nowrap">
+                                                        <input type="checkbox" class="status-toggle change-status"
+                                                               data-id="{{ $brand->id }}"
+                                                               {{ $brand->status == 1 ? 'checked' : '' }} data-bs-toggle="toggle">
+                                                    </td>
+                                                    <td class="align-middle text-center table-actions">
+                                                        <button type="button" class="btn btn-sm btn-primary copyScriptBtn"
+                                                                data-script='<script src="{{ asset('assets/js/wl-script.js') }}?token={{ $brand->script_token }}"></script>'
+                                                                title="Copy Script">
+                                                            <i class="fas fa-copy"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-primary editBtn"
+                                                                data-id="{{ $brand->id }}" title="Edit"><i
+                                                                class="fas fa-edit"></i></button>
+
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -160,25 +206,30 @@
         </div>
     </section>
     <!-- Modal -->
-
+    @if(\App\Helpers\NavigationHelper::hasAccess('brand.store'))
+    @include('user.brands.custom-form');
+    @endif
 
 
     @push('script')
         @include('user.brands.script')
         <script>
+            // Copy Script Js
 
             $(document).ready(function () {
-                const formContainer = $('#formContainer');
-                $('.open-form-btn').click(function () {
-                    $(this).hasClass('void') ? $(this).attr('title', "You don't have access to create a record.").tooltip({placement: 'bottom'}).tooltip('show') : (formContainer.addClass('open'));
-                });
-                $(document).click(function (event) {
-                    if (!$(event.target).closest('#formContainer').length && !$(event.target).is('#formContainer') && !$(event.target).closest('.open-form-btn').length) {
-                        formContainer.removeClass('open')
-                    }
+                $(document).on('click', '.copyScriptBtn', function () {
+                    const scriptText = $(this).data('script');
+                    navigator.clipboard.writeText(scriptText)
+                        .then(() => {
+                            toastr.success('Script copied to clipboard!');
+                        })
+                        .catch(err => {
+                            toastr.error('Failed to copy script');
+                            console.error(err);
+                        });
                 });
             });
-
         </script>
+
     @endpush
 @endsection

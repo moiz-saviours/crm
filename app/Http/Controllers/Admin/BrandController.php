@@ -18,7 +18,7 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $brands = Brand::with(['client_contacts', 'client_companies', 'client_accounts'])->get();
+        $brands = Brand::with(['client_contacts:id,special_key,name,email', 'client_companies:id,special_key,c_contact_key,name,email', 'client_accounts:id,c_contact_key,c_company_key,name,vendor_name,email'])->get();
         $clientContacts = ClientContact::where('status', 1)->get();
         $edit_brand = session()->has('edit_brand') ? session()->get('edit_brand') : null;
         return view('admin.brands.index', compact('brands', 'edit_brand', 'clientContacts'));
@@ -97,7 +97,7 @@ class BrandController extends Controller
     public function edit(Request $request, Brand $brand)
     {
         if ($request->ajax()) {
-            $brand->load(['client_contacts', 'client_companies', 'client_accounts']);
+            $brand->load(['client_contacts:id,special_key,name,email', 'client_companies:id,special_key,c_contact_key,name,email', 'client_accounts:id,c_contact_key,c_company_key,name,vendor_name,email']);
             return response()->json($brand);
         }
         session(['edit_brand' => $brand]);
