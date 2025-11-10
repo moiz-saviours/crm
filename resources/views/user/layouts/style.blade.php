@@ -782,4 +782,8 @@ Detailed information and more samples can be found in the documentation.
         background-color: var(--bs-primary);
     !important;
     }
+    .nav_icons {
+        width: 25px;
+        height: 25px;
+    }
 </style>
