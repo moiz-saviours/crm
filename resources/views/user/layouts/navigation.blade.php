@@ -471,8 +471,8 @@
                             <li class="nav-item">
                                 <a href="{{route('user.client.account.index')}}"
                                    class="nav-link mininav-toggle {{ request()->is('client/account*') ? 'active' : '' }}">
-                                    <i class="demo-pli-wallet-2 fs-5 me-2"></i>
-
+{{--                                    <i class="demo-pli-wallet-2 fs-5 me-2"></i>--}}
+                                    <img src="{{asset ('assets/images/icons/bank.png')}}" class="me-2 nav_icons" alt="">
                                     <span class="nav-label mininav-content ms-1 collapse" style="">
                               <span data-popper-arrow="" class="arrow"></span>
                               Accounts
