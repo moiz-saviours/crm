@@ -274,6 +274,39 @@
 
                             {{--                            @endcan--}}
                         @endif
+                        @if(\App\Helpers\NavigationHelper::hasAccess('team.index'))
+                            {{--                            @can('viewAny', App\Models\AssignTeamMember::class)--}}
+                            <li class="nav-item">
+                                <a href="{{route('team.index')}}"
+                                   class="nav-link mininav-toggle {{ request()->is('teams*') ? 'active' : '' }}">
+                                    <i class="demo-pli-add-user fs-5 me-2"></i>
+
+                                    <span class="nav-label mininav-content ms-1 collapse" style="">
+                              <span data-popper-arrow="" class="arrow"></span>
+                              Team
+                           </span>
+                                </a>
+                            </li>
+
+                            {{--                    <li class="nav-item has-sub">--}}
+                            {{--                        <a href="#"--}}
+                            {{--                           class="mininav-toggle nav-link collapsed {{ request()->is('teams*') ? 'active' : '' }}"><i--}}
+                            {{--                                class="demo-pli-add-user fs-5 me-2"></i>--}}
+                            {{--                            <span class="nav-label ms-1">Team</span>--}}
+                            {{--                        </a>--}}
+                            {{--                        <!-- Ui Elements submenu list -->--}}
+                            {{--                        <ul class="mininav-content nav collapse">--}}
+                            {{--                            <li data-popper-arrow class="arrow"></li>--}}
+                            {{--                            <li class="nav-item">--}}
+                            {{--                                <a href="{{route('team.index')}}"--}}
+                            {{--                                   class="nav-link {{ request()->is('teams*') ? 'active' : '' }}">Lists</a>--}}
+                            {{--                            </li>--}}
+                            {{--                        </ul>--}}
+                            {{--                        <!-- END : Ui Elements submenu list -->--}}
+                            {{--                    </li>--}}
+
+                            {{--                            @endcan--}}
+                        @endif
                         @if(\App\Helpers\NavigationHelper::hasAccess('brand.index'))
                             {{--                            @can('viewAny', App\Models\Brand::class)--}}
                             <li class="nav-item">
@@ -384,6 +417,22 @@
                             {{--                        <!-- END : Ui Elements submenu list -->--}}
                             {{--                    </li>--}}
 
+                            {{--                            @endcan--}}
+                        @endif
+
+                         @if(\App\Helpers\NavigationHelper::hasAccess('employee.index'))
+                            {{--                            @can('viewAny', App\Models\ClientContact::class)--}}
+                            <li class="nav-item">
+                                <a href="{{route('employee.index')}}"
+                                    class="nav-link mininav-toggle {{ request()->is('employees/employees*') ? 'active' : '' }}">
+                                    <i class="demo-pli-add-user-star fs-5 me-2"></i>
+
+                                    <span class="nav-label mininav-content ms-1 collapse" style="">
+                        <span data-popper-arrow="" class="arrow"></span>
+                        Employees
+                        </span>
+                                </a>
+                            </li>
                             {{--                            @endcan--}}
                         @endif
 
