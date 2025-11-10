@@ -361,6 +361,9 @@
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
                                 <td class="align-middle text-center table-actions">
+                                    <button type="button" class="btn btn-sm btn-primary changePwdBtn"
+                                            data-id="${id}" title="Change Password"><i
+                                            class="fas fa-key"></i></button>
                                     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
