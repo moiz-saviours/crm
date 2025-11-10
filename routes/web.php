@@ -20,8 +20,7 @@ use App\Http\Controllers\User\{BrandController,
     ProfileController,
     TeamController,
     TeamMemberController,
-    UserEmployeeController
-};
+    UserEmployeeController};
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -110,9 +109,11 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
     Route::prefix('brands')->name('brand.')->group(function () {
         Route::get('/', [BrandController::class, 'index'])->name('index');
 //        Route::get('/create', [BrandController::class, 'create'])->name('create');
-//        Route::post('/store', [BrandController::class, 'store'])->name('store');
-//        Route::get('/edit/{brand?}', [BrandController::class, 'edit'])->name('edit');
-//        Route::post('/update/{brand?}', [BrandController::class, 'update'])->name('update');
+        Route::post('/store', [BrandController::class, 'store'])->name('store');
+        Route::get('/edit/{brand?}', [BrandController::class, 'edit'])->name('edit');
+        Route::post('/update/{brand?}', [BrandController::class, 'update'])->name('update');
+        Route::get('/change-status/{brand?}', [BrandController::class, 'change_status'])->name('change.status');
+
     });
     /** Leads Routes */
     Route::name('lead.')->group(function () {
