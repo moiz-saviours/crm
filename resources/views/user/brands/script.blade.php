@@ -169,32 +169,32 @@
             if (!$imageInput.val()) updateImage($(this).val());
         });
         updateImage();
-        function updateParentCheckboxes() {
-            $('.multi-hierarchy-tree input[type="checkbox"]').each(function () {
-                let $this = $(this);
-
-                if ($this.attr('name') === 'client_accounts[]') {
-                    let companyCheckbox = $this.closest('ul').prev('label').find('input[type="checkbox"]');
-
-                    if ($this.closest('ul').find('input[type="checkbox"][name="client_accounts[]"]').length === $this.closest('ul').find('input[type="checkbox"][name="client_accounts[]"]:not(:checked)').length) {
-                        companyCheckbox.prop('checked', false);
-                    } else {
-                        companyCheckbox.prop('checked', true);
-                    }
-                }
-
-                // Check if it's a client company
-                if ($this.attr('name') === 'client_companies[]') {
-                    let contactCheckbox = $this.closest('ul').prev('label').find('input[type="checkbox"]');
-
-                    if ($this.closest('ul').find('input[type="checkbox"][name="client_companies[]"]').length === $this.closest('ul').find('input[type="checkbox"][name="client_companies[]"]:not(:checked)').length) {
-                        contactCheckbox.prop('checked', false);
-                    } else {
-                        contactCheckbox.prop('checked', true);
-                    }
-                }
-            });
-        }
+        // function updateParentCheckboxes() {
+        //     $('.multi-hierarchy-tree input[type="checkbox"]').each(function () {
+        //         let $this = $(this);
+        //
+        //         if ($this.attr('name') === 'client_accounts[]') {
+        //             let companyCheckbox = $this.closest('ul').prev('label').find('input[type="checkbox"]');
+        //
+        //             if ($this.closest('ul').find('input[type="checkbox"][name="client_accounts[]"]').length === $this.closest('ul').find('input[type="checkbox"][name="client_accounts[]"]:not(:checked)').length) {
+        //                 companyCheckbox.prop('checked', false);
+        //             } else {
+        //                 companyCheckbox.prop('checked', true);
+        //             }
+        //         }
+        //
+        //         // Check if it's a client company
+        //         if ($this.attr('name') === 'client_companies[]') {
+        //             let contactCheckbox = $this.closest('ul').prev('label').find('input[type="checkbox"]');
+        //
+        //             if ($this.closest('ul').find('input[type="checkbox"][name="client_companies[]"]').length === $this.closest('ul').find('input[type="checkbox"][name="client_companies[]"]:not(:checked)').length) {
+        //                 contactCheckbox.prop('checked', false);
+        //             } else {
+        //                 contactCheckbox.prop('checked', true);
+        //             }
+        //         }
+        //     });
+        // }
 
         function setDataAndShowEdit(data) {
 
@@ -221,18 +221,18 @@
                 $imageDiv.show();
             }
 
-            data.client_contacts.forEach(function (data) {
-                $('#client_contact_' + data.id).prop('checked', true);
-            });
-
-            data.client_companies.forEach(function (data) {
-                $('#client_company_' + data.id).prop('checked', true);
-            });
-
-            data.client_accounts.forEach(function (data) {
-                $('#client_account_' + data.id).prop('checked', true);
-            });
-            updateParentCheckboxes();
+            // data.client_contacts.forEach(function (data) {
+            //     $('#client_contact_' + data.id).prop('checked', true);
+            // });
+            //
+            // data.client_companies.forEach(function (data) {
+            //     $('#client_company_' + data.id).prop('checked', true);
+            // });
+            //
+            // data.client_accounts.forEach(function (data) {
+            //     $('#client_account_' + data.id).prop('checked', true);
+            // });
+            // updateParentCheckboxes();
             $('#manage-form').attr('action', `{{route('brand.update')}}/` + data.id);
             $('#formContainer').addClass('open')
         }
