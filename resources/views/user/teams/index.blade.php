@@ -59,7 +59,7 @@
                                             <tr>
                                                 <th></th>
                                                 <th class="align-middle text-center text-nowrap">SNO.</th>
-                                                    <th class="align-middle text-center text-nowrap">Team Key</th>
+                                                    {{-- <th class="align-middle text-center text-nowrap">Team Key</th> --}}
                                                 <th class="align-middle text-center text-nowrap">Name</th>
 
                                                     <th class="align-middle text-center text-nowrap">Description</th>
@@ -78,10 +78,10 @@
                                                 <tr id="tr-{{ $team->id }}">
                                                     <td class="align-middle text-center text-nowrap"></td>
                                                     <td class="align-middle text-center text-nowrap">{{ $loop->iteration }}
-                                                    </td>
+                                                    {{-- </td>
                                                         <td class="align-middle text-center text-nowrap">
                                                             {{ $team->team_key }}
-                                                    </td>
+                                                    </td> --}}
                                                     <td class="align-middle text-center text-nowrap">{{ $team->name }}
                                                     </td>
                                                     </td>

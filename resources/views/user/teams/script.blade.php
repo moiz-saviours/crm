@@ -175,12 +175,11 @@
                 AjaxRequestPromise(`{{ route("team.store") }}`, formData, 'POST', {useToastr: true})
                     .then(response => {
                         if (response?.data) {
-                            const {id, team_key, name, description, assign_brands, lead, status} = response.data;
+                            const {id, name, description, assign_brands, lead, status} = response.data;
                             const index = table.rows().count() + 1;
                             const columns = `
                                 <td class="align-middle text-center text-nowrap"></td>
                                 <td class="align-middle text-center text-nowrap">${index}</td>
-                                <td class="align-middle text-center text-nowrap">${team_key}</td>
                                 <td class="align-middle text-center text-nowrap">${name}</td>
                                 <td class="align-middle text-center text-nowrap">${description??""}</td>
                                 <td class="align-middle text-center text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" data-bs-toggle="tooltip" data-bs-placement="top" title="${assign_brands}">
@@ -218,26 +217,26 @@
                                 }
                             });
 
-                            /** Column 3: Name */
-                            if (decodeHtml(rowData[3]) !== name) {
-                                table.cell(index, 3).data(name).draw();
+                            /** Column 2: Name */
+                            if (decodeHtml(rowData[2]) !== name) {
+                                table.cell(index, 2).data(name).draw();
                             }
-                            // Column 4: Email
-                            if (decodeHtml(rowData[4]) !== description) {
-                                table.cell(index, 4).data(description).draw();
+                            // Column 3: Email
+                            if (decodeHtml(rowData[3]) !== description) {
+                                table.cell(index, 3).data(description).draw();
                             }
-                            // Column 5: Designation
-                            if (decodeHtml(rowData[5]) !== assign_brands) {
-                                table.cell(index, 5).data(assign_brands).draw();
+                            // Column 4: Designation
+                            if (decodeHtml(rowData[4]) !== assign_brands) {
+                                table.cell(index, 4).data(assign_brands).draw();
                             }
-                            // Column 6: Team
-                            if (decodeHtml(rowData[6]) !== lead) {
-                                table.cell(index, 6).data(lead).draw();
+                            // Column 5: Team
+                            if (decodeHtml(rowData[5]) !== lead) {
+                                table.cell(index, 5).data(lead).draw();
                             }
-                            // Column 7: Status
+                            // Column 6: Status
                             const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
-                            if (decodeHtml(rowData[7]) !== statusHtml) {
-                                table.cell(index, 7).data(statusHtml).draw();
+                            if (decodeHtml(rowData[6]) !== statusHtml) {
+                                table.cell(index, 6).data(statusHtml).draw();
                             }
                             $('#manage-form')[0].reset();
                             $('#formContainer').removeClass('open')
@@ -255,7 +254,7 @@
                 .then(response => {
                     const rowIndex = table.row($('#tr-' + rowId)).index();
                     const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${rowId}" ${status ? "checked" : ""} data-bs-toggle="toggle">`;
-                    table.cell(rowIndex, 7).data(statusHtml).draw();
+                    table.cell(rowIndex, 6).data(statusHtml).draw();
                 })
                 .catch(() => {
                     statusCheckbox.prop('checked', !status);
