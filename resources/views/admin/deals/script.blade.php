@@ -235,7 +235,7 @@
                                 company,
                                 contact,
                                 name,
-                                deal_stage_name,
+                                deal_stage,
                                 amount,
                                 close_date,
                                 priority,
@@ -253,7 +253,7 @@
                                 </td>
                                 <td class="align-middle text-left text-nowrap">${company ? company.name : 'N/A'}</td>
                                 <td class="align-middle text-left text-nowrap">${contact ? contact.name : 'N/A'}</td>
-                                <td class="align-middle text-left text-nowrap">${deal_stage_name}</td>
+                                <td class="align-middle text-left text-nowrap">${deal_stage}</td>
                                 <td class="align-middle text-left text-nowrap">$${amount}</td>
                                 <td class="align-middle text-left text-nowrap" data-order="${close_date}">${close_date ? new Date(close_date).toLocaleDateString() : 'N/A'}</td>
                                 <td class="align-middle text-left text-nowrap"><span class="badge bg-secondary">${priority ? priority.charAt(0).toUpperCase() + priority.slice(1) : 'N/A'}</span></td>
