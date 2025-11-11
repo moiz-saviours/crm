@@ -1,4 +1,4 @@
-const url = new URL(document.currentScript.src);
+var url = new URL(document.currentScript.src);
 const token = url.searchParams.get("token");
 !function (t, e, r) {
     if (!document.getElementById(t)) {
