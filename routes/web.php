@@ -286,10 +286,10 @@ Route::name('team.')->group(function () {
     Route::prefix('team')->group(function () {
         Route::get('/create', [TeamController::class, 'create'])->name('create');
         Route::post('/store', [TeamController::class, 'store'])->name('store');
-        Route::get('/edit/{user?}', [TeamController::class, 'edit'])->name('edit');
-        Route::post('/update/{user?}', [TeamController::class, 'update'])->name('update');
-        Route::post('/update-password/{user?}', [TeamController::class, 'update_password'])->name('update.password');
-        Route::get('/change-status/{user?}', [TeamController::class, 'change_status'])->name('change.status');
-        Route::delete('/delete/{user?}', [TeamController::class, 'delete'])->name('delete');
+        Route::get('/edit/{team?}', [TeamController::class, 'edit'])->name('edit');
+        Route::post('/update/{team?}', [TeamController::class, 'update'])->name('update');
+        Route::post('/update-password/{team?}', [TeamController::class, 'update_password'])->name('update.password');
+        Route::get('/change-status/{team?}', [TeamController::class, 'change_status'])->name('change.status');
+        Route::delete('/delete/{team?}', [TeamController::class, 'delete'])->name('delete');
     });
 });

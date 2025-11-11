@@ -105,6 +105,7 @@ class TeamController extends Controller
         }
 
         $request->merge(['status' => $request->has('status') & in_array($request->get('status'), ['on', 1]) ? 1 : 0]);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -129,9 +130,10 @@ class TeamController extends Controller
             'brands.*.exists' => 'One or more selected brands are invalid.',
         ]);
         $team = new Team($request->only(['name', 'description', 'status', 'lead_id']));
-
+        
         $team->save();
         $employees = $request->input('employees', []);
+
         if ($request->has('lead_id') && !empty($request->lead_id)) {
             if (!in_array($request->lead_id, $employees)) {
                 $employees[] = $request->lead_id;
@@ -140,10 +142,13 @@ class TeamController extends Controller
                 ->where('id', '!=', $team->id)
                 ->update(['lead_id' => null]);
         }
+
         if (!empty($employees)) {
             AssignTeamMember::whereIn('user_id', $employees)->delete();
             $team->users()->sync($employees);
+
         }
+
         if ($request->has('brands')) {
             $team->brands()->sync($request->brands);
         }
@@ -183,7 +188,7 @@ class TeamController extends Controller
     /**
      * Show the form for editing the specified team.
      */
-    public function edit($id)
+    public function edit(Team $team)
     {
         
         if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
@@ -203,7 +208,6 @@ class TeamController extends Controller
         
         
         try {
-            $team = Team::findOrFail($id);
             if (!$team->exists) {
                 if (request()->ajax()) {
                     return response()->json(['error' => 'Oops! Record not found.']);
