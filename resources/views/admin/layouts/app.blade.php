@@ -166,7 +166,7 @@
 
 
                     <!-- Brand title -->
-                    <div class="brand-title">Crm</div>
+                    <div class="brand-title"></div>
 
 
                     <!-- You can also use IMG or SVG instead of a text element. -->
