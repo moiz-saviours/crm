@@ -370,7 +370,7 @@ class UserEmployeeController extends Controller
                 'nullable',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email'),
+                Rule::unique('users', 'email')->ignore($user->id),
                 Rule::unique('users', 'pseudo_email')->ignore($user->id ?? null),
                 Rule::unique('user_pseudo_records', 'pseudo_email')
             ],
