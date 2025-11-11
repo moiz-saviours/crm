@@ -157,7 +157,7 @@
                 <div class="brand-wrap">
 
                     <!-- Brand logo -->
-                    <a href="{{route('user.dashboard')}}" class="brand-img stretched-link">
+                    <a href="{{route('user.dashboard')}}" class="stretched-link">
                         <img src="{{asset('assets/img/favicon.png')}}" alt="Logo" class="logo"
                              {{--                             width="16"--}}
                              {{--                             height="16"--}}
