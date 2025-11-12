@@ -17,9 +17,7 @@
                             <button class="start-tour-btn my-btn" data-bs-toggle="tooltip" data-bs-placement="top"
                                 title="Take a Tour" data-tour="team_create"> <i
                                     class="fas fa-exclamation-circle custom-dot"></i> </button>
-                            @if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive')
-                                <button class="create-contact open-form-btn tour-createteam">Create New</button>
-                            @endif
+                                    <button class="create-contact open-form-btn tour-createteam">Create New</button>
                         </div>
                     </div>
                 </header>
@@ -78,12 +76,11 @@
                                                 <tr id="tr-{{ $team->id }}">
                                                     <td class="align-middle text-center text-nowrap"></td>
                                                     <td class="align-middle text-center text-nowrap">{{ $loop->iteration }}
-                                                    {{-- </td>
-                                                        <td class="align-middle text-center text-nowrap">
+                                                    </td>
+                                                        {{-- <td class="align-middle text-center text-nowrap">
                                                             {{ $team->team_key }}
                                                     </td> --}}
                                                     <td class="align-middle text-center text-nowrap">{{ $team->name }}
-                                                    </td>
                                                     </td>
 
                                                         <td class="align-middle text-center text-nowrap">
@@ -107,16 +104,14 @@
                                                                 data-bs-toggle="toggle">
                                                         </td>
 
-                                                        @if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive')
-                                                            <td class="align-middle text-center table-actions">
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-primary editBtn"
-                                                                    data-id="{{ $team->id }}" data-bs-toggle="tooltip"
-                                                                    data-bs-placement="top" title="Edit">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                            </td>
-                                                        @endif
+                                                        <td class="align-middle text-center table-actions">
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-primary editBtn"
+                                                                data-id="{{ $team->id }}" data-bs-toggle="tooltip"
+                                                                data-bs-placement="top" title="Edit">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -125,9 +120,7 @@
                             </div>
                         </div>
                     </div>
-                    @if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive')
                         @include('user.teams.custom-form')
-                    @endif
                 </div>
             </div>
         </div>

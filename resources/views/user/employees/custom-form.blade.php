@@ -171,7 +171,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-               @if (!$isItExecutive)
+               @if (false)
                 <div class="form-group mb-3">
                     <label for="phone_number" class="form-label">Phone Number</label>
                     <input type="text" class="form-control tour-employeephone" id="phone_number" name="phone_number"
@@ -219,7 +219,7 @@
                         </div>
                     </div>
                 </div>
-                @if (!$isItExecutive)
+                @if (false)
                 <div class="form-group mb-3">
                     <label for="address" class="form-label">Address</label>
                     <textarea class="form-control tour-employeeaddress" id="address" name="address" rows="3"></textarea>
@@ -277,7 +277,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
-                @if (!$isItExecutive)
+                @if (false)
                 <div class="form-group mb-3">
                     <label for="target" class="form-label">Target</label>
                     <input type="number" class="form-control tour-employeetarget" id="target" name="target"

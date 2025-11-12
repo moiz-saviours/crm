@@ -51,7 +51,7 @@ class UserEmployeeController extends Controller
             $roles = Role::all();
         }
 
-        return view('user.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions','isItExecutive'));
+        return view('user.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions'));
     }
 
 
