@@ -14,32 +14,82 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class UserEmployeeController extends Controller
 {
     public function index()
     {
-        
-        $teams = Team::whereStatus(1)->get();
-        $users = User::all();
+        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
 
-        $departments = Department::whereIn('name', ['Sales', 'Operations'])->get();
-        $roles = Role::whereHas('department', function ($query) {
-            $query->where('name', 'Sales');
-        })
-            ->orWhere(function ($query) {
-                $query->whereHas('department', function ($q) {
-                    $q->where('name', 'Operations');
-                })
-                    ->whereIn('name', ['Accounts', 'IT Executive']);
-            })
-            ->get();
+            // AJAX request
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+            // Normal request
+            return redirect()
+                ->back()
+                ->with('error', 'You do not have permission to perform this action.');
+        }
+
+
+        $teams = Team::whereStatus(1)->get();
         $positions = Position::all();
-        return view('user.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions'));
+
+        $isItExecutive = auth()->user()?->department?->name === 'Operations'
+            && auth()->user()?->role?->name === 'IT Executive';
+
+        if ($isItExecutive){
+
+            // Restrict IT Executive (Operations) to Sales users only
+            $allowRoles = [40, 41, 42, 43, 44, 45, 46, 47];
+            $allowDepartments = [5];
+
+            $users = User::whereIn('role_id', $allowRoles)
+                ->whereIn('department_id', $allowDepartments)
+                ->get(['id','department_id', 'role_id', 'position_id', 'emp_id',
+                'name', 'pseudo_name', 'email', 'pseudo_email', 'designation', 'gender',
+                'date_of_joining', 'about', 'status']);
+
+            $departments = Department::whereIn('id', $allowDepartments)->get();
+            $roles = Role::whereIn('id', $allowRoles)->get();
+
+        } else {
+            $users = User::get(['id','department_id', 'role_id', 'position_id', 'emp_id',
+                'name', 'pseudo_name', 'email', 'pseudo_email', 'designation', 'gender',
+                'phone_number', 'pseudo_phone', 'address', 'city', 'state', 'country',
+                'postal_code', 'dob', 'date_of_joining', 'about', 'target', 'status']);
+            $departments = Department::all();
+            $roles = Role::all();
+        }
+
+        return view('user.employees.index', compact('teams', 'users', 'departments', 'roles', 'positions','isItExecutive'));
     }
+
 
     public function store(Request $request)
     {
+        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+
+            // AJAX request
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', 'You do not have permission to perform this action.');
+        }
+
         $messages = [
             // Department ID
             'department_id.required' => 'The department field is required.',
@@ -189,6 +239,21 @@ class UserEmployeeController extends Controller
             ],
             'extra_pseudos.*.pseudo_phone' => 'nullable|string|max:20',
         ], $messages);
+
+        if (auth()->user()->department->name == "Operations" && auth()->user()->role->name == 'IT Executive') {
+            $allowRoles = [40, 41, 42, 43, 44, 45, 46, 47];
+            $allowDepartments = [5];
+
+            if (!in_array($request->role_id, $allowRoles)) {
+                return response()->json(['error' => ' Unauthorize Access', 'message' => 'Invalid role selection.'], 422);
+
+            }
+
+            if (!in_array($request->department_id, $allowDepartments)) {
+                return response()->json(['error' => ' Unauthorize Access', 'message' => 'Invalid department selection.'], 422);
+            }
+        }
+
         if ($request->filled('extra_pseudos')) {
             $request->validate([
                 'pseudo_name' => 'required|string|max:255',
@@ -247,27 +312,100 @@ class UserEmployeeController extends Controller
         }
     }
 
-    public function edit(Request $request,$id)
+    public function edit(Request $request, $id)
     {
-        $user = User::findOrfail($id);
-        if (!$id) {
-            return response()->json(['error' => 'Employee Id Is Not Found.'], 400);
+
+        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', 'You do not have permission to perform this action.');
         }
+
+        $isItExecutive = auth()->user()?->department?->name === 'Operations'
+            && auth()->user()?->role?->name === 'IT Executive';
+
         $teams = Team::whereStatus(1)->get();
-        $firstTeam = $user->teams->first();
+
+        if ($isItExecutive) {
+            $allowRoles = [40, 41, 42, 43, 44, 45, 46, 47];
+            $allowDepartments = [5];
+
+            $user = User::whereIn('role_id', $allowRoles)
+                ->whereIn('department_id', $allowDepartments)
+                ->findOrFail($id, [
+                    'id','department_id','role_id','position_id','emp_id',
+                    'name','pseudo_name','email','pseudo_email','designation',
+                    'gender','date_of_joining','about','status'
+                ]);
+            $departments = Department::whereIn('id', $allowDepartments)->get();
+            $roles = Role::whereIn('id', $allowRoles)->get();
+
+        } else {
+            $user = User::findOrFail($id, [
+                'id','department_id','role_id','position_id','emp_id',
+                'name','pseudo_name','email','pseudo_email','designation','gender',
+                'phone_number','pseudo_phone','address','city','state','country',
+                'postal_code','dob','date_of_joining','about','target','status'
+            ]);
+            $departments = Department::get();
+            $roles = Role::get();
+        }
+
+        $teams = Team::whereStatus(1)->get();
+
+        $firstTeam = $user->teams()
+            ->select('teams.id', 'teams.name', 'teams.status', 'teams.team_key')
+            ->first();
+
         $user->team_key = $firstTeam ? $firstTeam->team_key : null;
         $user->load('pseudo_records');
 
         if ($request->ajax()) {
-            return response()->json(['user' => $user, 'teams' => $teams, 'extra_pseudos' => $user->pseudo_records]);
+            return response()->json([
+                'user' => $user,
+                'teams' => $teams,
+                'departments' => $departments,
+                'roles' => $roles,
+                'extra_pseudos' => $user->pseudo_records
+            ]);
         }
 
-        return view('user.employees.edit', compact('user', 'teams'));
+
+        return view('user.employees.edit', compact('user', 'teams', 'departments', 'roles', 'isItExecutive'));
     }
+
+
 
 
     public function update(Request $request, User $user)
     {
+
+        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+
+            // AJAX request
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+            // Normal request
+            return redirect()
+                ->back()
+                ->with('error', 'You do not have permission to perform this action.');
+        }
+
         $messages = [
             // Department ID
             'department_id.required' => 'The department field is required.',
@@ -370,7 +508,7 @@ class UserEmployeeController extends Controller
                 'nullable',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email'),
+                Rule::unique('users', 'email')->ignore($user->id),
                 Rule::unique('users', 'pseudo_email')->ignore($user->id ?? null),
                 Rule::unique('user_pseudo_records', 'pseudo_email')
             ],
@@ -419,6 +557,22 @@ class UserEmployeeController extends Controller
             'extra_pseudos.*.pseudo_phone' => 'nullable|string|max:20',
 //            'phone_number' => 'nullable|regex:/^(\+?\d{1,3})[\d\s().-]+$/|min:8|max:20'
         ], $messages);
+
+        if (auth()->user()->department->name == "Operations" && auth()->user()->role->name == 'IT Executive') {
+
+            $allowRoles = [40, 41, 42, 43, 44, 45, 46, 47];
+            $allowDepartments = [5];
+    
+            if (!in_array($request->role_id, $allowRoles)) {
+                return response()->json(['error' => ' Unauthorize Access', 'message' => 'Invalid role selection.'], 422);
+
+            }
+
+            if (!in_array($request->department_id, $allowDepartments)) {
+                return response()->json(['error' => ' Unauthorize Access', 'message' => 'Invalid department selection.'], 422);
+            }
+        }
+
         if ($request->filled('extra_pseudos')) {
             $request->validate([
                 'pseudo_name' => 'required|string|max:255',

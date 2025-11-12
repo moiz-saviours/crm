@@ -171,6 +171,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
+               @if (!$isItExecutive)
                 <div class="form-group mb-3">
                     <label for="phone_number" class="form-label">Phone Number</label>
                     <input type="text" class="form-control tour-employeephone" id="phone_number" name="phone_number"
@@ -179,6 +180,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
+                @endif
                 <div class="form-group mb-3">
                     <label for="image" class="form-label d-block">Profile Image (Optional)</label>
 
@@ -217,6 +219,7 @@
                         </div>
                     </div>
                 </div>
+                @if (!$isItExecutive)
                 <div class="form-group mb-3">
                     <label for="address" class="form-label">Address</label>
                     <textarea class="form-control tour-employeeaddress" id="address" name="address" rows="3"></textarea>
@@ -264,6 +267,8 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
+                @endif
+
                 <div class="form-group mb-3">
                     <label for="date_of_joining" class="form-label">Date of Joining</label>
                     <input type="date" class="form-control tour-employeedoj" id="date_of_joining" name="date_of_joining"
@@ -272,6 +277,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
+                @if (!$isItExecutive)
                 <div class="form-group mb-3">
                     <label for="target" class="form-label">Target</label>
                     <input type="number" class="form-control tour-employeetarget" id="target" name="target"
@@ -280,6 +286,7 @@
                     <span class="text-danger">{{ $message }}</span>
                     @enderror
                 </div>
+                @endif
                 <div class="form-group mb-3">
                     <label for="createPassword" class="form-label">Password</label>
                     <div class="d-flex align-items-center">

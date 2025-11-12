@@ -384,6 +384,87 @@
             </div>
         @endif
 
+        @if(optional(auth()->user()->department)->name == "Operations" && auth()->user()->role->name == 'IT Executive')
+            <div class="content__boxed">
+                <div class="content__wrap">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{{ route('team.index') }}" class="text-decoration-none">
+                                <div class="card text-white" style="background-color: var(--bs-primary);">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                        <i class="demo-pli-male-female display-6"></i>
+                                            <div class="ms-4">
+                                                <h5 class="text-white h2 mb-0">{{ \App\Models\Team::count() }}</h5>
+                                                <p class="text-white text-opacity-75 mb-0">Total Teams</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress progress-md">
+                                            <div class="progress-bar bg-white" role="progressbar"
+                                                style="width: 100%;">
+                                            </div>
+                                        </div>
+
+                                        <small>100% Active</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-md-3">
+                            <a href="{{ route('brand.index') }}" class="text-decoration-none">
+                                <div class="card text-white" style="background-color: var(--bs-primary);">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="demo-pli-bar-chart display-6"></i>
+                                            <div class="ms-4">
+                                                <h5 class="text-white h2 mb-0">{{ \App\Models\Brand::count() }}</h5>
+                                                <p class="text-white text-opacity-75 mb-0">Total Brands</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress progress-md">
+                                            <div class="progress-bar bg-white" role="progressbar"
+                                                style="width: 100%;">
+                                            </div>
+                                        </div>
+
+                                        <small>100% Active</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-md-3">
+                            <a href="{{ route('employee.index') }}" class="text-decoration-none">
+                                <div class="card text-white" style="background-color: var(--bs-primary);">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="demo-pli-male-female display-6"></i>
+                                            <div class="ms-4">
+                                                <h5 class="text-white h2 mb-0">{{ \App\Models\User::count() }}</h5>
+                                                <p class="text-white text-opacity-75 mb-0">Total Employees</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress progress-md">
+                                            <div class="progress-bar bg-white" role="progressbar"
+                                                style="width: 100%;">
+                                            </div>
+                                        </div>
+
+                                        <small>100% Active</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @endif
+
     </section>
 
     @if(strtolower(optional(auth()->user()->department)->name) == "sales")
