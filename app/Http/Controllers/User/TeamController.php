@@ -39,7 +39,7 @@ class TeamController extends Controller
             //IT IT Executive
             $teams = Team::all();
             $brands = Brand::where('status', 1)->orderBy('name')->get();
-            $users = User::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get(['id','name','email']);
             return view('user.teams.index', compact('teams', 'brands', 'users'));
         }else{
             //User
@@ -95,13 +95,13 @@ class TeamController extends Controller
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
             return redirect()
                 ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+                ->with('error', 'You do not have permission to perform this action.');
         }
 
         $request->merge(['status' => $request->has('status') & in_array($request->get('status'), ['on', 1]) ? 1 : 0]);

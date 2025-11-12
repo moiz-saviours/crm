@@ -82,7 +82,6 @@
                                             <th class="align-middle text-center text-nowrap">Email</th>
                                             <th class="align-middle text-center text-nowrap">Designation</th>
                                             <th class="align-middle text-center text-nowrap">Team</th>
-                                            <th class="align-middle text-center text-nowrap">Target</th>
                                             <th class="align-middle text-center text-nowrap">Status</th>
                                             <th class="align-middle text-center text-nowrap tour-employeeaction">Action</th>
                                         </tr>
@@ -105,7 +104,7 @@
                                                 <td class="align-middle text-center text-nowrap">{{ $user->email }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ $user->designation }}</td>
                                                 <td class="align-middle text-center text-nowrap">{{ optional($user->teams)->pluck('name')->map('htmlspecialchars_decode')->implode(', ') }}</td>
-                                                <td class="align-middle text-center text-nowrap">{{ $user->target }}</td>
+
                                                 <td class="align-middle text-center text-nowrap">
                                                     <input type="checkbox" class="status-toggle change-status"
                                                            data-id="{{ $user->id }}"
