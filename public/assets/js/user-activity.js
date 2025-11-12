@@ -117,32 +117,32 @@
     });
 
     // Form submissions
-    document.addEventListener("submit", function (e) {
-        const form = e.target;
-        const formData = {};
-
-        form.querySelectorAll("input, textarea, select").forEach(f => {
-            if (f.name) formData[f.name] = f.value;
-        });
-
-        const formSubmission = {
-            form_name: form.getAttribute("name") || form.id || "unnamed_form",
-            form_action: form.action,
-            submitted_at: new Date().toISOString(),
-            data: formData
-        };
-
-        const payload = JSON.stringify({
-            visitor_id,
-            event_type: "form_submission",
-            event_data: formSubmission,
-        });
-
-        fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: payload
-        }).catch(() => {});
-    });
+    // document.addEventListener("submit", function (e) {
+    //     const form = e.target;
+    //     const formData = {};
+    //
+    //     form.querySelectorAll("input, textarea, select").forEach(f => {
+    //         if (f.name) formData[f.name] = f.value;
+    //     });
+    //
+    //     const formSubmission = {
+    //         form_name: form.getAttribute("name") || form.id || "unnamed_form",
+    //         form_action: form.action,
+    //         submitted_at: new Date().toISOString(),
+    //         data: formData
+    //     };
+    //
+    //     const payload = JSON.stringify({
+    //         visitor_id,
+    //         event_type: "form_submission",
+    //         event_data: formSubmission,
+    //     });
+    //
+    //     fetch(endpoint, {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: payload
+    //     }).catch(() => {});
+    // });
 
 })();
