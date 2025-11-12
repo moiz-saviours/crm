@@ -20,22 +20,6 @@ class UserEmployeeController extends Controller
 {
     public function index()
     {
-        
-        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
-
-            // AJAX request
-            if (request()->ajax()) {
-                return response()->json([
-                    'status' => false,
-                    'error' => 'Permission denied',
-                    'message' => 'You do not have permission to perform this action.'
-                ], 403);
-            }
-
-
-            abort(401, 'You do not have permission to perform this action.');
-        }
-
 
         $teams = Team::whereStatus(1)->get();
         $positions = Position::all();
@@ -73,20 +57,6 @@ class UserEmployeeController extends Controller
 
     public function store(Request $request)
     {
-        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
-
-
-            // AJAX request
-            if (request()->ajax()) {
-                return response()->json([
-                    'status' => false,
-                    'error' => 'Permission denied',
-                    'message' => 'You do not have permission to perform this action.'
-                ], 403);
-            }
-
-            abort(401, 'You do not have permission to perform this action.');
-        }
 
         $messages = [
             // Department ID
@@ -313,21 +283,6 @@ class UserEmployeeController extends Controller
     public function edit(Request $request, $id)
     {
 
-        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
-
-
-            if (request()->ajax()) {
-                return response()->json([
-                    'status' => false,
-                    'error' => 'Permission denied',
-                    'message' => 'You do not have permission to perform this action.'
-                ], 403);
-            }
-
-
-            abort(401, 'You do not have permission to perform this action.');
-        }
-
         $isItExecutive = auth()->user()?->department?->name === 'Operations'
             && auth()->user()?->role?->name === 'IT Executive';
 
@@ -386,22 +341,6 @@ class UserEmployeeController extends Controller
 
     public function update(Request $request, User $user)
     {
-
-        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
-
-
-            // AJAX request
-            if (request()->ajax()) {
-                return response()->json([
-                    'status' => false,
-                    'error' => 'Permission denied',
-                    'message' => 'You do not have permission to perform this action.'
-                ], 403);
-            }
-
-
-            abort(401, 'You do not have permission to perform this action.');
-        }
 
         $messages = [
             // Department ID
