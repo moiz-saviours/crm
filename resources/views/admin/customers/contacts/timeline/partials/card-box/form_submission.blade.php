@@ -19,7 +19,6 @@
 
     @php
         $activityData = $item['data']->data ?? null;
-        $formName = $activityData->form_name ?? 'Unknown Form';
         $formData = $activityData->data ?? null;
     @endphp
 
@@ -28,8 +27,8 @@
             <div class="row">
                 <div class="col-md-12 cstm_form_cont">
                     <p class="user_cont mt-2 mb-4">
-                        {{ $customer_contact->name ?? "---" }} submitted
-                        <span class="submt_form_name">{{ $formName }}</span>
+                        {{ $customer_contact->name ?? "---" }} submitted Form
+
                     </p>
 
                     <div class="form-infromation mb-3 form-submissions-content" style="display: none;">
