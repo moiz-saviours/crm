@@ -123,7 +123,6 @@ class PostalCode implements ValidationRule
                 $valid = preg_match('/^\d{6}$/', $value);
                 $message = 'Invalid Romanian postal code. Must be 6 digits.';
                 break;
-
             // South America
             case 'BR': // Brazil
                 $valid = preg_match('/^\d{5}-\d{3}$/', $value);
@@ -164,6 +163,63 @@ class PostalCode implements ValidationRule
             case 'BO': // Bolivia
                 $valid = preg_match('/^\d{4}$/', $value);
                 $message = 'Invalid Bolivian postal code. Must be 4 digits.';
+                break;
+            // Middle East
+            case 'BH': // Bahrain
+                $valid = preg_match('/^\d{3,4}$/', $value);
+                $message = 'Invalid Bahraini postal code. Must be 3 or 4 digits.';
+                break;
+            case 'CY': // Cyprus
+                $valid = preg_match('/^\d{4}$/', $value);
+                $message = 'Invalid Cypriot postal code. Must be 4 digits.';
+                break;
+            case 'IR': // Iran
+                $valid = preg_match('/^\d{10}$/', $value);
+                $message = 'Invalid Iranian postal code. Must be 10 digits.';
+                break;
+            case 'IQ': // Iraq
+                $valid = preg_match('/^\d{5}$/', $value);
+                $message = 'Invalid Iraqi postal code. Must be 5 digits.';
+                break;
+            case 'IL': // Israel
+                $valid = preg_match('/^\d{5,7}$/', $value);
+                $message = 'Invalid Israeli postal code. Must be 5 to 7 digits.';
+                break;
+            case 'JO': // Jordan
+                $valid = preg_match('/^\d{5}$/', $value);
+                $message = 'Invalid Jordanian postal code. Must be 5 digits.';
+                break;
+            case 'KW': // Kuwait
+                $valid = preg_match('/^\d{5}$/', $value);
+                $message = 'Invalid Kuwaiti postal code. Must be 5 digits.';
+                break;
+            case 'LB': // Lebanon
+                $valid = preg_match('/^\d{4}(\d{4})?$/', $value);
+                $message = 'Invalid Lebanese postal code. Must be 4 or 8 digits.';
+                break;
+            case 'OM': // Oman
+                $valid = preg_match('/^\d{3}$/', $value);
+                $message = 'Invalid Omani postal code. Must be 3 digits.';
+                break;
+            case 'QA': // Qatar - for payment processing
+                $valid = preg_match('/^[0-9]{4,6}$/', $value) || empty($value) || preg_match('/^[A-Z0-9]{3,8}$/i', $value);
+                $message = 'For Qatar, use PO Box number (4-6 digits) or leave empty if unavailable.';
+                break;
+            case 'SA': // Saudi Arabia
+                $valid = preg_match('/^\d{5}(-\d{4})?$/', $value);
+                $message = 'Invalid Saudi Arabian postal code. Must be 5 digits (e.g., 12345) or 9 digits (e.g., 12345-6789).';
+                break;
+            case 'SY': // Syria
+                $valid = preg_match('/^\d{4}$/', $value);
+                $message = 'Invalid Syrian postal code. Must be 4 digits.';
+                break;
+            case 'TR': // Turkey
+                $valid = preg_match('/^\d{5}$/', $value);
+                $message = 'Invalid Turkish postal code. Must be 5 digits.';
+                break;
+            case 'YE': // Yemen
+                $valid = preg_match('/^\d{5}$/', $value);
+                $message = 'Invalid Yemeni postal code. Must be 5 digits.';
                 break;
             default:
                 $fail("Postal code validation not supported for country: {$this->country}");
