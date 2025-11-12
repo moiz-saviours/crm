@@ -511,7 +511,7 @@ Route::middleware('auth:sanctum')->group(function () {
         try {
             $response = Http::withHeaders([
                 'X-Broadcast-Secret' => 'Petu2Jh9LraEDXDhER8Ah9KIdxWpO8yRCd7mLXMq0dQ5j7',
-            ])->post("https://socket-server.payusinginvoice.com/broadcast", [
+            ])->post("https://socket-server.payusinginvoice.com/message-broadcast", [
                 'conversation_id' => $messageData['conversation_id'],
                 'event' => 'new_message',
                 'data' => $messageData,
