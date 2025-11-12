@@ -114,9 +114,13 @@
                                                     <button type="button" class="btn btn-sm btn-primary changePwdBtn"
                                                             data-id="{{ $user->id }}" title="Change Password"><i
                                                             class="fas fa-key"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-primary editBtn"
-                                                            data-id="{{ $user->id }}" title="Edit"><i
-                                                            class="fas fa-edit"></i></button>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-primary editBtn"
+                                                        {{ $user->id == Auth::id() ? 'disabled' : 'data-id=' . $user->id }}
+                                                        title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
 
                                                 </td>
                                             </tr>
