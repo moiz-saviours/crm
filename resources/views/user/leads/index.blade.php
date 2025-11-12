@@ -123,7 +123,7 @@
                                                 </td>
                                                 <td class="align-middle text-left text-nowrap">
                                                     @if(isset($lead->team))
-                                                        <a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $lead->team->name }}">{{ $lead->team->name }}</a>
+                                                        <a href="{{route('team-member.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $lead->team->name }}">{{ $lead->team->name }}</a>
                                                     @else
 
                                                     @endif

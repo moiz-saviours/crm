@@ -534,10 +534,7 @@
                             const columns = `
                                 <td class="align-middle text-left text-nowrap"></td>
                                 <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}</td>
-                                <td class="align-middle text-left text-nowrap">
-                                    ${brand ? `<a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}
-                                </td>
-                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}</td>
+
                                 <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
                                 <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
                                 <td class="align-middle text-left text-nowrap">${country}</td>
@@ -591,8 +588,8 @@
                             }
 
                             // Column 4: Team
-                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`) {
-                                table.cell(index, 3).data(`${team ? `<a href="{{route('teams.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`).draw();
+                            if (decodeHtml(rowData[3]) !== `${team ? `<a href="{{route('team-member.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`) {
+                                table.cell(index, 3).data(`${team ? `<a href="{{route('team-member.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}`).draw();
                             }
 
                             // Column 5: Created Date
