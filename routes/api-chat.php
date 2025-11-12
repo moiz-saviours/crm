@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MessageController;
 use Illuminate\Support\Facades\Validator;
@@ -506,6 +508,27 @@ Route::middleware('auth:sanctum')->group(function () {
             'updated_at' => $message->updated_at->format('Y-m-d H:i:s'),
             'attachments' => $attachmentsData,
         ];
+        try {
+            $response = Http::withHeaders([
+                'X-Broadcast-Secret' => 'Petu2Jh9LraEDXDhER8Ah9KIdxWpO8yRCd7mLXMq0dQ5j7',
+            ])->post("https://socket-server.payusinginvoice.com/broadcast", [
+                'conversation_id' => $messageData['conversation_id'],
+                'event' => 'new_message',
+                'data' => $messageData,
+            ]);
+            if ($response->successful()) {
+                Log::info('Message broadcasted to Socket.IO server.', ['message_id' => $messageData['id']]);
+            } else {
+                Log::error('Failed to broadcast message.', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+            }
+
+
+        } catch (\Exception $e) {
+            \Log::error('Socket emission failed: ' . $e->getMessage());
+        }
         return response()->json([
             'success' => true,
             'message' => 'Message sent successfully',
