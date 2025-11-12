@@ -17,19 +17,20 @@ class BrandController extends Controller
 {
     public function index()
     {
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
 
+
+            // AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
 
         if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
@@ -47,6 +48,23 @@ class BrandController extends Controller
 
     public function store(Request $request)
     {
+
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
+
+            // AJAX request
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+
+            abort(401, 'You do not have permission to perform this action.');
+        }
+
         $request->validate([
             'name' => 'required|max:255',
             'url' => 'nullable|url',
@@ -76,6 +94,22 @@ class BrandController extends Controller
 
     public function edit(Request $request, Brand $brand)
     {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
+
+            // AJAX request
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+
+            abort(401, 'You do not have permission to perform this action.');
+        }
+
 //        if ($request->ajax()) {
 //            $brand->load(['client_contacts:id,special_key,name,email', 'client_companies:id,special_key,c_contact_key,name,email', 'client_accounts:id,c_contact_key,c_company_key,name,vendor_name,email']);
 //            return response()->json($brand);
@@ -90,6 +124,23 @@ class BrandController extends Controller
 
     public function update(Request $request, Brand $brand)
     {
+
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
+
+            // AJAX request
+            if (request()->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Permission denied',
+                    'message' => 'You do not have permission to perform this action.'
+                ], 403);
+            }
+
+
+            abort(401, 'You do not have permission to perform this action.');
+        }
+
         $request->validate([
             'name' => 'required|max:255',
             'url' => 'nullable|url',

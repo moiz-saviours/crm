@@ -22,6 +22,7 @@ class InvoiceController extends Controller
 {
     public function index()
     {
+
         $user = Auth::user();
         $teams = $user->teams()->with('brands')->get();
         $brands = $teams->flatMap->brands;

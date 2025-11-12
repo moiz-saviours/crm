@@ -17,21 +17,20 @@ class TeamController extends Controller
      */
     public function index()
     {
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
 
             // AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
-            // Normal request
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
 
 
@@ -56,21 +55,20 @@ class TeamController extends Controller
      */
     public function create()
     {
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
 
             // AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
-            // Normal request
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
 
 
@@ -88,7 +86,8 @@ class TeamController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
 
             // AJAX request
             if (request()->ajax()) {
@@ -99,9 +98,8 @@ class TeamController extends Controller
                 ], 403);
             }
 
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to perform this action.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
 
         $request->merge(['status' => $request->has('status') & in_array($request->get('status'), ['on', 1]) ? 1 : 0]);
@@ -165,21 +163,20 @@ class TeamController extends Controller
      */
     public function show(Team $team)
     {
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
 
             // AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
-            // Normal request
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
 
         return view('user.teams.show', compact('team'));
@@ -191,19 +188,20 @@ class TeamController extends Controller
     public function edit(Team $team)
     {
         
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
 
+
+            // AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
         
         
@@ -237,21 +235,20 @@ class TeamController extends Controller
     public function update(Request $request, Team $team)
     {
 
-        if (!Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        if (Auth::user()->department->name !== 'Operations' && Auth::user()->role->name !== 'IT Executive') {
+
 
             // AJAX request
             if (request()->ajax()) {
                 return response()->json([
                     'status' => false,
                     'error' => 'Permission denied',
-                    'message' => 'You do not have permission to edit this team.'
+                    'message' => 'You do not have permission to perform this action.'
                 ], 403);
             }
 
-            // Normal request
-            return redirect()
-                ->back()
-                ->with('error', 'You do not have permission to edit this team.');
+
+            abort(401, 'You do not have permission to perform this action.');
         }
 
 
