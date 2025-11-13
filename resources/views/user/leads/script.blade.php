@@ -534,6 +534,10 @@
                             const columns = `
                                 <td class="align-middle text-left text-nowrap"></td>
                                 <td class="align-middle text-left text-nowrap">${customer_contact ? `<a href="/customer/contact/edit/${customer_contact.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : name}</td>
+                                <td class="align-middle text-left text-nowrap">
+                                    ${brand ? `<a href="{{route('brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : ''}
+                                </td>
+                                <td class="align-middle text-left text-nowrap">${team ? `<a href="{{route('team-member.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${team.name}">${team.name}</a>` : ''}</td>
 
                                 <td class="align-middle text-left text-nowrap" data-order="${created_at}">${date}</td>
                                 <td class="align-middle text-left text-nowrap">${lead_status ? lead_status?.name : ""}</td>
@@ -612,11 +616,6 @@
                                 table.cell(index, 7).data(note).draw();
                             }
 
-                            // Column 9: Status
-                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
-                            if (decodeHtml(rowData[8]) !== statusHtml) {
-                                table.cell(index, 8).data(statusHtml).draw();
-                            }
                             // Column 10: Actions - Update Convert Button
                             const actionsCell = table.cell(index, 9);
                             const currentActions = $(actionsCell.node());
