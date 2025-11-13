@@ -279,7 +279,6 @@ class LeadController extends Controller
                 'address' => $request->input('address'),
                 'city' => $request->input('city'),
                 'state' => $request->input('state'),
-                'country' => $request->input('country'),
                 'zipcode' => $request->input('zipcode'),
                 'note' => $request->input('note'),
                 'status' => $request->input('status'),
@@ -289,6 +288,9 @@ class LeadController extends Controller
             }
             if (is_null($lead->email) && $request->filled('email')) {
                 $updateData['email'] = $request->input('email');
+            }
+            if ($request->filled('country')) {
+                $updateData['country'] = $request->input('country');
             }
             $lead->update($updateData);
             $convertedStatus = LeadStatus::where('name', 'Converted')->first();
@@ -315,7 +317,10 @@ class LeadController extends Controller
                 },
                 'team' => function ($query) {
                     $query->withTrashed()->select('team_key', 'name');
-                }], 'leadStatus');
+                },
+                'leadStatus' => function ($query) {
+                    $query->withTrashed()->select('id', 'name');
+                }]);
             if ($lead->created_at->isToday()) {
                 $date = "Today at " . $lead->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
             } else {
@@ -768,8 +773,8 @@ class LeadController extends Controller
             } else {
                 $deviceInfo = json_decode($lead->device_info, true);
                 $customer_contact = new CustomerContact([
-                    'brand_key' => $lead->brand_key,
-                    'team_key' => null,
+                    'brand_key' => $lead->brand_key ?? null,
+                    'team_key' => $lead->team_key ?? null,
                     'name' => $lead->name,
                     'email' => $lead->email,
                     'phone' => $lead->phone,
