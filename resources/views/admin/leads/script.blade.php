@@ -404,7 +404,7 @@
                             const currentActions = $(actionsCell.node());
 
                             const convertBtn = currentActions.find('.btn-success');
-                            const isConvertible = lead_status.name == 'Converted' && customer_contact;
+                            const isConvertible = lead_status.name === 'Converted' || customer_contact;
 
                             if (convertBtn.length) {
                                 if (isConvertible) {
@@ -528,7 +528,7 @@
                             table.cell(index, 1).data(`${customer_contact ? `<a href="${getEditRoute('{{ route('admin.customer.contact.edit', ':id') }}', customer_contact.id)}" data-bs-toggle="tooltip" data-bs-placement="top" title="${customer_contact.name}">${customer_contact.name}</a>` : lead.name}`).draw();
                         }
                         if (decodeHtml(rowData[2]) !== `${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : brand.name}`) {
-                            table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${brand.name}</a>` : brand.name}`).draw();
+                            table.cell(index, 2).data(`${brand ? `<a href="{{route('admin.brand.index')}}" data-bs-toggle="tooltip" data-bs-placement="top" title="${brand.name}">${makeAcronym(brand.name)}</a>` : brand.name}`).draw();
                         }
                         if (decodeHtml(rowData[5]) !== 'Converted') {
                             table.cell(index, 5).data(lead_status.name).draw();
