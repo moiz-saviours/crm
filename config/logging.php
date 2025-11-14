@@ -63,12 +63,12 @@ return [
             'replace_placeholders' => true,
         ],
         'merchant' => [
-            'driver' => 'daily',
+            'driver' => 'single',
             'path' => storage_path('logs/merchant.log'),
             'level' => 'error',
         ],
         'merchant_log' => [
-            'driver' => 'daily',
+            'driver' => 'single',
             'path' => storage_path('logs/merchant-log.log'),
             'level' => 'info',
         ],
