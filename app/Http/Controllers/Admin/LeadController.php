@@ -849,23 +849,7 @@ class LeadController extends Controller
                 }
             }
         }
-        if (empty($lead->brand_key)) {
-            $scriptToken = $rawData['script_token'] ?? ($submission['script_token'] ?? null);
-            if ($scriptToken) {
-                try {
-                    $brand = Brand::all()->first(fn($b) => $b->script_token === $scriptToken);
-                    if ($brand) {
-                        $dataToSave['brand_key'] = $brand->brand_key;
-                    }
-                } catch (\Exception $e) {
-                    Log::channel('webToLead')->warning('Brand lookup failed during conversion', [
-                        'lead_id' => $lead->id,
-                        'script_token' => $scriptToken,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        }
+
         if (!empty($dataToSave)) {
             $lead->update($dataToSave);
         }
