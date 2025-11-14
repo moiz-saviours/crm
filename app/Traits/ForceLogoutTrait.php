@@ -30,9 +30,10 @@ trait ForceLogoutTrait
     {
         $criticalFields = [
             'password' => $user->password,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
             'status' => $user->status,
             'deleted_at' => $user->deleted_at,
-            'updated_at' => $user->updated_at,
         ];
         return hash('sha256', implode('|', $criticalFields));
     }
