@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\{
     SalesKpiController as AdminSalesKpiController,
     EmailController as AdminEmailController,
     DealController as AdminDealController,
+    TrackingCodeController as AdminTrackingCodeController,
 
 };
 use App\Http\Controllers\UserActivityController;
@@ -389,5 +390,7 @@ Route::middleware(['auth:admin', '2fa:admin', 'throttle:60,1'])->prefix('admin')
     });
     Route::post('/save-settings', [AdminSettingController::class, 'saveSettings'])->name('save.settings');
     Route::get('user-activity', [UserActivityController::class, 'index'])->name('user-activity.index');
+    Route::get('tracking-code', [AdminTrackingCodeController::class, 'tracking'])->name('tracking.index');
+
 
 });
