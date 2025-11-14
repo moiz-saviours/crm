@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\UserPseudoRecord;
+use App\Traits\ForceLogoutTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
+    use ForceLogoutTrait;
     /**
      * Display a listing of the resource.
      */
@@ -517,6 +519,7 @@ class EmployeeController extends Controller
                 $user->teams()->sync($request->input('team_key'));
             }
             $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
+            $this->forceLogoutUser($user);
             return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -540,7 +543,7 @@ class EmployeeController extends Controller
             $user->status = 0;
             $user->save();
             if ($user->delete()) {
-                $this->destroy_session($user);
+                $this->forceLogoutUser($user);
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
             return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
@@ -561,44 +564,12 @@ class EmployeeController extends Controller
         try {
             $user->password = Hash::make($request->input('change_password'));
             $user->save();
-            $deletedSessions = $this->destroy_session($user);
-            Log::info("Password updated for User ID: {$user->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
+            $this->forceLogoutUser($user);
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
-                'invalidated_sessions' => $deletedSessions,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
-        }
-    }
-
-    /**
-     * Destroy all sessions and soft-delete verification codes for the given user.
-     *
-     * @param \App\Models\User $user
-     * @return array  $deletedSessions
-     */
-    protected function destroy_session(User $user): array
-    {
-        $deletedSessions = [];
-        try {
-            $verificationCodes = $user->verification_codes()->get();
-            $sessionIds = $verificationCodes->whereNotNull('verified_at')->pluck('session_id')->toArray();
-            foreach ($sessionIds as $sessionId) {
-                $path = storage_path("framework/sessions/{$sessionId}");
-                if (File::exists($path)) {
-                    File::delete($path);
-                    $deletedSessions[] = $sessionId;
-                }
-            }
-            $user->verification_codes()->whereNull('deleted_at')->update(['deleted_at' => now()]);
-            return $deletedSessions;
-        } catch (\Exception $e) {
-            Log::error("Failed to destroy sessions for User ID: {$user->id}. Error: {$e->getMessage()}", [
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
-            return [];
         }
     }
 
@@ -613,7 +584,7 @@ class EmployeeController extends Controller
             }
             $user->status = $request->query('status');
             $user->save();
-            $this->destroy_session($user);
+            $this->forceLogoutUser($user);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);

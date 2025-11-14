@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\UserPseudoRecord;
+use App\Traits\ForceLogoutTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserEmployeeController extends Controller
 {
+    use ForceLogoutTrait;
     public function index()
     {
 
@@ -498,14 +500,14 @@ class UserEmployeeController extends Controller
 
             $allowRoles = [40, 41, 42, 43, 44, 45, 46, 47];
             $allowDepartments = [5];
-    
+
             if (!in_array($request->role_id, $allowRoles)) {
-                return response()->json(['error' => ' Unauthorize Access', 'message' => 'Invalid role selection.'], 422);
+                return response()->json(['error' => ' Unauthorized Access', 'message' => 'Invalid role selection.'], 422);
 
             }
 
             if (!in_array($request->department_id, $allowDepartments)) {
-                return response()->json(['error' => ' Unauthorize Access', 'message' => 'Invalid department selection.'], 422);
+                return response()->json(['error' => ' Unauthorized Access', 'message' => 'Invalid department selection.'], 422);
             }
         }
 
@@ -586,6 +588,7 @@ class UserEmployeeController extends Controller
                 $user->teams()->sync($request->input('team_key'));
             }
             $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
+            $this->forceLogoutUser($user);
             return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -600,41 +603,14 @@ class UserEmployeeController extends Controller
         try {
             $user->password = Hash::make($request->input('change_password'));
             $user->save();
-            $deletedSessions = $this->destroy_session($user);
-            Log::info("Password updated for User ID: {$user->id}. Invalidated sessions: " . implode(', ', $deletedSessions));
+            $this->forceLogoutUser($user);
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
-                'invalidated_sessions' => $deletedSessions,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
-
-    protected function destroy_session(User $user): array
-    {
-        $deletedSessions = [];
-        try {
-            $verificationCodes = $user->verification_codes()->get();
-            $sessionIds = $verificationCodes->whereNotNull('verified_at')->pluck('session_id')->toArray();
-            foreach ($sessionIds as $sessionId) {
-                $path = storage_path("framework/sessions/{$sessionId}");
-                if (File::exists($path)) {
-                    File::delete($path);
-                    $deletedSessions[] = $sessionId;
-                }
-            }
-            $user->verification_codes()->whereNull('deleted_at')->update(['deleted_at' => now()]);
-            return $deletedSessions;
-        } catch (\Exception $e) {
-            Log::error("Failed to destroy sessions for User ID: {$user->id}. Error: {$e->getMessage()}", [
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
-            return [];
-        }
-    }
-
     public function change_status(Request $request, User $user)
     {
         try {
@@ -643,11 +619,10 @@ class UserEmployeeController extends Controller
             }
             $user->status = $request->query('status');
             $user->save();
-            $this->destroy_session($user);
+            $this->forceLogoutUser($user);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
         }
     }
-
 }

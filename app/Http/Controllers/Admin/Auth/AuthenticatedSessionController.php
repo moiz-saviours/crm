@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LoginRequest as AdminLoginRequest;
 use App\Services\TwoFactorService;
+use App\Traits\ForceLogoutTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,7 @@ use function view;
 
 class AuthenticatedSessionController extends Controller
 {
+    use  ForceLogoutTrait;
     protected TwoFactorService $twoFactorService;
 
     public function __construct(TwoFactorService $twoFactorService)
@@ -55,6 +57,7 @@ class AuthenticatedSessionController extends Controller
             $deviceId = $this->twoFactorService->generateDeviceFingerprint();
             $this->twoFactorService->deleteCode($user, $deviceId);
         }
+        $this->forceLogoutUser($user);
         Auth::guard('admin')->logout();
         /** It will destroy every user session */
 //        $request->session()->invalidate();
