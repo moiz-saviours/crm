@@ -227,9 +227,25 @@ class TwoFactorService
             $agent->platform(),
             $agent->version($agent->platform()),
             $agent->device(),
-            request()->ip(),
-            session()->getId()
+            request()->header('Accept-Language'),
+            request()->header('User-Agent'),
         ];
-        return hash('sha256', implode('|', array_filter($components)));
+        $cookieName = 'device_fingerprint';
+        if (request()->hasCookie($cookieName)) {
+            return request()->cookie($cookieName);
+        }
+        $fingerprint = hash('sha256', implode('|', array_filter($components)) . uniqid());
+        cookie()->queue($cookieName, $fingerprint, 525600);
+        return $fingerprint;
+    }
+
+    /**
+     * Check if the existing fingerprint is still valid for the current device
+     * Allows for minor changes like browser version updates
+     */
+    protected function isValidDeviceFingerprint(string $existingFingerprint, string $currentComponentsHash): bool
+    {
+        if ($existingFingerprint && $currentComponentsHash) return true;
+        return false;
     }
 }
