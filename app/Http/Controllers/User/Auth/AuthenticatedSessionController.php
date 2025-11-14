@@ -50,7 +50,7 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $user = Auth::guard('web')->user();
-        session()->put('web_2fa_verified', false);
+        session()->put("web_2fa_verified:{$user->id}", false);
         if ($user) {
             Cache::forget("web_2fa_verified:{$user->id}");
             $deviceId = $this->twoFactorService->generateDeviceFingerprint();
