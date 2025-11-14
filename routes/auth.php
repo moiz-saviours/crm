@@ -12,7 +12,7 @@ use App\Http\Controllers\User\Auth\RegisteredUserController;
 use App\Http\Controllers\User\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['guest:web'])->group(function () {
+Route::middleware(['restricted.ips','guest:web'])->group(function () {
 //    Route::get('register', [RegisteredUserController::class, 'create'])
 //        ->name('register');
 //
@@ -30,7 +30,7 @@ Route::middleware(['guest:web'])->group(function () {
 //        ->name('password.store');
 
 });
-Route::middleware('auth:web')->group(function () {
+Route::middleware(['restricted.ips','auth:web'])->group(function () {
     Route::middleware('2fa')->group(function () {
         Route::get('/two-factor-auth', [UserTwoFactorController::class, 'show'])->name('2fa.show');
         Route::post('/two-factor-auth/send', [UserTwoFactorController::class, 'send'])->name('2fa.send');

@@ -75,7 +75,7 @@ Route::get('/', function () {
 //    ]);
 //})->middleware('auth');
 require __DIR__ . '/auth.php';
-Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1', 'dynamic.access'])->group(function () {
+Route::middleware(['restricted.ips','auth', '2fa', 'verified:verification.notice', 'throttle:60,1', 'dynamic.access'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard')//->middleware('can:dashboard_view')
     ;
     Route::get('/profile', [ProfileController::class, 'edit'])->name('user.profile');
