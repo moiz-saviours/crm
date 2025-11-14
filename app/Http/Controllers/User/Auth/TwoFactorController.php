@@ -124,7 +124,7 @@ class TwoFactorController extends Controller
         }
         $deviceId = $this->twoFactorService->generateDeviceFingerprint();
         if ($this->twoFactorService->verifyCode($user, $code, $lastCode->method, $deviceId)) {
-            session(['web_2fa_verified' => true, 'web_verified_device' => $deviceId]);
+            session(["web_2fa_verified:{$user->id}" => true, "web_verified_device:{$user->id}" => $deviceId]);
             return redirect()->route('user.dashboard');
         }
         return back()->withErrors(['code' => 'Invalid verification code']);
