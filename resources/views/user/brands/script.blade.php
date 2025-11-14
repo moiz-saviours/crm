@@ -272,9 +272,7 @@
                                     <input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? 'checked' : ''} data-bs-toggle="toggle">
                                 </td>
                                 <td class="align-middle text-center table-actions">
-                                    <button type="button" class="btn btn-sm btn-primary copyScriptBtn" data-script='${scriptTag}' title="Copy Script">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
+
                                     <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -345,14 +343,14 @@
         });
 
         // Copy Script Js
-        $(document).on('click', '.copyScriptBtn', function () {
-            const script = $(this).data('script');
-
-            navigator.clipboard.writeText(script).then(function () {
-                toastr.success("Script copied to clipboard!");
-            }, function (err) {
-                toastr.error("Failed to copy script.");
-            });
-        });
+        // $(document).on('click', '.copyScriptBtn', function () {
+        //     const script = $(this).data('script');
+        //
+        //     navigator.clipboard.writeText(script).then(function () {
+        //         toastr.success("Script copied to clipboard!");
+        //     }, function (err) {
+        //         toastr.error("Failed to copy script.");
+        //     });
+        // });
     });
 </script>
