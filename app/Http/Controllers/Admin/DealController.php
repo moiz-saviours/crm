@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class DealController extends Controller
 {
@@ -55,44 +56,67 @@ class DealController extends Controller
             'end_date' => $endDate->copy()->timezone('GMT+5')->format('Y-m-d h:i:s A'),
         ];
 
-        $deals = Deal::whereBetween('created_at', [$actual_dates['start_date'], $actual_dates['end_date']])
-            ->with(['company', 'contact'])
-            ->get();
-
-        if ($deals->isEmpty() && !isset($validated['start_date']) && !isset($validated['end_date'])) {
-            $lastRecordDate = Deal::latest('created_at')->value('created_at');
-            if ($lastRecordDate) {
-                $startDate = Carbon::parse($lastRecordDate)->startOfMonth();
-                $endDate = Carbon::parse($lastRecordDate)->endOfMonth();
-                $deals = Deal::whereBetween('created_at', [$startDate, $endDate])
-                    ->with(['company', 'contact'])
-                    ->get();
-                $actual_dates = [
-                    'start_date' => $startDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
-                    'end_date' => $endDate->timezone('GMT+5')->format('Y-m-d h:i:s A'),
-                ];
-            }
-        }
-
-        $deals = $deals->map(function ($deal) {
-            if ($deal->created_at->isToday()) {
-                $deal->date = "Today at " . $deal->created_at->timezone('GMT+5')->format('g:i A') . " GMT+5";
-            } else {
-                $deal->date = $deal->created_at->timezone('GMT+5')->format('M d, Y g:i A') . " GMT+5";
-            }
-            return $deal;
-        });
+        $query = Deal::whereBetween('created_at', [$actual_dates['start_date'], $actual_dates['end_date']])
+            ->with(['company', 'contact']);
 
         if ($request->ajax()) {
-            return response()->json([
-                'success' => true, 
-                'data' => $deals, 
-                'actual_dates' => $actual_dates, 
-                'count' => $deals->count()
-            ]);
+            return DataTables::eloquent($query)
+                ->addIndexColumn()
+                ->editColumn('company', function ($deal) {
+                    return $deal->company?->name ?? 'N/A';
+                })
+                ->editColumn('contact', function ($deal) {
+                    return $deal->contact?->name ?? 'N/A';
+                })
+                ->editColumn('deal_stage', function ($deal) {
+                    $stages = [
+                        1 => 'Appointment Scheduled',
+                        2 => 'Qualified To Buy',
+                        3 => 'Presentation Scheduled',
+                        4 => 'Decision Maker Bought-In',
+                        5 => 'Contract Sent',
+                        6 => 'Closed Won',
+                        7 => 'Closed Lost',
+                    ];
+                    $color = $deal->deal_stage >= 6
+                        ? ($deal->deal_stage == 6 ? 'success' : 'danger')
+                        : 'warning';
+                    return '<span class="badge bg-' . $color . ' text-white">' . ($stages[$deal->deal_stage] ?? 'Unknown') . '</span>';
+                })
+                ->editColumn('amount', fn($deal) => '$' . number_format($deal->amount, 2))
+                ->editColumn('close_date', fn($deal) => optional($deal->close_date)->format('M d, Y'))
+                ->editColumn('priority', function ($deal) {
+                    if (!$deal->priority) return '';
+                    $color = match ($deal->priority) {
+                        'high' => 'danger',
+                        'medium' => 'warning',
+                        default => 'secondary'
+                    };
+                    return '<span class="badge bg-' . $color . ' text-white">' . ucfirst($deal->priority) . '</span>';
+                })
+                ->editColumn('status', fn($deal) => '<span class="badge bg-' . ($deal->status ? 'success' : 'danger') . ' text-white">' . ($deal->status ? 'Active' : 'Inactive') . '</span>')
+                ->addColumn('action', function ($deal) {
+                    return '
+                        <div class="dropdown text-center">
+                            <a href="#" class="text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item editBtn" href="#" data-id="' . $deal->id . '">Edit</a></li>
+                                <li><a class="dropdown-item deleteBtn" href="#" data-id="' . $deal->id . '">Delete</a></li>
+                            </ul>
+                        </div>
+                    ';
+                })
+
+
+
+                ->rawColumns(['deal_stage', 'priority', 'status', 'action'])
+                ->make(true);
         }
 
-        $companies = CustomerCompany::where('status', 1)->orderBy('name')->get(['id', 'special_key','domain', 'name', 'email', 'phone']);
+        // 👇 For initial view load only
+        $companies = CustomerCompany::where('status', 1)->orderBy('name')->get(['id', 'special_key', 'domain', 'name', 'email', 'phone']);
         $contacts = CustomerContact::where('status', 1)->orderBy('name')->get(['id', 'special_key', 'name', 'email', 'phone']);
         $services = collect([
             ['id' => 1, 'name' => 'App Development'],
@@ -101,12 +125,9 @@ class DealController extends Controller
             ['id' => 4, 'name' => 'Content Writing'],
             ['id' => 5, 'name' => 'Website Design'],
             ['id' => 6, 'name' => 'Logo Design']
-        ])->map(function($item) {
-            return (object)$item;
-        });
+        ])->map(fn($item) => (object)$item);
 
         return view('admin.deals.index', compact(
-            'deals', 
             'companies', 
             'contacts', 
             'services', 

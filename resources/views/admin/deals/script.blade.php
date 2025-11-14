@@ -20,136 +20,112 @@
         }
 
         function initializeDatatable(table_div, index) {
-            const skipCols = [
-                0,
-                getColumnIndex(table_div, 'CLOSE DATE'),
-                getColumnIndex(table_div, 'STATUS'),
-                getColumnIndex(table_div, 'ACTION'),
-            ].filter(i => i !== null && i !== undefined).filter((value, index, self) => self.indexOf(value) === index);
+            const tableId = table_div.attr('id');
+            const orderKey = tableId + '_columnOrder';
+            const lengthKey = tableId + '_pageLength';
+            const visibilityKey = tableId + '_columnVisibility';
+
+            let savedVisibility;
+            try {
+                const visibility = localStorage.getItem(visibilityKey);
+                savedVisibility = visibility ? JSON.parse(visibility) : undefined;
+                if (!Array.isArray(savedVisibility)) throw new Error('Invalid column visibility');
+            } catch (e) {
+                localStorage.removeItem(visibilityKey);
+                savedVisibility = undefined;
+            }
+
+            let columnOrder;
+            try {
+                const savedOrder = localStorage.getItem(orderKey);
+                columnOrder = savedOrder ? JSON.parse(savedOrder) : undefined;
+                if (!Array.isArray(columnOrder)) throw new Error('Invalid column order');
+            } catch (e) {
+                localStorage.removeItem(orderKey);
+                columnOrder = undefined;
+            }
+
+            let pageLength = 10; // default
+            try {
+                const savedLength = localStorage.getItem(lengthKey);
+                const parsedLength = parseInt(savedLength);
+                if (!isNaN(parsedLength) && parsedLength > 0) pageLength = parsedLength;
+                else throw new Error('Invalid page length');
+            } catch (e) {
+                console.warn('Invalid page length in localStorage, resetting.');
+                localStorage.removeItem(lengthKey);
+            }
 
             let datatable = table_div.DataTable({
-                dom: "<'row'<'col-sm-12 col-md-1'B><'col-sm-12 col-md-5'l><'col-sm-12 col-md-6'f>>" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
-                buttons: [
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('admin.deal.index') }}",
+                    data: function(d) {
+                        d.start_date = $('#start_date_filter').val();
+                        d.end_date = $('#end_date_filter').val();
+                    }
+                },
+                columns: [
                     {
-                        extend: 'colvis',
-                        text: '<i class="fa fa-columns"></i> Columns',
-                        className: 'btn btn-secondary btn-sm',
-                        postfixButtons: ['colvisRestore'],
-                        columns: function (idx, data, node) {
-                            const header = $(table_div).find('thead th').eq(idx);
-                            const headerText = header.text().trim().toLowerCase();
-                            if (
-                                header.hasClass('no-col-vis') ||
-                                header.hasClass('select-checkbox') ||
-                                headerText.includes('action') ||
-                                headerText.includes('select')
-                            ) {
-                                return false;
-                            }
-                            return true;
-                        }
-                    },
-                ],
-                order: [[getColumnIndex(table_div, 'CLOSE DATE'), 'desc']],
-                responsive: false,
-                autoWidth: true,
-                scrollX: true,
-                scrollY: ($(window).height() - 350),
-                scrollCollapse: true,
-                paging: true,
-                pageLength: 100,
-                lengthMenu: [[10, 25, 50, 100, -1], ['10 Rows', '25 Rows', '50 Rows', '100 Rows', 'Show All']],
-                columnDefs: [
-                    {
+                        data: null,
                         orderable: false,
-                        targets: 0,
-                        className: 'select-checkbox',
-                        render: DataTable.render.select(),
+                        searchable: false,
+                        visible: savedVisibility ? savedVisibility[0] : true,
+                        render: (data, type, row) => `<input type="checkbox" class="row-checkbox" data-id="${row.id}">`
                     },
                     {
-                        targets: getColumnIndex(table_div, 'CLOSE DATE'),
-                        type: 'date',
-                        render: function (data, type, row) {
-                            if (type === 'sort') {
-                                return $(this).data('order') || data;
-                            }
-                            return data;
-                        }
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        visible: savedVisibility ? savedVisibility[1] : true,
+                        render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1
                     },
-                    {
-                        targets: '_all',
-                        render: function (data, type, row, meta) {
-                            if (skipCols.includes(meta.col)) return data;
-                            if (!data) return '';
-                            if (type !== 'display') return data;
-
-                            const maxLength = 15;
-                            const tempDiv = document.createElement('div');
-                            tempDiv.innerHTML = data;
-
-                            function truncateTextNodes(node) {
-                                node.childNodes.forEach(child => {
-                                    if (child.nodeType === Node.TEXT_NODE) {
-                                        const txt = child.textContent;
-                                        if (txt && txt.trim().length > maxLength) {
-                                            child.textContent = txt.substring(0, maxLength) + '...';
-                                        }
-                                    } else if (child.nodeType === Node.ELEMENT_NODE) {
-                                        truncateTextNodes(child);
-                                    }
-                                });
-                            }
-
-                            truncateTextNodes(tempDiv);
-                            return tempDiv.innerHTML;
-                        },
-                        createdCell: function (td, cellData, rowData, row, col) {
-                            if (skipCols.includes(col) || !cellData) {
-                                td.innerHTML = cellData || '';
-                                return;
-                            }
-                            const temp = document.createElement('div');
-                            temp.innerHTML = cellData;
-                            const fullText = (temp.textContent || temp.innerText || '').trim();
-                            const tooltipDiv = document.createElement('div');
-                            tooltipDiv.classList.add('truncate-cell');
-                            tooltipDiv.innerHTML = td.innerHTML;
-                            td.innerHTML = '';
-                            td.appendChild(tooltipDiv);
-                            if (fullText.length > 15) {
-                                tooltipDiv.setAttribute('title', fullText);
-                                tooltipDiv.setAttribute('data-bs-toggle', 'tooltip');
-                                tooltipDiv.setAttribute('data-bs-placement', 'top');
-                            }
-                            new bootstrap.Tooltip(tooltipDiv);
-                        }
-                    },
-                    {width: '10%', targets: 0},  // checkbox column
-                    {width: '20%', targets: 1},  // DEAL NAME
-                    {width: '15%', targets: 2},  // COMPANY
-                    {width: '15%', targets: 3},  // CONTACT
-                    {width: '12%', targets: 4},  // DEAL STAGE
-                    {width: '8%', targets: 5},   // AMOUNT
-                    {width: '8%', targets: 6},   // CLOSE DATE
-                    {width: '7%', targets: 7},   // PRIORITY
-                    {width: '5%', targets: 8},   // STATUS
-                    {width: '10%', targets: 9},  // ACTION buttons
+                    { data: 'name', name: 'name', visible: savedVisibility ? savedVisibility[2] : true },
+                    { data: 'company', name: 'company.name', orderable: false, searchable: false, visible: savedVisibility ? savedVisibility[3] : true },
+                    { data: 'contact', name: 'contact.name', orderable: false, searchable: false, visible: savedVisibility ? savedVisibility[4] : true },
+                    { data: 'deal_stage', name: 'deal_stage', orderable: false, searchable: false, visible: savedVisibility ? savedVisibility[5] : true },
+                    { data: 'amount', name: 'amount', visible: savedVisibility ? savedVisibility[6] : true },
+                    { data: 'close_date', name: 'close_date', visible: savedVisibility ? savedVisibility[7] : true },
+                    { data: 'priority', name: 'priority', orderable: false, visible: savedVisibility ? savedVisibility[8] : true },
+                    { data: 'status', name: 'status', orderable: false, visible: savedVisibility ? savedVisibility[9] : true },
+                    { data: 'action', name: 'action', orderable: false, searchable: false, visible: savedVisibility ? savedVisibility[10] : true }
                 ],
-                select: {
-                    style: 'os',
-                    selector: 'td:first-child'
-                },
-                fixedColumns: {
-                    start: 0,
-                    end: 1
-                },
+
+                dom: 'Blfrtip',
+                buttons: [
+                    { extend: 'colvis', columns: ':not(:first-child):not(:last-child)' }
+                ],
+                order: [[7, 'desc']],
+                colReorder: { order: columnOrder },
+                pageLength: pageLength
             });
-            datatable.columns.adjust().draw();
+
+            // Save column order safely
+            datatable.on('column-reorder', function () {
+                const order = datatable.colReorder.order();
+                if (order && order.length) localStorage.setItem(orderKey, JSON.stringify(order));
+                else localStorage.removeItem(orderKey);
+            });
+
+            // Save selected page length safely
+            datatable.on('length.dt', function (e, settings, len) {
+                if (len && !isNaN(len)) localStorage.setItem(lengthKey, len);
+            });
+
+            datatable.on('column-visibility.dt', function (e, settings, column, state) {
+                const visibility = datatable.columns().visible().toArray();
+                localStorage.setItem(visibilityKey, JSON.stringify(visibility));
+            });
+
+
+            datatable.columns.adjust();
             datatable.buttons().container().appendTo(`#right-icon-${index}`);
+
             return datatable;
         }
+
+
 
         dataTables[0].on('draw', function () {
             const tooltipElements = document.querySelectorAll('[data-bs-toggle="tooltip"], [title]');
@@ -219,138 +195,62 @@
             $('#formContainer').addClass('open');
         }
 
-        /** Create Manage Record */
         $('#manage-form').on('submit', function (e) {
             e.preventDefault();
-            var dataId = $('#manage-form').data('id');
-            var formData = new FormData(this);
+            const formData = new FormData(this);
+            const dataId = $('#manage-form').data('id');
             let table = dataTables[0];
-            
-            if (!dataId) {
-                AjaxRequestPromise(`{{ route("admin.deal.store") }}`, formData, 'POST', {useToastr: true})
-                    .then(response => {
-                        if (response?.data) {
-                            const {
-                                id,
-                                company,
-                                contact,
-                                name,
-                                deal_stage,
-                                amount,
-                                close_date,
-                                priority,
-                                date,
-                                status
-                            } = Object.fromEntries(
-                                Object.entries(response.data).map(([key, value]) => [key, value === null ? '' : value])
-                            );
+            const url = dataId
+                ? $(this).attr('action') // Update URL
+                : `{{ route("admin.deal.store") }}`; // Create URL
 
-                            const index = table.rows().count() + 1;
-                            const columns = `
-                                <td class="align-middle text-left text-nowrap"></td>
-                                <td class="align-middle text-left text-nowrap">
-                                    <a href="{{route('admin.deal.edit', '') }}/${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${name}">${name}</a>
-                                </td>
-                                <td class="align-middle text-left text-nowrap">${company ? company.name : 'N/A'}</td>
-                                <td class="align-middle text-left text-nowrap">${contact ? contact.name : 'N/A'}</td>
-                                <td class="align-middle text-left text-nowrap">${deal_stage}</td>
-                                <td class="align-middle text-left text-nowrap">$${amount}</td>
-                                <td class="align-middle text-left text-nowrap" data-order="${close_date}">${close_date ? new Date(close_date).toLocaleDateString() : 'N/A'}</td>
-                                <td class="align-middle text-left text-nowrap"><span class="badge bg-secondary">${priority ? priority.charAt(0).toUpperCase() + priority.slice(1) : 'N/A'}</span></td>
-                                <td class="align-middle text-left text-nowrap">
-                                    <span class="badge bg-${status == 1 ? 'success' : 'danger'}">
-                                        ${status == 1 ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                                <td class="align-middle text-left table-actions">
-                                    <button type="button" class="btn btn-sm btn-primary editBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger deleteBtn" data-id="${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            `;
-                            table.row.add($('<tr>', {id: `tr-${id}`}).append(columns)).draw(false);
-                            $('#manage-form')[0].reset();
-                            $('#formContainer').removeClass('open');
-                        }
-                    })
-                    .catch(error => console.error('An error occurred while creating the record.', error));
-            } else {
-                const url = $(this).attr('action');
-                AjaxRequestPromise(url, formData, 'POST', {useToastr: true})
-                    .then(response => {
-                        if (response?.data) {
-                            const {
-                                id,
-                                company,
-                                contact,
-                                name,
-                                deal_stage_name,
-                                amount,
-                                close_date,
-                                priority,
-                                date,
-                                status
-                            } = Object.fromEntries(
-                                Object.entries(response.data).map(([key, value]) => [key, value === null ? '' : value])
-                            );
-
-                            const index = table.row($('#tr-' + id)).index();
-                            
-                            // Update table cells
-                            table.cell(index, 1).data(`<a href="{{route('admin.deal.edit', '') }}/${id}" data-bs-toggle="tooltip" data-bs-placement="top" title="${name}">${name}</a>`).draw();
-                            table.cell(index, 2).data(company ? company.name : 'N/A').draw();
-                            table.cell(index, 3).data(contact ? contact.name : 'N/A').draw();
-                            table.cell(index, 4).data(deal_stage_name).draw();
-                            table.cell(index, 5).data(`$${amount}`).draw();
-                            table.cell(index, 6).data(close_date ? new Date(close_date).toLocaleDateString() : 'N/A').draw();
-                            table.cell(index, 7).data(priority ? priority.charAt(0).toUpperCase() + priority.slice(1) : 'N/A').draw();
-                            
-                            const statusHtml = `<input type="checkbox" class="status-toggle change-status" data-id="${id}" ${status == 1 ? "checked" : ""} data-bs-toggle="toggle">`;
-                            table.cell(index, 8).data(statusHtml).draw();
-
-                            $('#manage-form')[0].reset();
-                            $('#formContainer').removeClass('open');
-                        }
-                    })
-                    .catch(error => console.log(error));
-            }
+            AjaxRequestPromise(url, formData, 'POST', { useToastr: true })
+                .then(response => {
+                    if (response?.data) {
+                        // Reload the datatable instead of manually updating rows
+                        table.ajax.reload(null, false); // false = keep current paging
+                        $('#manage-form')[0].reset();
+                        $('#formContainer').removeClass('open');
+                    }
+                })
+                .catch(error => console.error('An error occurred while saving the record.', error));
         });
+
 
         /** Delete Record */
         $(document).on('click', '.deleteBtn', function () {
             const id = $(this).data('id');
             let table = dataTables[0];
-            console.log('Deleting record with ID:', id);
+
             AjaxDeleteRequestPromise(`{{ route("admin.deal.destroy", "") }}/${id}`, null, 'DELETE', {
                 useDeleteSwal: true,
                 useToastr: true,
             })
-                .then(response => {
-                    table.row(`#tr-${id}`).remove().draw();
-                })
-                .catch(error => {
-                    if (error.isConfirmed === false) {
-                        Swal.fire({
-                            title: 'Action Canceled',
-                            text: error?.message || 'The deletion has been canceled.',
-                            icon: 'info',
-                            confirmButtonText: 'OK'
-                        });
-                        console.error('Record deletion was canceled:', error?.message);
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'An error occurred while deleting the record.',
-                            icon: 'error',
-                            confirmButtonText: 'Try Again'
-                        });
-                        console.error('An error occurred while deleting the record:', error);
-                    }
-                });
+            .then(response => {
+                // Reload the datatable instead of removing row manually
+                table.ajax.reload(null, false); // false = keep current page
+            })
+            .catch(error => {
+                if (error.isConfirmed === false) {
+                    Swal.fire({
+                        title: 'Action Canceled',
+                        text: error?.message || 'The deletion has been canceled.',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                    console.warn('Record deletion was canceled:', error?.message);
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while deleting the record.',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again'
+                    });
+                    console.error('An error occurred while deleting the record:', error);
+                }
+            });
         });
+
 
         // Toggle contact start date field
         $('#is_contact_start_date').on('change', function () {
@@ -367,5 +267,18 @@
             placeholder: "Please select an option",
             allowClear: true
         });
+
+        // Select / deselect all row checkboxes
+        $(document).on('change', '#select-all', function () {
+            const checked = $(this).is(':checked');
+            $('.row-checkbox').prop('checked', checked);
+        });
+
+        // Keep header checkbox synced when individual row is checked/unchecked
+        $(document).on('change', '.row-checkbox', function () {
+            const allChecked = $('.row-checkbox').length === $('.row-checkbox:checked').length;
+            $('#select-all').prop('checked', allChecked);
+        });
+
     });
 </script>
