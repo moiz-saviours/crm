@@ -149,20 +149,20 @@ class Brand extends Model
     /** Scope */
 
     // This will create a "virtual" attribute
-    protected $appends = ['script_token'];
+//    protected $appends = ['script_token'];
 
-    public function getScriptTokenAttribute(): string
-    {
-        return self::generateScriptTokenFromName($this->name);
-    }
-
-    public static function generateScriptTokenFromName(string $name): string
-    {
-        $normalized = Str::lower($name);
-        $normalized = preg_replace('/[^a-z0-9]/', '', $normalized);
-
-        return substr(hash_hmac('sha256', $normalized, 'brand_token'), 0, 15);
-    }
+//    public function getScriptTokenAttribute(): string
+//    {
+//        return self::generateScriptTokenFromName($this->name);
+//    }
+//
+//    public static function generateScriptTokenFromName(string $name): string
+//    {
+//        $normalized = Str::lower($name);
+//        $normalized = preg_replace('/[^a-z0-9]/', '', $normalized);
+//
+//        return substr(hash_hmac('sha256', $normalized, 'brand_token'), 0, 15);
+//    }
 
     public function assignedTeams()
     {
