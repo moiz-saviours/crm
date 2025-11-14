@@ -151,7 +151,6 @@ class PaymentTransactionLogController extends Controller
                         }
                     } elseif ($log->gateway == 'Authorize.net') {
                         $responseData = json_decode($log->transaction_response, true);
-                        $errorDetails = [];
                         $responseCode = null;
                         if (isset($responseData['responseCode'])) {
                             $responseCode = $responseData['responseCode'];
