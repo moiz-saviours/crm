@@ -7,6 +7,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LastSeen;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\RestrictAccessMiddleware;
 use App\Http\Middleware\RestrictDevAccess;
 use App\Http\Middleware\SetGuardSessionCookie;
 use App\Http\Middleware\TwoFactorMiddleware;
@@ -50,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
             'dynamic.access' => DynamicAccessMiddleware::class,
+            'restricted.ips' => RestrictAccessMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
