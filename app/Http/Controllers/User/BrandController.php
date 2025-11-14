@@ -17,7 +17,10 @@ class BrandController extends Controller
 {
     public function index()
     {
-        if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
+        $isItExecutive = auth()->user()?->department?->name === 'Operations'
+            && auth()->user()?->role?->name === 'IT Executive';
+
+        if ($isItExecutive) {
             $brands = Brand::select('id','brand_key','name','url','logo','email','description','status')->get();
             $clientContacts = ClientContact::where('status', 1)->get();
             $edit_brand = session()->has('edit_brand') ? session()->get('edit_brand') : null;

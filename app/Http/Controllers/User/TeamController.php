@@ -17,9 +17,11 @@ class TeamController extends Controller
      */
     public function index()
     {
+        $isItExecutive = auth()->user()?->department?->name === 'Operations'
+            && auth()->user()?->role?->name === 'IT Executive';
 
-        if (Auth::user()->department->name === 'Operations' && Auth::user()->role->name === 'IT Executive') {
-            //IT IT Executive
+        if ($isItExecutive) {
+            //IT Executive
             $teams = Team::all();
             $brands = Brand::where('status', 1)->orderBy('name')->get();
             $users = User::where('status', 1)->orderBy('name')->get(['id','name','email']);
@@ -27,10 +29,13 @@ class TeamController extends Controller
         }else{
             //User
             $user = Auth::user();
+            $brands = Brand::where('status', 1)->orderBy('name')->get();
+            $users = User::where('status', 1)->orderBy('name')->get(['id','name','email']);
             $teams = $user->teams()->with(['users' => function($query) {
                 $query->where('status', 1);
             }])->get();
-            return view('user.teams.index', compact('teams'));
+
+            return view('user.teams.index', compact('teams', 'brands', 'users'));
         }
     }
 
