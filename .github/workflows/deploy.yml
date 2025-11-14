@@ -49,6 +49,8 @@ jobs:
           echo "DEV_DIGITAL_ROOTS_ENABLE=${{ secrets.DEV_DIGITAL_ROOTS_ENABLE }}" >> $GITHUB_ENV
           echo "LIVE_GENX_ENABLE=${{ secrets.LIVE_GENX_ENABLE }}" >> $GITHUB_ENV
           echo "DEV_GENX_ENABLE=${{ secrets.DEV_GENX_ENABLE }}" >> $GITHUB_ENV
+          echo "LIVE_SAVIOURS_ENABLE=${{ secrets.LIVE_SAVIOURS_ENABLE }}" >> $GITHUB_ENV
+          echo "DEV_SAVIOURS_ENABLE=${{ secrets.DEV_SAVIOURS_ENABLE }}" >> $GITHUB_ENV
 
           # Status
           if [[ "${{ secrets.LIVE_ENABLE }}" == "true" ]]; then
@@ -141,6 +143,12 @@ jobs:
             echo "❌ GENX Dev: DISABLED"
           fi
 
+          if [[ "${{ secrets.DEV_SAVIOURS_ENABLE }}" == "true" ]]; then
+            echo "🚀 SAVIOURS Dev: ENABLED"
+          else
+            echo "❌ SAVIOURS Dev: DISABLED"
+          fi
+
       # ========== LIVE DEPLOYMENTS ==========
       - name: Deploy to Live
         if: env.environment == 'live' && env.LIVE_ENABLE == 'true'
@@ -219,6 +227,17 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.LIVE_GENX_SERVER_DIR }}
 
+      - name: Deploy to SAVIOURS Live
+        if: env.environment == 'live' && env.LIVE_SAVIOURS_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.LIVE_SAVIOURS_FTP_SERVER }}
+          username: ${{ secrets.LIVE_SAVIOURS_FTP_USERNAME }}
+          password: ${{ secrets.LIVE_SAVIOURS_FTP_PASSWORD }}
+          port: ${{ secrets.LIVE_SAVIOURS_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.LIVE_SAVIOURS_SERVER_DIR }}
+
       # ========== DEV DEPLOYMENTS ==========
       - name: Deploy to Dev
         if: env.environment == 'development' && env.DEV_ENABLE == 'true'
@@ -296,3 +315,14 @@ jobs:
           port: ${{ secrets.DEV_GENX_FTP_PORT || 21 }}
           local-dir: ./
           server-dir: ${{ secrets.DEV_GENX_SERVER_DIR }}
+
+      - name: Deploy to SAVIOURS Dev
+        if: env.environment == 'development' && env.DEV_SAVIOURS_ENABLE == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.DEV_SAVIOURS_FTP_SERVER }}
+          username: ${{ secrets.DEV_SAVIOURS_FTP_USERNAME }}
+          password: ${{ secrets.DEV_SAVIOURS_FTP_PASSWORD }}
+          port: ${{ secrets.DEV_SAVIOURS_FTP_PORT || 21 }}
+          local-dir: ./
+          server-dir: ${{ secrets.DEV_SAVIOURS_SERVER_DIR }}
