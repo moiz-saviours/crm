@@ -594,6 +594,17 @@
                            </span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{route ('admin.tracking.index')}}"
+                           class="nav-link mininav-toggle {{ request()->is('admin/tracking*') ? 'active' : '' }}">
+                            {{--                            <i class="demo-pli-data-cloud fs-5 me-2"></i>--}}
+                            <img src="{{asset ('assets/images/icons/tracking.png')}}" class="me-2 nav_icons" alt="">
+                            <span class="nav-label mininav-content ms-1 collapse show" style="">
+                              <span data-popper-arrow="" class="arrow"></span>
+                              Tracking Code
+                           </span>
+                        </a>
+                    </li>
                     {{--                    <li class="nav-item has-sub">--}}
                     {{--                        <a href="javascript:void(0)"--}}
                     {{--                           class="mininav-toggle nav-link collapsed {{ request()->is('admin/activity-logs*') ? 'active' : '' }}"><i--}}
