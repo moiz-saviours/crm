@@ -205,11 +205,11 @@
                                                            {{ $brand->status == 1 ? 'checked' : '' }} data-bs-toggle="toggle">
                                                 </td>
                                                 <td class="align-middle text-center table-actions">
-                                                    <button type="button" class="btn btn-sm btn-primary copyScriptBtn"
-                                                            data-script='<script src="{{ asset('assets/js/wl-script.js') }}?token={{ $brand->script_token }}"></script>'
-                                                            title="Copy Script">
-                                                        <i class="fas fa-copy"></i>
-                                                    </button>
+{{--                                                    <button type="button" class="btn btn-sm btn-primary copyScriptBtn"--}}
+{{--                                                            data-script='<script src="{{ asset('assets/js/wl-script.js') }}?token={{ $brand->script_token }}"></script>'--}}
+{{--                                                            title="Copy Script">--}}
+{{--                                                        <i class="fas fa-copy"></i>--}}
+{{--                                                    </button>--}}
                                                     <button type="button" class="btn btn-sm btn-primary editBtn"
                                                             data-id="{{ $brand->id }}" title="Edit"><i
                                                                 class="fas fa-edit"></i></button>
