@@ -30,10 +30,46 @@ return [
             'payment-transaction-logs',
             'save.settings',
         ],
+        'restrictions' => [
+            'user.client.contact.index',
+            'user.client.contact.store',
+            'user.client.contact.edit',
+            'user.client.contact.update',
+            'user.client.contact.change.status',
+            'user.client.company.index',
+            'user.client.company.store',
+            'user.client.contact.companies',
+            'user.client.company.edit',
+            'user.client.company.update',
+            'user.client.company.change.status',
+            'user.client.account.index',
+            'user.client.account.store',
+            'user.client.account.edit',
+            'user.client.account.update',
+            'user.client.account.change.status',
+        ]
     ],
     'development' => [
         'routes' => [
         ],
+        'restrictions' => [
+            'user.client.contact.index',
+            'user.client.contact.store',
+            'user.client.contact.edit',
+            'user.client.contact.update',
+            'user.client.contact.change.status',
+            'user.client.company.index',
+            'user.client.company.store',
+            'user.client.contact.companies',
+            'user.client.company.edit',
+            'user.client.company.update',
+            'user.client.company.change.status',
+            'user.client.account.index',
+            'user.client.account.store',
+            'user.client.account.edit',
+            'user.client.account.update',
+            'user.client.account.change.status',
+        ]
     ],
     'marketing' => [
         'routes' => [
@@ -41,17 +77,76 @@ return [
             'user.profile',
             'user.profile.image.update',
             'user.profile.update',
+            'save.settings',
         ],
+        'restrictions' => [
+            'user.client.contact.index',
+            'user.client.contact.store',
+            'user.client.contact.edit',
+            'user.client.contact.update',
+            'user.client.contact.change.status',
+            'user.client.company.index',
+            'user.client.company.store',
+            'user.client.contact.companies',
+            'user.client.company.edit',
+            'user.client.company.update',
+            'user.client.company.change.status',
+            'user.client.account.index',
+            'user.client.account.store',
+            'user.client.account.edit',
+            'user.client.account.update',
+            'user.client.account.change.status',
+        ]
     ],
     'humanresources' => [
         'routes' => [
         ],
+        'restrictions' => [
+            'user.client.contact.index',
+            'user.client.contact.store',
+            'user.client.contact.edit',
+            'user.client.contact.update',
+            'user.client.contact.change.status',
+            'user.client.company.index',
+            'user.client.company.store',
+            'user.client.contact.companies',
+            'user.client.company.edit',
+            'user.client.company.update',
+            'user.client.company.change.status',
+            'user.client.account.index',
+            'user.client.account.store',
+            'user.client.account.edit',
+            'user.client.account.update',
+            'user.client.account.change.status',
+        ]
     ],
     'operations' => [
+        'restrictions' => [
+        ],
         'roles' => [
             'Q/A Analyst' => [
                 'routes' => [
+                    'user.dashboard',
+                    'save.settings',
                 ],
+                'restrictions' => [
+                    'user.client.contact.index',
+                    'user.client.contact.store',
+                    'user.client.contact.edit',
+                    'user.client.contact.update',
+                    'user.client.contact.change.status',
+                    'user.client.company.index',
+                    'user.client.company.store',
+                    'user.client.contact.companies',
+                    'user.client.company.edit',
+                    'user.client.company.update',
+                    'user.client.company.change.status',
+                    'user.client.account.index',
+                    'user.client.account.store',
+                    'user.client.account.edit',
+                    'user.client.account.update',
+                    'user.client.account.change.status',
+                ]
             ],
             'IT Executive' => [
                 'routes' => [
@@ -67,14 +162,32 @@ return [
                     'brand.edit',
                     'brand.update',
                     'brand.change.status',
-
                     'employee.index',
                     'employee.store',
                     'employee.edit',
                     'employee.update',
                     'employee.change.status',
                     'employee.update.password',
+                    'save.settings',
                 ],
+                'restrictions' => [
+                    'user.client.contact.index',
+                    'user.client.contact.store',
+                    'user.client.contact.edit',
+                    'user.client.contact.update',
+                    'user.client.contact.change.status',
+                    'user.client.company.index',
+                    'user.client.company.store',
+                    'user.client.contact.companies',
+                    'user.client.company.edit',
+                    'user.client.company.update',
+                    'user.client.company.change.status',
+                    'user.client.account.index',
+                    'user.client.account.store',
+                    'user.client.account.edit',
+                    'user.client.account.update',
+                    'user.client.account.change.status',
+                ]
             ],
             'Accounts' => [
                 'routes' => [

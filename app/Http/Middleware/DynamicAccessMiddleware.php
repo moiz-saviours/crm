@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class DynamicAccessMiddleware
@@ -26,21 +27,28 @@ class DynamicAccessMiddleware
         }
         $accessRules = config('access_rules');
         $routeName = $request->route()->getName();
-        $department = strtolower($user->department->name);
-        if (array_key_exists($department, $accessRules)) {
-            $departmentRules = $accessRules[$department];
-            if (isset($departmentRules['routes']) && in_array($routeName, $departmentRules['routes'])) {
-                return $next($request);
+        $normalizedDepartment = $this->normalizeKey($user->department?->name ?? '');
+        $normalizedAccessRules = collect($accessRules)->mapWithKeys(fn($v, $k) => [$this->normalizeKey($k) => $v])->toArray();
+        $departmentRules = $normalizedAccessRules[$normalizedDepartment] ?? [];
+        if (isset($departmentRules['restrictions']) && in_array($routeName, $departmentRules['restrictions'])) {
+            return $this->handleUnauthorizedAccess($request, $departmentRules);
+        }
+        if (isset($departmentRules['routes']) && in_array($routeName, $departmentRules['routes'])) {
+            return $next($request);
+        }
+        $roleName = $this->normalizeKey($user->role?->name ?? '');
+        $normalizedRoles = [];
+        if (isset($departmentRules['roles'])) {
+            foreach ($departmentRules['roles'] as $key => $value) {
+                $normalizedRoles[$this->normalizeKey($key)] = $value;
             }
-            if (isset($departmentRules['roles'])) {
-                $roleRules = $departmentRules['roles'][$user->role->name] ?? [];
-                if (isset($roleRules['routes']) && in_array($routeName, $roleRules['routes'])) {
-                    return $next($request);
-                }
-                if (isset($roleRules['restrictions']) && in_array($routeName, $roleRules['restrictions'])) {
-                    return $this->handleUnauthorizedAccess($request, $departmentRules, $roleRules);
-                }
-            }
+        }
+        $roleRules = $normalizedRoles[$roleName] ?? [];
+        if (isset($roleRules['restrictions']) && in_array($routeName, $roleRules['restrictions'])) {
+            return $this->handleUnauthorizedAccess($request, $departmentRules, $roleRules);
+        }
+        if (isset($roleRules['routes']) && in_array($routeName, $roleRules['routes'])) {
+            return $next($request);
         }
         return $this->handleUnauthorizedAccess($request, $departmentRules);
     }
@@ -122,5 +130,10 @@ class DynamicAccessMiddleware
             return response()->json(['error' => $message], 403);
         }
         return redirect()->route($route)->with('error', $message);
+    }
+
+    private function normalizeKey(string $key): string
+    {
+        return Str::snake(str_replace(['/', '\\'], ' ', strtolower($key)));
     }
 }

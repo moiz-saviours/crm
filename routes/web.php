@@ -191,6 +191,32 @@ Route::middleware(['auth', '2fa', 'verified:verification.notice', 'throttle:60,1
             });
         });
     });
+
+
+
+    Route::name('employee.')->group(function () {
+        Route::get('/employees', [UserEmployeeController::class, 'index'])->name('index');
+        Route::prefix('employee')->group(function () {
+            Route::post('/store', [UserEmployeeController::class, 'store'])->name('store');
+            Route::get('/edit/{user?}', [UserEmployeeController::class, 'edit'])->name('edit');
+            Route::post('/update/{user?}', [UserEmployeeController::class, 'update'])->name('update');
+            Route::get('/change-status/{user?}', [UserEmployeeController::class, 'change_status'])->name('change.status');
+            Route::post('/update-password/{user?}', [UserEmployeeController::class, 'update_password'])->name('update.password');
+
+        });
+    });
+    Route::name('team.')->group(function () {
+        Route::get('/teams', [TeamController::class, 'index'])->name('index');
+        Route::prefix('team')->group(function () {
+            Route::get('/create', [TeamController::class, 'create'])->name('create');
+            Route::post('/store', [TeamController::class, 'store'])->name('store');
+            Route::get('/edit/{team?}', [TeamController::class, 'edit'])->name('edit');
+            Route::post('/update/{team?}', [TeamController::class, 'update'])->name('update');
+            Route::post('/update-password/{team?}', [TeamController::class, 'update_password'])->name('update.password');
+            Route::get('/change-status/{team?}', [TeamController::class, 'change_status'])->name('change.status');
+            Route::delete('/delete/{team?}', [TeamController::class, 'delete'])->name('delete');
+        });
+    });
     /** Save Setting Route */
     Route::post('/save-settings', [SettingController::class, 'saveSettings'])->name('save.settings');
 });
@@ -268,28 +294,3 @@ Route::get('/emails/click/{id}', [App\Http\Controllers\EmailTrackingController::
 Route::post('/emails/bounce', [App\Http\Controllers\EmailTrackingController::class, 'trackBounce'])->name('emails.track.bounce');
 Route::post('/emails/delivery', [App\Http\Controllers\EmailTrackingController::class, 'trackDelivery'])->name('emails.track.delivery');
 Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController::class, 'trackSpamReport'])->name('emails.track.spam_report');
-
-
-Route::name('employee.')->group(function () {
-    Route::get('/employees', [UserEmployeeController::class, 'index'])->name('index');
-    Route::prefix('employee')->group(function () {
-        Route::post('/store', [UserEmployeeController::class, 'store'])->name('store');
-        Route::get('/edit/{user?}', [UserEmployeeController::class, 'edit'])->name('edit');
-        Route::post('/update/{user?}', [UserEmployeeController::class, 'update'])->name('update');
-        Route::get('/change-status/{user?}', [UserEmployeeController::class, 'change_status'])->name('change.status');
-        Route::post('/update-password/{user?}', [UserEmployeeController::class, 'update_password'])->name('update.password');
-
-    });
-});
-Route::name('team.')->group(function () {
-    Route::get('/teams', [TeamController::class, 'index'])->name('index');
-    Route::prefix('team')->group(function () {
-        Route::get('/create', [TeamController::class, 'create'])->name('create');
-        Route::post('/store', [TeamController::class, 'store'])->name('store');
-        Route::get('/edit/{team?}', [TeamController::class, 'edit'])->name('edit');
-        Route::post('/update/{team?}', [TeamController::class, 'update'])->name('update');
-        Route::post('/update-password/{team?}', [TeamController::class, 'update_password'])->name('update.password');
-        Route::get('/change-status/{team?}', [TeamController::class, 'change_status'])->name('change.status');
-        Route::delete('/delete/{team?}', [TeamController::class, 'delete'])->name('delete');
-    });
-});
