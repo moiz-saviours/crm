@@ -588,7 +588,6 @@ class UserEmployeeController extends Controller
                 $user->teams()->sync($request->input('team_key'));
             }
             $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
-            $this->forceLogoutUser($user);
             return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -603,7 +602,6 @@ class UserEmployeeController extends Controller
         try {
             $user->password = Hash::make($request->input('change_password'));
             $user->save();
-            $this->forceLogoutUser($user);
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
             ]);
@@ -619,7 +617,6 @@ class UserEmployeeController extends Controller
             }
             $user->status = $request->query('status');
             $user->save();
-            $this->forceLogoutUser($user);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
