@@ -147,6 +147,7 @@ class AccountController extends Controller
                 $admin->password = Hash::make($request->input('password'));
             }
             $admin->save();
+            $this->forceLogoutUser($admin);
             return response()->json(['data' => $admin, 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -164,6 +165,7 @@ class AccountController extends Controller
         try {
             $admin->password = Hash::make($request->input('change_password'));
             $admin->save();
+            $this->forceLogoutUser($admin);
             return response()->json(['data' => $admin,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
             ]);
@@ -210,6 +212,7 @@ class AccountController extends Controller
             }
             $admin->status = $request->query('status');
             $admin->save();
+            $this->forceLogoutUser($admin);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);

@@ -11,9 +11,25 @@ trait ForceLogoutTrait
 {
     protected function forceLogoutUser($user): void
     {
-        $user->touch();
-        $this->updateUserSignature($user);
-        $this->destroy_session($user);
+        if ($this->getCriticalChanges($user)) {
+            $user->touch();
+            $this->updateUserSignature($user);
+            $this->destroy_session($user);
+        }
+    }
+
+    /**
+     * Get the list of critical fields that were changed
+     */
+    protected function getCriticalChanges($user): bool
+    {
+        $criticalFields = ['password', 'email', 'email_verified_at', 'status', 'deleted_at'];
+        foreach ($criticalFields as $field) {
+            if ($user->isDirty($field)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected function updateUserSignature($user): void

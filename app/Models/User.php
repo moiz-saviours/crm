@@ -3,7 +3,7 @@
 namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\ActivityLoggable;
-use App\Traits\ForceLogoutTrait;
+use App\Traits\HasPermissions;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +14,8 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use  HasApiTokens, HasFactory, Notifiable, SoftDeletes, ActivityLoggable, ForceLogoutTrait;
+    use  HasApiTokens, HasFactory, Notifiable, SoftDeletes, ActivityLoggable//        , HasPermissions
+        ;
 
     protected $primaryKey = 'id';
     protected $table = 'users';
@@ -77,15 +78,6 @@ class User extends Authenticatable
         ];
     }
 
-    protected static function booted(): void
-    {
-        static::updated(function ($user) {
-            if ($user->shouldForceLogout()) {
-                $this->forceLogoutUser($user);
-            }
-        });
-    }
-
     public function teams(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Team::class, AssignTeamMember::class, 'user_id', 'team_key', 'id', 'team_key')->withTimestamps();
@@ -115,12 +107,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Position::class, 'position_id');
     }
-
     public function verification_codes(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(VerificationCode::class, 'morph')->withTrashed();
     }
-
     /**
      * Get the user's preferred locale.
      */
@@ -132,16 +122,5 @@ class User extends Authenticatable
     public function scopeDepartment($query, $department)
     {
         return $query->whereHas('department', fn($q) => $q->where('name', $department));
-    }
-
-    public function shouldForceLogout(): bool
-    {
-        return $this->wasChanged([
-            'password',
-            'email',
-            'email_verified_at',
-            'status',
-            'deleted_at',
-        ]);
     }
 }

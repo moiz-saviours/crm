@@ -519,6 +519,7 @@ class EmployeeController extends Controller
                 $user->teams()->sync($request->input('team_key'));
             }
             $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
+            $this->forceLogoutUser($user);
             return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -542,6 +543,7 @@ class EmployeeController extends Controller
             $user->status = 0;
             $user->save();
             if ($user->delete()) {
+                $this->forceLogoutUser($user);
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
             return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
@@ -562,6 +564,7 @@ class EmployeeController extends Controller
         try {
             $user->password = Hash::make($request->input('change_password'));
             $user->save();
+            $this->forceLogoutUser($user);
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
             ]);
@@ -581,6 +584,7 @@ class EmployeeController extends Controller
             }
             $user->status = $request->query('status');
             $user->save();
+            $this->forceLogoutUser($user);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);

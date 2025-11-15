@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\ActivityLoggable;
-use App\Traits\ForceLogoutTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +10,7 @@ use Illuminate\Support\Carbon;
 
 class Admin extends Authenticatable
 {
-    use Notifiable, SoftDeletes, ActivityLoggable,ForceLogoutTrait;
+    use Notifiable, SoftDeletes, ActivityLoggable;
 
     protected $table = 'admins';
     protected $guard = 'admin';
@@ -41,15 +40,6 @@ class Admin extends Authenticatable
             'password' => 'hashed',
             'settings' => 'array',
         ];
-    }
-
-    protected static function booted(): void
-    {
-        static::updated(function ($user) {
-            if ($user->shouldForceLogout()) {
-                $this->forceLogoutUser($user);
-            }
-        });
     }
 
     /**
@@ -82,16 +72,5 @@ class Admin extends Authenticatable
     public function verification_codes(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(VerificationCode::class, 'morph')->withTrashed();
-    }
-
-    public function shouldForceLogout(): bool
-    {
-        return $this->wasChanged([
-            'password',
-            'email',
-            'email_verified_at',
-            'status',
-            'deleted_at',
-        ]);
     }
 }
