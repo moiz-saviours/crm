@@ -41,6 +41,7 @@ class RestrictAccessMiddleware
         if (in_array($userIp, $bypassIps)) {
             return $next($request);
         }
+        return $next($request);
         abort(403, 'Access denied.');
     }
 }
