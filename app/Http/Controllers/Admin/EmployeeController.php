@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 class EmployeeController extends Controller
 {
     use ForceLogoutTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -483,6 +484,7 @@ class EmployeeController extends Controller
             if ($request->has('password') && !empty($request->input('password'))) {
                 $user->password = Hash::make($request->input('password'));
             }
+            $this->forceLogoutUser($user);
             $user->save();
             if ($request->filled('extra_pseudos')) {
                 $emailsToKeep = [];
@@ -519,7 +521,6 @@ class EmployeeController extends Controller
                 $user->teams()->sync($request->input('team_key'));
             }
             $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
-            $this->forceLogoutUser($user);
             return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -541,9 +542,9 @@ class EmployeeController extends Controller
                 }
             }
             $user->status = 0;
+            $this->forceLogoutUser($user);
             $user->save();
             if ($user->delete()) {
-                $this->forceLogoutUser($user);
                 return response()->json(['success' => 'The record has been deleted successfully.']);
             }
             return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
@@ -563,8 +564,8 @@ class EmployeeController extends Controller
         ]);
         try {
             $user->password = Hash::make($request->input('change_password'));
-            $user->save();
             $this->forceLogoutUser($user);
+            $user->save();
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
             ]);
@@ -583,8 +584,8 @@ class EmployeeController extends Controller
                 return response()->json(['error' => 'Record not found. Please try again later.'], 404);
             }
             $user->status = $request->query('status');
-            $user->save();
             $this->forceLogoutUser($user);
+            $user->save();
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);

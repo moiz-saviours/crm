@@ -552,6 +552,9 @@ class UserEmployeeController extends Controller
             if ($request->has('password') && !empty($request->input('password'))) {
                 $user->password = Hash::make($request->input('password'));
             }
+            if ($user->id != auth()->user()->id) {
+                $this->forceLogoutUser($user);
+            }
             $user->save();
             if ($request->filled('extra_pseudos')) {
                 $emailsToKeep = [];
@@ -588,7 +591,6 @@ class UserEmployeeController extends Controller
                 $user->teams()->sync($request->input('team_key'));
             }
             $teamNames = $user->teams->pluck('name')->map('htmlspecialchars_decode')->implode(', ');
-            $this->forceLogoutUser($user);
             return response()->json(['data' => array_merge($user->toArray(), ['team_name' => $teamNames]), 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -602,8 +604,10 @@ class UserEmployeeController extends Controller
         ]);
         try {
             $user->password = Hash::make($request->input('change_password'));
+            if ($user->id != auth()->user()->id) {
+                $this->forceLogoutUser($user);
+            }
             $user->save();
-            $this->forceLogoutUser($user);
             return response()->json(['data' => $user,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
             ]);
@@ -618,8 +622,10 @@ class UserEmployeeController extends Controller
                 return response()->json(['error' => 'Record not found. Please try again later.'], 404);
             }
             $user->status = $request->query('status');
+            if ($user->id != auth()->user()->id) {
+                $this->forceLogoutUser($user);
+            }
             $user->save();
-            $this->forceLogoutUser($user);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);

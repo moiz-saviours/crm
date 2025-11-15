@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 class AccountController extends Controller
 {
     use  ForceLogoutTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -146,8 +147,10 @@ class AccountController extends Controller
             if ($request->has('password') && !empty($request->input('password'))) {
                 $admin->password = Hash::make($request->input('password'));
             }
+            if ($admin->id != auth()->user()->id) {
+                $this->forceLogoutUser($admin);
+            }
             $admin->save();
-            $this->forceLogoutUser($admin);
             return response()->json(['data' => $admin, 'message' => 'Record updated successfully.']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
@@ -164,8 +167,10 @@ class AccountController extends Controller
         ]);
         try {
             $admin->password = Hash::make($request->input('change_password'));
+            if ($admin->id != auth()->user()->id) {
+                $this->forceLogoutUser($admin);
+            }
             $admin->save();
-            $this->forceLogoutUser($admin);
             return response()->json(['data' => $admin,
                 'message' => 'Password updated successfully. All active sessions have been invalidated.',
             ]);
@@ -189,10 +194,12 @@ class AccountController extends Controller
                 }
             }
             $admin->status = 0;
+            if ($admin->id != auth()->user()->id) {
+                $this->forceLogoutUser($admin);
+            }
             $admin->save();
             if ($admin->delete()) {
-                $this->forceLogoutUser($admin);
-                return response()->json(['success' => 'The record has been deleted successfully.']);
+                return response()->json(['success' => 'The record has been deleted successfully.'],403);
             }
             return response()->json(['error' => 'Unable to process deletion request at this time.'], 422);
 
@@ -211,8 +218,10 @@ class AccountController extends Controller
                 return response()->json(['error' => 'Record not found. Please try again later.'], 404);
             }
             $admin->status = $request->query('status');
+            if ($admin->id != auth()->user()->id) {
+                $this->forceLogoutUser($admin);
+            }
             $admin->save();
-            $this->forceLogoutUser($admin);
             return response()->json(['message' => 'Status updated successfully']);
         } catch (\Exception $e) {
             return response()->json(['error' => ' Internal Server Error', 'message' => $e->getMessage(), 'line' => $e->getLine()], 500);
