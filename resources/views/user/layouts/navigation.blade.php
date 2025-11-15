@@ -436,6 +436,18 @@
                             {{--                            @endcan--}}
                         @endif
 
+                        @if(\App\Helpers\NavigationHelper::hasAccess('tracking.index'))
+                        <a href="{{route ('tracking.index')}}"
+                           class="nav-link mininav-toggle {{ request()->is('admin/tracking*') ? 'active' : '' }}">
+                            {{--                            <i class="demo-pli-data-cloud fs-5 me-2"></i>--}}
+                            <img src="{{asset ('assets/images/icons/tracking.png')}}" class="me-2 nav_icons" alt="">
+                            <span class="nav-label mininav-content ms-1 collapse show" style="">
+                              <span data-popper-arrow="" class="arrow"></span>
+                              Tracking Code
+                           </span>
+                        </a>
+                        @endif
+
                         @if(\App\Helpers\NavigationHelper::hasAccess('user.client.contact.index'))
                             {{--                            @can('viewAny', App\Models\ClientContact::class)--}}
                             <li class="nav-item">

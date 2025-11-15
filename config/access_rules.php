@@ -169,6 +169,7 @@ return [
                     'employee.change.status',
                     'employee.update.password',
                     'save.settings',
+                    'tracking.index',
                 ],
                 'restrictions' => [
                     'user.client.contact.index',

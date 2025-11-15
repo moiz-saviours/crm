@@ -20,6 +20,7 @@ use App\Http\Controllers\User\{BrandController,
     ProfileController,
     TeamController,
     TeamMemberController,
+    TrackingCodeController,
     UserEmployeeController};
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Http\Request;
@@ -294,3 +295,5 @@ Route::get('/emails/click/{id}', [App\Http\Controllers\EmailTrackingController::
 Route::post('/emails/bounce', [App\Http\Controllers\EmailTrackingController::class, 'trackBounce'])->name('emails.track.bounce');
 Route::post('/emails/delivery', [App\Http\Controllers\EmailTrackingController::class, 'trackDelivery'])->name('emails.track.delivery');
 Route::post('/emails/spam-report', [App\Http\Controllers\EmailTrackingController::class, 'trackSpamReport'])->name('emails.track.spam_report');
+
+Route::get('tracking-code', [TrackingCodeController::class, 'tracking'])->name('tracking.index');
