@@ -23,7 +23,7 @@ trait ForceLogoutTrait
      */
     protected function getCriticalChanges($user): bool
     {
-        $criticalFields = ['password', 'email', 'email_verified_at', 'status', 'deleted_at'];
+        $criticalFields = ['department_id', 'role_id', 'position_id', 'password', 'email', 'email_verified_at', 'status', 'deleted_at'];
         foreach ($criticalFields as $field) {
             if ($user->isDirty($field)) {
                 return true;
@@ -52,6 +52,9 @@ trait ForceLogoutTrait
     protected function generateUserSignature(mixed $user): string
     {
         $criticalFields = [
+            'department_id' => $user->department_id,
+            'role_id' => $user->role_id,
+            'position_id' => $user->position_id,
             'password' => $user->password,
             'email' => $user->email,
             'email_verified_at' => $user->email_verified_at,
