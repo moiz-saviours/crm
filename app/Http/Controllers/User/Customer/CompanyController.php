@@ -42,12 +42,12 @@ class CompanyController extends Controller
                     [
                     'name' => $companyData['organization'] ?? $domain,
                     'email' => 'no-reply@' . $domain,
-                    'domain' => $domain,
-                    'city' => $companyData['city'],
-                    'state' => $companyData['state'],
-                    'country' => $companyData['country'],
-                    'zipcode' => $companyData['postal_code'],
-                    'response' => json_encode($companyData),
+                    'domain' => $domain ?? null,
+                    'city' => $companyData['city'] ?? null,
+                    'state' => $companyData['state'] ?? null,
+                    'country' => $companyData['country'] ?? null,
+                    'zipcode' => $companyData['postal_code'] ?? null,
+                    'response' => json_encode($companyData) ?? null,
                     'status' => 1,
                 ]);
             }
