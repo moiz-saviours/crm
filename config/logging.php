@@ -82,6 +82,11 @@ return [
             'path' => storage_path('logs/2fa-log.log'),
             'level' => 'debug',
         ],
+        'bypass_ip' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/bypass-ip.log'),
+            'level' => 'debug',
+        ],
         'webToLead' => [
             'driver' => 'daily',
             'path' => storage_path('logs/web-to-lead.log'),
