@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class RestrictAccessMiddleware
@@ -35,12 +36,17 @@ class RestrictAccessMiddleware
         $userIp = $request->ip();
         foreach ($restrictedIps as $restrictedPrefix) {
             if (str_starts_with($userIp, $restrictedPrefix)) {
+                Log::channel('bypass_ip')->error('Access denied.RESTRICTED IP: ' . $restrictedPrefix);
                 abort(403, 'Access denied.');
+
             }
         }
         if (in_array($userIp, $bypassIps)) {
+            Log::channel('bypass_ip')->info('Bypass IP: ' . $userIp);
             return $next($request);
         }
+        Log::channel('bypass_ip')->error('Access denied. User IP: ' . $userIp);
+        return $next($request);
         abort(403, 'Access denied.');
     }
 }
