@@ -21,7 +21,10 @@ trait ForceLogoutTrait
         $guard = $user instanceof \App\Models\Admin ? 'admin' : 'web';
         $userSignatureKey = "{$guard}_user_signature:{$user->id}";
         $currentSignature = $this->generateUserSignature($user);
-        Cache::put($userSignatureKey, $currentSignature, 86400);
+        $storedSignature = Cache::get($userSignatureKey);
+        if (!$storedSignature) {
+            Cache::put($userSignatureKey, $currentSignature, 86400); // 24 hours
+        }
     }
 
     /**
@@ -41,6 +44,7 @@ trait ForceLogoutTrait
         ];
         return hash('sha256', implode('|', $criticalFields));
     }
+
     protected function destroy_session($user): array
     {
         $deletedSessions = [];
