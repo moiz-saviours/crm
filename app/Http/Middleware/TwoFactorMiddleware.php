@@ -48,24 +48,6 @@ class TwoFactorMiddleware
             return $next($request);
         }
         $user = Auth::guard($guard)->user();
-        if ($user && $this->shouldForceLogout($user, $guard)) {
-            $this->forceLogout($user, $guard, $request);
-            return redirect()->route($guard === 'web' ? 'login' : $guard . '.login')
-                ->with('error', 'Your session has been terminated due to account changes.');
-        }
-        if ($user && $user->status !== 1) {
-            $this->forceLogout($user, $guard, $request);
-            return redirect()->route($guard === 'web' ? 'login' : $guard . '.login')
-                ->with('error', 'Your account has been deactivated.');
-        }
-//        if ($user && in_array($user->email, ['moiz@saviours.co', 'waqas@saviours.co'])) {
-//            return $next($request);
-//        }
-        if ($this->isTwoFactorRoute($request, $guard)) {
-            if ($user) {
-                return $this->handleTwoFactorRoute($request, $guard, $user, $next);
-            }
-        }
         if (!$user) {
             $currentPath = request()->path();
             if (str_starts_with($currentPath, 'admin')) {
@@ -75,6 +57,22 @@ class TwoFactorMiddleware
                 return redirect()->route('developer.login');
             }
             return redirect()->route('login');
+        }
+        if ($user && $this->shouldForceLogout($user, $guard)) {
+            $this->forceLogout($user, $guard, $request);
+            return redirect()->route($guard === 'web' ? 'login' : $guard . '.login')
+                ->with('error', 'Your session has been terminated due to account changes.');
+        }
+        if ($user->status !== 1) {
+            $this->forceLogout($user, $guard, $request);
+            return redirect()->route($guard === 'web' ? 'login' : $guard . '.login')
+                ->with('error', 'Your account has been deactivated.');
+        }
+//        if ($user && in_array($user->email, ['moiz@saviours.co', 'waqas@saviours.co'])) {
+//            return $next($request);
+//        }
+        if ($this->isTwoFactorRoute($request, $guard)) {
+            return $this->handleTwoFactorRoute($request, $guard, $user, $next);
         }
         if (session($guard . "_2fa_verified:{$user->id}") && !$this->isTwoFactorRoute($request, $guard)) {
             return $next($request);
